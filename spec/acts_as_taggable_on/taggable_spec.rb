@@ -55,4 +55,20 @@ describe "Taggable" do
     Tag.find(:all).size.should == 1
     User.find_tagged_with("ruby").should == User.find_tagged_with("Ruby")
   end
+  
+  it "should be able to get tag counts on model as a whole" do
+    bob = User.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = User.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = User.create(:name => "Charlie", :skill_list => "ruby")
+    User.tag_counts.should_not be_empty
+    User.skill_counts.should_not be_empty
+  end
+  
+  it "should be able to get tag counts on an association" do
+    bob = User.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = User.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = User.create(:name => "Charlie", :skill_list => "ruby")
+    bob.tag_counts.first.count.should == 2
+    charlie.skill_counts.first.count.should == 1
+  end
 end

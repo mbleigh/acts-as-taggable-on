@@ -32,6 +32,10 @@ module ActiveRecord
               def self.caching_#{tag_type.singularize}_list?
                 column_names.include?("cached_#{tag_type.singularize}_list")
               end
+              
+              def self.#{tag_type.singularize}_counts(options={})
+                Tag.find(:all, find_options_for_tag_counts(options.merge({:on => '#{tag_type}'})))
+              end
         
               def #{tag_type.singularize}_list
                 return @#{tag_type.singularize}_list unless @#{tag_type.singularize}_list.nil?
@@ -49,7 +53,7 @@ module ActiveRecord
             
               def #{tag_type.singularize}_counts(*args)
                 options = args.empty? ? {} : args.first
-                #{tag_type.singularize}_counts({:conditions => ["#{Tag.table_name}.name IN (?)", #{tag_type.singularize}_list]}.reverse_merge!(options))
+                self.class.#{tag_type.singularize}_counts({:conditions => ["#{Tag.table_name}.name IN (?)", #{tag_type.singularize}_list]}.reverse_merge!(options))
               end
             RUBY
           end
@@ -118,32 +122,27 @@ module ActiveRecord
         #  :at_least - Exclude tags with a frequency less than the given value
         #  :at_most - Exclude tags with a frequency greater than the given value
         #  :on - Scope the find to only include a certain context
-        def tag_counts(options = {})
-          Tag.find(:all, find_options_for_tag_counts(options))
-        end
-
         def find_options_for_tag_counts(options = {})
-          options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit
-
+          options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :on
+          
           scope = scope(:find)
           start_at = sanitize_sql(["#{Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
           end_at = sanitize_sql(["#{Tagging.table_name}.created_at <= ?", options.delete(:end_at)]) if options[:end_at]
 
+          type_and_context = "#{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}"
+          
           conditions = [
-            "#{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}",
+            type_and_context,
             options[:conditions],
             scope && scope[:conditions],
             start_at,
             end_at
           ]
           
-          unless (on = options.delete(:on)).nil?
-            conditions << sanitize_sql(["context = ?",on])
-          end
-          
           conditions = conditions.compact.join(' AND ')
 
           joins = ["LEFT OUTER JOIN #{Tagging.table_name} ON #{Tag.table_name}.id = #{Tagging.table_name}.tag_id"]
+          joins << sanitize_sql(["AND #{Tagging.table_name}.context = ?",options.delete(:on).to_s]) unless options[:on].nil?
           joins << "LEFT OUTER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"
           joins << scope[:joins] if scope && scope[:joins]
 
