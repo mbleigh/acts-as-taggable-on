@@ -33,19 +33,33 @@ Example
 =======
 
 class User < ActiveRecord::Base
-  acts_as_taggable_on :skills, :interests
+  acts_as_taggable_on :tags, :skills, :interests
 end
 
-@user = User.new
-@user.skill_list = "ruby, rails"
+@user = User.new(:name => "Bobby")
+@user.tag_list = "awesome, slick, hefty"      # this should be familiar
+@user.skill_list = "joking, clowning, boxing" # but you can do it for any context!
+@user.skill_list # => ["joking","clowning","boxing"] as TagList
 @user.save
-@user.skill_list # => ["ruby","rails"] (as TagList)
-@user.skills     # => [<Tag name:"ruby">,<Tag name:"rails">]
+
+@user.tags # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
+@user.skills # => => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
+
+User.find_tagged_with("awesome") # => [@user]
+User.find_tagged_with("joking") # => [@user]
+User.find_tagged_with("awesome", :on => :tags) # => [@user]
+User.find_tagged_with("awesome", :on => :skills) # => []
 
 Caveats, Uncharted Waters
 =========================
 
 This plugin is still under active development. Plugin caching and tag cloud calculations
 have not been thoroughly (or even partially) tested and may not work as expected.
+
+Resources
+=========
+
+SVN - http://svn.intridea.com/svn/public/acts_as_taggable_on
+Trac - http://trac.intridea.com/trac/public
 
 Copyright (c) 2007 Michael Bleigh and Intridea Inc., released under the MIT license
