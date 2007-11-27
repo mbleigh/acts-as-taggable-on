@@ -1,0 +1,51 @@
+ActsAsTaggableOn
+================
+
+This plugin is heavily based on Acts as Taggable on Steroids by Jonathan Viney. While
+basic tagging functionality is handled expertly as well as tag cloud calculations, for
+many applications there may be a need to have several "tag fields" for a given model.
+
+For instance, in a social network, a user might have tags that are called skills,
+interests, sports, and more. There is no real way to differentiate between tags and
+so an implementation of this type is not possible with acts as taggable on steroids.
+
+Enter Acts as Taggable On. Rather than tying functionality to a specific keyword
+(namely "tags"), acts as taggable on allows you to specify an arbitrary number of
+tag "contexts" that can be used locally or in combination in the same way steroids
+was used.
+
+Installation
+============
+
+The simplest way is just to install straight from the SVN:
+
+script/plugin install http://svn.intridea.com/svn/public/acts_as_taggable_on
+
+Testing
+=======
+
+Acts As Taggable On uses RSpec for its test coverage. If you already have RSpec on your
+application, the specs will run while using:
+
+rake spec:plugins
+
+Example
+=======
+
+class User < ActiveRecord::Base
+  acts_as_taggable_on :skills, :interests
+end
+
+@user = User.new
+@user.skill_list = "ruby, rails"
+@user.save
+@user.skill_list # => ["ruby","rails"] (as TagList)
+@user.skills     # => [<Tag name:"ruby">,<Tag name:"rails">]
+
+Caveats, Uncharted Waters
+=========================
+
+This plugin is still under active development. Plugin caching and tag cloud calculations
+have not been thoroughly (or even partially) tested and may not work as expected.
+
+Copyright (c) 2007 Michael Bleigh and Intridea Inc., released under the MIT license
