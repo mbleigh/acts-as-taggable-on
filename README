@@ -43,18 +43,24 @@ end
 @user.save
 
 @user.tags # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
-@user.skills # => => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
+@user.skills # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
 
 User.find_tagged_with("awesome") # => [@user]
 User.find_tagged_with("joking") # => [@user]
 User.find_tagged_with("awesome", :on => :tags) # => [@user]
 User.find_tagged_with("awesome", :on => :skills) # => []
 
+@frankie = User.create(:name => "Frankie", :skill_list => "joking, flying, eating")
+User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="awesome" count=1>...]
+
+@bobby.skill_counts
+@frankie.skill_counts
+
 Caveats, Uncharted Waters
 =========================
 
-This plugin is still under active development. Plugin caching and tag cloud calculations
-have not been thoroughly (or even partially) tested and may not work as expected.
+This plugin is still under active development. Plugin caching has not 
+been thoroughly (or even casually) tested and may not work as expected.
 
 Resources
 =========
