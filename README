@@ -51,7 +51,7 @@ User.find_tagged_with("awesome", :on => :tags) # => [@user]
 User.find_tagged_with("awesome", :on => :skills) # => []
 
 @frankie = User.create(:name => "Frankie", :skill_list => "joking, flying, eating")
-User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="awesome" count=1>...]
+User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
 
 @bobby.skill_counts
 @frankie.skill_counts
