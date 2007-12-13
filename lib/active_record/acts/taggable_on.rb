@@ -17,6 +17,11 @@ module ActiveRecord
               @tag_types
             end
             
+            has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag
+            has_many :base_tags, :class_name => "Tag", :through => :taggings, :source => :tag
+            
+            attr_accessor :custom_contexts
+            
             before_save :save_cached_tag_list
             after_save :save_tags
           end
@@ -28,37 +33,31 @@ module ActiveRecord
               has_many "#{tag_type}".to_sym, :through => "#{tag_type.singularize}_taggings".to_sym, :source => :tag
             end
             
+            include ActiveRecord::Acts::TaggableOn::InstanceMethods
+            
             self.class_eval <<-RUBY
               def self.caching_#{tag_type.singularize}_list?
-                column_names.include?("cached_#{tag_type.singularize}_list")
+                caching_tag_list_on?("#{tag_type}")
               end
               
               def self.#{tag_type.singularize}_counts(options={})
-                Tag.find(:all, find_options_for_tag_counts(options.merge({:on => '#{tag_type}'})))
+                tag_counts_on('#{tag_type}',options)
               end
         
               def #{tag_type.singularize}_list
-                return @#{tag_type.singularize}_list unless @#{tag_type.singularize}_list.nil?
-              
-                if self.class.caching_#{tag_type.singularize}_list? and !(cached_value = cached_#{tag_type.singularize}_list).nil?
-                  @#{tag_type.singularize}_list = TagList.from(cached_value)
-                else
-                  @#{tag_type.singularize}_list = TagList.new(*#{tag_type}.map(&:name))
-                end
+                tag_list_on('#{tag_type}')
               end
             
               def #{tag_type.singularize}_list=(new_tags)
-                @#{tag_type.singularize}_list = TagList.from(new_tags)
+                set_tag_list_on('#{tag_type}',new_tags)
               end
             
-              def #{tag_type.singularize}_counts(*args)
-                options = args.empty? ? {} : args.first
-                self.class.#{tag_type.singularize}_counts({:conditions => ["#{Tag.table_name}.name IN (?)", #{tag_type.singularize}_list]}.reverse_merge!(options))
+              def #{tag_type.singularize}_counts(options = {})
+                tag_counts_on('#{tag_type}',options)
               end
             RUBY
           end
           
-          include ActiveRecord::Acts::TaggableOn::InstanceMethods
           extend ActiveRecord::Acts::TaggableOn::SingletonMethods          
           
           alias_method_chain :reload, :tag_list
@@ -77,6 +76,14 @@ module ActiveRecord
           options = find_options_for_find_tagged_with(*args)
           options.blank? ? [] : find(:all,options)
         end
+        
+        def caching_tag_list_on?(context)
+          column_names.include?("cached_#{context.to_s.singularize}_list")
+        end     
+        
+        def tag_counts_on(context, options = {})
+          Tag.find(:all, find_options_for_tag_counts(options.merge({:on => context.to_s})))
+        end           
         
         def find_options_for_find_tagged_with(tags, options = {})
           tags = tags.is_a?(Array) ? TagList.new(tags.map(&:to_s)) : TagList.from(tags)
@@ -161,6 +168,48 @@ module ActiveRecord
       end
     
       module InstanceMethods
+        def initialize(*args)
+          @custom_contexts = Array.new
+          super(*args)
+        end
+        
+        def add_custom_context(value)
+          @custom_contexts ||= []
+          @custom_contexts << value.to_s unless @custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
+        end
+        
+        def custom_contexts
+          @custom_contexts
+        end
+        
+        def tag_list_on(context)
+          var_name = context.to_s.singularize + "_list"
+          return instance_variable_get("@#{var_name}") unless instance_variable_get("@#{var_name}").nil?
+        
+          if self.class.caching_tag_list_on?(context) and !(cached_value = cached_tag_list_on(context)).nil?
+            instance_variable_set("@#{var_name}", TagList.from(self["cached_#{var_name}"]))
+          else
+            instance_variable_set("@#{var_name}", TagList.new(*tags_on(context).map(&:name)))
+          end
+        end
+        
+        def tags_on(context)
+          base_tags.find(:all, :conditions => ["context=?",context.to_s])
+        end
+        
+        def cached_tag_list_on(context)
+          self["cached_#{context.to_s.singularize}_list"]
+        end
+        
+        def set_tag_list_on(context,new_list)
+          instance_variable_set("@#{context.to_s.singularize}_list",TagList.from(new_list))
+          add_custom_context(context)
+        end
+        
+        def tag_counts_on(context,options={})
+          self.class.tag_counts_on(context,{:conditions => ["#{Tag.table_name}.name IN (?)", tag_list_on(context)]}.reverse_merge!(options))
+        end
+        
         def save_cached_tag_list
           self.class.tag_types.map(&:to_s).each do |tag_type|
             if self.class.send("caching_#{tag_type.singularize}_list?")
@@ -170,14 +219,14 @@ module ActiveRecord
         end
         
         def save_tags
-          self.class.tag_types.map(&:to_s).each do |tag_type|
+          (custom_contexts + self.class.tag_types.map(&:to_s)).each do |tag_type|
             next unless instance_variable_get("@#{tag_type.singularize}_list")
           
-            new_tag_names = instance_variable_get("@#{tag_type.singularize}_list") - send(tag_type).map(&:name)
-            old_tags = send(tag_type).reject { |tag| instance_variable_get("@#{tag_type.singularize}_list").include?(tag.name) }
+            new_tag_names = instance_variable_get("@#{tag_type.singularize}_list") - tags_on(tag_type).map(&:name)
+            old_tags = tags_on(tag_type).reject { |tag| instance_variable_get("@#{tag_type.singularize}_list").include?(tag.name) }
           
             self.class.transaction do
-              send(tag_type).delete(*old_tags) if old_tags.any?
+              base_tags.delete(*old_tags) if old_tags.any?
               new_tag_names.each do |new_tag_name|
                 new_tag = Tag.find_or_create_with_like_by_name(new_tag_name)
                 Tagging.create(:tag_id => new_tag.id, :context => tag_type, :taggable_type => self.class.to_s, :taggable_id => self.id)

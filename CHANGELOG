@@ -1,0 +1,4 @@
+== 2007-12-12
+
+ * Added ability to use dynamic tag contexts
+ * Fixed missing migration generator

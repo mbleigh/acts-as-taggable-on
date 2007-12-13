@@ -71,4 +71,21 @@ describe "Taggable" do
     bob.tag_counts.first.count.should == 2
     charlie.skill_counts.first.count.should == 1
   end
+  
+  it "should be able to set a custom tag context list" do
+    bob = User.create(:name => "Bob")
+    bob.set_tag_list_on(:rotors, "spinning, jumping")
+    bob.tag_list_on(:rotors).should == ["spinning","jumping"]
+    bob.save
+    bob.reload
+    bob.tags_on(:rotors).should_not be_empty
+  end
+  
+  it "should be able to find tagged on a custom tag context" do
+    bob = User.create(:name => "Bob")
+    bob.set_tag_list_on(:rotors, "spinning, jumping")
+    bob.tag_list_on(:rotors).should == ["spinning","jumping"]
+    bob.save
+    User.find_tagged_with("spinning", :on => :rotors).should_not be_empty
+  end
 end

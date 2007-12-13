@@ -52,6 +52,20 @@ User.find_tagged_with("awesome", :on => :skills) # => []
 User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
 @frankie.skill_counts
 
+Dynamic Tag Contexts
+====================
+
+In addition to the generated tag contexts in the definition, it is also possible
+to allow for dynamic tag contexts (this could be user generated tag contexts!)
+
+@user = User.new(:name => "Bobby")
+@user.set_tag_list_on(:customs, "same, as, tag, list")
+@user.tag_list_on(:customs) # => ["same","as","tag","list"]
+@user.save
+@user.tags_on(:customs) # => [<Tag name='same'>,...]
+@user.tag_counts_on(:customs)
+User.find_tagged_with("same", :on => :customs) # => [@user]
+
 Caveats, Uncharted Waters
 =========================
 
