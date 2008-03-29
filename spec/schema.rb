@@ -11,7 +11,7 @@ ActiveRecord::Schema.define :version => 0 do
     t.column :created_at, :datetime
   end
   
-  create_table :users, :force => true do |t|
+  create_table :taggable_models, :force => true do |t|
     t.column :name, :string
     #t.column :cached_tag_list, :string
   end
