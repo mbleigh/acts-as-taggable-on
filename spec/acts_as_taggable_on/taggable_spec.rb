@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe "Taggable" do
   before(:each) do
-    @taggable = User.new(:name => "Bob Jones")
+    @taggable = TaggableModel.new(:name => "Bob Jones")
   end
   
   it "should be able to create tags" do
@@ -36,44 +36,44 @@ describe "Taggable" do
   it "should be able to find by tag" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.save
-    User.find_tagged_with("ruby").first.should == @taggable
+    TaggableModel.find_tagged_with("ruby").first.should == @taggable
   end
   
   it "should be able to find by tag with context" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.tag_list = "bob, charlie"
     @taggable.save
-    User.find_tagged_with("ruby").first.should == @taggable
-    User.find_tagged_with("bob", :on => :skills).first.should_not == @taggable
-    User.find_tagged_with("bob", :on => :tags).first.should == @taggable
+    TaggableModel.find_tagged_with("ruby").first.should == @taggable
+    TaggableModel.find_tagged_with("bob", :on => :skills).first.should_not == @taggable
+    TaggableModel.find_tagged_with("bob", :on => :tags).first.should == @taggable
   end
   
   it "should not care about case" do
-    bob = User.create(:name => "Bob", :tag_list => "ruby")
-    frank = User.create(:name => "Frank", :tag_list => "Ruby")
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
     
     Tag.find(:all).size.should == 1
-    User.find_tagged_with("ruby").should == User.find_tagged_with("Ruby")
+    TaggableModel.find_tagged_with("ruby").should == TaggableModel.find_tagged_with("Ruby")
   end
   
   it "should be able to get tag counts on model as a whole" do
-    bob = User.create(:name => "Bob", :tag_list => "ruby, rails, css")
-    frank = User.create(:name => "Frank", :tag_list => "ruby, rails")
-    charlie = User.create(:name => "Charlie", :skill_list => "ruby")
-    User.tag_counts.should_not be_empty
-    User.skill_counts.should_not be_empty
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
+    TaggableModel.tag_counts.should_not be_empty
+    TaggableModel.skill_counts.should_not be_empty
   end
   
   it "should be able to get tag counts on an association" do
-    bob = User.create(:name => "Bob", :tag_list => "ruby, rails, css")
-    frank = User.create(:name => "Frank", :tag_list => "ruby, rails")
-    charlie = User.create(:name => "Charlie", :skill_list => "ruby")
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
     bob.tag_counts.first.count.should == 2
     charlie.skill_counts.first.count.should == 1
   end
   
   it "should be able to set a custom tag context list" do
-    bob = User.create(:name => "Bob")
+    bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
     bob.tag_list_on(:rotors).should == ["spinning","jumping"]
     bob.save
@@ -82,10 +82,10 @@ describe "Taggable" do
   end
   
   it "should be able to find tagged on a custom tag context" do
-    bob = User.create(:name => "Bob")
+    bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
     bob.tag_list_on(:rotors).should == ["spinning","jumping"]
     bob.save
-    User.find_tagged_with("spinning", :on => :rotors).should_not be_empty
+    TaggableModel.find_tagged_with("spinning", :on => :rotors).should_not be_empty
   end
 end

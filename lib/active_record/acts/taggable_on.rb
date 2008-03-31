@@ -20,7 +20,7 @@ module ActiveRecord
             has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag
             has_many :base_tags, :class_name => "Tag", :through => :taggings, :source => :tag
             
-            attr_accessor :custom_contexts
+            attr_writer :custom_contexts
             
             before_save :save_cached_tag_list
             after_save :save_tags
@@ -168,18 +168,13 @@ module ActiveRecord
       end
     
       module InstanceMethods
-        def initialize(*args)
-          @custom_contexts = Array.new
-          super(*args)
+        
+        def custom_contexts
+          @custom_contexts ||= []
         end
         
         def add_custom_context(value)
-          @custom_contexts ||= []
-          @custom_contexts << value.to_s unless @custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
-        end
-        
-        def custom_contexts
-          @custom_contexts
+          custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
         end
         
         def tag_list_on(context)
