@@ -75,7 +75,7 @@ been thoroughly (or even casually) tested and may not work as expected.
 Resources
 =========
 
-SVN - http://svn.intridea.com/svn/public/acts_as_taggable_on
-Trac - http://trac.intridea.com/trac/public
+GitHub - http://github.com/mbleigh/acts-as-taggable-on
+Lighthouse - http://mbleigh.lighthouseapp.com/projects/10116-acts-as-taggable-on
 
-Copyright (c) 2007 Michael Bleigh and Intridea Inc., released under the MIT license
+Copyright (c) 2007 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license
