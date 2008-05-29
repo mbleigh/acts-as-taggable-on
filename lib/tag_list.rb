@@ -6,6 +6,8 @@ class TagList < Array
     add(*args)
   end
   
+  attr_accessor :owner
+  
   # Add tags to the tag_list. Duplicate or blank tags will be ignored.
   #
   #   tag_list.add("Fun", "Happy")
@@ -79,6 +81,12 @@ class TagList < Array
         string.gsub!(/'(.*?)'\s*#{delimiter}?\s*/) { tag_list << $1; "" }
         
         tag_list.add(string.split(delimiter))
+      end
+    end
+    
+    def from_owner(owner, *tags)
+      returning from(*tags) do |taglist|
+        taglist.owner = owner
       end
     end
   end
