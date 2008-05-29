@@ -60,6 +60,10 @@ module ActiveRecord
               def #{tag_type}_from(owner)
                 tag_list_on('#{tag_type}', owner)
               end
+              
+              def find_related_#{tag_type}(options = {})
+                related_tags_on('#{tag_type}',options)
+              end
             RUBY
           end
           
@@ -230,6 +234,19 @@ module ActiveRecord
         
         def tag_counts_on(context,options={})
           self.class.tag_counts_on(context,{:conditions => ["#{Tag.table_name}.name IN (?)", tag_list_on(context)]}.reverse_merge!(options))
+        end
+        
+        def related_tags_on(context, options={})
+          self.class.find_by_sql([
+            "SELECT #{self.class.table_name}.*, COUNT(#{Tag.table_name}.id) AS count " +
+            "FROM #{self.class.table_name}, #{Tag.table_name}, #{Tagging.table_name} " +
+            "WHERE #{self.class.table_name}.id != #{self.id} " +
+                  "AND #{self.class.table_name}.id = #{Tagging.table_name}.taggable_id " +
+                  "AND #{Tagging.table_name}.taggable_type = ? " +
+                  "AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)" +
+            "GROUP BY #{self.class.table_name}.id ORDER BY count DESC",
+            self.class.to_s, self.tags_on(context).collect {|t| t.name}
+          ])
         end
         
         def save_cached_tag_list

@@ -40,4 +40,24 @@ describe "acts_as_taggable_on" do
       found_taggable.save
     end
   end
+  
+  context "related" do
+    it "should find related objects based on tag names on context" do
+      taggable1 = TaggableModel.create!(:name => "Taggable 1")
+      taggable2 = TaggableModel.create!(:name => "Taggable 2")
+      taggable3 = TaggableModel.create!(:name => "Taggable 3")
+
+      taggable1.tag_list = "one, two"
+      taggable1.save
+      
+      taggable2.tag_list = "three, four"
+      taggable2.save
+      
+      taggable3.tag_list = "one, four"
+      taggable3.save
+      
+      taggable1.find_related_tags.should include(taggable3)
+      taggable1.find_related_tags.should_not include(taggable2)
+    end
+  end
 end
