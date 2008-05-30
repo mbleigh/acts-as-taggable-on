@@ -59,14 +59,14 @@ You can find objects of the same type based on similar tags on certain contexts.
 Also, objects will be returned in descending order based on the total number of 
 matched tags.
 
-@bobby = User.new(:name => "Bobby")
-@bobby.skill_list = "jogging, diving"
+@bobby = User.find_by_name("Bobby")
+@bobby.skill_list # => ["jogging", "diving"]
 
-@frankie = User.new(:name => "Frankie")
-@frankie.skill_list = "hacking"
+@frankie = User.find_by_name("Frankie")
+@frankie.skill_list # => ["hacking"]
 
-@tom = User.new(:name => "Tom")
-@tom.skill_list = "hacking, jogging, diving"
+@tom = User.find_by_name("Tom")
+@tom.skill_list # => ["hacking", "jogging", "diving"]
 
 @tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
 @bobby.find_related_skills # => [<User name="Tom">] 
