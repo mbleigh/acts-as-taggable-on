@@ -9,6 +9,8 @@ ActiveRecord::Schema.define :version => 0 do
     t.column :taggable_type, :string
     t.column :context, :string
     t.column :created_at, :datetime
+    t.column :tagger_id, :integer
+    t.column :tagger_type, :string
   end
   
   create_table :taggable_models, :force => true do |t|

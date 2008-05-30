@@ -3,10 +3,20 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe "Tagger" do
   before(:each) do
     @user = User.new
+    @taggable = TaggableModel.new(:name => "Bob Jones")
   end
   
-  it { @user.should respond_to(:owned_taggings) }
-  it { @user.should respond_to(:owned_tags) }
-  it { @user.should respond_to(:is_tagger?)}
-  it { @user.should respond_to(:tag) }
+  it "should have taggings" do
+    @user.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
+    @user.owned_taggings.size == 2
+  end
+  
+  it "should have tags" do
+    @user.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
+    @user.owned_tags.size == 2
+  end
+  
+  it "is tagger" do
+    @user.is_tagger?.should(be_true)
+  end  
 end
