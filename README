@@ -52,6 +52,27 @@ User.find_tagged_with("awesome", :on => :skills) # => []
 User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
 @frankie.skill_counts
 
+Relationships
+====================
+
+You can find objects of the same type based on similar tags on certain contexts.
+Also, objects will be returned in descending order based on the total number of 
+matched tags.
+
+@bobby = User.new(:name => "Bobby")
+@bobby.skill_list = "jogging, diving"
+
+@frankie = User.new(:name => "Frankie")
+@frankie.skill_list = "hacking"
+
+@tom = User.new(:name => "Tom")
+@tom.skill_list = "hacking, jogging, diving"
+
+@tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
+@bobby.find_related_skills # => [<User name="Tom">] 
+@frankie.find_related_skills # => [<User name="Tom">] 
+
+
 Dynamic Tag Contexts
 ====================
 
