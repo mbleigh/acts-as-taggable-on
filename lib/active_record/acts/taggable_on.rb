@@ -29,7 +29,8 @@ module ActiveRecord
           for tag_type in args
             tag_type = tag_type.to_s
             self.class_eval do
-              has_many "#{tag_type.singularize}_taggings".to_sym, :as => :taggable, :dependent => :destroy, :include => :tag, :conditions => ["context = ?",tag_type], :class_name => "Tagging"
+              has_many "#{tag_type.singularize}_taggings".to_sym, :as => :taggable, :dependent => :destroy, 
+                :include => :tag, :conditions => ["context = ?",tag_type], :class_name => "Tagging"
               has_many "#{tag_type}".to_sym, :through => "#{tag_type.singularize}_taggings".to_sym, :source => :tag
             end
             
@@ -56,6 +57,10 @@ module ActiveRecord
                 tag_counts_on('#{tag_type}',options)
               end
               
+              def #{tag_type}_from(owner)
+                tag_list_on('#{tag_type}', owner)
+              end
+              
               def find_related_#{tag_type}(options = {})
                 related_tags_on('#{tag_type}',options)
               end
@@ -65,6 +70,10 @@ module ActiveRecord
           extend ActiveRecord::Acts::TaggableOn::SingletonMethods          
           
           alias_method_chain :reload, :tag_list
+        end
+        
+        def is_taggable?
+          false
         end
       end
       
@@ -168,40 +177,58 @@ module ActiveRecord
             :conditions => conditions,
             :group      => group_by
           }.update(options)
-        end                    
+        end    
+        
+        def is_taggable?
+          true
+        end                
       end
     
       module InstanceMethods
         
+        def tag_types
+          self.class.tag_types
+        end
+        
         def custom_contexts
           @custom_contexts ||= []
+        end
+        
+        def is_taggable?
+          self.class.is_taggable?
         end
         
         def add_custom_context(value)
           custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
         end
         
-        def tag_list_on(context)
+        def tag_list_on(context, owner=nil)
           var_name = context.to_s.singularize + "_list"
           return instance_variable_get("@#{var_name}") unless instance_variable_get("@#{var_name}").nil?
         
-          if self.class.caching_tag_list_on?(context) and !(cached_value = cached_tag_list_on(context)).nil?
+          if !owner && self.class.caching_tag_list_on?(context) and !(cached_value = cached_tag_list_on(context, owner)).nil?
             instance_variable_set("@#{var_name}", TagList.from(self["cached_#{var_name}"]))
           else
-            instance_variable_set("@#{var_name}", TagList.new(*tags_on(context).map(&:name)))
+            instance_variable_set("@#{var_name}", TagList.new(*tags_on(context, owner).map(&:name)))
           end
         end
         
-        def tags_on(context)
-          base_tags.find(:all, :conditions => ["context=?",context.to_s])
+        def tags_on(context, owner=nil)
+          if owner
+            opts = {:conditions => ["context = ? AND tagger_id = ? AND tagger_type = ?",
+                                    context.to_s, owner.id, owner.class.to_s]}
+          else
+            opts = {:conditions => ["context = ?", context.to_s]}
+          end
+          base_tags.find(:all, opts)
         end
         
         def cached_tag_list_on(context)
           self["cached_#{context.to_s.singularize}_list"]
         end
         
-        def set_tag_list_on(context,new_list)
-          instance_variable_set("@#{context.to_s.singularize}_list",TagList.from(new_list))
+        def set_tag_list_on(context,new_list, tagger=nil)
+          instance_variable_set("@#{context.to_s.singularize}_list", TagList.from_owner(tagger, new_list))
           add_custom_context(context)
         end
         
@@ -233,7 +260,7 @@ module ActiveRecord
         def save_tags
           (custom_contexts + self.class.tag_types.map(&:to_s)).each do |tag_type|
             next unless instance_variable_get("@#{tag_type.singularize}_list")
-          
+            owner = instance_variable_get("@#{tag_type.singularize}_list").owner
             new_tag_names = instance_variable_get("@#{tag_type.singularize}_list") - tags_on(tag_type).map(&:name)
             old_tags = tags_on(tag_type).reject { |tag| instance_variable_get("@#{tag_type.singularize}_list").include?(tag.name) }
           
@@ -241,7 +268,8 @@ module ActiveRecord
               base_tags.delete(*old_tags) if old_tags.any?
               new_tag_names.each do |new_tag_name|
                 new_tag = Tag.find_or_create_with_like_by_name(new_tag_name)
-                Tagging.create(:tag_id => new_tag.id, :context => tag_type, :taggable_type => self.class.to_s, :taggable_id => self.id)
+                Tagging.create(:tag_id => new_tag.id, :context => tag_type, 
+                               :taggable => self, :tagger => owner)
               end
             end
           end

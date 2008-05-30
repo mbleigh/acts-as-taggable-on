@@ -87,6 +87,24 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 @user.tag_counts_on(:customs)
 User.find_tagged_with("same", :on => :customs) # => [@user]
 
+Tag Ownership
+=============
+
+Tags can have owners:
+
+class User < ActiveRecord::Base
+  acts_as_tagger
+end
+
+class Photo < ActiveRecord::Base
+  acts_as_taggable_on :locations
+end
+
+@some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations)
+@some_user.owned_taggings
+@some_user.owned_tags
+@some_photo.locations_from(@some_user)
+
 Caveats, Uncharted Waters
 =========================
 
