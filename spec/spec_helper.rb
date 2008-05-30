@@ -8,3 +8,7 @@ load(File.dirname(__FILE__) + '/schema.rb')
 class TaggableModel < ActiveRecord::Base
   acts_as_taggable_on :tags, :languages, :skills
 end
+
+class User < ActiveRecord::Base
+  acts_as_tagger
+end
