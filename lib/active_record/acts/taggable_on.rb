@@ -237,16 +237,16 @@ module ActiveRecord
         end
         
         def related_tags_on(context, options={})
-          self.class.find_by_sql([
-            "SELECT #{self.class.table_name}.*, COUNT(#{Tag.table_name}.id) AS count " +
-            "FROM #{self.class.table_name}, #{Tag.table_name}, #{Tagging.table_name} " +
-            "WHERE #{self.class.table_name}.id != #{self.id} " +
-                  "AND #{self.class.table_name}.id = #{Tagging.table_name}.taggable_id " +
-                  "AND #{Tagging.table_name}.taggable_type = ? " +
-                  "AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)" +
-            "GROUP BY #{self.class.table_name}.id ORDER BY count DESC",
-            self.class.to_s, self.tags_on(context).collect {|t| t.name}
-          ])
+          tags_to_find = self.tags_on(context).collect {|t| t.name}
+          search_conditions = { 
+            :select     => "#{self.class.table_name}.*, COUNT(#{Tag.table_name}.id) AS count", 
+            :from       => "#{self.class.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
+            :conditions => ["#{self.class.table_name}.id != #{self.id} AND #{self.class.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{self.class.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)",tags_to_find],
+            :group      => "#{self.class.table_name}.id",
+            :order      => "count DESC"
+          }.update(options)
+          
+          User.find(:all, search_conditions)
         end
         
         def save_cached_tag_list
