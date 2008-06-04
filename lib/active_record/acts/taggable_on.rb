@@ -246,7 +246,7 @@ module ActiveRecord
             :order      => "count DESC"
           }.update(options)
           
-          User.find(:all, search_conditions)
+          self.class.find(:all, search_conditions)
         end
         
         def save_cached_tag_list
