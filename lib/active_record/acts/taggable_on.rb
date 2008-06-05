@@ -154,12 +154,12 @@ module ActiveRecord
           conditions = [
             type_and_context,
             options[:conditions],
-            scope && scope[:conditions],
             start_at,
             end_at
           ]
-          
+
           conditions = conditions.compact.join(' AND ')
+          conditions = merge_conditions(conditions, scope[:conditions]) if scope
 
           joins = ["LEFT OUTER JOIN #{Tagging.table_name} ON #{Tag.table_name}.id = #{Tagging.table_name}.tag_id"]
           joins << sanitize_sql(["AND #{Tagging.table_name}.context = ?",options.delete(:on).to_s]) unless options[:on].nil?
