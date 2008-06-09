@@ -11,21 +11,7 @@ module ActiveRecord
         end
         
         def acts_as_taggable_on(*args)
-          self.class_eval do
-            @tag_types = args
-            def self.tag_types
-              @tag_types
-            end
-            
-            has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag
-            has_many :base_tags, :class_name => "Tag", :through => :taggings, :source => :tag
-            
-            attr_writer :custom_contexts
-            
-            before_save :save_cached_tag_list
-            after_save :save_tags
-          end
-          
+          puts "Registering #{args.inspect} with #{self.inspect}"
           for tag_type in args
             tag_type = tag_type.to_s
             self.class_eval do
@@ -33,8 +19,6 @@ module ActiveRecord
                 :include => :tag, :conditions => ["context = ?",tag_type], :class_name => "Tagging"
               has_many "#{tag_type}".to_sym, :through => "#{tag_type.singularize}_taggings".to_sym, :source => :tag
             end
-            
-            include ActiveRecord::Acts::TaggableOn::InstanceMethods
             
             self.class_eval <<-RUBY
               def self.caching_#{tag_type.singularize}_list?
@@ -64,12 +48,31 @@ module ActiveRecord
               def find_related_#{tag_type}(options = {})
                 related_tags_on('#{tag_type}',options)
               end
+              alias_method :find_related_on_#{tag_type}, :find_related_#{tag_type}
             RUBY
+          end      
+          
+          if respond_to?(:tag_types)
+            puts "Appending #{args.inspect} onto #{tag_types.inspect}"
+            write_inheritable_attribute(:tag_types, tag_types + args)
+          else
+            self.class_eval do
+              write_inheritable_attribute(:tag_types, args)
+              class_inheritable_reader :tag_types
+            
+              has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag
+              has_many :base_tags, :class_name => "Tag", :through => :taggings, :source => :tag
+            
+              attr_writer :custom_contexts
+            
+              before_save :save_cached_tag_list
+              after_save :save_tags
+            end
+            
+            include ActiveRecord::Acts::TaggableOn::InstanceMethods
+            extend ActiveRecord::Acts::TaggableOn::SingletonMethods                
+            alias_method_chain :reload, :tag_list
           end
-          
-          extend ActiveRecord::Acts::TaggableOn::SingletonMethods          
-          
-          alias_method_chain :reload, :tag_list
         end
         
         def is_taggable?

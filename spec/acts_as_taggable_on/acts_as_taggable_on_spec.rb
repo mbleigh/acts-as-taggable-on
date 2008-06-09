@@ -33,6 +33,23 @@ describe "acts_as_taggable_on" do
     end
   end
   
+  context "inheritance" do
+    before do
+      @taggable = TaggableModel.new(:name => "taggable")
+      @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
+      @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")
+    end
+    
+    it "should pass on tag contexts to STI-inherited models" do
+      @inherited_same.should respond_to(:tag_list, :skill_list, :language_list)
+      @inherited_different.should respond_to(:tag_list, :skill_list, :language_list)
+    end
+    
+    it "should have tag contexts added in altered STI models" do
+      @inherited_different.should respond_to(:part_list)
+    end
+  end
+  
   context "reloading" do
     it "should save a model instantiated by Model.find" do
       taggable = TaggableModel.create!(:name => "Taggable")

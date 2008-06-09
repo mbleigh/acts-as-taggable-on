@@ -6,9 +6,17 @@ ActiveRecord::Base.logger = Logger.new(plugin_spec_dir + "/debug.log")
 load(File.dirname(__FILE__) + '/schema.rb')
 
 class TaggableModel < ActiveRecord::Base
-  acts_as_taggable_on :tags, :languages, :skills
+  acts_as_taggable_on :tags, :languages
+  acts_as_taggable_on :skills
 end
 
-class User < ActiveRecord::Base
+class InheritingTaggableModel < TaggableModel
+end
+
+class AlteredInheritingTaggableModel < TaggableModel
+  acts_as_taggable_on :parts
+end
+
+class TaggableUser < ActiveRecord::Base
   acts_as_tagger
 end

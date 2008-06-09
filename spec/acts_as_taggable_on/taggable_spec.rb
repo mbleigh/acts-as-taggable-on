@@ -88,4 +88,31 @@ describe "Taggable" do
     bob.save
     TaggableModel.find_tagged_with("spinning", :on => :rotors).should_not be_empty
   end
+  
+  context "inheritance" do
+    before do
+      @taggable = TaggableModel.new(:name => "taggable")
+      @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
+      @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")
+    end
+    
+    it "should be able to save tags for inherited models" do
+      @inherited_same.tag_list = "bob, kelso"
+      @inherited_same.save
+      InheritingTaggableModel.find_tagged_with("bob").first.should == @inherited_same
+    end
+    
+    it "should find STI tagged models on the superclass" do
+      @inherited_same.tag_list = "bob, kelso"
+      @inherited_same.save
+      TaggableModel.find_tagged_with("bob").first.should == @inherited_same
+    end
+    
+    it "should be able to add on contexts only to some subclasses" do
+      @inherited_different.part_list = "fork, spoon"
+      @inherited_different.save
+      InheritingTaggableModel.find_tagged_with("fork", :on => :parts).should be_empty
+      AlteredInheritingTaggableModel.find_tagged_with("fork", :on => :parts).first.should == @inherited_different
+    end
+  end
 end
