@@ -1,9 +1,9 @@
 ActsAsTaggableOn
 ================
 
-This plugin is heavily based on Acts as Taggable on Steroids by Jonathan Viney. While
-basic tagging functionality is handled expertly as well as tag cloud calculations, for
-many applications there may be a need to have several "tag fields" for a given model.
+This plugin was originally based on Acts as Taggable on Steroids by Jonathan Viney.
+It has evolved substantially since that point, but all credit goes to him for the
+initial tagging functionality that so many people have used.
 
 For instance, in a social network, a user might have tags that are called skills,
 interests, sports, and more. There is no real way to differentiate between tags and
@@ -130,6 +130,19 @@ Caveats, Uncharted Waters
 
 This plugin is still under active development. Tag caching has not 
 been thoroughly (or even casually) tested and may not work as expected.
+
+Contributors
+============
+
+* Michael Bleigh - Original Author
+* Brendan Lim - Related objects
+* Pradeep Elankumaran - Taggers
+
+Patch Contributors
+------------------
+
+* Peter Cooper - named_scope fix
+* slainer68 - STI fix
 
 Resources
 =========
