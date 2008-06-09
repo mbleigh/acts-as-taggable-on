@@ -1,0 +1,37 @@
+Gem::Specification.new do |s|
+  s.name = "acts-as-taggable-on"
+  s.version = "1.0.0"
+  s.date = "2008-06-09"
+  s.summary = "Tagging for ActiveRecord with custom contexts and advanced features."
+  s.email = "michael@intridea.com"
+  s.homepage = "http://www.actsascommunity.com/projects/acts-as-taggable-on"
+  s.description = "Acts As Taggable On provides the ability to have multiple tag contexts on a single model in ActiveRecord. It also has support for tag clouds, related items, taggers, and more."
+  s.has_rdoc = false
+  s.authors = ["Michael Bleigh"]
+  s.files = [ "CHANGELOG",
+              "MIT-LICENSE",
+              "README",
+              "generators/acts_as_taggable_on_migration/acts_as_taggable_on_migration_generator.rb",
+              "generators/acts_as_taggable_on_migration/templates",
+              "generators/acts_as_taggable_on_migration/templates/add_users_migration.rb",
+              "generators/acts_as_taggable_on_migration/templates/migration.rb",
+              "init.rb",
+              "lib/active_record/acts/taggable_on.rb",
+              "lib/active_record/acts/tagger.rb",
+              "lib/tag.rb",
+              "lib/tag_list.rb",
+              "lib/tagging.rb",
+              "lib/tags_helper.rb",
+              "rails/init.rb",
+              "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
+              "spec/acts_as_taggable_on/tag_list_spec.rb",
+              "spec/acts_as_taggable_on/tag_spec.rb",
+              "spec/acts_as_taggable_on/taggable_spec.rb",
+              "spec/acts_as_taggable_on/tagger_spec.rb",
+              "spec/acts_as_taggable_on/tagging_spec.rb",
+              "spec/schema.rb",
+              "spec/spec_helper.rb" ]
+  #s.rdoc_options = ["--main", "README.txt"]
+  #s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
+  #s.add_dependency("mbleigh-mash", [">= 0.0.5"])
+end

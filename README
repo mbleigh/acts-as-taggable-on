@@ -17,9 +17,29 @@ was used.
 Installation
 ============
 
-The simplest way is just to install straight from the SVN:
+Plugin
+------
 
-script/plugin install http://svn.intridea.com/svn/public/acts_as_taggable_on
+Acts As Taggable On is available both as a gem and as a traditional plugin. For the
+traditional plugin you can install like so (Rails 2.1 or later):
+
+  script/plugin install git://github.com/mbleigh/acts-as-taggable-on.git
+  
+For earlier versions:
+
+  git clone git://github.com/mbleigh/acts-as-taggable-on.git vendor/plugins/acts-as-taggable-on
+  
+GemPlugin
+---------
+
+Acts As Taggable On is also available as a gem plugin using Rails 2.1's gem dependencies.
+To install the gem, add this to your config/environment.rb:
+  
+  config.gem "mbleigh-acts-as-taggable-on", :source => "http://gems.github.com"
+  
+After that, you can run "rake gems:install" to install the gem if you don't already have it.
+See http://ryandaigle.com/articles/2008/4/1/what-s-new-in-edge-rails-gem-dependencies for
+additional details about gem dependencies in Rails.
 
 Testing
 =======
@@ -114,6 +134,7 @@ been thoroughly (or even casually) tested and may not work as expected.
 Resources
 =========
 
+Acts As Community - http://www.actsascommunity.com/projects/acts-as-taggable-on
 GitHub - http://github.com/mbleigh/acts-as-taggable-on
 Lighthouse - http://mbleigh.lighthouseapp.com/projects/10116-acts-as-taggable-on
 
