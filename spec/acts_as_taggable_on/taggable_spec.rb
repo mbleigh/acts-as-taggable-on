@@ -13,6 +13,13 @@ describe "Taggable" do
     Tag.find(:all).size.should == 3
   end
   
+  it "should be able to create tags through the tag list directly" do
+    @taggable.tag_list_on(:test).add("hello")
+    @taggable.save    
+    @taggable.reload
+    @taggable.tag_list_on(:test).should == ["hello"]
+  end
+  
   it "should differentiate between contexts" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.tag_list = "ruby, bob, charlie"
