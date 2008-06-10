@@ -1,8 +1,6 @@
-require 'active_record/acts/taggable_on'
-require 'tag'
-require 'tag_list'
-require 'tags_helper'
-require 'tagging'
-require 'active_record/acts/tagger'
-# Include hook code here
+require 'acts-as-taggable-on'
+
 ActiveRecord::Base.send :include, ActiveRecord::Acts::TaggableOn
+ActiveRecord::Base.send :include, ActiveRecord::Acts::Tagger
+
+RAILS_DEFAULT_LOGGER.info "** acts_as_taggable_on: initialized properly."
