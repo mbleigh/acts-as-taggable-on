@@ -18,10 +18,16 @@ class ActsAsTaggableOnMigration < ActiveRecord::Migration
     
     add_index :taggings, :tag_id
     add_index :taggings, [:taggable_id, :taggable_type, :context]
+    
+    add_column :taggings, :tagger_id, :integer
+    add_column :taggings, :tagger_type, :string
   end
   
   def self.down
     drop_table :taggings
     drop_table :tags
+    
+    remove_column :taggings, :tagger_type
+    remove_column :taggings, :tagger_id
   end
 end
