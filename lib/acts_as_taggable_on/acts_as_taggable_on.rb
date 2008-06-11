@@ -11,7 +11,6 @@ module ActiveRecord
         end
         
         def acts_as_taggable_on(*args)
-          puts "Registering #{args.inspect} with #{self.inspect}"
           for tag_type in args
             tag_type = tag_type.to_s
             self.class_eval do
@@ -53,11 +52,10 @@ module ActiveRecord
           end      
           
           if respond_to?(:tag_types)
-            puts "Appending #{args.inspect} onto #{tag_types.inspect}"
-            write_inheritable_attribute(:tag_types, tag_types + args)
+            write_inheritable_attribute( :tag_types, (tag_types + args).uniq )
           else
             self.class_eval do
-              write_inheritable_attribute(:tag_types, args)
+              write_inheritable_attribute(:tag_types, args.uniq)
               class_inheritable_reader :tag_types
             
               has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag

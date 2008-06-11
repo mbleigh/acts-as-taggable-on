@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe "Taggable" do
   before(:each) do
+    [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
     @taggable = TaggableModel.new(:name => "Bob Jones")
   end
   
@@ -96,8 +97,9 @@ describe "Taggable" do
     TaggableModel.find_tagged_with("spinning", :on => :rotors).should_not be_empty
   end
   
-  context "inheritance" do
+  describe "Single Table Inheritance" do
     before do
+      [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
       @taggable = TaggableModel.new(:name => "taggable")
       @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
       @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")

@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe "Tagger" do
   before(:each) do
+    [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
     @user = TaggableUser.new
     @taggable = TaggableModel.new(:name => "Bob Jones")
   end

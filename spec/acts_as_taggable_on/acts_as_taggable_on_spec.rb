@@ -1,8 +1,9 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe "acts_as_taggable_on" do
+describe "Acts As Taggable On" do
   context "Taggable Method Generation" do
     before(:each) do
+      [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
       @taggable = TaggableModel.new(:name => "Bob Jones")
     end
   
@@ -33,7 +34,7 @@ describe "acts_as_taggable_on" do
     end
   end
   
-  context "inheritance" do
+  describe "Single Table Inheritance" do
     before do
       @taggable = TaggableModel.new(:name => "taggable")
       @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
@@ -50,7 +51,7 @@ describe "acts_as_taggable_on" do
     end
   end
   
-  context "reloading" do
+  describe "Reloading" do
     it "should save a model instantiated by Model.find" do
       taggable = TaggableModel.create!(:name => "Taggable")
       found_taggable = TaggableModel.find(taggable.id)
@@ -58,7 +59,7 @@ describe "acts_as_taggable_on" do
     end
   end
   
-  context "related" do
+  describe "Related Objects" do
     it "should find related objects based on tag names on context" do
       taggable1 = TaggableModel.create!(:name => "Taggable 1")
       taggable2 = TaggableModel.create!(:name => "Taggable 2")
@@ -77,4 +78,28 @@ describe "acts_as_taggable_on" do
       taggable1.find_related_tags.should_not include(taggable2)
     end
   end
+  
+  describe 'Tagging Contexts' do
+    context '#acts_as_taggable_on' do
+      before(:all) do
+        class Array
+          def freq
+            k=Hash.new(0)
+            self.each {|e| k[e]+=1}
+            k
+          end
+        end
+      end
+      
+      it 'should eliminate duplicate tagging contexts ' do
+        TaggableModel.acts_as_taggable_on(:skills, :skills)
+        TaggableModel.tag_types.freq[:skills].should_not == 3
+
+      end
+      after(:all) do
+        class Array; remove_method :freq; end
+      end
+    end
+  end
+  
 end
