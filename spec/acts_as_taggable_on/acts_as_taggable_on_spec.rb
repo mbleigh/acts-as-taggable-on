@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe "Acts As Taggable On" do
-  context "Taggable Method Generation" do
+  describe "Taggable Method Generation" do
     before(:each) do
       [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
       @taggable = TaggableModel.new(:name => "Bob Jones")
@@ -80,25 +80,45 @@ describe "Acts As Taggable On" do
   end
   
   describe 'Tagging Contexts' do
-    context '#acts_as_taggable_on' do
-      before(:all) do
-        class Array
-          def freq
-            k=Hash.new(0)
-            self.each {|e| k[e]+=1}
-            k
-          end
+    before(:all) do
+      class Array
+        def freq
+          k=Hash.new(0)
+          self.each {|e| k[e]+=1}
+          k
         end
       end
-      
-      it 'should eliminate duplicate tagging contexts ' do
-        TaggableModel.acts_as_taggable_on(:skills, :skills)
-        TaggableModel.tag_types.freq[:skills].should_not == 3
+    end
+    
+    it 'should eliminate duplicate tagging contexts ' do
+      TaggableModel.acts_as_taggable_on(:skills, :skills)
+      TaggableModel.tag_types.freq[:skills].should_not == 3
+    end
 
-      end
-      after(:all) do
-        class Array; remove_method :freq; end
-      end
+    it "should not contain embedded/nested arrays" do
+      TaggableModel.acts_as_taggable_on([:array], [:array])
+      TaggableModel.tag_types.freq[[:array]].should == 0
+    end
+
+    it "should _flatten_ the content of arrays" do
+      TaggableModel.acts_as_taggable_on([:array], [:array])
+      TaggableModel.tag_types.freq[:array].should == 1
+    end
+
+    it "should not raise an error when passed nil" do
+      lambda {
+        TaggableModel.acts_as_taggable_on()
+      }.should_not raise_error
+    end
+
+    it "should not raise an error when passed [nil]" do
+      lambda {
+        TaggableModel.acts_as_taggable_on([nil])
+      }.should_not raise_error
+    end
+
+    after(:all) do
+      class Array; remove_method :freq; end
     end
   end
   

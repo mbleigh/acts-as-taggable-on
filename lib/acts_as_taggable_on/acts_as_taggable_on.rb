@@ -11,6 +11,8 @@ module ActiveRecord
         end
         
         def acts_as_taggable_on(*args)
+          args.flatten! if args
+          args.compact! if args
           for tag_type in args
             tag_type = tag_type.to_s
             self.class_eval do
