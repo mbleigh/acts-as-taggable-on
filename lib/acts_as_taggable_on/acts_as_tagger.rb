@@ -24,10 +24,14 @@ module ActiveRecord
         end
         
         def tag(taggable, opts={})
+          opts.reverse_merge!(:force => true)
+
           return false unless taggable.respond_to?(:is_taggable?) && taggable.is_taggable?
           raise "You need to specify a tag context using :on" unless opts.has_key?(:on)
           raise "You need to specify some tags using :with" unless opts.has_key?(:with)
-          raise "No context :#{opts[:on]} defined in #{taggable.class.to_s}" unless taggable.tag_types.include?(opts[:on])
+          raise "No context :#{opts[:on]} defined in #{taggable.class.to_s}" unless 
+              ( opts[:force] || taggable.tag_types.include?(opts[:on]) )
+
           taggable.set_tag_list_on(opts[:on].to_s, opts[:with], self)
           taggable.save
         end
