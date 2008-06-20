@@ -6,6 +6,10 @@ module ActiveRecord
       end
       
       module ClassMethods
+        def taggable?
+          false
+        end
+        
         def acts_as_taggable
           acts_as_taggable_on :tags
         end
@@ -22,6 +26,10 @@ module ActiveRecord
             end
             
             self.class_eval <<-RUBY
+              def self.taggable?
+                true
+              end
+              
               def self.caching_#{tag_type.singularize}_list?
                 caching_tag_list_on?("#{tag_type}")
               end

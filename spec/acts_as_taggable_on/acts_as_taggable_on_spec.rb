@@ -1,12 +1,20 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe "Acts As Taggable On" do
+  it "should provide a class method 'taggable?' that is false for untaggable models" do
+    UntaggableModel.should_not be_taggable
+  end
+  
   describe "Taggable Method Generation" do
     before(:each) do
       [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
       @taggable = TaggableModel.new(:name => "Bob Jones")
     end
   
+    it "should respond 'true' to taggable?" do
+      @taggable.class.should be_taggable
+    end
+    
     it "should create a class attribute for tag types" do
       @taggable.class.should respond_to(:tag_types)
     end
