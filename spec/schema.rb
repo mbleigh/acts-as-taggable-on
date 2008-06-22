@@ -24,4 +24,9 @@ ActiveRecord::Schema.define :version => 0 do
   create_table :taggable_users, :force => true do |t|
     t.column :name, :string
   end
+  create_table :other_taggable_models, :force => true do |t|
+    t.column :name, :string
+    t.column :type, :string
+    #t.column :cached_tag_list, :string
+  end
 end

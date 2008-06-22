@@ -58,6 +58,10 @@ module ActiveRecord
                 related_tags_on('#{tag_type}',options)
               end
               alias_method :find_related_on_#{tag_type}, :find_related_#{tag_type}
+
+              def find_related_#{tag_type}_for(klass, options = {})
+                related_tags_for('#{tag_type}', klass, options)
+              end
             RUBY
           end      
           
@@ -249,16 +253,26 @@ module ActiveRecord
         end
         
         def related_tags_on(context, options={})
-          tags_to_find = self.tags_on(context).collect {|t| t.name}
-          search_conditions = { 
-            :select     => "#{self.class.table_name}.*, COUNT(#{Tag.table_name}.id) AS count", 
-            :from       => "#{self.class.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
-            :conditions => ["#{self.class.table_name}.id != #{self.id} AND #{self.class.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{self.class.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)",tags_to_find],
-            :group      => "#{self.class.table_name}.id",
+          search_conditions = related_search_options(context, self.class, options)          
+
+          self.class.find(:all, search_conditions)
+        end
+
+        def related_tags_for(context, klass, options = {})
+          search_conditions = related_search_options(context, klass, options)
+
+          klass.find(:all, search_conditions)
+        end
+
+        def related_search_options(context, klass, options = {})
+          tags_to_find = self.tags_on(context).collect { |t| t.name }
+
+          { :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count", 
+            :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
+            :conditions => ["#{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)", tags_to_find],
+            :group      => "#{klass.table_name}.id",
             :order      => "count DESC"
           }.update(options)
-          
-          self.class.find(:all, search_conditions)
         end
         
         def save_cached_tag_list
