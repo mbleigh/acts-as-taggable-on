@@ -55,7 +55,7 @@ module ActiveRecord
               end
               
               def find_related_#{tag_type}(options = {})
-                related_tags_on('#{tag_type}',options)
+                related_tags_for('#{tag_type}', self.class, options)
               end
               alias_method :find_related_on_#{tag_type}, :find_related_#{tag_type}
 
@@ -250,12 +250,6 @@ module ActiveRecord
         
         def tag_counts_on(context,options={})
           self.class.tag_counts_on(context,{:conditions => ["#{Tag.table_name}.name IN (?)", tag_list_on(context)]}.reverse_merge!(options))
-        end
-        
-        def related_tags_on(context, options={})
-          search_conditions = related_search_options(context, self.class, options)          
-
-          self.class.find(:all, search_conditions)
         end
 
         def related_tags_for(context, klass, options = {})
