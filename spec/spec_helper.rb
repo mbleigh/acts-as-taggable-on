@@ -14,6 +14,10 @@ class TaggableModel < ActiveRecord::Base
   acts_as_taggable_on :skills
 end
 
+class OtherTaggableModel < ActiveRecord::Base
+  acts_as_taggable_on :tags, :languages
+end
+
 class InheritingTaggableModel < TaggableModel
 end
 
