@@ -1,3 +1,8 @@
+== 2008-06-23
+
+* Can now find related objects of another class (tristanzdunn)
+* Removed extraneous down migration cruft (azabaj)
+
 == 2008-06-09
  
  * Added support for Single Table Inheritance

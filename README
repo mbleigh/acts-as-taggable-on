@@ -148,6 +148,8 @@ Contributors
 Patch Contributors
 ------------------
 
+* tristanzdunn - Related objects of other classes
+* azabaj - Fixed migrate down
 * Peter Cooper - named_scope fix
 * slainer68 - STI fix
 
