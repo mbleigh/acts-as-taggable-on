@@ -26,8 +26,5 @@ class ActsAsTaggableOnMigration < ActiveRecord::Migration
   def self.down
     drop_table :taggings
     drop_table :tags
-    
-    remove_column :taggings, :tagger_type
-    remove_column :taggings, :tagger_id
   end
 end
