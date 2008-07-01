@@ -157,6 +157,8 @@ Patch Contributors
 * azabaj - Fixed migrate down
 * Peter Cooper - named_scope fix
 * slainer68 - STI fix
+* harrylove - migration instructions and fix-ups
+* lawrencepit - cached tag work
 
 Resources
 =========
