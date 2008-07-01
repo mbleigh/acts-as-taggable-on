@@ -47,6 +47,11 @@ try just installing it as a normal gem:
 
   gem install mbleigh-acts-as-taggable-on --source http://gems.github.com
 
+Post Installation (Rails)
+-------------------------
+1. script/generate acts_as_taggable_on_migration
+2. rake db/migrate
+
 Testing
 =======
 

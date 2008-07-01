@@ -7,6 +7,8 @@ class ActsAsTaggableOnMigration < ActiveRecord::Migration
     create_table :taggings do |t|
       t.column :tag_id, :integer
       t.column :taggable_id, :integer
+      t.column :tagger_id, :integer
+      t.column :tagger_type, :string
       
       # You should make sure that the column created is
       # long enough to store the required class names.
@@ -18,9 +20,6 @@ class ActsAsTaggableOnMigration < ActiveRecord::Migration
     
     add_index :taggings, :tag_id
     add_index :taggings, [:taggable_id, :taggable_type, :context]
-    
-    add_column :taggings, :tagger_id, :integer
-    add_column :taggings, :tagger_type, :string
   end
   
   def self.down
