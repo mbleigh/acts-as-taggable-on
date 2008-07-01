@@ -222,7 +222,7 @@ module ActiveRecord
           add_custom_context(context)
           return instance_variable_get("@#{var_name}") unless instance_variable_get("@#{var_name}").nil?
         
-          if !owner && self.class.caching_tag_list_on?(context) and !(cached_value = cached_tag_list_on(context, owner)).nil?
+          if !owner && self.class.caching_tag_list_on?(context) and !(cached_value = cached_tag_list_on(context)).nil?
             instance_variable_set("@#{var_name}", TagList.from(self["cached_#{var_name}"]))
           else
             instance_variable_set("@#{var_name}", TagList.new(*tags_on(context, owner).map(&:name)))
