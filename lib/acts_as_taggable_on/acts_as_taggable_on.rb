@@ -292,7 +292,7 @@ module ActiveRecord
             next unless instance_variable_get("@#{tag_type.singularize}_list")
             owner = instance_variable_get("@#{tag_type.singularize}_list").owner
             new_tag_names = instance_variable_get("@#{tag_type.singularize}_list") - tags_on(tag_type).map(&:name)
-            old_tags = tags_on(tag_type).reject { |tag| instance_variable_get("@#{tag_type.singularize}_list").include?(tag.name) }
+            old_tags = tags_on(tag_type, owner).reject { |tag| instance_variable_get("@#{tag_type.singularize}_list").include?(tag.name) }
           
             self.class.transaction do
               base_tags.delete(*old_tags) if old_tags.any?
