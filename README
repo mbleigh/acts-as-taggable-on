@@ -76,15 +76,35 @@ end
 @user.tags # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
 @user.skills # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
 
+# The old way
 User.find_tagged_with("awesome", :on => :tags) # => [@user]
 User.find_tagged_with("awesome", :on => :skills) # => []
+
+# The better way (utilizes named_scope)
+User.tagged_with("awesome", :on => :tags) # => [@user]
+User.tagged_with("awesome", :on => :skills) # => []
 
 @frankie = User.create(:name => "Frankie", :skill_list => "joking, flying, eating")
 User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
 @frankie.skill_counts
 
+Finding Tagged Objects
+======================
+
+Acts As Taggable On utilizes Rails 2.1's named_scope to create an association
+for tags. This way you can mix and match to filter down your results, and it
+also improves compatibility with the will_paginate gem:
+
+class User < ActiveRecord::Base
+  acts_as_taggable_on :tags
+  named_scope :by_join_date, :order => "created_at DESC"
+end
+
+User.tagged_with("awesome").by_date
+User.tagged_with("awesome").by_date.paginate(:page => params[:page], :per_page => 20)
+
 Relationships
-====================
+=============
 
 You can find objects of the same type based on similar tags on certain contexts.
 Also, objects will be returned in descending order based on the total number of 

@@ -56,6 +56,15 @@ describe "Taggable" do
     TaggableModel.find_tagged_with("bob", :on => :tags).first.should == @taggable
   end
   
+  it "should be able to use the tagged_with named scope" do
+    @taggable.skill_list = "ruby, rails, css"
+    @taggable.tag_list = "bob, charlie"
+    @taggable.save
+    TaggableModel.tagged_with("ruby", {}).first.should == @taggable
+    TaggableModel.tagged_with("bob", :on => :skills).first.should_not == @taggable
+    TaggableModel.tagged_with("bob", :on => :tags).first.should == @taggable
+  end
+  
   it "should not care about case" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
