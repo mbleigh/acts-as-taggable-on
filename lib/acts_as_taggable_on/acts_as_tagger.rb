@@ -9,7 +9,7 @@ module ActiveRecord
         def acts_as_tagger(opts={})
           has_many :owned_taggings, opts.merge(:as => :tagger, :dependent => :destroy, 
                                                :include => :tag, :class_name => "Tagging")
-          has_many :owned_tags, :through => :owned_taggings, :source => :tag
+          has_many :owned_tags, :through => :owned_taggings, :source => :tag, :uniq => true
           include ActiveRecord::Acts::Tagger::InstanceMethods
           extend ActiveRecord::Acts::Tagger::SingletonMethods       
         end
