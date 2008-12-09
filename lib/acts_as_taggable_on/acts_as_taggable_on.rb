@@ -266,10 +266,12 @@ module ActiveRecord
 
         def related_search_options(context, klass, options = {})
           tags_to_find = self.tags_on(context).collect { |t| t.name }
+          
+          exclude_self = "#{klass.table_name}.id != #{self.id} AND" if self.class == klass
 
           { :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count", 
             :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
-            :conditions => ["#{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)", tags_to_find],
+            :conditions => ["#{exclude_self} #{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)", tags_to_find],
             :group      => "#{klass.table_name}.id",
             :order      => "count DESC"
           }.update(options)
