@@ -19,9 +19,11 @@ module ActiveRecord
           args.compact! if args
           for tag_type in args
             tag_type = tag_type.to_s
+            # use aliased_join_table_name for context condition so that sphix can join multiple
+            # tag references from same model without getting an ambiguous column error
             self.class_eval do
               has_many "#{tag_type.singularize}_taggings".to_sym, :as => :taggable, :dependent => :destroy, 
-                :include => :tag, :conditions => ["context = ?",tag_type], :class_name => "Tagging"
+                :include => :tag, :conditions => ['#{aliased_join_table_name rescue "taggings"}.context = ?',tag_type], :class_name => "Tagging"
               has_many "#{tag_type}".to_sym, :through => "#{tag_type.singularize}_taggings".to_sym, :source => :tag
             end
             
