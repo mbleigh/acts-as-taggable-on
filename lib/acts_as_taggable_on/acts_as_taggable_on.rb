@@ -64,6 +64,10 @@ module ActiveRecord
               def find_related_#{tag_type}_for(klass, options = {})
                 related_tags_for('#{tag_type}', klass, options)
               end
+              
+              def top_#{tag_type}(limit = 10)
+                tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+              end
             RUBY
           end      
           
