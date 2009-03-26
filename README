@@ -50,7 +50,7 @@ try just installing it as a normal gem:
 Post Installation (Rails)
 -------------------------
 1. script/generate acts_as_taggable_on_migration
-2. rake db/migrate
+2. rake db:migrate
 
 Testing
 =======
