@@ -178,6 +178,7 @@ module ActiveRecord
 
           taggable_type = sanitize_sql(["#{Tagging.table_name}.taggable_type = ?", base_class.name])
           taggable_id = sanitize_sql(["#{Tagging.table_name}.taggable_id = ?", options.delete(:id)]) if options[:id]
+          options[:conditions] = sanitize_sql(options[:conditions]) if options[:conditions]
           
           conditions = [
             taggable_type,
