@@ -68,6 +68,10 @@ module ActiveRecord
               def top_#{tag_type}(limit = 10)
                 tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
               end
+              
+              def self.top_#{tag_type}(limit = 10)
+                tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+              end
             RUBY
           end      
           
