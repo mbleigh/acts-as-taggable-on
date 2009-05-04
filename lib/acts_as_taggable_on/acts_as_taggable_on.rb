@@ -87,8 +87,8 @@ module ActiveRecord
               after_save :save_tags
               
               if respond_to?(:named_scope)
-                named_scope :tagged_with, lambda{ |tags, options|
-                  find_options_for_find_tagged_with(tags, options)
+                named_scope :tagged_with, lambda{ |*args|
+                  find_options_for_find_tagged_with(*args)
                 }
               end
             end
