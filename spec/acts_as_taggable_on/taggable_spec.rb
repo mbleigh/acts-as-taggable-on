@@ -143,5 +143,16 @@ describe "Taggable" do
       InheritingTaggableModel.find_tagged_with("fork", :on => :parts).should be_empty
       AlteredInheritingTaggableModel.find_tagged_with("fork", :on => :parts).first.should == @inherited_different
     end
+    
+    it "should have different tag_counts_on for inherited models" do
+      @inherited_same.tag_list = "bob, kelso"
+      @inherited_same.save!
+      @inherited_different.tag_list = "fork, spoon"
+      @inherited_different.save!
+      
+      InheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso)
+      AlteredInheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(fork spoon)
+      TaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso fork spoon)
+    end
   end
 end

@@ -197,7 +197,13 @@ module ActiveRecord
 
           joins = ["LEFT OUTER JOIN #{Tagging.table_name} ON #{Tag.table_name}.id = #{Tagging.table_name}.tag_id"]
           joins << sanitize_sql(["AND #{Tagging.table_name}.context = ?",options.delete(:on).to_s]) unless options[:on].nil?
-          joins << "LEFT OUTER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"
+          
+          joins << " INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"
+          unless self.descends_from_active_record?
+            # Current model is STI descendant, so add type checking to the join condition
+            joins << " AND #{table_name}.#{self.inheritance_column} = '#{self.name}'"
+          end
+          
           joins << scope[:joins] if scope && scope[:joins]
 
           at_least  = sanitize_sql(['COUNT(*) >= ?', options.delete(:at_least)]) if options[:at_least]
