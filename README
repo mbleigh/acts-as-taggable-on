@@ -55,10 +55,16 @@ Post Installation (Rails)
 Testing
 =======
 
-Acts As Taggable On uses RSpec for its test coverage. If you already have RSpec on your
-application, the specs will run while using:
+Acts As Taggable On uses RSpec for its test coverage. Inside the plugin
+directory, you can run the specs with:
+
+rake spec
+
+
+If you already have RSpec on your application, the specs will run while using:
 
 rake spec:plugins
+
 
 Example
 =======

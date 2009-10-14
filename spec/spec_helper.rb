@@ -1,13 +1,26 @@
-require File.dirname(__FILE__) + '/../../../../spec/spec_helper'
+# require File.dirname(__FILE__) + '/../../../../spec/spec_helper'
+require 'rubygems'
+require 'active_support'
+require 'active_record'
+require 'spec'
 
 module Spec::Example::ExampleGroupMethods
   alias :context :describe
 end
 
-plugin_spec_dir = File.dirname(__FILE__)
-ActiveRecord::Base.logger = Logger.new(plugin_spec_dir + "/debug.log")
+TEST_DATABASE_FILE = File.join(File.dirname(__FILE__), '..', 'test.sqlite3')
+
+File.unlink(TEST_DATABASE_FILE) if File.exist?(TEST_DATABASE_FILE)
+ActiveRecord::Base.establish_connection(
+  "adapter" => "sqlite3", "database" => TEST_DATABASE_FILE
+)
+
+RAILS_DEFAULT_LOGGER = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
 
 load(File.dirname(__FILE__) + '/schema.rb')
+
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
+require File.join(File.dirname(__FILE__), '..', 'init')
 
 class TaggableModel < ActiveRecord::Base
   acts_as_taggable_on :tags, :languages
