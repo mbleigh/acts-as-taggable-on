@@ -68,6 +68,10 @@ module ActiveRecord
               def top_#{tag_type}(limit = 10)
                 tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
               end
+              
+              def self.top_#{tag_type}(limit = 10)
+                tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+              end
             RUBY
           end      
           
@@ -87,8 +91,8 @@ module ActiveRecord
               after_save :save_tags
               
               if respond_to?(:named_scope)
-                named_scope :tagged_with, lambda{ |tags, options|
-                  find_options_for_find_tagged_with(tags, options)
+                named_scope :tagged_with, lambda{ |*args|
+                  find_options_for_find_tagged_with(*args)
                 }
               end
             end
@@ -178,6 +182,7 @@ module ActiveRecord
 
           taggable_type = sanitize_sql(["#{Tagging.table_name}.taggable_type = ?", base_class.name])
           taggable_id = sanitize_sql(["#{Tagging.table_name}.taggable_id = ?", options.delete(:id)]) if options[:id]
+          options[:conditions] = sanitize_sql(options[:conditions]) if options[:conditions]
           
           conditions = [
             taggable_type,
@@ -192,7 +197,13 @@ module ActiveRecord
 
           joins = ["LEFT OUTER JOIN #{Tagging.table_name} ON #{Tag.table_name}.id = #{Tagging.table_name}.tag_id"]
           joins << sanitize_sql(["AND #{Tagging.table_name}.context = ?",options.delete(:on).to_s]) unless options[:on].nil?
-          joins << "LEFT OUTER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"
+          
+          joins << " INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"
+          unless self.descends_from_active_record?
+            # Current model is STI descendant, so add type checking to the join condition
+            joins << " AND #{table_name}.#{self.inheritance_column} = '#{self.name}'"
+          end
+          
           joins << scope[:joins] if scope && scope[:joins]
 
           at_least  = sanitize_sql(['COUNT(*) >= ?', options.delete(:at_least)]) if options[:at_least]
@@ -204,7 +215,9 @@ module ActiveRecord
           { :select     => "#{Tag.table_name}.id, #{Tag.table_name}.name, COUNT(*) AS count", 
             :joins      => joins.join(" "),
             :conditions => conditions,
-            :group      => group_by
+            :group      => group_by,
+            :limit      => options[:limit],
+            :order      => options[:order]
           }
         end    
         
