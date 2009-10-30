@@ -35,17 +35,15 @@ GemPlugin
 Acts As Taggable On is also available as a gem plugin using Rails 2.1's gem dependencies.
 To install the gem, add this to your config/environment.rb:
   
-  config.gem "mbleigh-acts-as-taggable-on", :source => "http://gems.github.com", :lib => "acts-as-taggable-on"
+  config.gem "acts-as-taggable-on", :source => "http://gemcutter.org"
   
 After that, you can run "rake gems:install" to install the gem if you don't already have it.
-See http://ryandaigle.com/articles/2008/4/1/what-s-new-in-edge-rails-gem-dependencies for
-additional details about gem dependencies in Rails.
 
 ** NOTE **
 Some issues have been experienced with "rake gems:install". If that doesn't work to install the gem,
 try just installing it as a normal gem:
 
-  gem install mbleigh-acts-as-taggable-on --source http://gems.github.com
+  gem install acts-as-taggable-on --source http://gemcutter.org
 
 Post Installation (Rails)
 -------------------------

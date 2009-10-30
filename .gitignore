@@ -1,2 +1,3 @@
 *.log
 test.sqlite3
+/pkg/*
