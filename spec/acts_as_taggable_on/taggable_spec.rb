@@ -99,12 +99,22 @@ describe "Taggable" do
     bob.tags_on(:rotors).should_not be_empty
   end
   
+  it "should be able to find tagged" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive", :skill_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
+    
+    TaggableModel.find_tagged_with("ruby", :order => 'taggable_models.name').should == [bob, frank, steve]
+    TaggableModel.find_tagged_with("ruby, rails", :order => 'taggable_models.name').should == [bob, frank]
+    TaggableModel.find_tagged_with(["ruby", "rails"], :order => 'taggable_models.name').should == [bob, frank]    
+  end
+  
   it "should be able to find tagged on a custom tag context" do
     bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
     bob.tag_list_on(:rotors).should == ["spinning","jumping"]
     bob.save
-    TaggableModel.find_tagged_with("spinning", :on => :rotors).should_not be_empty
+    TaggableModel.find_tagged_with("spinning", :on => :rotors).should == [bob]
   end
 
   it "should be able to use named scopes to chain tag finds" do
@@ -113,9 +123,10 @@ describe "Taggable" do
     steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, python')
     
     # Let's only find those productive Rails developers
-    TaggableModel.tagged_with('rails', :on => :skills).all(:order => 'taggable_models.name').should == [bob, frank]
-    TaggableModel.tagged_with('happier', :on => :tags).all(:order => 'taggable_models.name').should == [bob, steve]
+    TaggableModel.tagged_with('rails', :on => :skills, :order => 'taggable_models.name').should == [bob, frank]
+    TaggableModel.tagged_with('happier', :on => :tags, :order => 'taggable_models.name').should == [bob, steve]
     TaggableModel.tagged_with('rails', :on => :skills).tagged_with('happier', :on => :tags).should == [bob]
+    TaggableModel.tagged_with('rails').tagged_with('happier', :on => :tags).should == [bob]
   end
   
   it "should be able to find tagged with only the matching tags" do
