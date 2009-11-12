@@ -173,7 +173,7 @@ module ActiveRecord
                      "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
                      " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
              
-            group = "#{taggings_alias}.taggable_id HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
+            group = "#{table_name}.#{primary_key} HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
           end
           
           { :joins      => joins.join(" "),
