@@ -117,6 +117,14 @@ describe "Taggable" do
     TaggableModel.tagged_with('rails', :on => :skills).tagged_with('happier', :on => :tags).should == [bob]
   end
   
+  it "should be able to find tagged with only the matching tags" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "lazy, happier")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "fitter, happier, inefficient")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => "fitter, happier")
+    
+    TaggableModel.find_tagged_with("fitter, happier", :match_all => true).should == [steve]    
+  end
+  
   describe "Single Table Inheritance" do
     before do
       [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)

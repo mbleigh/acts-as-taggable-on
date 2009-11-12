@@ -156,9 +156,20 @@ module ActiveRecord
           
             joins << tagging_join
             joins << tag_join
+          end
+          
+          taggings_alias, tags_alias = "#{table_name}_taggings_group", "#{table_name}_tags_group"
+
+          if options.delete(:match_all)
+            joins << "LEFT OUTER JOIN #{Tagging.table_name} #{taggings_alias}" +
+                     "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
+                     " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
+             
+            group = "#{taggings_alias}.taggable_id HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
           end     
           
-          { :joins => joins.join(" ") }.update(options)
+          { :joins => joins.join(" "),
+            :group => group }.update(options)
         end    
         
         # Calculate the tag counts for all tags.
