@@ -60,7 +60,8 @@ describe "Taggable" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.tag_list = "bob, charlie"
     @taggable.save
-    TaggableModel.tagged_with("ruby", {}).first.should == @taggable
+    
+    TaggableModel.tagged_with("ruby").first.should == @taggable
     TaggableModel.tagged_with("bob", :on => :skills).first.should_not == @taggable
     TaggableModel.tagged_with("bob", :on => :tags).first.should == @taggable
   end
