@@ -1,7 +1,6 @@
 # require File.dirname(__FILE__) + '/../../../../spec/spec_helper'
 require 'rubygems'
-require 'active_support'
-require 'active_record'
+require 'activerecord'
 require 'spec'
 
 module Spec::Example::ExampleGroupMethods
