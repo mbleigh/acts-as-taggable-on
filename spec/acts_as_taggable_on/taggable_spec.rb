@@ -125,6 +125,14 @@ describe "Taggable" do
     TaggableModel.find_tagged_with("fitter, happier", :match_all => true).should == [steve]    
   end
   
+  it "should be able to find tagged with some excluded tags" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "happier, lazy")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "happier")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => "happier")
+    
+    TaggableModel.find_tagged_with("lazy", :exclude => true).should == [frank, steve]    
+  end
+  
   describe "Single Table Inheritance" do
     before do
       [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)

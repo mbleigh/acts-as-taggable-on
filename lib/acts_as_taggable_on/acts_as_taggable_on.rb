@@ -135,27 +135,35 @@ module ActiveRecord
           return {} if tags.empty?
           
           joins = []
+          conditions = []
           
           context = options.delete(:on)
+
+          
+          if options.delete(:exclude)
+            tags_conditions = "(" + tags.map { |t| sanitize_sql(["#{Tag.table_name}.name LIKE ?", t]) }.join(" OR ") + ")"
+            conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{Tagging.table_name}.taggable_id FROM #{Tagging.table_name} JOIN #{Tag.table_name} ON #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{tags_conditions} WHERE #{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
+          
+          else          
+            tags.each do |tag|
+              safe_tag = tag.gsub(/[^a-zA-Z0-9]/, '')
+              prefix   = "#{safe_tag}_#{rand(1024)}"
   
-          tags.each do |tag|
-            safe_tag = tag.gsub(/[^a-zA-Z0-9]/, '')
-            prefix   = "#{safe_tag}_#{rand(1024)}"
-  
-            taggings_alias = "#{table_name}_taggings_#{prefix}"
-            tags_alias     = "#{table_name}_tags_#{prefix}"
+              taggings_alias = "#{table_name}_taggings_#{prefix}"
+              tags_alias     = "#{table_name}_tags_#{prefix}"
             
-            tagging_join  = "JOIN #{Tagging.table_name} #{taggings_alias}" +
-                            "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
-                            " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
-            tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
+              tagging_join  = "JOIN #{Tagging.table_name} #{taggings_alias}" +
+                              "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
+                              " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
+              tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
           
-            tag_join     = "JOIN #{Tag.table_name} #{tags_alias}" +
-                           "  ON #{tags_alias}.id = #{taggings_alias}.tag_id" +
-                           " AND " + sanitize_sql(["#{tags_alias}.name like ?", tag])
+              tag_join     = "JOIN #{Tag.table_name} #{tags_alias}" +
+                             "  ON #{tags_alias}.id = #{taggings_alias}.tag_id" +
+                             " AND " + sanitize_sql(["#{tags_alias}.name like ?", tag])
           
-            joins << tagging_join
-            joins << tag_join
+              joins << tagging_join
+              joins << tag_join
+            end            
           end
           
           taggings_alias, tags_alias = "#{table_name}_taggings_group", "#{table_name}_tags_group"
@@ -166,10 +174,11 @@ module ActiveRecord
                      " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
              
             group = "#{taggings_alias}.taggable_id HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
-          end     
+          end
           
-          { :joins => joins.join(" "),
-            :group => group }.update(options)
+          { :joins      => joins.join(" "),
+            :group      => group,
+            :conditions => conditions.join(" AND ") }.update(options)
         end    
         
         # Calculate the tag counts for all tags.
