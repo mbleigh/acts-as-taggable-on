@@ -277,10 +277,10 @@ module ActiveRecord
         
         def tags_on(context, owner=nil)
           if owner
-            opts = {:conditions => ["context = ? AND tagger_id = ? AND tagger_type = ?",
+            opts = {:conditions => ["#{Tagging.table_name}.context = ? AND #{Tagging.table_name}.tagger_id = ? AND #{Tagging.table_name}.tagger_type = ?",
                                     context.to_s, owner.id, owner.class.to_s]}
           else
-            opts = {:conditions => ["context = ?", context.to_s]}
+            opts = {:conditions => ["#{Tagging.table_name}.context = ?", context.to_s]}
           end
           base_tags.find(:all, opts)
         end
