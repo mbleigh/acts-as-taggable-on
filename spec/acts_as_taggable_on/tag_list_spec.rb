@@ -20,6 +20,12 @@ describe TagList do
     @tag_list.include?("wicked").should be_true
   end
   
+  it "should be able to add an array of words" do
+    @tag_list.add(["cool", "wicked"], :parse => true)
+    @tag_list.include?("cool").should be_true
+    @tag_list.include?("wicked").should be_true
+  end
+  
   it "should be able to remove words" do
     @tag_list.remove("awesome")
     @tag_list.include?("awesome").should be_false
@@ -27,6 +33,11 @@ describe TagList do
   
   it "should be able to remove delimited lists of words" do
     @tag_list.remove("awesome, radical", :parse => true)
+    @tag_list.should be_empty
+  end
+  
+  it "should be able to remove an array of words" do
+    @tag_list.remove(["awesome", "radical"], :parse => true)
     @tag_list.should be_empty
   end
   

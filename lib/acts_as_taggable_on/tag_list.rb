@@ -73,6 +73,8 @@ class TagList < Array
     #   tag_list = TagList.from("One , Two,  Three")
     #   tag_list # ["One", "Two", "Three"]
     def from(string)
+      string = string.join(", ") if string.respond_to?(:join)
+
       returning new do |tag_list|
         string = string.to_s.dup
         
