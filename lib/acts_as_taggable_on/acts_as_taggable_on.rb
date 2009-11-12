@@ -136,12 +136,12 @@ module ActiveRecord
 
           conditions = []
           conditions << sanitize_sql(options.delete(:conditions)) if options[:conditions]
-          
-          unless (on = options.delete(:on)).nil?
-            conditions << sanitize_sql(["context = ?",on.to_s])
-          end
 
           taggings_alias, tags_alias = "#{table_name}_taggings", "#{table_name}_tags"
+
+          if on = options.delete(:on)
+            conditions << sanitize_sql(["#{taggings_alias}.context = ?",on.to_s])
+          end
 
           if options.delete(:exclude)
             tags_conditions = tags.map { |t| sanitize_sql(["#{Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
