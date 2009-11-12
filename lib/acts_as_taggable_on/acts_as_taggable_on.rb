@@ -130,36 +130,35 @@ module ActiveRecord
         end           
         
         def find_options_for_find_tagged_with(tags, options = {})
-          tags = tags.is_a?(Array) ? TagList.new(tags.map(&:to_s)) : TagList.from(tags)
-
-          return {} if tags.empty?
-
-          conditions = []
-          conditions << sanitize_sql(options.delete(:conditions)) if options[:conditions]
-
-          taggings_alias, tags_alias = "#{table_name}_taggings", "#{table_name}_tags"
-
-          if on = options.delete(:on)
-            conditions << sanitize_sql(["#{taggings_alias}.context = ?",on.to_s])
-          end
-
-          if options.delete(:exclude)
-            tags_conditions = tags.map { |t| sanitize_sql(["#{Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
-            conditions << sanitize_sql(["#{table_name}.id NOT IN (SELECT #{Tagging.table_name}.taggable_id FROM #{Tagging.table_name} LEFT OUTER JOIN #{Tag.table_name} ON #{Tagging.table_name}.tag_id = #{Tag.table_name}.id WHERE (#{tags_conditions}) AND #{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})", tags])
-          else
-            conditions << tags.map { |t| sanitize_sql(["#{tags_alias}.name LIKE ?", t]) }.join(" OR ")
-
-            if options.delete(:match_all)
-              group = "#{taggings_alias}.taggable_id HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
-            end
-          end
+          tags = TagList.from(tags)
           
-          { :select => "DISTINCT #{table_name}.*",
-            :joins => "LEFT OUTER JOIN #{Tagging.table_name} #{taggings_alias} ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key} AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)} " +
-                      "LEFT OUTER JOIN #{Tag.table_name} #{tags_alias} ON #{tags_alias}.id = #{taggings_alias}.tag_id",
-            :conditions => conditions.join(" AND "),
-            :group      => group
-          }.update(options)
+          return {} if tags.empty?
+          
+          joins = []
+          
+          context = options.delete(:on)
+  
+          tags.each do |tag|
+            safe_tag = tag.gsub(/[^a-zA-Z0-9]/, '')
+            prefix   = "#{safe_tag}_#{rand(1024)}"
+  
+            taggings_alias = "#{table_name}_taggings_#{prefix}"
+            tags_alias     = "#{table_name}_tags_#{prefix}"
+            
+            tagging_join  = "JOIN #{Tagging.table_name} #{taggings_alias}" +
+                            "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
+                            " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
+            tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
+          
+            tag_join     = "JOIN #{Tag.table_name} #{tags_alias}" +
+                           "  ON #{tags_alias}.id = #{taggings_alias}.tag_id" +
+                           " AND " + sanitize_sql(["#{tags_alias}.name like ?", tag])
+          
+            joins << tagging_join
+            joins << tag_join
+          end     
+          
+          { :joins => joins.join(" ") }.update(options)
         end    
         
         # Calculate the tag counts for all tags.
