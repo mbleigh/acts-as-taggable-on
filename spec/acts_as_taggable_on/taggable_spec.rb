@@ -100,6 +100,14 @@ describe "Taggable" do
     TaggableModel.tagged_with("ruby").skill_counts.first.count.should == 1 # ruby
   end
   
+  it "should be able to get all scoped tag counts" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
+    
+    TaggableModel.tagged_with("ruby").all_tag_counts.first.count.should == 3 # ruby
+  end
+  
   it "should be able to set a custom tag context list" do
     bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
