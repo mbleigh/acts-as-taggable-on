@@ -82,12 +82,13 @@ describe "Taggable" do
     TaggableModel.skill_counts.should_not be_empty
   end
   
-  it "should be able to get tag counts on an association" do
+  it "should be able to get scoped tag counts" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
-    bob.tag_counts.first.count.should == 2
-    charlie.skill_counts.first.count.should == 1
+    
+    TaggableModel.tagged_with("ruby").tag_counts.first.count.should == 2
+    TaggableModel.tagged_with("ruby").skill_counts.first.count.should == 1
   end
   
   it "should be able to set a custom tag context list" do
