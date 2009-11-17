@@ -129,6 +129,10 @@ module ActiveRecord
           Tag.find(:all, find_options_for_tag_counts(options.merge({:on => context.to_s})))
         end           
         
+        def all_tag_counts(options = {})
+          Tag.find(:all, find_options_for_tag_counts(options))
+        end
+        
         def find_options_for_find_tagged_with(tags, options = {})
           tags = TagList.from(tags)
           
