@@ -232,10 +232,10 @@ module ActiveRecord
           at_least  = sanitize_sql(['COUNT(*) >= ?', options.delete(:at_least)]) if options[:at_least]
           at_most   = sanitize_sql(['COUNT(*) <= ?', options.delete(:at_most)]) if options[:at_most]
           having    = [at_least, at_most].compact.join(' AND ')
-          group_by  = "#{Tag.table_name}.id, #{Tag.table_name}.name HAVING COUNT(*) > 0"
+          group_by  = "#{Tag.table_name}.id HAVING COUNT(*) > 0"
           group_by << " AND #{having}" unless having.blank?
 
-          { :select     => "#{Tag.table_name}.id, #{Tag.table_name}.name, COUNT(*) AS count", 
+          { :select     => "#{Tag.table_name}.*, COUNT(*) AS count", 
             :joins      => joins.join(" "),
             :conditions => conditions,
             :group      => group_by,
