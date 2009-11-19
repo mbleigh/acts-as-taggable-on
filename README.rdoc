@@ -1,0 +1,158 @@
+= ActsAsTaggableOn
+
+This plugin was originally based on Acts as Taggable on Steroids by Jonathan Viney.
+It has evolved substantially since that point, but all credit goes to him for the
+initial tagging functionality that so many people have used.
+
+For instance, in a social network, a user might have tags that are called skills,
+interests, sports, and more. There is no real way to differentiate between tags and
+so an implementation of this type is not possible with acts as taggable on steroids.
+
+Enter Acts as Taggable On. Rather than tying functionality to a specific keyword
+(namely "tags"), acts as taggable on allows you to specify an arbitrary number of
+tag "contexts" that can be used locally or in combination in the same way steroids
+was used.
+
+== Installation
+
+=== Plugin
+
+Acts As Taggable On is available both as a gem and as a traditional plugin. For the
+traditional plugin you can install like so (Rails 2.1 or later):
+
+  script/plugin install git://github.com/mbleigh/acts-as-taggable-on.git
+  
+=== GemPlugin
+
+Acts As Taggable On is also available as a gem plugin using Rails 2.1's gem dependencies.
+To install the gem, add this to your config/environment.rb:
+  
+  config.gem "acts-as-taggable-on", :source => "http://gemcutter.org"
+  
+After that, you can run "rake gems:install" to install the gem if you don't already have it.
+
+=== Post Installation (Rails)
+
+1. script/generate acts_as_taggable_on_migration
+2. rake db:migrate
+
+=== Testing
+
+Acts As Taggable On uses RSpec for its test coverage. Inside the plugin
+directory, you can run the specs with:
+
+rake spec
+
+If you already have RSpec on your application, the specs will run while using:
+
+rake spec:plugins
+
+
+== Usage
+
+    class User < ActiveRecord::Base
+      acts_as_taggable_on :tags, :skills, :interests
+    end
+
+    @user = User.new(:name => "Bobby")
+    @user.tag_list = "awesome, slick, hefty"      # this should be familiar
+    @user.skill_list = "joking, clowning, boxing" # but you can do it for any context!
+    @user.skill_list # => ["joking","clowning","boxing"] as TagList
+    @user.save
+
+    @user.tags # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
+    @user.skills # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
+
+    # The old way
+    User.find_tagged_with("awesome", :on => :tags) # => [@user]
+    User.find_tagged_with("awesome", :on => :skills) # => []
+
+    # The better way (utilizes named_scope)
+    User.tagged_with("awesome", :on => :tags) # => [@user]
+    User.tagged_with("awesome", :on => :skills) # => []
+
+    @frankie = User.create(:name => "Frankie", :skill_list => "joking, flying, eating")
+    User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
+    @frankie.skill_counts
+
+=== Finding Tagged Objects
+
+Acts As Taggable On utilizes Rails 2.1's named_scope to create an association
+for tags. This way you can mix and match to filter down your results, and it
+also improves compatibility with the will_paginate gem:
+
+    class User < ActiveRecord::Base
+      acts_as_taggable_on :tags
+      named_scope :by_join_date, :order => "created_at DESC"
+    end
+
+    User.tagged_with("awesome").by_date
+    User.tagged_with("awesome").by_date.paginate(:page => params[:page], :per_page => 20)
+
+=== Relationships
+
+You can find objects of the same type based on similar tags on certain contexts.
+Also, objects will be returned in descending order based on the total number of 
+matched tags.
+
+    @bobby = User.find_by_name("Bobby")
+    @bobby.skill_list # => ["jogging", "diving"]
+
+    @frankie = User.find_by_name("Frankie")
+    @frankie.skill_list # => ["hacking"]
+
+    @tom = User.find_by_name("Tom")
+    @tom.skill_list # => ["hacking", "jogging", "diving"]
+
+    @tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
+    @bobby.find_related_skills # => [<User name="Tom">] 
+    @frankie.find_related_skills # => [<User name="Tom">] 
+
+=== Dynamic Tag Contexts
+
+In addition to the generated tag contexts in the definition, it is also possible
+to allow for dynamic tag contexts (this could be user generated tag contexts!)
+
+    @user = User.new(:name => "Bobby")
+    @user.set_tag_list_on(:customs, "same, as, tag, list")
+    @user.tag_list_on(:customs) # => ["same","as","tag","list"]
+    @user.save
+    @user.tags_on(:customs) # => [<Tag name='same'>,...]
+    @user.tag_counts_on(:customs)
+    User.find_tagged_with("same", :on => :customs) # => [@user]
+
+=== Tag Ownership
+
+Tags can have owners:
+
+    class User < ActiveRecord::Base
+      acts_as_tagger
+    end
+
+    class Photo < ActiveRecord::Base
+      acts_as_taggable_on :locations
+    end
+
+    @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations)
+    @some_user.owned_taggings
+    @some_user.owned_tags
+    @some_photo.locations_from(@some_user)
+
+== Contributors
+
+* TomEric (i76) - Maintainer
+* Michael Bleigh - Original Author
+* Brendan Lim - Related Objects
+* Pradeep Elankumaran - Taggers
+* Sinclair Bain - Patch King
+
+== Patch Contributors
+
+* tristanzdunn - Related objects of other classes
+* azabaj - Fixed migrate down
+* Peter Cooper - named_scope fix
+* slainer68 - STI fix
+* harrylove - migration instructions and fix-ups
+* lawrencepit - cached tag work
+
+Copyright (c) 2007-2009 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license
