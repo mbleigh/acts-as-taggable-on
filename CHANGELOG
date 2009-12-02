@@ -1,3 +1,7 @@
+== 2009-12-02
+
+* PostgreSQL is now supported (via morgoth)
+
 == 2008-07-17
 
 * Can now use a named_scope to find tags!
