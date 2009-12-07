@@ -40,14 +40,6 @@ describe "Acts As Taggable On" do
       @taggable.should respond_to(:tag_list, :skill_list, :language_list)
       @taggable.should respond_to(:tag_list=, :skill_list=, :language_list=)
     end
-
-    it "should return all column names joined for Tag GROUP clause" do
-      TaggableModel.column_names_for_tag_group.should == "tags.id, tags.name"
-    end
-
-    it "should return all column names joined for TaggableModel GROUP clause" do
-      TaggableModel.column_names_for_tagging_group.should == "taggable_models.id, taggable_models.name, taggable_models.type"
-    end
   end
 
   describe "Single Table Inheritance" do

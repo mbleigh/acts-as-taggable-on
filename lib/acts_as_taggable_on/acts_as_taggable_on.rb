@@ -109,6 +109,7 @@ module ActiveRecord
       end
 
       module SingletonMethods
+        include ActiveRecord::Acts::TaggableOn::GroupHelper
         # Pass either a tag string, or an array of strings or tags
         #
         # Options:
@@ -177,7 +178,7 @@ module ActiveRecord
                      "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
                      " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
 
-            group = "#{column_names_for_tagging_group} HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
+            group = "#{grouped_column_names_for(self)} HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
           end
 
           { :joins      => joins.join(" "),
@@ -232,7 +233,7 @@ module ActiveRecord
           at_least  = sanitize_sql(['COUNT(*) >= ?', options.delete(:at_least)]) if options[:at_least]
           at_most   = sanitize_sql(['COUNT(*) <= ?', options.delete(:at_most)]) if options[:at_most]
           having    = [at_least, at_most].compact.join(' AND ')
-          group_by  = "#{column_names_for_tag_group} HAVING COUNT(*) > 0"
+          group_by  = "#{grouped_column_names_for(Tag)} HAVING COUNT(*) > 0"
           group_by << " AND #{having}" unless having.blank?
 
           { :select     => "#{Tag.table_name}.*, COUNT(*) AS count",
@@ -247,17 +248,10 @@ module ActiveRecord
         def is_taggable?
           true
         end
-
-        def column_names_for_tag_group
-          Tag.column_names.map { |column| "#{Tag.table_name}.#{column}" }.join(", ")
-        end
-
-        def column_names_for_tagging_group
-          column_names.map { |column| "#{table_name}.#{column}" }.join(", ")
-        end
       end
 
       module InstanceMethods
+        include ActiveRecord::Acts::TaggableOn::GroupHelper
 
         def tag_types
           self.class.tag_types
@@ -324,7 +318,7 @@ module ActiveRecord
           { :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count",
             :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
             :conditions => ["#{exclude_self} #{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)", tags_to_find],
-            :group      => "#{klass.table_name}.id",
+            :group      => grouped_column_names_for(klass),
             :order      => "count DESC"
           }.update(options)
         end
