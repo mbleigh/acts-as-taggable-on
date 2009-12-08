@@ -4,6 +4,7 @@ describe Tag do
   before(:each) do
     @tag = Tag.new
     @user = TaggableModel.create(:name => "Pablo")  
+    Tag.delete_all
   end
   
   it "should require a name" do
@@ -23,5 +24,18 @@ describe Tag do
   it "should return its name when to_s is called" do
     @tag.name = "cool"
     @tag.to_s.should == "cool"
+  end
+  
+  it "have named_scope named(something)" do
+    @tag.name = "cool"
+    @tag.save!
+    Tag.named('cool').should include(@tag)
+  end
+  
+  it "have named_scope named_like(something)" do
+    @tag.name = "cool"
+    @tag.save!
+    @another_tag = Tag.create!(:name => "coolip")
+    Tag.named_like('cool').should include(@tag, @another_tag)
   end
 end
