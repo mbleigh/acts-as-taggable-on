@@ -119,6 +119,58 @@ describe "Acts As Taggable On" do
     end
   end
 
+  describe "Matching Contexts" do
+    it "should find objects with tags of matching contexts" do
+      taggable1 = TaggableModel.create!(:name => "Taggable 1")
+      taggable2 = TaggableModel.create!(:name => "Taggable 2")
+      taggable3 = TaggableModel.create!(:name => "Taggable 3")
+
+      taggable1.offering_list = "one, two"
+      taggable1.save!
+
+      taggable2.need_list = "one, two"
+      taggable2.save!
+
+      taggable3.offering_list = "one, two"
+      taggable3.save!
+
+      taggable1.find_matching_contexts(:offerings, :needs).should include(taggable2)
+      taggable1.find_matching_contexts(:offerings, :needs).should_not include(taggable3)
+    end
+
+    it "should find other related objects with tags of matching contexts" do
+      taggable1 = TaggableModel.create!(:name => "Taggable 1")
+      taggable2 = OtherTaggableModel.create!(:name => "Taggable 2")
+      taggable3 = OtherTaggableModel.create!(:name => "Taggable 3")
+
+      taggable1.offering_list = "one, two"
+      taggable1.save
+
+      taggable2.need_list = "one, two"
+      taggable2.save
+
+      taggable3.offering_list = "one, two"
+      taggable3.save
+
+      taggable1.find_matching_contexts_for(OtherTaggableModel, :offerings, :needs).should include(taggable2)
+      taggable1.find_matching_contexts_for(OtherTaggableModel, :offerings, :needs).should_not include(taggable3)
+    end
+
+    it "should not include the object itself in the list of related objects" do
+      taggable1 = TaggableModel.create!(:name => "Taggable 1")
+      taggable2 = TaggableModel.create!(:name => "Taggable 2")
+
+      taggable1.tag_list = "one"
+      taggable1.save
+
+      taggable2.tag_list = "one, two"
+      taggable2.save
+
+      taggable1.find_related_tags.should include(taggable2)
+      taggable1.find_related_tags.should_not include(taggable1)
+    end
+  end
+
   describe 'Tagging Contexts' do
     before(:all) do
       class Array

@@ -65,6 +65,14 @@ module ActiveRecord
                 related_tags_for('#{tag_type}', klass, options)
               end
 
+              def find_matching_contexts(search_context, result_context, options = {})
+                matching_contexts_for(search_context.to_s, result_context.to_s, self.class, options)
+              end
+              
+              def find_matching_contexts_for(klass, search_context, result_context, options = {})
+                matching_contexts_for(search_context.to_s, result_context.to_s, klass, options)
+              end
+
               def top_#{tag_type}(limit = 10)
                 tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
               end
@@ -322,7 +330,26 @@ module ActiveRecord
             :order      => "count DESC"
           }.update(options)
         end
+        
+        def matching_contexts_for(search_context, result_context, klass, options = {})
+          search_conditions = matching_context_search_options(search_context, result_context, klass, options)
 
+          klass.find(:all, search_conditions)
+        end
+        
+        def matching_context_search_options(search_context, result_context, klass, options = {})
+          tags_to_find = self.tags_on(search_context).collect { |t| t.name }
+
+          exclude_self = "#{klass.table_name}.id != #{self.id} AND" if self.class == klass
+
+          { :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count",
+            :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
+            :conditions => ["#{exclude_self} #{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?) AND #{Tagging.table_name}.context = ?", tags_to_find, result_context],
+            :group      => grouped_column_names_for(klass),
+            :order      => "count DESC"
+          }.update(options)
+        end
+        
         def save_cached_tag_list
           self.class.tag_types.map(&:to_s).each do |tag_type|
             if self.class.send("caching_#{tag_type.singularize}_list?")

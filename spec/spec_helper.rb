@@ -24,10 +24,12 @@ require File.join(File.dirname(__FILE__), '..', 'init')
 class TaggableModel < ActiveRecord::Base
   acts_as_taggable_on :tags, :languages
   acts_as_taggable_on :skills
+  acts_as_taggable_on :needs, :offerings
 end
 
 class OtherTaggableModel < ActiveRecord::Base
   acts_as_taggable_on :tags, :languages
+  acts_as_taggable_on :needs, :offerings
 end
 
 class InheritingTaggableModel < TaggableModel
