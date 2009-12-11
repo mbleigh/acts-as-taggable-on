@@ -137,6 +137,39 @@ Tags can have owners:
     @some_user.owned_taggings
     @some_user.owned_tags
     @some_photo.locations_from(@some_user)
+    
+=== Tag cloud calculations
+
+To construct tag clouds, the frequency of each tag needs to be calculated.
+Because we specified +acts_as_taggable_on+ on the <tt>User</tt> class, we can
+get a calculation of all the tag counts by using <tt>User.tag_counts_on(:customs)</tt>. But what if we wanted a tag count for
+an single user's posts? To achieve this we call tag_counts on the association:
+
+  User.find(:first).posts.tag_counts_on(:tags)
+
+A helper is included to assist with generating tag clouds.
+
+Here is an example that generates a tag cloud.
+
+Controller:
+
+  class PostController < ApplicationController
+    def tag_cloud
+      @tags = Post.tag_counts_on(:tags)
+    end
+  end
+
+View:
+  <% tag_cloud @tags, %w(css1 css2 css3 css4) do |tag, css_class| %>
+    <%= link_to tag.name, { :action => :tag, :id => tag.name }, :class => css_class %>
+  <% end %>
+
+CSS:
+
+  .css1 { font-size: 1.0em; }
+  .css2 { font-size: 1.2em; }
+  .css3 { font-size: 1.4em; }
+  .css4 { font-size: 1.6em; }
 
 == Contributors
 
