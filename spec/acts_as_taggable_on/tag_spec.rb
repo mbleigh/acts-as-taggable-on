@@ -7,6 +7,27 @@ describe Tag do
     Tag.delete_all
   end
   
+  describe "find or create by name" do
+    before(:each) do
+      @tag.name = "awesome"
+      @tag.save
+    end
+    
+    it "should find by name" do
+      Tag.find_or_create_with_like_by_name("awesome").should == @tag
+    end
+    
+    it "should find by name case insensitive" do
+      Tag.find_or_create_with_like_by_name("AWESOME").should == @tag
+    end
+    
+    it "should create by name" do
+      lambda {
+        Tag.find_or_create_with_like_by_name("epic")
+      }.should change(Tag, :count).by(1)
+    end
+  end
+
   it "should require a name" do
     @tag.valid?
     @tag.errors.on(:name).should == "can't be blank"

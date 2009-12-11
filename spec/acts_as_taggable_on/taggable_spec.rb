@@ -5,6 +5,21 @@ describe "Taggable" do
     [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
     @taggable = TaggableModel.new(:name => "Bob Jones")
   end
+
+  it "should have tag types" do
+    TaggableModel.tag_types.should == [:tags, :languages, :skills, :needs, :offerings]
+    @taggable.tag_types.should == TaggableModel.tag_types
+  end
+
+  it "should have tag_counts_on" do
+    TaggableModel.tag_counts_on(:tags).should be_empty
+    
+    @taggable.tag_list = ["awesome", "epic"]
+    @taggable.save
+
+    TaggableModel.tag_counts_on(:tags).count.should == 2
+    @taggable.tag_counts_on(:tags).count.should == 2
+  end
   
   it "should be able to create tags" do
     @taggable.skill_list = "ruby, rails, css"

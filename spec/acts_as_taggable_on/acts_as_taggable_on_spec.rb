@@ -18,6 +18,10 @@ describe "Acts As Taggable On" do
     it "should create a class attribute for tag types" do
       @taggable.class.should respond_to(:tag_types)
     end
+    
+    it "should create an instance attribute for tag types" do
+      @taggable.should respond_to(:tag_types)
+    end
 
     it "should generate an association for each tag type" do
       @taggable.should respond_to(:tags, :skills, :languages)
