@@ -151,6 +151,12 @@ A helper is included to assist with generating tag clouds.
 
 Here is an example that generates a tag cloud.
 
+Helper:
+
+  module PostsHelper
+    include TagsHelper
+  end
+
 Controller:
 
   class PostController < ApplicationController
@@ -160,6 +166,7 @@ Controller:
   end
 
 View:
+
   <% tag_cloud @tags, %w(css1 css2 css3 css4).each do |tag, css_class| %>
     <%= link_to tag.name, { :action => :tag, :id => tag.name }, :class => css_class %>
   <% end %>
@@ -187,5 +194,6 @@ CSS:
 * slainer68 - STI fix
 * harrylove - migration instructions and fix-ups
 * lawrencepit - cached tag work
+* sobrinho - fixed tag_cloud helper
 
 Copyright (c) 2007-2009 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license
