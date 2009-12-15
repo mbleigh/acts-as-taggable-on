@@ -9,7 +9,7 @@ begin
     gemspec.email = "michael@intridea.com"
     gemspec.homepage = "http://github.com/mbleigh/acts-as-taggable-on"
     gemspec.authors = ["Michael Bleigh"]
-    gemspec.files =  FileList["[A-Z]*", "{lib,spec,rails}/**/*"] - FileList["**/*.log"]
+    gemspec.files =  FileList["[A-Z]*", "{generators,lib,spec,rails}/**/*"] - FileList["**/*.log"]
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
