@@ -7,6 +7,17 @@ describe Tag do
     Tag.delete_all
   end
   
+  describe "named like any" do
+    before(:each) do
+      Tag.create(:name => "awesome")
+      Tag.create(:name => "epic")
+    end
+    
+    it "should find both tags" do
+      Tag.named_like_any(["awesome", "epic"]).should have(2).items
+    end
+  end
+  
   describe "find or create by name" do
     before(:each) do
       @tag.name = "awesome"
