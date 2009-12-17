@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Bleigh"]
-  s.date = %q{2009-12-11}
+  s.date = %q{2009-12-17}
   s.description = %q{With ActsAsTaggableOn, you could tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
   s.email = %q{michael@intridea.com}
   s.extra_rdoc_files = [
@@ -21,6 +21,8 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
+     "generators/acts_as_taggable_on_migration/acts_as_taggable_on_migration_generator.rb",
+     "generators/acts_as_taggable_on_migration/templates/migration.rb",
      "lib/acts-as-taggable-on.rb",
      "lib/acts_as_taggable_on/acts_as_taggable_on.rb",
      "lib/acts_as_taggable_on/acts_as_tagger.rb",
