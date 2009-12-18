@@ -77,6 +77,8 @@ describe "Taggable" do
     @taggable.save
     
     TaggableModel.tagged_with("ruby").first.should == @taggable
+    TaggableModel.tagged_with("ruby, css").first.should == @taggable
+    TaggableModel.tagged_with("ruby, nonexistingtag").should be_empty
     TaggableModel.tagged_with("bob", :on => :skills).first.should_not == @taggable
     TaggableModel.tagged_with("bob", :on => :tags).first.should == @taggable
   end

@@ -139,9 +139,9 @@ module ActiveRecord
         end
 
         def find_options_for_find_tagged_with(tags, options = {})
-          tags = TagList.from(tags)
+          tag_list = TagList.from(tags)
 
-          return {} if tags.empty?
+          return {} if tag_list.empty?
 
           joins = []
           conditions = []
@@ -150,11 +150,12 @@ module ActiveRecord
 
 
           if options.delete(:exclude)
-            tags_conditions = tags.map { |t| sanitize_sql(["#{Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
             conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{Tagging.table_name}.taggable_id FROM #{Tagging.table_name} JOIN #{Tag.table_name} ON #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND (#{tags_conditions}) WHERE #{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
           else
-            tags = Tag.named_like_any(tags)
+            tags = Tag.named_like_any(tag_list)
+            return { :conditions => "1 = 0" } unless tags.length == tag_list.length
                       
             tags.each do |tag|
               safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')
