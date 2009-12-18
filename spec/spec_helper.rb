@@ -7,6 +7,14 @@ module Spec::Example::ExampleGroupMethods
   alias :context :describe
 end
 
+class Array
+  def freq
+    k=Hash.new(0)
+    each {|e| k[e]+=1}
+    k
+  end
+end
+
 TEST_DATABASE_FILE = File.join(File.dirname(__FILE__), '..', 'test.sqlite3')
 
 File.unlink(TEST_DATABASE_FILE) if File.exist?(TEST_DATABASE_FILE)
