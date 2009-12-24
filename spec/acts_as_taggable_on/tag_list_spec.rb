@@ -20,6 +20,18 @@ describe TagList do
     @tag_list.include?("wicked").should be_true
   end
   
+  it "should be able to add delimited list of words with quoted delimiters" do
+    @tag_list.add("'cool, wicked', \"really cool, really wicked\"", :parse => true)
+    @tag_list.include?("cool, wicked").should be_true
+    @tag_list.include?("really cool, really wicked").should be_true
+  end
+  
+  it "should be able to handle other uses of quotation marks correctly" do
+    @tag_list.add("john's cool car, mary's wicked toy", :parse => true)
+    @tag_list.include?("john's cool car").should be_true
+    @tag_list.include?("mary's wicked toy").should be_true
+  end
+  
   it "should be able to add an array of words" do
     @tag_list.add(["cool", "wicked"], :parse => true)
     @tag_list.include?("cool").should be_true

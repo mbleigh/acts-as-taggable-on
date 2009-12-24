@@ -79,8 +79,8 @@ class TagList < Array
         string = string.to_s.dup
         
         # Parse the quoted tags
-        string.gsub!(/"(.*?)"\s*#{delimiter}?\s*/) { tag_list << $1; "" }
-        string.gsub!(/'(.*?)'\s*#{delimiter}?\s*/) { tag_list << $1; "" }
+        string.gsub!(/(\A|#{delimiter})\s*"(.*?)"\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
+        string.gsub!(/(\A|#{delimiter})\s*'(.*?)'\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
         
         tag_list.add(string.split(delimiter))
       end
