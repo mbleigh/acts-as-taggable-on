@@ -13,4 +13,13 @@ describe Tagging do
     @tagging.should_not be_valid
     @tagging.errors.on(:tag_id).should == "can't be blank"
   end
+  
+  it "should not create duplicate taggings" do
+    @taggable = TaggableModel.create(:name => "Bob Jones")
+    @tag = Tag.create(:name => "awesome")
+    
+    lambda {
+      2.times { Tagging.create(:taggable => @taggable, :tag => @tag, :context => 'tags') }
+    }.should change(Tagging, :count).by(1)
+  end
 end
