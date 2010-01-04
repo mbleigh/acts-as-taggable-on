@@ -230,6 +230,8 @@ module ActiveRecord
             joins << " AND #{table_name}.#{self.inheritance_column} = '#{self.name}'"
           end
 
+          # Based on a proposed patch by donV to ActiveRecord Base
+          # This is needed becuase merge_joins and construct_join are private in ActiveRecord Base
           if scope && scope[:joins]
             case scope[:joins]
             when Array
