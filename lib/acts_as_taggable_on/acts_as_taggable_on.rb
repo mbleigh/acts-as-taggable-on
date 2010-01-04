@@ -223,14 +223,30 @@ module ActiveRecord
 
           joins = ["LEFT OUTER JOIN #{Tagging.table_name} ON #{Tag.table_name}.id = #{Tagging.table_name}.tag_id"]
           joins << sanitize_sql(["AND #{Tagging.table_name}.context = ?",options.delete(:on).to_s]) unless options[:on].nil?
-
           joins << " INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"
+          
           unless self.descends_from_active_record?
             # Current model is STI descendant, so add type checking to the join condition
             joins << " AND #{table_name}.#{self.inheritance_column} = '#{self.name}'"
           end
 
-          joins << scope[:joins] if scope && scope[:joins]
+          if scope && scope[:joins]
+            case scope[:joins]
+            when Array
+              scope_joins = scope[:joins].flatten
+              strings = scope_joins.select{|j| j.is_a? String}
+              joins << strings.join(' ') + " "
+              symbols = scope_joins - strings
+              join_dependency = ActiveRecord::Associations::ClassMethods::InnerJoinDependency.new(self, symbols, nil)
+              joins << " #{join_dependency.join_associations.collect { |assoc| assoc.association_join }.join} "
+              joins.flatten!
+            when Symbol, Hash
+              join_dependency = ActiveRecord::Associations::ClassMethods::InnerJoinDependency.new(self, scope[:joins], nil)
+              joins << " #{join_dependency.join_associations.collect { |assoc| assoc.association_join }.join} "
+            when String
+              joins << scope[:joins]
+            end
+          end
 
           at_least  = sanitize_sql(['COUNT(*) >= ?', options.delete(:at_least)]) if options[:at_least]
           at_most   = sanitize_sql(['COUNT(*) <= ?', options.delete(:at_most)]) if options[:at_most]
