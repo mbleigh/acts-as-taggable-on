@@ -231,7 +231,7 @@ module ActiveRecord
           end
 
           # Based on a proposed patch by donV to ActiveRecord Base
-          # This is needed becuase merge_joins and construct_join are private in ActiveRecord Base
+          # This is needed because merge_joins and construct_join are private in ActiveRecord Base
           if scope && scope[:joins]
             case scope[:joins]
             when Array
