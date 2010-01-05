@@ -108,6 +108,12 @@ describe "Taggable" do
     TaggableModel.all_tag_counts.first.count.should == 3 # ruby
   end
   
+  it "should not return read-only records" do
+    TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    
+    TaggableModel.tagged_with("ruby").first.should_not be_readonly
+  end
+  
   it "should be able to get scoped tag counts" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")

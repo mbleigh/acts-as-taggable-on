@@ -185,7 +185,8 @@ module ActiveRecord
 
           { :joins      => joins.join(" "),
             :group      => group,
-            :conditions => conditions.join(" AND ") }.update(options)
+            :conditions => conditions.join(" AND "),
+            :readonly   => false }.update(options)
         end
 
         # Calculate the tag counts for all tags.
