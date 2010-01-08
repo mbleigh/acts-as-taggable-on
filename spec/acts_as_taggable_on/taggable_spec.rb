@@ -186,6 +186,15 @@ describe "Taggable" do
     TaggableModel.find_tagged_with("lazy", :exclude => true).should == [frank, steve]    
   end
   
+  it "should not create duplicate taggings" do
+    bob = TaggableModel.create(:name => "Bob")
+    lambda {
+      bob.tag_list << "happier"
+      bob.tag_list << "happier"
+      bob.save
+    }.should change(Tagging, :count).by(1)
+  end
+  
   describe "Single Table Inheritance" do
     before do
       [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
