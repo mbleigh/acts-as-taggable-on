@@ -149,7 +149,17 @@ describe "Taggable" do
     TaggableModel.find_tagged_with("ruby, rails", :order => 'taggable_models.name').should == [bob, frank]
     TaggableModel.find_tagged_with(["ruby", "rails"], :order => 'taggable_models.name').should == [bob, frank]    
   end
-  
+
+  it "should be able to find tagged with any tag" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive", :skill_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
+    
+    TaggableModel.find_tagged_with(["ruby", "java"], :order => 'taggable_models.name', :any => true).should == [bob, frank, steve]
+    TaggableModel.find_tagged_with(["c++", "fitter"], :order => 'taggable_models.name', :any => true).should == [bob, steve]
+    TaggableModel.find_tagged_with(["depressed", "css"], :order => 'taggable_models.name', :any => true).should == [bob, frank]    
+  end
+    
   it "should be able to find tagged on a custom tag context" do
     bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
