@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{acts-as-taggable-on}
-  s.version = "1.0.18"
+  s.version = "1.0.19"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Bleigh"]
-  s.date = %q{2010-01-06}
+  s.date = %q{2010-01-21}
   s.description = %q{With ActsAsTaggableOn, you could tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
   s.email = %q{michael@intridea.com}
   s.extra_rdoc_files = [
@@ -51,17 +51,17 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{ActsAsTaggableOn is a tagging plugin for Rails that provides multiple tagging contexts on a single model.}
   s.test_files = [
-    "spec/spec_helper.rb",
-     "spec/schema.rb",
-     "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
+    "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
+     "spec/acts_as_taggable_on/acts_as_tagger_spec.rb",
+     "spec/acts_as_taggable_on/group_helper_spec.rb",
+     "spec/acts_as_taggable_on/tag_list_spec.rb",
+     "spec/acts_as_taggable_on/tag_spec.rb",
+     "spec/acts_as_taggable_on/taggable_spec.rb",
+     "spec/acts_as_taggable_on/tagger_spec.rb",
      "spec/acts_as_taggable_on/tagging_spec.rb",
      "spec/acts_as_taggable_on/tags_helper_spec.rb",
-     "spec/acts_as_taggable_on/tag_list_spec.rb",
-     "spec/acts_as_taggable_on/taggable_spec.rb",
-     "spec/acts_as_taggable_on/acts_as_tagger_spec.rb",
-     "spec/acts_as_taggable_on/tag_spec.rb",
-     "spec/acts_as_taggable_on/tagger_spec.rb",
-     "spec/acts_as_taggable_on/group_helper_spec.rb"
+     "spec/schema.rb",
+     "spec/spec_helper.rb"
   ]
 
   if s.respond_to? :specification_version then
