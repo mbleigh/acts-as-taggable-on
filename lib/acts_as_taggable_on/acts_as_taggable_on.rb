@@ -19,15 +19,15 @@ module ActiveRecord
           args.compact! if args
           for tag_type in args
             tag_type = tag_type.to_s
-            # use aliased_join_table_name for context condition so that sphix can join multiple
+            # use aliased_join_table_name for context condition so that sphinx can join multiple
             # tag references from same model without getting an ambiguous column error
-            self.class_eval do
+            class_eval do
               has_many "#{tag_type.singularize}_taggings".to_sym, :as => :taggable, :dependent => :destroy,
-                :include => :tag, :conditions => ['#{aliased_join_table_name rescue "taggings"}.context = ?',tag_type], :class_name => "Tagging"
+                :include => :tag, :conditions => ['#{aliased_join_table_name || Tagging.table_name rescue Tagging.table_name}.context = ?',tag_type], :class_name => "Tagging"
               has_many "#{tag_type}".to_sym, :through => "#{tag_type.singularize}_taggings".to_sym, :source => :tag
             end
 
-            self.class_eval <<-RUBY
+            class_eval <<-RUBY
               def self.taggable?
                 true
               end
@@ -86,7 +86,7 @@ module ActiveRecord
           if respond_to?(:tag_types)
             write_inheritable_attribute( :tag_types, (tag_types + args).uniq )
           else
-            self.class_eval do
+            class_eval do
               write_inheritable_attribute(:tag_types, args.uniq)
               class_inheritable_reader :tag_types
 
@@ -109,10 +109,6 @@ module ActiveRecord
             extend ActiveRecord::Acts::TaggableOn::SingletonMethods
             alias_method_chain :reload, :tag_list
           end
-        end
-
-        def is_taggable?
-          false
         end
       end
 
@@ -143,9 +139,9 @@ module ActiveRecord
         end
 
         def find_options_for_find_tagged_with(tags, options = {})
-          tags = TagList.from(tags)
+          tag_list = TagList.from(tags)
 
-          return {} if tags.empty?
+          return {} if tag_list.empty?
 
           joins = []
           conditions = []
@@ -154,28 +150,26 @@ module ActiveRecord
 
 
           if options.delete(:exclude)
-            tags_conditions = tags.map { |t| sanitize_sql(["#{Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
             conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{Tagging.table_name}.taggable_id FROM #{Tagging.table_name} JOIN #{Tag.table_name} ON #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND (#{tags_conditions}) WHERE #{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
           else
+            tags = Tag.named_like_any(tag_list)
+            return { :conditions => "1 = 0" } unless tags.length == tag_list.length
+                      
             tags.each do |tag|
-              safe_tag = tag.gsub(/[^a-zA-Z0-9]/, '')
+              safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')
               prefix   = "#{safe_tag}_#{rand(1024)}"
 
               taggings_alias = "#{table_name}_taggings_#{prefix}"
-              tags_alias     = "#{table_name}_tags_#{prefix}"
 
               tagging_join  = "JOIN #{Tagging.table_name} #{taggings_alias}" +
                               "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
-                              " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
+                              " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}" +
+                              " AND #{taggings_alias}.tag_id = #{tag.id}"
               tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
-              tag_join     = "JOIN #{Tag.table_name} #{tags_alias}" +
-                             "  ON #{tags_alias}.id = #{taggings_alias}.tag_id" +
-                             " AND " + sanitize_sql(["#{tags_alias}.name like ?", tag])
-
               joins << tagging_join
-              joins << tag_join
             end
           end
 
@@ -191,7 +185,8 @@ module ActiveRecord
 
           { :joins      => joins.join(" "),
             :group      => group,
-            :conditions => conditions.join(" AND ") }.update(options)
+            :conditions => conditions.join(" AND "),
+            :readonly   => false }.update(options)
         end
 
         # Calculate the tag counts for all tags.
@@ -229,14 +224,32 @@ module ActiveRecord
 
           joins = ["LEFT OUTER JOIN #{Tagging.table_name} ON #{Tag.table_name}.id = #{Tagging.table_name}.tag_id"]
           joins << sanitize_sql(["AND #{Tagging.table_name}.context = ?",options.delete(:on).to_s]) unless options[:on].nil?
-
           joins << " INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"
-          unless self.descends_from_active_record?
+          
+          unless descends_from_active_record?
             # Current model is STI descendant, so add type checking to the join condition
-            joins << " AND #{table_name}.#{self.inheritance_column} = '#{self.name}'"
+            joins << " AND #{table_name}.#{inheritance_column} = '#{name}'"
           end
 
-          joins << scope[:joins] if scope && scope[:joins]
+          # Based on a proposed patch by donV to ActiveRecord Base
+          # This is needed because merge_joins and construct_join are private in ActiveRecord Base
+          if scope && scope[:joins]
+            case scope[:joins]
+            when Array
+              scope_joins = scope[:joins].flatten
+              strings = scope_joins.select{|j| j.is_a? String}
+              joins << strings.join(' ') + " "
+              symbols = scope_joins - strings
+              join_dependency = ActiveRecord::Associations::ClassMethods::InnerJoinDependency.new(self, symbols, nil)
+              joins << " #{join_dependency.join_associations.collect { |assoc| assoc.association_join }.join} "
+              joins.flatten!
+            when Symbol, Hash
+              join_dependency = ActiveRecord::Associations::ClassMethods::InnerJoinDependency.new(self, scope[:joins], nil)
+              joins << " #{join_dependency.join_associations.collect { |assoc| assoc.association_join }.join} "
+            when String
+              joins << scope[:joins]
+            end
+          end
 
           at_least  = sanitize_sql(['COUNT(*) >= ?', options.delete(:at_least)]) if options[:at_least]
           at_most   = sanitize_sql(['COUNT(*) <= ?', options.delete(:at_most)]) if options[:at_most]
@@ -260,10 +273,6 @@ module ActiveRecord
 
       module InstanceMethods
         include ActiveRecord::Acts::TaggableOn::GroupHelper
-
-        def tag_types
-          self.class.tag_types
-        end
 
         def custom_contexts
           @custom_contexts ||= []
@@ -309,7 +318,7 @@ module ActiveRecord
         end
 
         def tag_counts_on(context, options={})
-          self.class.tag_counts_on(context, options.merge(:id => self.id))
+          self.class.tag_counts_on(context, options.merge(:id => id))
         end
 
         def related_tags_for(context, klass, options = {})
@@ -319,9 +328,9 @@ module ActiveRecord
         end
 
         def related_search_options(context, klass, options = {})
-          tags_to_find = self.tags_on(context).collect { |t| t.name }
+          tags_to_find = tags_on(context).collect { |t| t.name }
 
-          exclude_self = "#{klass.table_name}.id != #{self.id} AND" if self.class == klass
+          exclude_self = "#{klass.table_name}.id != #{id} AND" if self.class == klass
 
           { :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count",
             :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
@@ -338,9 +347,9 @@ module ActiveRecord
         end
         
         def matching_context_search_options(search_context, result_context, klass, options = {})
-          tags_to_find = self.tags_on(search_context).collect { |t| t.name }
+          tags_to_find = tags_on(search_context).collect { |t| t.name }
 
-          exclude_self = "#{klass.table_name}.id != #{self.id} AND" if self.class == klass
+          exclude_self = "#{klass.table_name}.id != #{id} AND" if self.class == klass
 
           { :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count",
             :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
@@ -365,7 +374,7 @@ module ActiveRecord
             new_tag_names = instance_variable_get("@#{tag_type.singularize}_list") - tags_on(tag_type).map(&:name)
             old_tags = tags_on(tag_type, owner).reject { |tag| instance_variable_get("@#{tag_type.singularize}_list").include?(tag.name) }
 
-            self.class.transaction do
+            transaction do
               base_tags.delete(*old_tags) if old_tags.any?
               new_tag_names.each do |new_tag_name|
                 new_tag = Tag.find_or_create_with_like_by_name(new_tag_name)
@@ -380,7 +389,7 @@ module ActiveRecord
 
         def reload_with_tag_list(*args)
           self.class.tag_types.each do |tag_type|
-            self.instance_variable_set("@#{tag_type.to_s.singularize}_list", nil)
+            instance_variable_set("@#{tag_type.to_s.singularize}_list", nil)
           end
 
           reload_without_tag_list(*args)

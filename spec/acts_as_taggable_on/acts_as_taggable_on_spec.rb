@@ -176,16 +176,6 @@ describe "Acts As Taggable On" do
   end
 
   describe 'Tagging Contexts' do
-    before(:all) do
-      class Array
-        def freq
-          k=Hash.new(0)
-          self.each {|e| k[e]+=1}
-          k
-        end
-      end
-    end
-
     it 'should eliminate duplicate tagging contexts ' do
       TaggableModel.acts_as_taggable_on(:skills, :skills)
       TaggableModel.tag_types.freq[:skills].should_not == 3
@@ -211,10 +201,6 @@ describe "Acts As Taggable On" do
       lambda {
         TaggableModel.acts_as_taggable_on([nil])
       }.should_not raise_error
-    end
-
-    after(:all) do
-      class Array; remove_method :freq; end
     end
   end
 
