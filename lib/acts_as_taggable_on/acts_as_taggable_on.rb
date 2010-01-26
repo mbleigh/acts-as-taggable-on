@@ -310,7 +310,7 @@ module ActiveRecord
           else
             opts = {:conditions => ["#{Tagging.table_name}.context = ?", context.to_s]}
           end
-          base_tags.find(:all, opts)
+          base_tags.find(:all, opts, :order => "created_at")
         end
 
         def cached_tag_list_on(context)
