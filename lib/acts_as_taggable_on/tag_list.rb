@@ -86,11 +86,5 @@ class TagList < Array
         tag_list.add(string.split(delimiter))
       end
     end
-    
-    def from_owner(owner, *tags)
-      returning from(*tags) do |taglist|
-        taglist.owner = owner
-      end
-    end
   end
 end

@@ -82,7 +82,6 @@ module ActiveRecord
               end
             RUBY
           end
-
           if respond_to?(:tag_types)
             write_inheritable_attribute( :tag_types, (tag_types + args).uniq )
           else
@@ -286,39 +285,57 @@ module ActiveRecord
         def is_taggable?
           self.class.is_taggable?
         end
-
+        
         def add_custom_context(value)
           custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
         end
 
-        def tag_list_on(context, owner=nil)
-          var_name = context.to_s.singularize + "_list"
+        def tag_list_on(context, owner = nil)
           add_custom_context(context)
-          return instance_variable_get("@#{var_name}") unless instance_variable_get("@#{var_name}").nil?
-
+          cache = tag_list_cache_on(context)
+          return owner ? cache[owner] : cache[owner] if cache[owner]
+          
           if !owner && self.class.caching_tag_list_on?(context) and !(cached_value = cached_tag_list_on(context)).nil?
-            instance_variable_set("@#{var_name}", TagList.from(self["cached_#{var_name}"]))
+            cache[owner] = TagList.from(cached_tag_list_on(context))
           else
-            instance_variable_set("@#{var_name}", TagList.new(*tags_on(context, owner).map(&:name)))
+            cache[owner] = TagList.new(*tags_on(context, owner).map(&:name))
           end
         end
+        
+        def all_tags_list_on(context)
+          variable_name = "@all_#{context.to_s.singularize}_list"
+          return instance_variable_get(variable_name) if instance_variable_get(variable_name)
+          instance_variable_set(variable_name, TagList.new(all_tags_on(context).map(&:name)).freeze)
+        end
+        
+        def all_tags_on(context)
+          opts = {:conditions => ["#{Tagging.table_name}.context = ?", context.to_s]}
+          base_tags.find(:all, opts)
+        end
 
-        def tags_on(context, owner=nil)
+        def tags_on(context, owner = nil)
           if owner
             opts = {:conditions => ["#{Tagging.table_name}.context = ? AND #{Tagging.table_name}.tagger_id = ? AND #{Tagging.table_name}.tagger_type = ?",
                                     context.to_s, owner.id, owner.class.to_s]}
           else
-            opts = {:conditions => ["#{Tagging.table_name}.context = ?", context.to_s]}
+            opts = {:conditions => ["#{Tagging.table_name}.context = ? AND tagger_id IS NULL", context.to_s]}
           end
-          base_tags.find(:all, opts, :order => "created_at")
+          base_tags.find(:all, opts)
         end
 
         def cached_tag_list_on(context)
           self["cached_#{context.to_s.singularize}_list"]
         end
+        
+        def tag_list_cache_on(context)
+          variable_name = "@#{context.to_s.singularize}_list"
+          cache = instance_variable_get(variable_name)
+          instance_variable_set(variable_name, cache = {}) unless cache
+          cache
+        end
 
-        def set_tag_list_on(context,new_list, tagger=nil)
-          instance_variable_set("@#{context.to_s.singularize}_list", TagList.from_owner(tagger, new_list))
+        def set_tag_list_on(context, new_list, tagger = nil)
+          tag_list_cache_on(context)[tagger] = TagList.from(new_list)
           add_custom_context(context)
         end
 
@@ -367,24 +384,24 @@ module ActiveRecord
         def save_cached_tag_list
           self.class.tag_types.map(&:to_s).each do |tag_type|
             if self.class.send("caching_#{tag_type.singularize}_list?")
-              self["cached_#{tag_type.singularize}_list"] = send("#{tag_type.singularize}_list").to_s
+              self["cached_#{tag_type.singularize}_list"] = tag_list_cache_on(tag_type.singularize).tags.join(', ')
             end
           end
         end
 
         def save_tags
           (custom_contexts + self.class.tag_types.map(&:to_s)).each do |tag_type|
-            next unless instance_variable_get("@#{tag_type.singularize}_list")
-            owner = instance_variable_get("@#{tag_type.singularize}_list").owner
-            new_tag_names = instance_variable_get("@#{tag_type.singularize}_list") - tags_on(tag_type).map(&:name)
-            old_tags = tags_on(tag_type, owner).reject { |tag| instance_variable_get("@#{tag_type.singularize}_list").include?(tag.name) }
-
-            transaction do
-              base_tags.delete(*old_tags) if old_tags.any?
-              new_tag_names.each do |new_tag_name|
-                new_tag = Tag.find_or_create_with_like_by_name(new_tag_name)
-                Tagging.create(:tag_id => new_tag.id, :context => tag_type,
-                               :taggable => self, :tagger => owner)
+            tag_list_cache = tag_list_cache_on(tag_type)
+            for owner,  tag_list in tag_list_cache
+              new_tag_names = tag_list - tags_on(tag_type, owner).map(&:name)
+              old_tags = tags_on(tag_type, owner).reject { |tag| tag_list.include?(tag.name) }
+              transaction do
+                base_tags.delete(*old_tags) if old_tags.any?
+                new_tag_names.each do |new_tag_name|
+                  new_tag = Tag.find_or_create_with_like_by_name(new_tag_name)
+                  Tagging.create(:tag_id => new_tag.id, :context => tag_type,
+                                 :taggable => self, :tagger => owner)
+                end
               end
             end
           end

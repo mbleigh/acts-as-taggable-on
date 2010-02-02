@@ -48,8 +48,22 @@ describe "acts_as_tagger" do
       
       it 'should by default create the tag context on-the-fly' do
         @taggable.tag_list_on(:here_ond_now).should be_empty
-        @tagger.tag(@taggable, :with=>'that', :on=>:here_ond_now)
-        @taggable.tag_list_on(:here_ond_now).should include('that')
+        @tagger.tag(@taggable, :with=>'that', :on => :here_ond_now)
+        @taggable.tag_list_on(:here_ond_now).should_not include('that')
+        @taggable.all_tags_list_on(:here_ond_now).should include('that')
+      end
+      
+      it "should show all the tag list when both public and owned tags exist" do
+        @taggable.tag_list = 'ruby, python'
+        @tagger.tag(@taggable, :with => 'java, lisp', :on => :tags)
+        @taggable.all_tags_on(:tags).map(&:name).sort.should == %w(ruby python java lisp).sort
+      end
+      
+      it "should not add owned tags to the common list" do
+        @taggable.tag_list = 'ruby, python'
+        @tagger.tag(@taggable, :with => 'java, lisp', :on => :foo)
+        @tagger.tag(@taggable, :with => '', :on => :foo)
+        @taggable.tag_list.should == %w(ruby python)
       end
       
       it "should throw an exception when the default is over-ridden" do
