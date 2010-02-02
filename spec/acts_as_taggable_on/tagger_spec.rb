@@ -17,20 +17,19 @@ describe "Tagger" do
     @user.owned_tags.size == 2
   end
   
-  it "should not overlap tags from different users" do
+  it "should not overlap or lose tags from different users" do
     @user2 = TaggableUser.new
     lambda{
       @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
-      @user2.tag(@taggable, :with => 'java, python, lisp', :on => :tags)
-    }.should change(Tagging, :count).by(5)
+      @user2.tag(@taggable, :with => 'java, python, lisp, ruby', :on => :tags)
+    }.should change(Tagging, :count).by(6)
 
     @user.owned_tags.map(&:name).should == %w(ruby scheme)
-    @user2.owned_tags.map(&:name).should == %w(java python lisp)
+    @user2.owned_tags.map(&:name).sort.should == %w(java python lisp ruby).sort
     @taggable.tags_from(@user).should == %w(ruby scheme)
-    @taggable.tags_from(@user2).should == %w(java python lisp)
-    @taggable.save!
-    @taggable.all_tags_list_on(:tags).should == %w(ruby scheme java python lisp)
-    @taggable.all_tags_on(:tags).size.should == 5
+    @taggable.tags_from(@user2).should == %w(java python lisp ruby)
+    @taggable.all_tags_list_on(:tags).sort.should == %w(ruby scheme java python lisp).sort
+    @taggable.all_tags_on(:tags).size.should == 6
   end
 
   it "is tagger" do
