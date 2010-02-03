@@ -310,7 +310,7 @@ module ActiveRecord
         
         def all_tags_on(context)
           opts = {:conditions => ["#{Tagging.table_name}.context = ?", context.to_s]}
-          base_tags.find(:all, opts)
+          base_tags.find(:all, opts.merge(:order => "#{Tagging.table_name}.created_at"))
         end
 
         def tags_on(context, owner = nil)
@@ -318,7 +318,7 @@ module ActiveRecord
             opts = {:conditions => ["#{Tagging.table_name}.context = ? AND #{Tagging.table_name}.tagger_id = ? AND #{Tagging.table_name}.tagger_type = ?",
                                     context.to_s, owner.id, owner.class.to_s]}
           else
-            opts = {:conditions => ["#{Tagging.table_name}.context = ? AND tagger_id IS NULL", context.to_s]}
+            opts = {:conditions => ["#{Tagging.table_name}.context = ? AND #{Tagging.table_name}.tagger_id IS NULL", context.to_s]}
           end
           base_tags.find(:all, opts)
         end
