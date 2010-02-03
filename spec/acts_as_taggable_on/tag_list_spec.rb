@@ -61,4 +61,10 @@ describe TagList do
     @tag_list.add("cool","rad,bodacious")
     @tag_list.to_s.should == "awesome, radical, cool, \"rad,bodacious\""
   end
+  
+  it "should be able to call to_s on a frozen tag list" do
+    @tag_list.freeze
+    lambda { @tag_list.add("cool","rad,bodacious") }.should raise_error
+    lambda { @tag_list.to_s }.should_not raise_error
+  end
 end

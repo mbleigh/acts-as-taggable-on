@@ -1,6 +1,6 @@
 # require File.dirname(__FILE__) + '/../../../../spec/spec_helper'
 require 'rubygems'
-require 'activerecord'
+require 'active_record'
 require 'spec'
 
 module Spec::Example::ExampleGroupMethods
@@ -24,7 +24,10 @@ ActiveRecord::Base.establish_connection(
 
 RAILS_DEFAULT_LOGGER = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
 
-load(File.dirname(__FILE__) + '/schema.rb')
+ActiveRecord::Base.silence do
+  ActiveRecord::Migration.verbose = false
+  load(File.dirname(__FILE__) + '/schema.rb')
+end
 
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
 require File.join(File.dirname(__FILE__), '..', 'init')
