@@ -38,6 +38,33 @@ describe Tag do
       }.should change(Tag, :count).by(1)
     end
   end
+  
+  describe "find or create all by any name" do
+    before(:each) do
+      @tag.name = "awesome"
+      @tag.save
+    end
+    
+    it "should find by name" do
+      Tag.find_or_create_all_with_like_by_name("awesome").should == [@tag]
+    end
+    
+    it "should find by name case insensitive" do
+      Tag.find_or_create_all_with_like_by_name("AWESOME").should == [@tag]
+    end
+    
+    it "should create by name" do
+      lambda {
+        Tag.find_or_create_all_with_like_by_name("epic")
+      }.should change(Tag, :count).by(1)
+    end
+    
+    it "should find or create by name" do
+      lambda {
+        Tag.find_or_create_all_with_like_by_name("awesome", "epic").map(&:name).should == ["awesome", "epic"]
+      }.should change(Tag, :count).by(1)      
+    end
+  end
 
   it "should require a name" do
     @tag.valid?

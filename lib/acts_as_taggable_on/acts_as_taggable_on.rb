@@ -390,21 +390,36 @@ module ActiveRecord
         end
 
         def save_tags
-          (custom_contexts + self.class.tag_types.map(&:to_s)).each do |tag_type|
-            tag_list_cache = tag_list_cache_on(tag_type)
-            for owner,  tag_list in tag_list_cache
-              new_tag_names = tag_list - tags_on(tag_type, owner).map(&:name)
-              old_tags = tags_on(tag_type, owner).reject { |tag| tag_list.include?(tag.name) }
-              transaction do
-                base_tags.delete(*old_tags) if old_tags.any?
-                new_tag_names.each do |new_tag_name|
-                  new_tag = Tag.find_or_create_with_like_by_name(new_tag_name)
-                  Tagging.create(:tag_id => new_tag.id, :context => tag_type,
-                                 :taggable => self, :tagger => owner)
+          contexts = custom_contexts + self.class.tag_types.map(&:to_s)
+
+          transaction do
+            contexts.each do |context|
+              cache = tag_list_cache_on(context)
+            
+              cache.each do |owner, list|
+                new_tags = Tag.find_or_create_all_with_like_by_name(list.uniq)
+
+                # Destroy old taggings:
+                if owner
+                  old_tags = tags_on(context, owner) - new_tags
+                  old_taggings = taggings.find(:all, :conditions => { :tag_id => old_tags, :tagger_id => owner, :tagger_type => owner.class.to_s, :context => context })
+                  old_taggings.each(&:destroy)
+                else                  
+                  old_tags = tags_on(context) - new_tags
+                  base_tags.delete(*old_tags)                
+                end
+                
+                new_tags.reject! { |tag| taggings.any? { |tagging| tagging.tag     == tag   &&
+                                                                   tagging.tagger  == owner &&
+                                                                   tagging.context == context } }
+                
+                # create new taggings:
+                new_tags.each do |tag|
+                  taggings.create!(:tag_id => tag.id, :context => context, :tagger => owner)
                 end
               end
             end
-          end
+          end          
 
           true
         end

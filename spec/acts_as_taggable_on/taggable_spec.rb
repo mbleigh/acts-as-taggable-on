@@ -46,8 +46,8 @@ describe "Taggable" do
     @taggable.tag_list = "ruby, bob, charlie"
     @taggable.save
     @taggable.reload
-    @taggable.skill_list.include?("ruby").should be_true
-    @taggable.skill_list.include?("bob").should be_false
+    @taggable.skill_list.should include("ruby")
+    @taggable.skill_list.should_not include("bob")
   end
 
   it "should be able to remove tags through list alone" do

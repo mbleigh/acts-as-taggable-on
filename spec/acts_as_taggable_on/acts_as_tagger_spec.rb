@@ -1,8 +1,11 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe "acts_as_tagger" do
+  before(:each) do
+    [TaggableUser, TaggableModel, Tagging, Tag].each(&:destroy_all)
+  end
+  
   context "Tagger Method Generation" do
-
     before(:each) do
       @tagger = TaggableUser.new()
     end
@@ -78,9 +81,28 @@ describe "acts_as_tagger" do
         @tagger.tag(@taggable, :with=>'this, and, that', :on=>:foo_boo, :force=>false) rescue
         @taggable.tag_list_on(:foo_boo).should be_empty
       end
-
     end
-  
+    
+    context "when called by multiple tagger's" do
+      before(:each) do
+        @user_x = TaggableUser.new
+        @user_y = TaggableUser.new
+        @taggable = TaggableModel.new(:name => 'acts_as_taggable_on', :tag_list => 'plugin')
+        
+        @user_x.tag(@taggable, :with => 'ruby, rails',  :on => :tags)
+        @user_y.tag(@taggable, :with => 'ruby, plugin', :on => :tags)
+      end
+      
+      it "should not delete other taggers tags" do
+        @user_y.tag(@taggable, :with => '', :on => :tags)
+        @taggable.all_tags_list_on(:tags).should include('ruby')
+      end
+      
+      it "should not delete original tags" do
+        @user_y.tag(@taggable, :with => '', :on => :tags)
+        @taggable.all_tags_list_on(:tags).should include('plugin')
+      end
+    end
   end
 
 end
