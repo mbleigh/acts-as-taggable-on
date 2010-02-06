@@ -392,10 +392,12 @@ module ActiveRecord
         def save_tags
           contexts = custom_contexts + self.class.tag_types.map(&:to_s)
 
+          # raise contexts.map { |context| tag_list_cache_on(context) }.inspect if $debug
+
           transaction do
             contexts.each do |context|
               cache = tag_list_cache_on(context)
-            
+              
               cache.each do |owner, list|
                 new_tags = Tag.find_or_create_all_with_like_by_name(list.uniq)
 
@@ -403,6 +405,7 @@ module ActiveRecord
                 if owner
                   old_tags = tags_on(context, owner) - new_tags
                   old_taggings = taggings.find(:all, :conditions => { :tag_id => old_tags, :tagger_id => owner, :tagger_type => owner.class.to_s, :context => context })
+
                   old_taggings.each(&:destroy)
                 else                  
                   old_tags = tags_on(context) - new_tags

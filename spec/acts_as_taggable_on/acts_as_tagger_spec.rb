@@ -85,21 +85,25 @@ describe "acts_as_tagger" do
     
     context "when called by multiple tagger's" do
       before(:each) do
-        @user_x = TaggableUser.new
-        @user_y = TaggableUser.new
+        @user_x = TaggableUser.new(:name => "User X")
+        @user_y = TaggableUser.new(:name => "User Y")
         @taggable = TaggableModel.new(:name => 'acts_as_taggable_on', :tag_list => 'plugin')
         
         @user_x.tag(@taggable, :with => 'ruby, rails',  :on => :tags)
         @user_y.tag(@taggable, :with => 'ruby, plugin', :on => :tags)
+
+        @user_y.tag(@taggable, :with => '', :on => :tags)
+      end
+      
+      it "should delete owned tags" do        
+        @user_y.owned_tags.should be_empty
       end
       
       it "should not delete other taggers tags" do
-        @user_y.tag(@taggable, :with => '', :on => :tags)
-        @taggable.all_tags_list_on(:tags).should include('ruby')
+        @user_x.owned_tags.should have(2).items
       end
       
       it "should not delete original tags" do
-        @user_y.tag(@taggable, :with => '', :on => :tags)
         @taggable.all_tags_list_on(:tags).should include('plugin')
       end
     end

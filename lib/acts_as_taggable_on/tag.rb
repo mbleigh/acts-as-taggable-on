@@ -26,6 +26,8 @@ class Tag < ActiveRecord::Base
   
   def self.find_or_create_all_with_like_by_name(*list)
     list = [list].flatten
+    
+    return [] if list.empty?
 
     existing_tags = Tag.named_any(list).all
     new_tag_names = list.reject { |name| existing_tags.any? { |tag| tag.name.downcase == name.downcase } }

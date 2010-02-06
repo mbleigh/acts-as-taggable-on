@@ -64,6 +64,10 @@ describe Tag do
         Tag.find_or_create_all_with_like_by_name("awesome", "epic").map(&:name).should == ["awesome", "epic"]
       }.should change(Tag, :count).by(1)      
     end
+    
+    it "should return an empty array if no tags are specified" do
+      Tag.find_or_create_all_with_like_by_name([]).should == []
+    end
   end
 
   it "should require a name" do
