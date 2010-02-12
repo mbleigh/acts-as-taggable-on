@@ -403,17 +403,21 @@ module ActiveRecord
                 # Destroy old taggings:
                 if owner
                   old_tags = tags_on(context, owner) - new_tags
-                  old_taggings = Tagging.find(:all, :conditions => { :taggable_id => self.id, :taggable_type => self.class.to_s, :tag_id => old_tags, :tagger_id => owner, :tagger_type => owner.class.to_s, :context => context })
+                  old_taggings = Tagging.find(:all, :conditions => { :taggable_id => self.id, :taggable_type => self.class.to_s, :tag_id => old_tags, :tagger_id => owner.id, :tagger_type => owner.class.to_s, :context => context })
 
-                  old_taggings.each(&:destroy)
-                else                  
+                  Tagging.destroy_all :id => old_taggings.map(&:id)
+                else
                   old_tags = tags_on(context) - new_tags
                   base_tags.delete(*old_tags)                
                 end
-                
-                new_tags.reject! { |tag| taggings.any? { |tagging| tagging.tag     == tag   &&
-                                                                   tagging.tagger  == owner &&
-                                                                   tagging.context == context } }
+ 
+                new_tags.reject! { |tag| taggings.any? { |tagging|
+                    tagging.tag_id      == tag.id &&
+                    tagging.tagger_id   == (owner ? owner.id : nil) &&
+                    tagging.tagger_type == (owner ? owner.class.to_s : nil) &&
+                    tagging.context     == context
+                  }
+                }
                 
                 # create new taggings:
                 new_tags.each do |tag|
