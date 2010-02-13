@@ -158,7 +158,7 @@ module ActiveRecord
             conditions << "#{table_name}.#{primary_key} IN (SELECT #{Tagging.table_name}.taggable_id FROM #{Tagging.table_name} JOIN #{Tag.table_name} ON #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND (#{tags_conditions}) WHERE #{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
           else
-            tags = Tag.named_like_any(tag_list)
+            tags = Tag.named_any(tag_list)
             return { :conditions => "1 = 0" } unless tags.length == tag_list.length
                       
             tags.each do |tag|
