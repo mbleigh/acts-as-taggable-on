@@ -380,11 +380,11 @@ module ActiveRecord
             :order      => "count DESC"
           }.update(options)
         end
-        
+
         def save_cached_tag_list
           self.class.tag_types.map(&:to_s).each do |tag_type|
-            if self.class.send("caching_#{tag_type.singularize}_list?")
-              self["cached_#{tag_type.singularize}_list"] = tag_list_cache_on(tag_type.singularize).tags.join(', ')
+            if self.class.send("caching_#{tag_type.singularize}_list?")              
+              self["cached_#{tag_type.singularize}_list"] = tag_list_cache_on(tag_type.singularize).to_a.flatten.compact.join(', ')
             end
           end
         end
