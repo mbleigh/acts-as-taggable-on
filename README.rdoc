@@ -89,6 +89,9 @@ also improves compatibility with the will_paginate gem:
     User.tagged_with("awesome").by_date
     User.tagged_with("awesome").by_date.paginate(:page => params[:page], :per_page => 20)
 
+    #Find a user with matching all tags, not just one
+    User.tagged_with(["awesome", "cool"], :match_all => :true)
+
 === Relationships
 
 You can find objects of the same type based on similar tags on certain contexts.
