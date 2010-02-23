@@ -247,5 +247,15 @@ describe "Taggable" do
       AlteredInheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(fork spoon)
       TaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso fork spoon)
     end
+    
+    it 'should store same tag without validation conflict' do
+      @taggable.tag_list = 'one'
+      @taggable.save!
+      
+      @inherited_same.tag_list = 'one'
+      @inherited_same.save!
+      
+      @inherited_same.update_attributes! :name => 'foo'
+    end
   end
 end

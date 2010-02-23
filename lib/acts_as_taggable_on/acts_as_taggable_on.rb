@@ -398,12 +398,12 @@ module ActiveRecord
               
               cache.each do |owner, list|
                 new_tags = Tag.find_or_create_all_with_like_by_name(list.uniq)
-                taggings = Tagging.find(:all, :conditions => { :taggable_id => self.id, :taggable_type => self.class.to_s })
+                taggings = Tagging.find(:all, :conditions => { :taggable_id => self.id, :taggable_type => self.class.base_class.to_s })
 
                 # Destroy old taggings:
                 if owner
                   old_tags = tags_on(context, owner) - new_tags
-                  old_taggings = Tagging.find(:all, :conditions => { :taggable_id => self.id, :taggable_type => self.class.to_s, :tag_id => old_tags, :tagger_id => owner.id, :tagger_type => owner.class.to_s, :context => context })
+                  old_taggings = Tagging.find(:all, :conditions => { :taggable_id => self.id, :taggable_type => self.class.base_class.to_s, :tag_id => old_tags, :tagger_id => owner.id, :tagger_type => owner.class.to_s, :context => context })
 
                   Tagging.destroy_all :id => old_taggings.map(&:id)
                 else
