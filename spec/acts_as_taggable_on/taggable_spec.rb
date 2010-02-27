@@ -19,8 +19,8 @@ describe "Taggable" do
     @taggable.tag_list = ["awesome", "epic"]
     @taggable.save
 
-    TaggableModel.tag_counts_on(:tags).count.should == 2
-    @taggable.tag_counts_on(:tags).count.should == 2
+    TaggableModel.tag_counts_on(:tags).length.should == 2
+    @taggable.tag_counts_on(:tags).length.should == 2
   end
 
   it "should be able to create tags" do
