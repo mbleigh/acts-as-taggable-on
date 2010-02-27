@@ -57,3 +57,12 @@ end
 
 class UntaggableModel < ActiveRecord::Base
 end
+
+def clean_database!
+  $debug = false
+  models = [Tag, Tagging, TaggableModel, OtherTaggableModel, InheritingTaggableModel,
+            AlteredInheritingTaggableModel, TaggableUser]
+  models.each do |model|
+    model.destroy_all
+  end
+end

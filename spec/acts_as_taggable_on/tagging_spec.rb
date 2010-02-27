@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Tagging do
   before(:each) do
+    clean_database!
     @tagging = Tagging.new
   end
   

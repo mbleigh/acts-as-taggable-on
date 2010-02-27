@@ -2,9 +2,9 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Tag do
   before(:each) do
+    clean_database!
     @tag = Tag.new
-    @user = TaggableModel.create(:name => "Pablo")  
-    Tag.delete_all
+    @user = TaggableModel.create(:name => "Pablo")
   end
   
   describe "named like any" do

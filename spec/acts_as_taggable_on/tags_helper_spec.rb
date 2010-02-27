@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe TagsHelper do
   before(:each) do
-    [TaggableModel, Tag, Tagging].each(&:delete_all)
+    clean_database!
     
     @bob = TaggableModel.create(:name => "Bob Jones",  :language_list => "ruby, php")
     @tom = TaggableModel.create(:name => "Tom Marley", :language_list => "ruby, java")
