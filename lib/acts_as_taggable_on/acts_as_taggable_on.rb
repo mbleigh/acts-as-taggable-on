@@ -193,7 +193,7 @@ module ActiveRecord
             group = "#{grouped_column_names_for(self)} HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
           end
 
-          Tag.joins(joins.join(" ")).group(group).where(conditions.join(" AND "))
+          Tag.joins(joins.join(" ")).group(group).where(conditions.join(" AND ")).readonly(false)
 
           # { :joins      => joins.join(" "),
           #   :group      => group,
