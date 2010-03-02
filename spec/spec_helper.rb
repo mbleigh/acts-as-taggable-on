@@ -1,7 +1,5 @@
-# require File.dirname(__FILE__) + '/../../../../spec/spec_helper'
-require 'rubygems'
-require 'active_record'
-require 'spec'
+require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
+Bundler.require :test
 
 module Spec::Example::ExampleGroupMethods
   alias :context :describe
