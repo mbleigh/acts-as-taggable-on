@@ -64,26 +64,17 @@ describe "Taggable" do
   it "should be able to find by tag" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.save
-    TaggableModel.find_tagged_with("ruby").first.should == @taggable
+
+    TaggableModel.tagged_with("ruby").first.should == @taggable
   end
 
   it "should be able to find by tag with context" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.tag_list = "bob, charlie"
     @taggable.save
-    TaggableModel.find_tagged_with("ruby").first.should == @taggable
-    TaggableModel.find_tagged_with("bob", :on => :skills).first.should_not == @taggable
-    TaggableModel.find_tagged_with("bob", :on => :tags).first.should == @taggable
-  end
-
-  it "should be able to use the tagged_with named scope" do
-    @taggable.skill_list = "ruby, rails, css"
-    @taggable.tag_list = "bob, charlie"
-    @taggable.save
 
     TaggableModel.tagged_with("ruby").first.should == @taggable
     TaggableModel.tagged_with("ruby, css").first.should == @taggable
-    TaggableModel.tagged_with("ruby, nonexistingtag").should be_empty
     TaggableModel.tagged_with("bob", :on => :skills).first.should_not == @taggable
     TaggableModel.tagged_with("bob", :on => :tags).first.should == @taggable
   end
@@ -93,7 +84,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
 
     Tag.find(:all).size.should == 1
-    TaggableModel.find_tagged_with("ruby").all.should == TaggableModel.find_tagged_with("Ruby").all
+    TaggableModel.tagged_with("ruby").all.should == TaggableModel.tagged_with("Ruby").all
   end
 
   it "should be able to get tag counts on model as a whole" do
@@ -150,9 +141,9 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
 
-    TaggableModel.find_tagged_with("ruby", :order => 'taggable_models.name').all.should == [bob, frank, steve]
-    TaggableModel.find_tagged_with("ruby, rails", :order => 'taggable_models.name').all.should == [bob, frank]
-    TaggableModel.find_tagged_with(["ruby", "rails"], :order => 'taggable_models.name').all.should == [bob, frank]
+    TaggableModel.tagged_with("ruby", :order => 'taggable_models.name').all.should == [bob, frank, steve]
+    TaggableModel.tagged_with("ruby, rails", :order => 'taggable_models.name').all.should == [bob, frank]
+    TaggableModel.tagged_with(["ruby", "rails"], :order => 'taggable_models.name').all.should == [bob, frank]
   end
 
   it "should be able to find tagged with any tag" do
@@ -160,9 +151,9 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
 
-    TaggableModel.find_tagged_with(["ruby", "java"], :order => 'taggable_models.name', :any => true).all.should == [bob, frank, steve]
-    TaggableModel.find_tagged_with(["c++", "fitter"], :order => 'taggable_models.name', :any => true).all.should == [bob, steve]
-    TaggableModel.find_tagged_with(["depressed", "css"], :order => 'taggable_models.name', :any => true).all.should == [bob, frank]
+    TaggableModel.tagged_with(["ruby", "java"], :order => 'taggable_models.name', :any => true).all.should == [bob, frank, steve]
+    TaggableModel.tagged_with(["c++", "fitter"], :order => 'taggable_models.name', :any => true).all.should == [bob, steve]
+    TaggableModel.tagged_with(["depressed", "css"], :order => 'taggable_models.name', :any => true).all.should == [bob, frank]
   end
 
   it "should be able to find tagged on a custom tag context" do
@@ -170,7 +161,8 @@ describe "Taggable" do
     bob.set_tag_list_on(:rotors, "spinning, jumping")
     bob.tag_list_on(:rotors).should == ["spinning","jumping"]
     bob.save
-    TaggableModel.find_tagged_with("spinning", :on => :rotors).all.should == [bob]
+
+    TaggableModel.tagged_with("spinning", :on => :rotors).all.should == [bob]
   end
 
   it "should be able to use named scopes to chain tag finds" do
@@ -190,7 +182,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "fitter, happier, inefficient")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => "fitter, happier")
 
-    TaggableModel.find_tagged_with("fitter, happier", :match_all => true).all.should == [steve]
+    TaggableModel.tagged_with("fitter, happier", :match_all => true).all.should == [steve]
   end
 
   it "should be able to find tagged with some excluded tags" do
@@ -198,7 +190,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "happier")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => "happier")
 
-    TaggableModel.find_tagged_with("lazy", :exclude => true).all.should == [frank, steve]
+    TaggableModel.tagged_with("lazy", :exclude => true).all.should == [frank, steve]
   end
 
   it "should not create duplicate taggings" do
@@ -221,20 +213,20 @@ describe "Taggable" do
     it "should be able to save tags for inherited models" do
       @inherited_same.tag_list = "bob, kelso"
       @inherited_same.save
-      InheritingTaggableModel.find_tagged_with("bob").first.should == @inherited_same
+      InheritingTaggableModel.tagged_with("bob").first.should == @inherited_same
     end
 
     it "should find STI tagged models on the superclass" do
       @inherited_same.tag_list = "bob, kelso"
       @inherited_same.save
-      TaggableModel.find_tagged_with("bob").first.should == @inherited_same
+      TaggableModel.tagged_with("bob").first.should == @inherited_same
     end
 
     it "should be able to add on contexts only to some subclasses" do
       @inherited_different.part_list = "fork, spoon"
       @inherited_different.save
-      InheritingTaggableModel.find_tagged_with("fork", :on => :parts).should be_empty
-      AlteredInheritingTaggableModel.find_tagged_with("fork", :on => :parts).first.should == @inherited_different
+      InheritingTaggableModel.tagged_with("fork", :on => :parts).should be_empty
+      AlteredInheritingTaggableModel.tagged_with("fork", :on => :parts).first.should == @inherited_different
     end
 
     it "should have different tag_counts_on for inherited models" do

@@ -104,11 +104,9 @@ module ActiveRecord
 
               after_save:save_tags
 
-              if respond_to?(:named_scope)
-                scope :tagged_with, lambda{ |*args|
-                  find_options_for_find_tagged_with(*args)
-                }
-              end
+              scope :tagged_with, lambda{ |*args|
+                find_options_for_find_tagged_with(*args)
+              }
             end
 
             include ActiveRecord::Acts::TaggableOn::InstanceMethods
@@ -131,9 +129,9 @@ module ActiveRecord
         #   :match_all - Find models that match all of the given tags, not just one
         #   :conditions - A piece of SQL conditions to add to the query
         #   :on - scopes the find to a context
-        def find_tagged_with(*args)
-          find_options_for_find_tagged_with(*args)
-        end
+        # def find_tagged_with(*args)
+        #   find_options_for_find_tagged_with(*args)
+        # end
 
         def caching_tag_list_on?(context)
           column_names.include?("cached_#{context.to_s.singularize}_list")
@@ -197,7 +195,7 @@ module ActiveRecord
 
           Tag.joins(joins.join(" ")).group(group).where(conditions.join(" AND "))
 
-          # { :joins      => joins.join(" "),L
+          # { :joins      => joins.join(" "),
           #   :group      => group,
           #   :conditions => conditions.join(" AND "),
           #   :readonly   => false }.update(options)

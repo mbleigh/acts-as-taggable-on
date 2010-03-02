@@ -2,9 +2,9 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe "Acts As Taggable On" do
   before(:each) do
-    clean_database!  
+    clean_database!
   end
-  
+
   it "should provide a class method 'taggable?' that is false for untaggable models" do
     UntaggableModel.should_not be_taggable
   end
@@ -22,7 +22,7 @@ describe "Acts As Taggable On" do
     it "should create a class attribute for tag types" do
       @taggable.class.should respond_to(:tag_types)
     end
-    
+
     it "should create an instance attribute for tag types" do
       @taggable.should respond_to(:tag_types)
     end
@@ -36,7 +36,7 @@ describe "Acts As Taggable On" do
     end
 
     it "should add tagged_with and tag_counts to singleton" do
-      TaggableModel.should respond_to(:find_tagged_with, :tag_counts)
+      TaggableModel.should respond_to(:tagged_with, :tag_counts)
     end
 
     it "should add saving of tag lists and cached tag lists to the instance" do
