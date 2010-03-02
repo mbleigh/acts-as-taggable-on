@@ -14,7 +14,7 @@ describe "Taggable" do
   end
 
   it "should have tag_counts_on" do
-    TaggableModel.tag_counts_on(:tags).should be_empty
+    TaggableModel.tag_counts_on(:tags).all.should be_empty
 
     @taggable.tag_list = ["awesome", "epic"]
     @taggable.save
@@ -91,8 +91,8 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
-    TaggableModel.tag_counts.should_not be_empty
-    TaggableModel.skill_counts.should_not be_empty
+    TaggableModel.tag_counts.all.should_not be_empty
+    TaggableModel.skill_counts.all.should_not be_empty
   end
 
   it "should be able to get all tag counts on model as whole" do
@@ -100,7 +100,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.all_tag_counts.should_not be_empty
+    TaggableModel.all_tag_counts.all.should_not be_empty
     TaggableModel.all_tag_counts.first.count.should == 3 # ruby
   end
 
