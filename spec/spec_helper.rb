@@ -20,7 +20,7 @@ ActiveRecord::Base.establish_connection(
   "adapter" => "sqlite3", "database" => TEST_DATABASE_FILE
 )
 
-RAILS_DEFAULT_LOGGER = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
+Rails.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
 
 ActiveRecord::Base.silence do
   ActiveRecord::Migration.verbose = false
