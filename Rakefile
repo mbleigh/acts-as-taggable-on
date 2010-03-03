@@ -1,5 +1,5 @@
-gem 'rspec', '1.3.0'
-require 'spec/rake/spectask'
+gem 'rspec', '2.0.0.beta.1'
+require 'rspec/core/rake_task'
 
 begin
   require 'jeweler'
@@ -19,12 +19,12 @@ end
 
 desc 'Default: run specs'
 task :default => :spec
-Spec::Rake::SpecTask.new do |t|
-  t.spec_files = FileList["spec/**/*_spec.rb"]
+Rspec::Core::RakeTask.new do |t|
+  t.pattern = "spec/**/*_spec.rb"
 end
 
-Spec::Rake::SpecTask.new('rcov') do |t|
-  t.spec_files = FileList["spec/**/*_spec.rb"]
+Rspec::Core::RakeTask.new('rcov') do |t|
+  t.pattern = "spec/**/*_spec.rb"
   t.rcov = true
   t.rcov_opts = ['--exclude', 'spec']
 end

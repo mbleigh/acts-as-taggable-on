@@ -1,7 +1,7 @@
 require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
 Bundler.require :test
 
-module Spec::Example::ExampleGroupMethods
+module Rspec::Core::ExampleGroupSubject
   alias :context :describe
 end
 
