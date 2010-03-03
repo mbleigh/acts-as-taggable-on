@@ -28,7 +28,6 @@ ActiveRecord::Base.silence do
 end
 
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
-require File.join(File.dirname(__FILE__), '..', 'init')
 
 class TaggableModel < ActiveRecord::Base
   acts_as_taggable
