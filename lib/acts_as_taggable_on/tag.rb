@@ -30,7 +30,7 @@ class Tag < ActiveRecord::Base
     return [] if list.empty?
 
     existing_tags = Tag.named_any(list).all
-    new_tag_names = list.reject { |name| existing_tags.any? { |tag| tag.name.downcase == name.downcase } }
+    new_tag_names = list.reject { |name| existing_tags.any? { |tag| tag.name.mb_chars.downcase == name.mb_chars.downcase } }
     created_tags  = new_tag_names.map { |name| Tag.create(:name => name) }
   
     existing_tags + created_tags    
