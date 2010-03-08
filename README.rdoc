@@ -31,6 +31,16 @@ To install the gem, add this to your config/environment.rb:
   
 After that, you can run "rake gems:install" to install the gem if you don't already have it.
 
+== Rails 3.0
+
+Acts As Taggable On is now useable in Rails 3.0, thanks to the excellent work of Szymon Nowak
+and Jelle Vandebeeck. Because backwards compatibility is hard to maintain, their work is available
+in the feature/rails3_compatibility branch.
+
+A Rails 3.0 compatible version of the gem is also available: 
+  
+  gem install acts-as-taggable-on -v=2.0.0.pre1
+
 === Post Installation (Rails)
 
 1. script/generate acts_as_taggable_on_migration
