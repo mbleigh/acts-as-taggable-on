@@ -1,8 +1,8 @@
 source :gemcutter
 
-gem 'rails', :git => 'git://github.com/rails/rails.git'
-gem 'sqlite3-ruby', :require => 'sqlite3'
+gem 'rails', '3.0.0.beta'
 
 group :test do
   gem 'rspec', '2.0.0.beta.1'
+  gem 'sqlite3-ruby', :require => 'sqlite3'
 end
