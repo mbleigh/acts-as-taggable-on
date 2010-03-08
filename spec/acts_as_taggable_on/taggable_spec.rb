@@ -210,9 +210,20 @@ describe "Taggable" do
     }.should change(Tagging, :count).by(1)
   end
   
+  describe "Associations" do
+    before(:each) do
+      @taggable = TaggableModel.create(:tag_list => "awesome, epic")
+    end
+    
+    it "should not remove tags when creating associated objects" do
+      @taggable.untaggable_models.create!
+      @taggable.reload
+      @taggable.tag_list.should have(2).items
+    end
+  end
+  
   describe "Single Table Inheritance" do
     before do
-      [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
       @taggable = TaggableModel.new(:name => "taggable")
       @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
       @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")

@@ -106,7 +106,6 @@ module ActiveRecord
 
             include ActiveRecord::Acts::TaggableOn::InstanceMethods
             extend ActiveRecord::Acts::TaggableOn::SingletonMethods
-            alias_method_chain :reload, :tag_list
           end
         end
       end
@@ -383,8 +382,8 @@ module ActiveRecord
 
         def save_cached_tag_list
           self.class.tag_types.map(&:to_s).each do |tag_type|
-            if self.class.send("caching_#{tag_type.singularize}_list?")              
-              self["cached_#{tag_type.singularize}_list"] = tag_list_cache_on(tag_type.singularize).to_a.flatten.compact.join(', ')
+            if self.class.send("caching_#{tag_type.singularize}_list?")
+              send(:"cached_#{tag_type.singularize}_list=", tag_list_cache_on(tag_type.singularize).to_a.flatten.compact.join(', '))
             end
           end
         end
@@ -428,14 +427,6 @@ module ActiveRecord
           end          
 
           true
-        end
-
-        def reload_with_tag_list(*args)
-          self.class.tag_types.each do |tag_type|
-            instance_variable_set("@#{tag_type.to_s.singularize}_list", nil)
-          end
-
-          reload_without_tag_list(*args)
         end
       end
     end

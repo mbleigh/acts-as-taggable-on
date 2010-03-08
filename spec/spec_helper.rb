@@ -22,7 +22,7 @@ ActiveRecord::Base.establish_connection(
   "adapter" => "sqlite3", "database" => TEST_DATABASE_FILE
 )
 
-RAILS_DEFAULT_LOGGER = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
+ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
 
 ActiveRecord::Base.silence do
   ActiveRecord::Migration.verbose = false
@@ -37,6 +37,7 @@ class TaggableModel < ActiveRecord::Base
   acts_as_taggable_on :languages
   acts_as_taggable_on :skills
   acts_as_taggable_on :needs, :offerings
+  has_many :untaggable_models
 end
 
 class OtherTaggableModel < ActiveRecord::Base
@@ -56,10 +57,10 @@ class TaggableUser < ActiveRecord::Base
 end
 
 class UntaggableModel < ActiveRecord::Base
+  belongs_to :taggable_model, :touch => true
 end
 
 def clean_database!
-  $debug = false
   models = [Tag, Tagging, TaggableModel, OtherTaggableModel, InheritingTaggableModel,
             AlteredInheritingTaggableModel, TaggableUser]
   models.each do |model|
