@@ -11,12 +11,23 @@ class Tag < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
-  ### NAMED SCOPES:
+  ### SCOPES:
 
-  scope :named,          lambda { |name| { :conditions => ["name LIKE ?", name] } }
-  scope :named_any,      lambda { |list| { :conditions => list.map { |tag| sanitize_sql(["name LIKE ?", tag.to_s]) }.join(" OR ") } }
-  scope :named_like,     lambda { |name| { :conditions => ["name LIKE ?", "%#{name}%"] } }
-  scope :named_like_any, lambda { |list| { :conditions => list.map { |tag| sanitize_sql(["name LIKE ?", "%#{tag.to_s}%"]) }.join(" OR ") } }
+  def self.named(name)
+    where(["name LIKE ?", name])
+  end
+  
+  def self.named_any(list)
+    where(list.map { |tag| sanitize_sql(["name LIKE ?", tag.to_s]) }.join(" OR "))
+  end
+  
+  def self.named_like(name)
+    where(["name LIKE ?", "%#{name}%"])
+  end
+
+  def self.named_like_any(list)
+    where(list.map { |tag| sanitize_sql(["name LIKE ?", "%#{tag.to_s}%"]) }.join(" OR "))
+  end
 
   ### CLASS METHODS:
 

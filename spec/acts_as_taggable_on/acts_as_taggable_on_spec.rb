@@ -26,6 +26,10 @@ describe "Acts As Taggable On" do
     it "should create an instance attribute for tag types" do
       @taggable.should respond_to(:tag_types)
     end
+    
+    it "should have all tag types" do
+      @taggable.tag_types.should == [:tags, :languages, :skills, :needs, :offerings]
+    end
 
     it "should generate an association for each tag type" do
       @taggable.should respond_to(:tags, :skills, :languages)

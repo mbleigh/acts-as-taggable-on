@@ -2,7 +2,7 @@ module TagsHelper
 
   # See the README for an example using tag_cloud.
   def tag_cloud(tags, classes)
-    tags = tags.all if tags.is_a? ActiveRecord::Relation
+    tags = tags.all if tags.respond_to?(:all)
 
     return [] if tags.empty?
 

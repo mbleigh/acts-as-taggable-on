@@ -1,8 +1,21 @@
 require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
-Bundler.require :test
 
-module Rspec::Core::ExampleGroupSubject
-  alias :context :describe
+begin
+  # Try to require the preresolved locked set of gems.
+  require File.expand_path("../.bundle/environment", __FILE__)
+rescue LoadError
+  # Fall back on doing an unlocked resolve at runtime.
+  require "rubygems"
+  require "bundler"
+  Bundler.setup
+end
+
+Bundler.require
+
+if defined?(Rspec::Core::ExampleGroupSubject)
+  module Rspec::Core::ExampleGroupSubject
+    alias :context :describe
+  end
 end
 
 class Array
@@ -13,46 +26,15 @@ class Array
   end
 end
 
+# Setup a database
 TEST_DATABASE_FILE = File.join(File.dirname(__FILE__), '..', 'test.sqlite3')
-
 File.unlink(TEST_DATABASE_FILE) if File.exist?(TEST_DATABASE_FILE)
-ActiveRecord::Base.establish_connection(
-  "adapter" => "sqlite3", "database" => TEST_DATABASE_FILE
-)
-
-Rails.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
+ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => TEST_DATABASE_FILE
 
 ActiveRecord::Base.silence do
   ActiveRecord::Migration.verbose = false
   load(File.dirname(__FILE__) + '/schema.rb')
-end
-
-$: << File.join(File.dirname(__FILE__), '..', 'lib')
-
-class TaggableModel < ActiveRecord::Base
-  acts_as_taggable
-  acts_as_taggable_on :languages
-  acts_as_taggable_on :skills
-  acts_as_taggable_on :needs, :offerings
-end
-
-class OtherTaggableModel < ActiveRecord::Base
-  acts_as_taggable_on :tags, :languages
-  acts_as_taggable_on :needs, :offerings
-end
-
-class InheritingTaggableModel < TaggableModel
-end
-
-class AlteredInheritingTaggableModel < TaggableModel
-  acts_as_taggable_on :parts
-end
-
-class TaggableUser < ActiveRecord::Base
-  acts_as_tagger
-end
-
-class UntaggableModel < ActiveRecord::Base
+  load(File.dirname(__FILE__) + '/models.rb')
 end
 
 def clean_database!

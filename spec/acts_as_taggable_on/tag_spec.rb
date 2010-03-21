@@ -72,10 +72,21 @@ describe Tag do
 
   it "should require a name" do
     @tag.valid?
-    @tag.errors[:name].should == ["can't be blank"]
+    
+    if ActiveRecord::VERSION::MAJOR >= 3
+      @tag.errors[:name].should == ["can't be blank"]
+    else
+      @tag.errors[:name].should == "can't be blank"
+    end
+
     @tag.name = "something"
     @tag.valid?
-    @tag.errors[:name].should == []
+    
+    if ActiveRecord::VERSION::MAJOR >= 3      
+      @tag.errors[:name].should == []
+    else
+      @tag.errors[:name].should be_nil
+    end
   end
 
   it "should equal a tag with the same name" do

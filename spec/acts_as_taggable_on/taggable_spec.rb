@@ -171,10 +171,10 @@ describe "Taggable" do
     steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, python')
 
     # Let's only find those productive Rails developers
-    TaggableModel.tagged_with('rails', :on => :skills, :order => 'taggable_models.name').should == [bob, frank]
-    TaggableModel.tagged_with('happier', :on => :tags, :order => 'taggable_models.name').should == [bob, steve]
-    TaggableModel.tagged_with('rails', :on => :skills).tagged_with('happier', :on => :tags).should == [bob]
-    TaggableModel.tagged_with('rails').tagged_with('happier', :on => :tags).should == [bob]
+    TaggableModel.tagged_with('rails', :on => :skills, :order => 'taggable_models.name').all.should == [bob, frank]
+    TaggableModel.tagged_with('happier', :on => :tags, :order => 'taggable_models.name').all.should == [bob, steve]
+    TaggableModel.tagged_with('rails', :on => :skills).tagged_with('happier', :on => :tags).all.should == [bob]
+    TaggableModel.tagged_with('rails').tagged_with('happier', :on => :tags).all.should == [bob]
   end
 
   it "should be able to find tagged with only the matching tags" do
