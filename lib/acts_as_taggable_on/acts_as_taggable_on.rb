@@ -15,7 +15,7 @@ module ActsAsTaggableOn
         write_inheritable_attribute(:tag_types, (self.tag_types + tag_types).uniq)
       else
         if ::ActiveRecord::VERSION::MAJOR < 3
-          base.send :include, ActsAsTaggableOn::ActiveRecord::Backports
+          include ActsAsTaggableOn::ActiveRecord::Backports
         end
       
         write_inheritable_attribute(:tag_types, tag_types)
