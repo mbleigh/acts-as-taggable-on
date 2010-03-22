@@ -16,8 +16,8 @@ module ActsAsTaggableOn::Taggable
         )
       end
       
-      base.extend ClassMethods
-      include InstanceMethods
+      base.extend ActsAsTaggableOn::Taggable::Cache::ClassMethods
+      base.send :include, ActsAsTaggableOn::Taggable::Cache::InstanceMethods
     end
     
     module ClassMethods

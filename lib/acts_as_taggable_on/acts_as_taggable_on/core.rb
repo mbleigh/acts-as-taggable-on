@@ -40,8 +40,8 @@ module ActsAsTaggableOn::Taggable
         )
       end
       
-      base.extend ClassMethods
-      include InstanceMethods
+      base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
+      base.send :include, ActsAsTaggableOn::Taggable::Core::InstanceMethods
     end
     
     module ClassMethods

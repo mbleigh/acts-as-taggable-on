@@ -1,8 +1,8 @@
 module ActsAsTaggableOn::Taggable
   module Ownership
     def self.included(base)
-      include InstanceMethods
-      base.extend ClassMethods
+      base.send :include, ActsAsTaggableOn::Taggable::Ownership::InstanceMethods
+      base.extend ActsAsTaggableOn::Taggable::Ownership::ClassMethods
       
       base.tag_types.map(&:to_s).each do |tag_type|
         base.class_eval %(

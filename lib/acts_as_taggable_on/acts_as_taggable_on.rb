@@ -31,11 +31,11 @@ module ActsAsTaggableOn
         end
       end
       
-      include Core
-      include Aggregate
-      include Cache
-      include Ownership
-      include Related
+      include ActsAsTaggableOn::Taggable::Core
+      include ActsAsTaggableOn::Taggable::Aggregate
+      include ActsAsTaggableOn::Taggable::Cache
+      include ActsAsTaggableOn::Taggable::Ownership
+      include ActsAsTaggableOn::Taggable::Related
     end
   end
 end
