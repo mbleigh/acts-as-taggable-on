@@ -1,6 +1,9 @@
 module ActsAsTaggableOn::Taggable
   module Core
     def self.included(base)
+      base.send :include, ActsAsTaggableOn::Taggable::Core::InstanceMethods
+      base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
+
       base.class_eval do
         attr_writer :custom_contexts
 
@@ -39,9 +42,6 @@ module ActsAsTaggableOn::Taggable
           end
         )
       end
-      
-      base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
-      base.send :include, ActsAsTaggableOn::Taggable::Core::InstanceMethods
     end
     
     module ClassMethods
@@ -149,7 +149,7 @@ module ActsAsTaggableOn::Taggable
       # Returns all tags of a given context
       def all_tags_on(context)
         opts =  ["#{Tagging.table_name}.context = ?", context.to_s]
-        base_tags.where(opts).order("#{Tagging.table_name}.created_at")
+        base_tags.where(opts).order("#{Tagging.table_name}.created_at").group("#{Tagging.table_name}.tag_id").all
       end
 
       ##
@@ -169,6 +169,15 @@ module ActsAsTaggableOn::Taggable
         custom_contexts + self.class.tag_types.map(&:to_s)
       end
 
+      def reload
+        self.class.tag_types.each do |tag_type|
+          instance_variable_set("@#{tag_type.to_s.singularize}_list", nil)
+          instance_variable_set("@all_#{tag_type.to_s.singularize}_list", nil)
+        end
+      
+        super
+      end
+
       def save_tags
         transaction do
           tagging_contexts.each do |context|
@@ -184,13 +193,13 @@ module ActsAsTaggableOn::Taggable
             # Find taggings to remove:
             old_taggings = Tagging.where(:taggable_id => self.id, :taggable_type => self.class.base_class.to_s,
                                          :tagger_type => nil, :tagger_id => nil,
-                                         :context => context, :tag_id => old_tags)
+                                         :context => context.to_s, :tag_id => old_tags)
 
             Tagging.destroy_all :id => old_taggings.map(&:id)
 
             # Create new taggings:
             new_tags.each do |tag|
-              Tagging.create!(:tag_id => tag.id, :context => context, :taggable => self)
+              Tagging.create!(:tag_id => tag.id, :context => context.to_s, :taggable => self)
             end
           end
         end
