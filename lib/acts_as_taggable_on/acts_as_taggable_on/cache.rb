@@ -1,6 +1,9 @@
 module ActsAsTaggableOn::Taggable
   module Cache
     def self.included(base)
+      # Skip adding caching capabilities if no cache columns exist
+      return unless base.tag_types.any? { |context| base.column_names.include?("cached_#{context.to_s.singularize}_list") }
+      
       base.class_eval do
         before_save :save_cached_tag_list        
       end
@@ -25,7 +28,7 @@ module ActsAsTaggableOn::Taggable
     
     module InstanceMethods
       def save_cached_tag_list
-        self.class.tag_types.map(&:to_s).each do |tag_type|
+        tag_types.map(&:to_s).each do |tag_type|
           if self.class.send("caching_#{tag_type.singularize}_list?")
             self["cached_#{tag_type.singularize}_list"] = tag_list_cache_on(tag_type.singularize).to_a.flatten.compact.join(', ')
           end

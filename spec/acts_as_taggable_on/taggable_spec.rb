@@ -206,6 +206,16 @@ describe "Taggable" do
     }.should change(Tagging, :count).by(1)
   end
 
+  describe "grouped_column_names_for method" do
+    it "should return all column names joined for Tag GROUP clause" do
+      @taggable.grouped_column_names_for(Tag).should == "tags.id, tags.name"
+    end
+
+    it "should return all column names joined for TaggableModel GROUP clause" do
+      @taggable.grouped_column_names_for(TaggableModel).should == "taggable_models.id, taggable_models.name, taggable_models.type, taggable_models.cached_tag_list"
+    end
+  end
+
   describe "Single Table Inheritance" do
     before do
       [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
