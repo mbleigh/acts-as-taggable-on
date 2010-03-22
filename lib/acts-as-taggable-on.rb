@@ -9,7 +9,7 @@ end
 
 require "acts_as_taggable_on/acts_as_taggable_on"
 require "acts_as_taggable_on/acts_as_taggable_on/core"
-require "acts_as_taggable_on/acts_as_taggable_on/aggregate"
+require "acts_as_taggable_on/acts_as_taggable_on/collection"
 require "acts_as_taggable_on/acts_as_taggable_on/cache"
 require "acts_as_taggable_on/acts_as_taggable_on/ownership"
 require "acts_as_taggable_on/acts_as_taggable_on/related"

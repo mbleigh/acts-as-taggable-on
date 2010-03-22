@@ -32,7 +32,7 @@ module ActsAsTaggableOn
       end
       
       include ActsAsTaggableOn::Taggable::Core
-      include ActsAsTaggableOn::Taggable::Aggregate
+      include ActsAsTaggableOn::Taggable::Collection
       include ActsAsTaggableOn::Taggable::Cache
       include ActsAsTaggableOn::Taggable::Ownership
       include ActsAsTaggableOn::Taggable::Related

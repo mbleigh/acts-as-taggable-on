@@ -65,16 +65,15 @@ module ActsAsTaggableOn::Taggable
               # Find existing tags or create non-existing tags:
               tag_list = Tag.find_or_create_all_with_like_by_name(tag_list.uniq)            
  
-              owned_tags = owner_tags_on(owner, context)
-              
-              old_tags     = owned_tags - tag_list
-              new_tags     = tag_list   - owned_tags
+              owned_tags = owner_tags_on(owner, context)              
+              old_tags   = owned_tags - tag_list
+              new_tags   = tag_list   - owned_tags
             
               # Find all taggings that belong to the taggable (self), are owned by the owner, 
               # have the correct context, and are removed from the list.
               old_taggings = Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
                                            :tagger_type => owner.class.to_s, :tagger_id => owner.id,
-                                           :tag_id => old_tags, :context => context)
+                                           :tag_id => old_tags, :context => context).all
             
               if old_taggings.present?
                 # Destroy old taggings:

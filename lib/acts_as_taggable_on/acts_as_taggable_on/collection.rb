@@ -1,10 +1,8 @@
 module ActsAsTaggableOn::Taggable
-  module Aggregate
+  module Collection
     def self.included(base)
-      unless base.ancestors.include?(ActsAsTaggableOn::Taggable::Aggregate::InstanceMethods)
-        base.send :include, ActsAsTaggableOn::Taggable::Aggregate::InstanceMethods
-        base.extend ActsAsTaggableOn::Taggable::Aggregate::ClassMethods
-      end
+      base.send :include, ActsAsTaggableOn::Taggable::Collection::InstanceMethods
+      base.extend ActsAsTaggableOn::Taggable::Collection::ClassMethods
       
       base.tag_types.map(&:to_s).each do |tag_type|
         base.class_eval %(
