@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{acts-as-taggable-on}
-  s.version = "2.0.0.pre3"
+  s.version = "2.0.0.pre4"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Bleigh"]
@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
      "lib/acts_as_taggable_on/tags_helper.rb",
      "lib/generators/acts_as_taggable_on/migration/migration_generator.rb",
      "lib/generators/acts_as_taggable_on/migration/templates/active_record/migration.rb",
+     "rails/init.rb",
      "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
      "spec/acts_as_taggable_on/acts_as_tagger_spec.rb",
      "spec/acts_as_taggable_on/tag_list_spec.rb",
@@ -56,7 +57,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/mbleigh/acts-as-taggable-on}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{ActsAsTaggableOn is a tagging plugin for Rails that provides multiple tagging contexts on a single model.}
   s.test_files = [
     "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
