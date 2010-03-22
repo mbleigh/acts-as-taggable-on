@@ -1,5 +1,3 @@
-require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
-
 begin
   # Try to require the preresolved locked set of gems.
   require File.expand_path("../.bundle/environment", __FILE__)
@@ -11,6 +9,7 @@ rescue LoadError
 end
 
 Bundler.require
+require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
 
 if defined?(Rspec::Core::ExampleGroupSubject)
   module Rspec::Core::ExampleGroupSubject

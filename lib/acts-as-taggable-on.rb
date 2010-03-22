@@ -22,7 +22,7 @@ require "acts_as_taggable_on/tagging"
 
 if defined?(ActiveRecord::Base)
   ActiveRecord::Base.extend ActsAsTaggableOn::Taggable
-  ActiveRecord::Base.send :include, ActiveRecord::Acts::Tagger
+  ActiveRecord::Base.send :include, ActsAsTaggableOn::Tagger
 end
 
 if defined?(ActionView::Base)

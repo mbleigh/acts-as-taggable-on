@@ -30,7 +30,7 @@ describe "Tagger" do
     @taggable.tags_from(@user).sort.should == %w(ruby scheme).sort
     @taggable.tags_from(@user2).sort.should == %w(java lisp python ruby).sort
     
-    @taggable.all_tags_list_on(:tags).sort.should == %w(ruby scheme java python lisp).sort
+    @taggable.all_tags_list.sort.should == %w(ruby scheme java python lisp).sort
     @taggable.all_tags_on(:tags).size.should == 6
   end
 
