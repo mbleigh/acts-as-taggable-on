@@ -37,7 +37,7 @@ describe "Tagger" do
   end
   
   it "should not lose tags from different taggers" do
-    @user2 = TaggableUser.new
+    @user2 = TaggableUser.create
     @user2.tag(@taggable, :with => 'java, python, lisp, ruby', :on => :tags)
     @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)  
     

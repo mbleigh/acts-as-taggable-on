@@ -30,7 +30,7 @@ module ActsAsTaggableOn
         raise "No context :#{opts[:on]} defined in #{taggable.class.to_s}" unless (opts[:force] || taggable.tag_types.include?(opts[:on]))
 
         taggable.set_owner_tag_list_on(self, opts[:on].to_s, opts[:with])
-        taggable.save #_owned_tags
+        taggable.save
       end
 
       def is_tagger?

@@ -142,6 +142,7 @@ module ActsAsTaggableOn::Taggable
       def all_tags_list_on(context)
         variable_name = "@all_#{context.to_s.singularize}_list"
         return instance_variable_get(variable_name) if instance_variable_get(variable_name)
+
         instance_variable_set(variable_name, TagList.new(all_tags_on(context).map(&:name)).freeze)
       end
 
@@ -170,9 +171,9 @@ module ActsAsTaggableOn::Taggable
       end
 
       def reload
-        self.class.tag_types.each do |tag_type|
-          instance_variable_set("@#{tag_type.to_s.singularize}_list", nil)
-          instance_variable_set("@all_#{tag_type.to_s.singularize}_list", nil)
+        self.class.tag_types.each do |context|
+          instance_variable_set("@#{context.to_s.singularize}_list", nil)
+          instance_variable_set("@all_#{context.to_s.singularize}_list", nil)
         end
       
         super

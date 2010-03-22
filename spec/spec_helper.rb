@@ -37,10 +37,11 @@ ActiveRecord::Base.silence do
 end
 
 def clean_database!
-  $debug = false
   models = [Tag, Tagging, TaggableModel, OtherTaggableModel, InheritingTaggableModel,
-            AlteredInheritingTaggableModel, TaggableUser]
+            AlteredInheritingTaggableModel, TaggableUser, UntaggableModel]
   models.each do |model|
     model.destroy_all
   end
 end
+
+clean_database!

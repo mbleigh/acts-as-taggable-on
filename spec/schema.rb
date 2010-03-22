@@ -31,4 +31,8 @@ ActiveRecord::Schema.define :version => 0 do
     t.column :type, :string
     #t.column :cached_tag_list, :string
   end
+  
+  create_table :untaggable_models, :force => true do |t|
+    t.column :name, :string
+  end
 end
