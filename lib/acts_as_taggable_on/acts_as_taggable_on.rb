@@ -43,6 +43,10 @@ module ActiveRecord
               def #{tag_type.singularize}_list
                 tag_list_on('#{tag_type}')
               end
+              
+              def all_#{tag_type}_list
+                all_tags_list_on('#{tag_type}')
+              end
 
               def #{tag_type.singularize}_list=(new_tags)
                 set_tag_list_on('#{tag_type}',new_tags)

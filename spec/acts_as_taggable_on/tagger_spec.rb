@@ -33,6 +33,22 @@ describe "Tagger" do
     @taggable.all_tags_list_on(:tags).sort.should == %w(ruby scheme java python lisp).sort
     @taggable.all_tags_on(:tags).size.should == 6
   end
+  
+  it "should not lose tags" do
+    @taggable.update_attributes(:tag_list => 'ruby')
+    @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
+    
+    [@taggable, @user].each(&:reload)
+    @taggable.tag_list.should == %w(ruby)
+    @taggable.all_tags_list.sort.should == %w(ruby scheme).sort
+    
+    lambda {
+      @taggable.update_attributes(:tag_list => "")
+    }.should change(Tagging, :count).by(-1)
+    
+    @taggable.tag_list.should == []
+    @taggable.all_tags_list.sort.should == %w(ruby scheme).sort
+  end
 
   it "is tagger" do
     @user.is_tagger?.should(be_true)

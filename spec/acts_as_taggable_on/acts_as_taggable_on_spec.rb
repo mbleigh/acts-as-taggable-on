@@ -48,6 +48,10 @@ describe "Acts As Taggable On" do
       @taggable.should respond_to(:tag_list, :skill_list, :language_list)
       @taggable.should respond_to(:tag_list=, :skill_list=, :language_list=)
     end
+    
+    it "should generate a tag_list accessor for getting all tags for each tag type" do
+      @taggable.should respond_to(:all_tags_list, :all_skills_list, :all_languages_list)
+    end
   end
 
   describe "Single Table Inheritance" do
