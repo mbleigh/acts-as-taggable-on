@@ -35,7 +35,7 @@ module ActsAsTaggableOn::Taggable
           end
           
           def all_#{tag_type}_list
-            all_tag_list_on('#{tag_type}')
+            all_tags_list_on('#{tag_type}')
           end
         )
       end
