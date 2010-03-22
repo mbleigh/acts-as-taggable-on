@@ -8,10 +8,6 @@ module ActsAsTaggableOn::Taggable
         attr_writer :custom_contexts
 
         after_save :save_tags
-
-        def self.tagged_with(*args)
-          find_options_for_find_tagged_with(*args)
-        end
       end
       
       base.tag_types.map(&:to_s).each do |tag_type|
@@ -25,10 +21,6 @@ module ActsAsTaggableOn::Taggable
         end
         
         base.class_eval %(
-          def self.#{tag_type.singularize}_counts(options={})
-            tag_counts_on('#{tag_type}', options)
-          end
-
           def #{tag_type.singularize}_list
             tag_list_on('#{tag_type}')
           end
@@ -50,7 +42,7 @@ module ActsAsTaggableOn::Taggable
         object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
       end
 
-      def find_options_for_find_tagged_with(tags, options = {})
+      def tagged_with(tags, options = {})
         tag_list = TagList.from(tags)
 
         return {} if tag_list.empty?
@@ -104,13 +96,12 @@ module ActsAsTaggableOn::Taggable
       def is_taggable?
         true
       end
-
     end    
     
     module InstanceMethods
       # all column names are necessary for PostgreSQL group clause
       def grouped_column_names_for(object)
-        object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
+        self.class.grouped_column_names_for(object)
       end
 
       def custom_contexts

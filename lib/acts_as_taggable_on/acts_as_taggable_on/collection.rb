@@ -6,6 +6,10 @@ module ActsAsTaggableOn::Taggable
       
       base.tag_types.map(&:to_s).each do |tag_type|
         base.class_eval %(
+          def self.#{tag_type.singularize}_counts(options={})
+            tag_counts_on('#{tag_type}', options)
+          end
+
           def #{tag_type.singularize}_counts(options = {})
             tag_counts_on('#{tag_type}', options)
           end
@@ -23,11 +27,7 @@ module ActsAsTaggableOn::Taggable
     
     module ClassMethods
       def tag_counts_on(context, options = {})
-        find_for_tag_counts(options.merge({:on => context.to_s}))
-      end
-
-      def all_tag_counts(options = {})
-        find_for_tag_counts(options)
+        all_tag_counts(options.merge({:on => context.to_s}))
       end
       
       # Calculate the tag counts for all tags.
@@ -41,7 +41,7 @@ module ActsAsTaggableOn::Taggable
       #  :at_least - Exclude tags with a frequency less than the given value
       #  :at_most - Exclude tags with a frequency greater than the given value
       #  :on - Scope the find to only include a certain context
-      def find_for_tag_counts(options = {})
+      def all_tag_counts(options = {})
         options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :on, :id
 
         start_at = sanitize_sql(["#{Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
@@ -77,7 +77,6 @@ module ActsAsTaggableOn::Taggable
         group_by << " AND #{having}" unless having.blank?
 
         Tag.select("#{Tag.table_name}.*, COUNT(*) AS count").joins(joins.join(" ")).where(conditions).group(group_by).limit(options[:limit]).order(options[:order])
-
       end
     end
     

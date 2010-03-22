@@ -6,18 +6,26 @@ module ActsAsTaggableOn::Taggable
      
       base.class_eval do
         after_save :save_owned_tags    
-      end     
-      
-      base.tag_types.map(&:to_s).each do |tag_type|
-        base.class_eval %(
-          def #{tag_type}_from(owner)
-            owner_tag_list_on(owner, '#{tag_type}')
-          end      
-        )
       end
+      
+      base.initialize_acts_as_taggable_on_ownership
     end
     
     module ClassMethods
+      def acts_as_taggable_on(*args)
+        initialize_acts_as_taggable_on_ownership
+        super(*args)
+      end
+      
+      def initialize_acts_as_taggable_on_ownership      
+        tag_types.map(&:to_s).each do |tag_type|
+          class_eval %(
+            def #{tag_type}_from(owner)
+              owner_tag_list_on(owner, '#{tag_type}')
+            end      
+          )
+        end        
+      end
     end
     
     module InstanceMethods
