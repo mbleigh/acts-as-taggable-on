@@ -1,10 +1,8 @@
 module ActsAsTaggableOn::Taggable
   module Related
     def self.included(base)
-      unless base.ancestors.include?(ActsAsTaggableOn::Taggable::Related::InstanceMethods)
-        base.send :include, ActsAsTaggableOn::Taggable::Related::InstanceMethods
-        base.extend ActsAsTaggableOn::Taggable::Related::ClassMethods
-      end
+      base.send :include, ActsAsTaggableOn::Taggable::Related::InstanceMethods
+      base.extend ActsAsTaggableOn::Taggable::Related::ClassMethods
       
       base.tag_types.map(&:to_s).each do |tag_type|
         base.class_eval %(
