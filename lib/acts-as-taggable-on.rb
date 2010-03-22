@@ -1,7 +1,6 @@
 require "active_record"
 require "action_view"
 
-
 if ActiveRecord::VERSION::MAJOR < 3
   require "acts_as_taggable_on/compatibility/active_record_backports"
   require "acts_as_taggable_on/compatibility/tag"
@@ -10,9 +9,10 @@ end
 
 require "acts_as_taggable_on/acts_as_taggable_on"
 require "acts_as_taggable_on/acts_as_taggable_on/core"
-require "acts_as_taggable_on/acts_as_taggable_on/cache"
-require "acts_as_taggable_on/acts_as_taggable_on/related"
 require "acts_as_taggable_on/acts_as_taggable_on/aggregate"
+require "acts_as_taggable_on/acts_as_taggable_on/cache"
+require "acts_as_taggable_on/acts_as_taggable_on/ownership"
+require "acts_as_taggable_on/acts_as_taggable_on/related"
 
 require "acts_as_taggable_on/acts_as_tagger"
 require "acts_as_taggable_on/tag"

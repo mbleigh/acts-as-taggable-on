@@ -7,10 +7,11 @@ describe "Taggable" do
   end
 
   it "should have tag types" do
-      for type in [:tags, :languages, :skills, :needs, :offerings]
-        TaggableModel.tag_types.should include type
-      end
-      @taggable.tag_types.should == TaggableModel.tag_types
+    [:tags, :languages, :skills, :needs, :offerings].each do |type|
+      TaggableModel.tag_types.should include type
+    end
+
+    @taggable.tag_types.should == TaggableModel.tag_types
   end
 
   it "should have tag_counts_on" do
@@ -25,18 +26,21 @@ describe "Taggable" do
 
   it "should be able to create tags" do
     @taggable.skill_list = "ruby, rails, css"
-    @taggable.instance_variable_get("@skill_list").instance_of?(Hash).should be_true
-    @taggable.instance_variable_get("@skill_list")[nil].instance_of?(TagList).should be_true
-    @taggable.save
-
-    Tag.find(:all).size.should == 3
+    @taggable.instance_variable_get("@skill_list").instance_of?(TagList).should be_true
+    
+    lambda {
+      @taggable.save
+    }.should change(Tag, :count).by(3)
   end
 
   it "should be able to create tags through the tag list directly" do
     @taggable.tag_list_on(:test).add("hello")
     @taggable.tag_list_cache_on(:test).should_not be_empty
+    @taggable.tag_list_on(:test).should == ["hello"]
+    
     @taggable.save
     @taggable.save_tags
+    
     @taggable.reload
     @taggable.tag_list_on(:test).should == ["hello"]
   end
@@ -209,44 +213,44 @@ describe "Taggable" do
       @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
       @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")
     end
-
+  
     it "should be able to save tags for inherited models" do
       @inherited_same.tag_list = "bob, kelso"
       @inherited_same.save
       InheritingTaggableModel.tagged_with("bob").first.should == @inherited_same
     end
-
+  
     it "should find STI tagged models on the superclass" do
       @inherited_same.tag_list = "bob, kelso"
       @inherited_same.save
       TaggableModel.tagged_with("bob").first.should == @inherited_same
     end
-
+  
     it "should be able to add on contexts only to some subclasses" do
       @inherited_different.part_list = "fork, spoon"
       @inherited_different.save
       InheritingTaggableModel.tagged_with("fork", :on => :parts).should be_empty
       AlteredInheritingTaggableModel.tagged_with("fork", :on => :parts).first.should == @inherited_different
     end
-
+  
     it "should have different tag_counts_on for inherited models" do
       @inherited_same.tag_list = "bob, kelso"
       @inherited_same.save!
       @inherited_different.tag_list = "fork, spoon"
       @inherited_different.save!
-
+  
       InheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso)
       AlteredInheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(fork spoon)
       TaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso fork spoon)
     end
-
+  
     it 'should store same tag without validation conflict' do
       @taggable.tag_list = 'one'
       @taggable.save!
-
+  
       @inherited_same.tag_list = 'one'
       @inherited_same.save!
-
+  
       @inherited_same.update_attributes! :name => 'foo'
     end
   end

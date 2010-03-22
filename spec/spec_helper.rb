@@ -5,7 +5,7 @@ begin
   require File.expand_path("../.bundle/environment", __FILE__)
 rescue LoadError
   # Fall back on doing an unlocked resolve at runtime.
-  require "rubygems"
+  require "rubygems" unless RUBY_VERSION >= "1.9"
   require "bundler"
   Bundler.setup
 end
