@@ -90,6 +90,7 @@ module ActsAsTaggableOn::Taggable
           group = "#{grouped_column_names_for(self)} HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
 
+
         joins(joins.join(" ")).group(group).where(conditions.join(" AND ")).readonly(false)
       end
 

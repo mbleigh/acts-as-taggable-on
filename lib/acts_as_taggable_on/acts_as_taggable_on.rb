@@ -37,11 +37,5 @@ module ActsAsTaggableOn
       include ActsAsTaggableOn::Taggable::Ownership
       include ActsAsTaggableOn::Taggable::Related
     end
-    
-    private
-    
-    def initialize_acts_as_taggable_on
-
-    end
   end
 end

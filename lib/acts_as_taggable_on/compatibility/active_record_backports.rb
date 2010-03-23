@@ -6,10 +6,10 @@ module ActsAsTaggableOn
           named_scope :where,    lambda { |conditions| { :conditions => conditions } }  
           named_scope :joins,    lambda { |joins|      { :joins => joins } }
           named_scope :group,    lambda { |group|      { :group => group } }
-          named_scope :readonly, lambda { |readonly|   { :readonly => readonly } }
           named_scope :order,    lambda { |order|      { :order => order } }
           named_scope :select,   lambda { |select|     { :select => select } }
-          named_scope :limit,    lambda { |limit|      { :limit => limit } }      
+          named_scope :limit,    lambda { |limit|      { :limit => limit } }
+          named_scope :readonly, lambda { |readonly|   { :readonly => readonly } }   
         end
       end
     end

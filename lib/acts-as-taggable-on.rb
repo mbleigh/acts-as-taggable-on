@@ -1,11 +1,7 @@
 require "active_record"
 require "action_view"
 
-if ActiveRecord::VERSION::MAJOR < 3
-  require "acts_as_taggable_on/compatibility/active_record_backports"
-  require "acts_as_taggable_on/compatibility/tag"
-  require "acts_as_taggable_on/compatibility/tagging"
-end
+require "acts_as_taggable_on/compatibility/active_record_backports" if ActiveRecord::VERSION::MAJOR < 3
 
 require "acts_as_taggable_on/acts_as_taggable_on"
 require "acts_as_taggable_on/acts_as_taggable_on/core"
