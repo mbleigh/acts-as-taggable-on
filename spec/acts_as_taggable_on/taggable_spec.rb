@@ -88,7 +88,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
 
     Tag.find(:all).size.should == 1
-    TaggableModel.tagged_with("ruby").all.should == TaggableModel.tagged_with("Ruby").all
+    TaggableModel.tagged_with("ruby").to_a.should == TaggableModel.tagged_with("Ruby").to_a
   end
 
   it "should be able to get tag counts on model as a whole" do
@@ -108,10 +108,20 @@ describe "Taggable" do
     TaggableModel.all_tag_counts.first.count.should == 3 # ruby
   end
 
-  it "should not return read-only records" do
-    TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
-
-    TaggableModel.tagged_with("ruby").first.should_not be_readonly
+  if ActiveRecord::VERSION::MAJOR >= 3
+    it "should not return read-only records" do
+      TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+      TaggableModel.tagged_with("ruby").first.should_not be_readonly
+    end
+  else
+    xit "should not return read-only records" do
+      # apparantly, there is no way to set readonly to false in a scope if joins are made
+    end
+    
+    it "should be possible to return writable records" do
+      TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+      TaggableModel.tagged_with("ruby").first(:readonly => false).should_not be_readonly      
+    end
   end
 
   it "should be able to get scoped tag counts" do
@@ -145,9 +155,9 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
 
-    TaggableModel.tagged_with("ruby", :order => 'taggable_models.name').all.should == [bob, frank, steve]
-    TaggableModel.tagged_with("ruby, rails", :order => 'taggable_models.name').all.should == [bob, frank]
-    TaggableModel.tagged_with(["ruby", "rails"], :order => 'taggable_models.name').all.should == [bob, frank]
+    TaggableModel.tagged_with("ruby", :order => 'taggable_models.name').to_a.should == [bob, frank, steve]
+    TaggableModel.tagged_with("ruby, rails", :order => 'taggable_models.name').to_a.should == [bob, frank]
+    TaggableModel.tagged_with(["ruby", "rails"], :order => 'taggable_models.name').to_a.should == [bob, frank]
   end
 
   it "should be able to find tagged with any tag" do
@@ -155,9 +165,9 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
 
-    TaggableModel.tagged_with(["ruby", "java"], :order => 'taggable_models.name', :any => true).all.should == [bob, frank, steve]
-    TaggableModel.tagged_with(["c++", "fitter"], :order => 'taggable_models.name', :any => true).all.should == [bob, steve]
-    TaggableModel.tagged_with(["depressed", "css"], :order => 'taggable_models.name', :any => true).all.should == [bob, frank]
+    TaggableModel.tagged_with(["ruby", "java"], :order => 'taggable_models.name', :any => true).to_a.should == [bob, frank, steve]
+    TaggableModel.tagged_with(["c++", "fitter"], :order => 'taggable_models.name', :any => true).to_a.should == [bob, steve]
+    TaggableModel.tagged_with(["depressed", "css"], :order => 'taggable_models.name', :any => true).to_a.should == [bob, frank]
   end
 
   it "should be able to find tagged on a custom tag context" do
@@ -166,7 +176,7 @@ describe "Taggable" do
     bob.tag_list_on(:rotors).should == ["spinning","jumping"]
     bob.save
 
-    TaggableModel.tagged_with("spinning", :on => :rotors).all.should == [bob]
+    TaggableModel.tagged_with("spinning", :on => :rotors).to_a.should == [bob]
   end
 
   it "should be able to use named scopes to chain tag finds" do
@@ -175,10 +185,10 @@ describe "Taggable" do
     steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, python')
 
     # Let's only find those productive Rails developers
-    TaggableModel.tagged_with('rails', :on => :skills, :order => 'taggable_models.name').all.should == [bob, frank]
-    TaggableModel.tagged_with('happier', :on => :tags, :order => 'taggable_models.name').all.should == [bob, steve]
-    TaggableModel.tagged_with('rails', :on => :skills).tagged_with('happier', :on => :tags).all.should == [bob]
-    TaggableModel.tagged_with('rails').tagged_with('happier', :on => :tags).all.should == [bob]
+    TaggableModel.tagged_with('rails', :on => :skills, :order => 'taggable_models.name').to_a.should == [bob, frank]
+    TaggableModel.tagged_with('happier', :on => :tags, :order => 'taggable_models.name').to_a.should == [bob, steve]
+    TaggableModel.tagged_with('rails', :on => :skills).tagged_with('happier', :on => :tags).to_a.should == [bob]
+    TaggableModel.tagged_with('rails').tagged_with('happier', :on => :tags).to_a.should == [bob]
   end
 
   it "should be able to find tagged with only the matching tags" do
@@ -186,7 +196,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "fitter, happier, inefficient")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => "fitter, happier")
 
-    TaggableModel.tagged_with("fitter, happier", :match_all => true).all.should == [steve]
+    TaggableModel.tagged_with("fitter, happier", :match_all => true).to_a.should == [steve]
   end
 
   it "should be able to find tagged with some excluded tags" do
@@ -194,7 +204,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "happier")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => "happier")
 
-    TaggableModel.tagged_with("lazy", :exclude => true).all.should == [frank, steve]
+    TaggableModel.tagged_with("lazy", :exclude => true).to_a.should == [frank, steve]
   end
 
   it "should not create duplicate taggings" do
