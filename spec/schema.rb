@@ -19,6 +19,11 @@ ActiveRecord::Schema.define :version => 0 do
   create_table :taggable_models, :force => true do |t|
     t.column :name, :string
     t.column :type, :string
+  end
+  
+  create_table :cached_models, :force => true do |t|
+    t.column :name, :string
+    t.column :type, :string
     t.column :cached_tag_list, :string
   end
   
@@ -29,7 +34,6 @@ ActiveRecord::Schema.define :version => 0 do
   create_table :other_taggable_models, :force => true do |t|
     t.column :name, :string
     t.column :type, :string
-    #t.column :cached_tag_list, :string
   end
   
   create_table :untaggable_models, :force => true do |t|
