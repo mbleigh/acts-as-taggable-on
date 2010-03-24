@@ -27,10 +27,18 @@ module ActsAsTaggableOn::Taggable
     end
     
     module InstanceMethods
+      def tag_list_cache_set_on(context)
+        variable_name = "@#{context.to_s.singularize}_list"
+        !instance_variable_get(variable_name).nil?
+      end
+      
       def save_cached_tag_list
         tag_types.map(&:to_s).each do |tag_type|
           if self.class.send("caching_#{tag_type.singularize}_list?")
-            self["cached_#{tag_type.singularize}_list"] = tag_list_cache_on(tag_type.singularize).to_a.flatten.compact.join(', ')
+            if tag_list_cache_set_on(tag_type)
+              list = tag_list_cache_on(tag_type.singularize).to_a.flatten.compact.join(', ')
+              self["cached_#{tag_type.singularize}_list"] = list
+            end
           end
         end
       end
