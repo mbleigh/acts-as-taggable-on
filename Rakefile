@@ -1,20 +1,4 @@
 begin
-  # Rspec 2.0
-  require 'rspec/core/rake_task'
-
-  desc 'Default: run specs'
-  task :default => :spec  
-  Rspec::Core::RakeTask.new do |t|
-    t.pattern = "spec/**/*_spec.rb"
-  end
-  
-  Rspec::Core::RakeTask.new('rcov') do |t|
-    t.pattern = "spec/**/*_spec.rb"
-    t.rcov = true
-    t.rcov_opts = ['--exclude', 'spec']
-  end  
-  
-rescue LoadError
   # Rspec 1.3.0
   require 'spec/rake/spectask'
 
@@ -29,6 +13,23 @@ rescue LoadError
     t.rcov = true
     t.rcov_opts = ['--exclude', 'spec']
   end
+  
+rescue LoadError
+  # Rspec 2.0
+  require 'rspec/core/rake_task'
+
+  desc 'Default: run specs'
+  task :default => :spec  
+  Rspec::Core::RakeTask.new do |t|
+    t.pattern = "spec/**/*_spec.rb"
+  end
+  
+  Rspec::Core::RakeTask.new('rcov') do |t|
+    t.pattern = "spec/**/*_spec.rb"
+    t.rcov = true
+    t.rcov_opts = ['--exclude', 'spec']
+  end
+
 rescue LoadError
   puts "Rspec not available. Install it with: gem install rspec"  
 end
