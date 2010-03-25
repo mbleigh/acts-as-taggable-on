@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{acts-as-taggable-on}
-  s.version = "2.0.0.pre4"
+  s.version = "2.0.0.pre5"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Bleigh"]
-  s.date = %q{2010-03-22}
+  s.date = %q{2010-03-25}
   s.description = %q{With ActsAsTaggableOn, you could tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
   s.email = %q{michael@intridea.com}
   s.extra_rdoc_files = [
@@ -24,16 +24,15 @@ Gem::Specification.new do |s|
      "VERSION",
      "lib/acts-as-taggable-on.rb",
      "lib/acts_as_taggable_on/acts_as_taggable_on.rb",
-     "lib/acts_as_taggable_on/acts_as_taggable_on/aggregate.rb",
      "lib/acts_as_taggable_on/acts_as_taggable_on/cache.rb",
+     "lib/acts_as_taggable_on/acts_as_taggable_on/collection.rb",
      "lib/acts_as_taggable_on/acts_as_taggable_on/core.rb",
+     "lib/acts_as_taggable_on/acts_as_taggable_on/dirty.rb",
      "lib/acts_as_taggable_on/acts_as_taggable_on/ownership.rb",
      "lib/acts_as_taggable_on/acts_as_taggable_on/related.rb",
      "lib/acts_as_taggable_on/acts_as_tagger.rb",
      "lib/acts_as_taggable_on/compatibility/Gemfile",
      "lib/acts_as_taggable_on/compatibility/active_record_backports.rb",
-     "lib/acts_as_taggable_on/compatibility/tag.rb",
-     "lib/acts_as_taggable_on/compatibility/tagging.rb",
      "lib/acts_as_taggable_on/tag.rb",
      "lib/acts_as_taggable_on/tag_list.rb",
      "lib/acts_as_taggable_on/tagging.rb",
@@ -49,6 +48,7 @@ Gem::Specification.new do |s|
      "spec/acts_as_taggable_on/tagger_spec.rb",
      "spec/acts_as_taggable_on/tagging_spec.rb",
      "spec/acts_as_taggable_on/tags_helper_spec.rb",
+     "spec/bm.rb",
      "spec/models.rb",
      "spec/schema.rb",
      "spec/spec.opts",
@@ -57,7 +57,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/mbleigh/acts-as-taggable-on}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{ActsAsTaggableOn is a tagging plugin for Rails that provides multiple tagging contexts on a single model.}
   s.test_files = [
     "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
@@ -68,6 +68,7 @@ Gem::Specification.new do |s|
      "spec/acts_as_taggable_on/tagger_spec.rb",
      "spec/acts_as_taggable_on/tagging_spec.rb",
      "spec/acts_as_taggable_on/tags_helper_spec.rb",
+     "spec/bm.rb",
      "spec/models.rb",
      "spec/schema.rb",
      "spec/spec_helper.rb"
