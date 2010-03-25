@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{acts-as-taggable-on}
-  s.version = "1.1.7"
+  s.version = "0.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Bleigh"]
-  s.date = %q{2010-03-08}
+  s.date = %q{2010-03-25}
   s.description = %q{With ActsAsTaggableOn, you could tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
   s.email = %q{michael@intridea.com}
   s.extra_rdoc_files = [
@@ -21,12 +21,10 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
-     "generators/acts_as_taggable_on_migration/acts_as_taggable_on_migration_generator.rb",
-     "generators/acts_as_taggable_on_migration/templates/migration.rb",
      "lib/acts-as-taggable-on.rb",
      "lib/acts_as_taggable_on/acts_as_taggable_on.rb",
+     "lib/acts_as_taggable_on/acts_as_taggable_on/dirty.rb",
      "lib/acts_as_taggable_on/acts_as_tagger.rb",
-     "lib/acts_as_taggable_on/group_helper.rb",
      "lib/acts_as_taggable_on/tag.rb",
      "lib/acts_as_taggable_on/tag_list.rb",
      "lib/acts_as_taggable_on/tagging.rb",
@@ -34,13 +32,13 @@ Gem::Specification.new do |s|
      "rails/init.rb",
      "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
      "spec/acts_as_taggable_on/acts_as_tagger_spec.rb",
-     "spec/acts_as_taggable_on/group_helper_spec.rb",
      "spec/acts_as_taggable_on/tag_list_spec.rb",
      "spec/acts_as_taggable_on/tag_spec.rb",
      "spec/acts_as_taggable_on/taggable_spec.rb",
      "spec/acts_as_taggable_on/tagger_spec.rb",
      "spec/acts_as_taggable_on/tagging_spec.rb",
      "spec/acts_as_taggable_on/tags_helper_spec.rb",
+     "spec/bm.rb",
      "spec/schema.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb"
@@ -53,13 +51,14 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/acts_as_taggable_on/acts_as_taggable_on_spec.rb",
      "spec/acts_as_taggable_on/acts_as_tagger_spec.rb",
-     "spec/acts_as_taggable_on/group_helper_spec.rb",
      "spec/acts_as_taggable_on/tag_list_spec.rb",
      "spec/acts_as_taggable_on/tag_spec.rb",
      "spec/acts_as_taggable_on/taggable_spec.rb",
      "spec/acts_as_taggable_on/tagger_spec.rb",
      "spec/acts_as_taggable_on/tagging_spec.rb",
      "spec/acts_as_taggable_on/tags_helper_spec.rb",
+     "spec/bm.rb",
+     "spec/models.rb",
      "spec/schema.rb",
      "spec/spec_helper.rb"
   ]
