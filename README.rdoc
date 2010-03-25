@@ -15,43 +15,53 @@ was used.
 
 == Installation
 
-=== Plugin
+=== Rails 2.3.x
+
+Acts As Taggable On is tested to work in Rails 2.3.5. 
+
+==== Plugin
 
 Acts As Taggable On is available both as a gem and as a traditional plugin. For the
-traditional plugin you can install like so (Rails 2.1 or later):
+traditional plugin you can install like so:
 
   script/plugin install git://github.com/mbleigh/acts-as-taggable-on.git
-  
-=== GemPlugin
 
 Acts As Taggable On is also available as a gem plugin using Rails 2.1's gem dependencies.
 To install the gem, add this to your config/environment.rb:
   
-  config.gem "acts-as-taggable-on", :source => "http://gemcutter.org"
+  config.gem "acts-as-taggable-on", :source => "http://gemcutter.org", :version => '2.0.0.rc1'
   
 After that, you can run "rake gems:install" to install the gem if you don't already have it.
+
+==== Post Installation
+
+1. script/generate acts_as_taggable_on_migration
+2. rake db:migrate
 
 == Rails 3.0
 
 Acts As Taggable On is now useable in Rails 3.0, thanks to the excellent work of Szymon Nowak
-and Jelle Vandebeeck. Because backwards compatibility is hard to maintain, their work is available
-in the feature/rails3_compatibility branch.
+and Jelle Vandebeeck.
 
-A Rails 3.0 compatible version of the gem is also available: 
+To use it, add it to your Gemfile:
   
-  gem install acts-as-taggable-on -v=2.0.0.pre1
+  gem 'acts-as-taggable-on', '2.0.0.rc1'
 
-=== Post Installation (Rails)
+=== Post Installation
 
-1. script/generate acts_as_taggable_on_migration
+1. rails generate acts_as_taggable_on:migration
 2. rake db:migrate
 
 === Testing
 
 Acts As Taggable On uses RSpec for its test coverage. Inside the plugin
-directory, you can run the specs with:
+directory, you can run the specs for RoR 3.0.0 with:
 
-rake spec
+  rake spec
+
+If you want to test the plugin for Rails 2.3.x, use:
+
+  rake rails2.3:spec
 
 If you already have RSpec on your application, the specs will run while using:
 
@@ -67,19 +77,11 @@ rake spec:plugins
     @user = User.new(:name => "Bobby")
     @user.tag_list = "awesome, slick, hefty"      # this should be familiar
     @user.skill_list = "joking, clowning, boxing" # but you can do it for any context!
-    @user.skill_list # => ["joking","clowning","boxing"] as TagList
+    @user.skill_list                              # => ["joking","clowning","boxing"] as TagList
     @user.save
 
     @user.tags # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
     @user.skills # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
-
-    # The old way
-    User.find_tagged_with("awesome", :on => :tags) # => [@user]
-    User.find_tagged_with("awesome", :on => :skills) # => []
-
-    # The better way (utilizes named_scope)
-    User.tagged_with("awesome", :on => :tags) # => [@user]
-    User.tagged_with("awesome", :on => :skills) # => []
 
     @frankie = User.create(:name => "Frankie", :skill_list => "joking, flying, eating")
     User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
@@ -87,9 +89,9 @@ rake spec:plugins
 
 === Finding Tagged Objects
 
-Acts As Taggable On utilizes Rails 2.1's named_scope to create an association
-for tags. This way you can mix and match to filter down your results, and it
-also improves compatibility with the will_paginate gem:
+Acts As Taggable On utilizes named_scopes to create an association for tags.
+This way you can mix and match to filter down your results, and it also improves
+compatibility with the will_paginate gem:
 
     class User < ActiveRecord::Base
       acts_as_taggable_on :tags
@@ -99,8 +101,11 @@ also improves compatibility with the will_paginate gem:
     User.tagged_with("awesome").by_date
     User.tagged_with("awesome").by_date.paginate(:page => params[:page], :per_page => 20)
 
-    #Find a user with matching all tags, not just one
+    # Find a user with matching all tags, not just one
     User.tagged_with(["awesome", "cool"], :match_all => :true)
+    
+    # Find a user with any of the tags:
+    User.tagged_with(["awesome", "cool"], :any => true)
 
 === Relationships
 
@@ -195,6 +200,8 @@ CSS:
 
 * TomEric (i76) - Maintainer
 * Michael Bleigh - Original Author
+* Szymon Nowak - Rails 3.0 compatibility
+* Jelle Vandebeeck - Rails 3.0 compatibility
 * Brendan Lim - Related Objects
 * Pradeep Elankumaran - Taggers
 * Sinclair Bain - Patch King
@@ -209,4 +216,4 @@ CSS:
 * lawrencepit - cached tag work
 * sobrinho - fixed tag_cloud helper
 
-Copyright (c) 2007-2009 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license
+Copyright (c) 2007-2010 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license

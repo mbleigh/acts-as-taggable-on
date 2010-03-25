@@ -3,8 +3,8 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe "Tagger" do
   before(:each) do
     clean_database!
-    @user = TaggableUser.new
-    @taggable = TaggableModel.new(:name => "Bob Jones")
+    @user = TaggableUser.create
+    @taggable = TaggableModel.create(:name => "Bob Jones")
   end
 
   it "should have taggings" do
@@ -17,12 +17,14 @@ describe "Tagger" do
     @user.owned_tags.size == 2
   end
   
-  it "should not overlap or lose tags from different users" do
+  it "should not overlap tags from different taggers" do
     @user2 = TaggableUser.new
     lambda{
       @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
       @user2.tag(@taggable, :with => 'java, python, lisp, ruby', :on => :tags)
     }.should change(Tagging, :count).by(6)
+
+    [@user, @user2, @taggable].each(&:reload)
 
     @user.owned_tags.map(&:name).sort.should == %w(ruby scheme).sort
     @user2.owned_tags.map(&:name).sort.should == %w(java python lisp ruby).sort
@@ -30,8 +32,41 @@ describe "Tagger" do
     @taggable.tags_from(@user).sort.should == %w(ruby scheme).sort
     @taggable.tags_from(@user2).sort.should == %w(java lisp python ruby).sort
     
-    @taggable.all_tags_list_on(:tags).sort.should == %w(ruby scheme java python lisp).sort
-    @taggable.all_tags_on(:tags).size.should == 6
+    @taggable.all_tags_list.sort.should == %w(ruby scheme java python lisp).sort
+    @taggable.all_tags_on(:tags).size.should == 5
+  end
+  
+  it "should not lose tags from different taggers" do
+    @user2 = TaggableUser.create
+    @user2.tag(@taggable, :with => 'java, python, lisp, ruby', :on => :tags)
+    @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)  
+    
+    lambda {
+      @user2.tag(@taggable, :with => 'java, python, lisp', :on => :tags)
+    }.should change(Tagging, :count).by(-1)
+
+    [@user, @user2, @taggable].each(&:reload)
+    
+    @taggable.tags_from(@user).sort.should == %w(ruby scheme).sort
+    @taggable.tags_from(@user2).sort.should == %w(java python lisp).sort
+    
+    @taggable.all_tags_list.sort.should == %w(ruby scheme java python lisp).sort
+    @taggable.all_tags_on(:tags).length.should == 5
+  end
+
+  it "should not lose tags" do
+    @user2 = TaggableUser.create
+    
+    @user.tag(@taggable, :with => 'awesome', :on => :tags)
+    @user2.tag(@taggable, :with => 'awesome, epic', :on => :tags)
+
+    lambda {
+      @user2.tag(@taggable, :with => 'epic', :on => :tags)
+    }.should change(Tagging, :count).by(-1)
+
+    @taggable.reload  
+    @taggable.all_tags_list.should include('awesome')
+    @taggable.all_tags_list.should include('epic')
   end
   
   it "should not lose tags" do

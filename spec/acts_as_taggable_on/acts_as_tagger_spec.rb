@@ -64,8 +64,9 @@ describe "acts_as_tagger" do
       
       it "should not add owned tags to the common list" do
         @taggable.tag_list = 'ruby, python'
-        @tagger.tag(@taggable, :with => 'java, lisp', :on => :foo)
-        @tagger.tag(@taggable, :with => '', :on => :foo)
+        @tagger.tag(@taggable, :with => 'java, lisp', :on => :tags)
+        @taggable.tag_list.should == %w(ruby python)
+        @tagger.tag(@taggable, :with => '', :on => :tags)
         @taggable.tag_list.should == %w(ruby python)
       end
       

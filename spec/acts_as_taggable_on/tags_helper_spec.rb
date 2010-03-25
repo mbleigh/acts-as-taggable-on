@@ -11,8 +11,6 @@ describe TagsHelper do
     @helper = class Helper
       include TagsHelper
     end.new
-    
-    
   end
   
   it "should yield the proper css classes" do 
