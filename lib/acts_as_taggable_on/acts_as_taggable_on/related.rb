@@ -3,30 +3,36 @@ module ActsAsTaggableOn::Taggable
     def self.included(base)
       base.send :include, ActsAsTaggableOn::Taggable::Related::InstanceMethods
       base.extend ActsAsTaggableOn::Taggable::Related::ClassMethods
-      
-      base.tag_types.map(&:to_s).each do |tag_type|
-        base.class_eval %(
-          def find_related_#{tag_type}(options = {})
-            related_tags_for('#{tag_type}', self.class, options)
-          end
-          alias_method :find_related_on_#{tag_type}, :find_related_#{tag_type}
-
-          def find_related_#{tag_type}_for(klass, options = {})
-            related_tags_for('#{tag_type}', klass, options)
-          end
-
-          def find_matching_contexts(search_context, result_context, options = {})
-            matching_contexts_for(search_context.to_s, result_context.to_s, self.class, options)
-          end
-
-          def find_matching_contexts_for(klass, search_context, result_context, options = {})
-            matching_contexts_for(search_context.to_s, result_context.to_s, klass, options)
-          end
-        )
-      end
     end
     
     module ClassMethods
+      def initialize_acts_as_taggable_on_related
+        tag_types.map(&:to_s).each do |tag_type|
+          class_eval %(
+            def find_related_#{tag_type}(options = {})
+              related_tags_for('#{tag_type}', self.class, options)
+            end
+            alias_method :find_related_on_#{tag_type}, :find_related_#{tag_type}
+
+            def find_related_#{tag_type}_for(klass, options = {})
+              related_tags_for('#{tag_type}', klass, options)
+            end
+
+            def find_matching_contexts(search_context, result_context, options = {})
+              matching_contexts_for(search_context.to_s, result_context.to_s, self.class, options)
+            end
+
+            def find_matching_contexts_for(klass, search_context, result_context, options = {})
+              matching_contexts_for(search_context.to_s, result_context.to_s, klass, options)
+            end
+          )
+        end        
+      end
+      
+      def acts_as_taggable_on(*args)
+        super(*args)
+        initialize_acts_as_taggable_on_related
+      end
     end
     
     module InstanceMethods

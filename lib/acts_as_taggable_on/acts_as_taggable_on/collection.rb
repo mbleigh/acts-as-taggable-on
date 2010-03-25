@@ -3,29 +3,37 @@ module ActsAsTaggableOn::Taggable
     def self.included(base)
       base.send :include, ActsAsTaggableOn::Taggable::Collection::InstanceMethods
       base.extend ActsAsTaggableOn::Taggable::Collection::ClassMethods
-      
-      base.tag_types.map(&:to_s).each do |tag_type|
-        base.class_eval %(
-          def self.#{tag_type.singularize}_counts(options={})
-            tag_counts_on('#{tag_type}', options)
-          end
-
-          def #{tag_type.singularize}_counts(options = {})
-            tag_counts_on('#{tag_type}', options)
-          end
-
-          def top_#{tag_type}(limit = 10)
-            tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
-          end
-
-          def self.top_#{tag_type}(limit = 10)
-            tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
-          end        
-        )
-      end
+      base.initialize_acts_as_taggable_on_collection
     end
     
     module ClassMethods
+      def initialize_acts_as_taggable_on_collection
+        tag_types.map(&:to_s).each do |tag_type|
+          class_eval %(
+            def self.#{tag_type.singularize}_counts(options={})
+              tag_counts_on('#{tag_type}', options)
+            end
+
+            def #{tag_type.singularize}_counts(options = {})
+              tag_counts_on('#{tag_type}', options)
+            end
+
+            def top_#{tag_type}(limit = 10)
+              tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+            end
+
+            def self.top_#{tag_type}(limit = 10)
+              tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+            end        
+          )
+        end        
+      end
+      
+      def acts_as_taggable_on(*args)
+        super(*args)
+        initialize_acts_as_taggable_on_collection
+      end
+      
       def tag_counts_on(context, options = {})
         all_tag_counts(options.merge({:on => context.to_s}))
       end

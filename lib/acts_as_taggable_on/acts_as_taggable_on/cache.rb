@@ -11,16 +11,25 @@ module ActsAsTaggableOn::Taggable
         before_save :save_cached_tag_list        
       end
       
-      base.tag_types.map(&:to_s).each do |tag_type|
-        base.class_eval %(
-          def self.caching_#{tag_type.singularize}_list?
-            caching_tag_list_on?("#{tag_type}")
-          end        
-        )
-      end
+      base.intialize_acts_as_taggable_on_cache
     end
     
     module ClassMethods
+      def intialize_acts_as_taggable_on_cache      
+        tag_types.map(&:to_s).each do |tag_type|
+          class_eval %(
+            def self.caching_#{tag_type.singularize}_list?
+              caching_tag_list_on?("#{tag_type}")
+            end        
+          )
+        end        
+      end
+      
+      def acts_as_taggable_on(*args)
+        super(*args)
+        intialize_acts_as_taggable_on_cache
+      end
+      
       def caching_tag_list_on?(context)
         column_names.include?("cached_#{context.to_s.singularize}_list")
       end

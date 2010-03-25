@@ -6,37 +6,45 @@ module ActsAsTaggableOn::Taggable
 
       base.class_eval do
         attr_writer :custom_contexts
-
         after_save :save_tags
       end
       
-      base.tag_types.map(&:to_s).each do |tag_type|
-        context_taggings = "#{tag_type.singularize}_taggings".to_sym
-        context_tags     = tag_type.to_sym
-        
-        base.class_eval do
-          has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "Tagging",
-                   :conditions => ['#{Tagging.table_name}.tagger_id IS NULL AND #{Tagging.table_name}.context = ?', tag_type]
-          has_many context_tags, :through => context_taggings, :source => :tag
-        end
-        
-        base.class_eval %(
-          def #{tag_type.singularize}_list
-            tag_list_on('#{tag_type}')
-          end
-
-          def #{tag_type.singularize}_list=(new_tags)
-            set_tag_list_on('#{tag_type}', new_tags)
-          end
-          
-          def all_#{tag_type}_list
-            all_tags_list_on('#{tag_type}')
-          end
-        )
-      end
+      base.initialize_acts_as_taggable_on_core
     end
     
     module ClassMethods
+      def initialize_acts_as_taggable_on_core
+        tag_types.map(&:to_s).each do |tag_type|
+          context_taggings = "#{tag_type.singularize}_taggings".to_sym
+          context_tags     = tag_type.to_sym
+
+          class_eval do
+            has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "Tagging",
+                     :conditions => ['#{Tagging.table_name}.tagger_id IS NULL AND #{Tagging.table_name}.context = ?', tag_type]
+            has_many context_tags, :through => context_taggings, :source => :tag
+          end
+
+          class_eval %(
+            def #{tag_type.singularize}_list
+              tag_list_on('#{tag_type}')
+            end
+
+            def #{tag_type.singularize}_list=(new_tags)
+              set_tag_list_on('#{tag_type}', new_tags)
+            end
+
+            def all_#{tag_type}_list
+              all_tags_list_on('#{tag_type}')
+            end
+          )
+        end        
+      end
+      
+      def acts_as_taggable_on(*args)
+        super(*args)
+        initialize_acts_as_taggable_on_core
+      end
+      
       # all column names are necessary for PostgreSQL group clause
       def grouped_column_names_for(object)
         object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
