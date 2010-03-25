@@ -16,8 +16,8 @@ module ActsAsTaggableOn
       else
         if ::ActiveRecord::VERSION::MAJOR < 3
           include ActsAsTaggableOn::ActiveRecord::Backports
-        end   
-      
+        end
+
         write_inheritable_attribute(:tag_types, tag_types)
         class_inheritable_reader(:tag_types)
         
@@ -28,14 +28,14 @@ module ActsAsTaggableOn
           def self.taggable?
             true
           end
+        
+          include ActsAsTaggableOn::Taggable::Core
+          include ActsAsTaggableOn::Taggable::Collection
+          include ActsAsTaggableOn::Taggable::Cache
+          include ActsAsTaggableOn::Taggable::Ownership
+          include ActsAsTaggableOn::Taggable::Related
         end
       end
-      
-      include ActsAsTaggableOn::Taggable::Core
-      include ActsAsTaggableOn::Taggable::Collection
-      include ActsAsTaggableOn::Taggable::Cache
-      include ActsAsTaggableOn::Taggable::Ownership
-      include ActsAsTaggableOn::Taggable::Related
     end
   end
 end
