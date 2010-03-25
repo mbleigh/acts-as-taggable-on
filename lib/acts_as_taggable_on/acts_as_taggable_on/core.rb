@@ -208,7 +208,7 @@ module ActsAsTaggableOn::Taggable
 
             # Create new taggings:
             new_tags.each do |tag|
-              Tagging.create!(:tag_id => tag.id, :context => context.to_s, :taggable => self)
+              taggings.create!(:tag_id => tag.id, :context => context.to_s, :taggable => self)
             end
           end
         end
