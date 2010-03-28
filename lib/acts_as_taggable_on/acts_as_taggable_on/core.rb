@@ -162,13 +162,7 @@ module ActsAsTaggableOn::Taggable
       ##
       # Returns all tags that are not owned of a given context
       def tags_on(context)
-        if respond_to?(context)
-          # If the association is available, use it:
-          send(context).all
-        else
-          # If the association is not available, query it the old fashioned way
-          base_tags.where(["#{Tagging.table_name}.context = ? AND #{Tagging.table_name}.tagger_id IS NULL", context.to_s]).all
-        end
+        base_tags.where(["#{Tagging.table_name}.context = ? AND #{Tagging.table_name}.tagger_id IS NULL", context.to_s]).all
       end
 
       def set_tag_list_on(context, new_list)
