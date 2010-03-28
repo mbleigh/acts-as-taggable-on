@@ -100,7 +100,10 @@ module ActsAsTaggableOn::Taggable
         end
 
 
-        joins(joins.join(" ")).group(group).where(conditions.join(" AND ")).readonly(false)
+        scoped(:joins      => joins.join(" "),
+               :group      => group,
+               :conditions => conditions.join(" AND "),
+               :readonly   => false)
       end
 
       def is_taggable?

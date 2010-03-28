@@ -42,10 +42,10 @@ module ActsAsTaggableOn::Taggable
         exclude_self = "#{klass.table_name}.id != #{id} AND" if self.class == klass
         
         klass.scoped({ :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count",
-                 :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
-                 :conditions => ["#{exclude_self} #{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?) AND #{Tagging.table_name}.context = ?", tags_to_find, result_context],
-                 :group      => grouped_column_names_for(klass),
-                 :order      => "count DESC" }.update(options))
+                       :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
+                       :conditions => ["#{exclude_self} #{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?) AND #{Tagging.table_name}.context = ?", tags_to_find, result_context],
+                       :group      => grouped_column_names_for(klass),
+                       :order      => "count DESC" }.update(options))
       end
       
       def related_tags_for(context, klass, options = {})
@@ -54,10 +54,10 @@ module ActsAsTaggableOn::Taggable
         exclude_self = "#{klass.table_name}.id != #{id} AND" if self.class == klass
 
         klass.scoped({ :select     => "#{klass.table_name}.*, COUNT(#{Tag.table_name}.id) AS count",
-                 :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
-                 :conditions => ["#{exclude_self} #{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)", tags_to_find],
-                 :group      => grouped_column_names_for(klass),
-                 :order      => "count DESC" }.update(options))
+                       :from       => "#{klass.table_name}, #{Tag.table_name}, #{Tagging.table_name}",
+                       :conditions => ["#{exclude_self} #{klass.table_name}.id = #{Tagging.table_name}.taggable_id AND #{Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{Tagging.table_name}.tag_id = #{Tag.table_name}.id AND #{Tag.table_name}.name IN (?)", tags_to_find],
+                       :group      => grouped_column_names_for(klass),
+                       :order      => "count DESC" }.update(options))
       end
     end
   end
