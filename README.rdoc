@@ -71,7 +71,9 @@ rake spec:plugins
 = Usage
 
     class User < ActiveRecord::Base
-      acts_as_taggable_on :tags, :skills, :interests
+      # Alias for <tt>acts_as_taggable_on :tags</tt>:
+      acts_as_taggable
+      acts_as_taggable_on :skills, :interests
     end
 
     @user = User.new(:name => "Bobby")
