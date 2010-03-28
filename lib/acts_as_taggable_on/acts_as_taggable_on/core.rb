@@ -14,27 +14,28 @@ module ActsAsTaggableOn::Taggable
     
     module ClassMethods
       def initialize_acts_as_taggable_on_core
-        tag_types.map(&:to_s).each do |tag_type|
-          context_taggings = "#{tag_type.singularize}_taggings".to_sym
-          context_tags     = tag_type.to_sym
+        tag_types.map(&:to_s).each do |tags_type|
+          tag_type         = tags_type.to_s.singularize
+          context_taggings = "#{tag_type}_taggings".to_sym
+          context_tags     = tags_type.to_sym
 
           class_eval do
             has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "Tagging",
-                     :conditions => ['#{Tagging.table_name}.tagger_id IS NULL AND #{Tagging.table_name}.context = ?', tag_type]
+                     :conditions => ['#{Tagging.table_name}.tagger_id IS NULL AND #{Tagging.table_name}.context = ?', tags_type]
             has_many context_tags, :through => context_taggings, :source => :tag
           end
 
           class_eval %(
-            def #{tag_type.singularize}_list
-              tag_list_on('#{tag_type}')
+            def #{tag_type}_list
+              tag_list_on('#{tags_type}')
             end
 
-            def #{tag_type.singularize}_list=(new_tags)
-              set_tag_list_on('#{tag_type}', new_tags)
+            def #{tag_type}_list=(new_tags)
+              set_tag_list_on('#{tags_type}', new_tags)
             end
 
-            def all_#{tag_type}_list
-              all_tags_list_on('#{tag_type}')
+            def all_#{tags_type}_list
+              all_tags_list_on('#{tags_type}')
             end
           )
         end        
@@ -129,6 +130,11 @@ module ActsAsTaggableOn::Taggable
         self["cached_#{context.to_s.singularize}_list"]
       end
 
+      def tag_list_cache_set_on(context)
+        variable_name = "@#{context.to_s.singularize}_list"
+        !instance_variable_get(variable_name).nil?
+      end
+
       def tag_list_cache_on(context)
         variable_name = "@#{context.to_s.singularize}_list"
         instance_variable_get(variable_name) || instance_variable_set(variable_name, TagList.new(tags_on(context).map(&:name)))
@@ -167,7 +173,7 @@ module ActsAsTaggableOn::Taggable
 
       def set_tag_list_on(context, new_list)
         add_custom_context(context)
-        
+
         variable_name = "@#{context.to_s.singularize}_list"
         instance_variable_set(variable_name, TagList.from(new_list))
       end
@@ -186,30 +192,30 @@ module ActsAsTaggableOn::Taggable
       end
 
       def save_tags
-        transaction do          
-          tagging_contexts.each do |context|
-            tag_list = tag_list_cache_on(context).uniq
-  
-            # Find existing tags or create non-existing tags:
-            tag_list = Tag.find_or_create_all_with_like_by_name(tag_list)
+        tagging_contexts.each do |context|
+          next unless tag_list_cache_set_on(context)
 
-            current_tags = tags_on(context)
-            old_tags     = current_tags - tag_list
-            new_tags     = tag_list     - current_tags
-            
-            # Find taggings to remove:
-            old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil,
-                                          :context => context.to_s, :tag_id => old_tags).all
+          tag_list = tag_list_cache_on(context).uniq
 
-            if old_taggings.present?
-              # Destroy old taggings:
-              Tagging.destroy_all :id => old_taggings.map(&:id)
-            end
+          # Find existing tags or create non-existing tags:
+          tag_list = Tag.find_or_create_all_with_like_by_name(tag_list)
 
-            # Create new taggings:
-            new_tags.each do |tag|
-              taggings.create!(:tag_id => tag.id, :context => context.to_s, :taggable => self)
-            end
+          current_tags = tags_on(context)
+          old_tags     = current_tags - tag_list
+          new_tags     = tag_list     - current_tags
+          
+          # Find taggings to remove:
+          old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil,
+                                        :context => context.to_s, :tag_id => old_tags).all
+
+          if old_taggings.present?
+            # Destroy old taggings:
+            Tagging.destroy_all :id => old_taggings.map(&:id)
+          end
+
+          # Create new taggings:
+          new_tags.each do |tag|
+            taggings.create!(:tag_id => tag.id, :context => context.to_s, :taggable => self)
           end
         end
 

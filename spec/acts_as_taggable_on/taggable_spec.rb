@@ -31,6 +31,9 @@ describe "Taggable" do
     lambda {
       @taggable.save
     }.should change(Tag, :count).by(3)
+    
+    @taggable.reload
+    @taggable.skill_list.sort.should == %w(ruby rails css).sort
   end
 
   it "should be able to create tags through the tag list directly" do
