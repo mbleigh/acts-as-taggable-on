@@ -4,20 +4,32 @@ module ActsAsTaggableOn
       false
     end
 
+    ##
+    # This is an alias for calling <tt>acts_as_taggable_on :tags</tt>.
+    #
+    # Example:
+    #   class Book < ActiveRecord::Base
+    #     acts_as_taggable
+    #   end
     def acts_as_taggable
       acts_as_taggable_on :tags
     end
 
+    ##
+    # Make a model taggable on specified contexts.
+    #
+    # @param [Array] tag_types An array of taggable contexts
+    #
+    # Example:
+    #   class User < ActiveRecord::Base
+    #     acts_as_taggable_on :languages, :skills
+    #   end
     def acts_as_taggable_on(*tag_types)
       tag_types = tag_types.to_a.flatten.compact.map(&:to_sym)
 
       if taggable?
         write_inheritable_attribute(:tag_types, (self.tag_types + tag_types).uniq)
       else
-        if ::ActiveRecord::VERSION::MAJOR < 3
-          include ActsAsTaggableOn::ActiveRecord::Backports
-        end
-
         write_inheritable_attribute(:tag_types, tag_types)
         class_inheritable_reader(:tag_types)
         

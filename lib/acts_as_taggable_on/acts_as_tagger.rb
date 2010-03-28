@@ -5,10 +5,20 @@ module ActsAsTaggableOn
     end
 
     module ClassMethods
+      ##
+      # Make a model a tagger. This allows an instance of a model to claim ownership
+      # of tags.
+      #
+      # Example:
+      #   class User < ActiveRecord::Base
+      #     acts_as_tagger
+      #   end
       def acts_as_tagger(opts={})
-        has_many :owned_taggings, opts.merge(:as => :tagger, :dependent => :destroy,
-                                             :include => :tag, :class_name => "Tagging")
-        has_many :owned_tags, :through => :owned_taggings, :source => :tag, :uniq => true
+        class_eval do
+          has_many :owned_taggings, opts.merge(:as => :tagger, :dependent => :destroy,
+                                               :include => :tag, :class_name => "Tagging")
+          has_many :owned_tags, :through => :owned_taggings, :source => :tag, :uniq => true
+        end
 
         include ActsAsTaggableOn::Tagger::InstanceMethods
         extend ActsAsTaggableOn::Tagger::SingletonMethods
@@ -20,6 +30,16 @@ module ActsAsTaggableOn
     end
 
     module InstanceMethods
+      ##
+      # Tag a taggable model with tags that are owned by the tagger. 
+      #
+      # @param taggable The object that will be tagged
+      # @param [Hash] options An hash with options. Available options are:
+      #               * <tt>:with</tt> - The tags that you want to
+      #               * <tt>:on</tt>   - The context on which you want to tag
+      #
+      # Example:
+      #   @user.tag(@photo, :with => "paris, normandy", :on => :locations)
       def tag(taggable, opts={})
         opts.reverse_merge!(:force => true)
 

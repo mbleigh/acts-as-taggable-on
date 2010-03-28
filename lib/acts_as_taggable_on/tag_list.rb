@@ -1,21 +1,40 @@
 class TagList < Array
 
   cattr_accessor :delimiter
-
   self.delimiter = ','
+
+  attr_accessor :owner
 
   def initialize(*args)
     add(*args)
   end
+  
+  ##
+  # Returns a new TagList using the given tag string.
+  #
+  # Example:
+  #   tag_list = TagList.from("One , Two,  Three")
+  #   tag_list # ["One", "Two", "Three"]
+  def self.from(string)
+    string = string.join(", ") if string.respond_to?(:join)
 
-  attr_accessor :owner
+    new.tap do |tag_list|
+      string = string.to_s.dup
 
+      # Parse the quoted tags
+      string.gsub!(/(\A|#{delimiter})\s*"(.*?)"\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
+      string.gsub!(/(\A|#{delimiter})\s*'(.*?)'\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
+
+      tag_list.add(string.split(delimiter))
+    end
+  end
+
+  ##
   # Add tags to the tag_list. Duplicate or blank tags will be ignored.
-  #
-  #   tag_list.add("Fun", "Happy")
-  #
   # Use the <tt>:parse</tt> option to add an unparsed tag string.
   #
+  # Example:
+  #   tag_list.add("Fun", "Happy")
   #   tag_list.add("Fun, Happy", :parse => true)
   def add(*names)
     extract_and_apply_options!(names)
@@ -24,12 +43,12 @@ class TagList < Array
     self
   end
 
+  ##
   # Remove specific tags from the tag_list.
+  # Use the <tt>:parse</tt> option to add an unparsed tag string.
   #
+  # Example:
   #   tag_list.remove("Sad", "Lonely")
-  #
-  # Like #add, the <tt>:parse</tt> option can be used to remove multiple tags in a string.
-  #
   #   tag_list.remove("Sad, Lonely", :parse => true)
   def remove(*names)
     extract_and_apply_options!(names)
@@ -37,9 +56,11 @@ class TagList < Array
     self
   end
 
+  ##
   # Transform the tag_list into a tag string suitable for edting in a form.
   # The tags are joined with <tt>TagList.delimiter</tt> and quoted if necessary.
   #
+  # Example:
   #   tag_list = TagList.new("Round", "Square,Cube")
   #   tag_list.to_s # 'Round, "Square,Cube"'
   def to_s
@@ -51,7 +72,8 @@ class TagList < Array
     end.join(delimiter.ends_with?(" ") ? delimiter : "#{delimiter} ")
   end
 
- private
+  private
+  
   # Remove whitespace, duplicates, and blanks.
   def clean!
     reject!(&:blank?)
@@ -68,28 +90,6 @@ class TagList < Array
     end
 
     args.flatten!
-  end
-
-  class << self
-
-    # Returns a new TagList using the given tag string.
-    #
-    #   tag_list = TagList.from("One , Two,  Three")
-    #   tag_list # ["One", "Two", "Three"]
-    def from(string)
-      string = string.join(", ") if string.respond_to?(:join)
-
-      new.tap do |tag_list|
-        string = string.to_s.dup
-
-        # Parse the quoted tags
-        string.gsub!(/(\A|#{delimiter})\s*"(.*?)"\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
-        string.gsub!(/(\A|#{delimiter})\s*'(.*?)'\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
-
-        tag_list.add(string.split(delimiter))
-      end
-    end
-
   end
 
 end

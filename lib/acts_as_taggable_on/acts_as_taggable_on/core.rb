@@ -51,6 +51,20 @@ module ActsAsTaggableOn::Taggable
         object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
       end
 
+      ##
+      # Return a scope of objects that are tagged with the specified tags.
+      #
+      # @param tags The tags that we want to query for
+      # @param [Hash] options A hash of options to alter you query:
+      #                       * <tt>:exclude</tt> - if set to true, return objects that are *NOT* tagged with the specified tags
+      #                       * <tt>:any</tt> - if set to true, return objects that are tagged with *ANY* of the specified tags
+      #                       * <tt>:match_all</tt> - if set to true, return objects that are *ONLY* tagged with the specified tags
+      #
+      # Example:
+      #   User.tagged_with("awesome", "cool")                     # Users that are tagged with awesome and cool
+      #   User.tagged_with("awesome", "cool", :exclude => true)   # Users that are not tagged with awesome or cool
+      #   User.tagged_with("awesome", "cool", :any => true)       # Users that are tagged with awesome or cool
+      #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
       def tagged_with(tags, options = {})
         tag_list = TagList.from(tags)
 
