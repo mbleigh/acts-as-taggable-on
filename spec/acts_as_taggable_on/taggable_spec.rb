@@ -148,9 +148,15 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby, java")
-    
+ 
     TaggableModel.tagged_with('rails').all_tag_counts.should have(3).items
-    TaggableModel.tagged_with('rails').all_tag_counts.any? { |tag| tag.name == 'java' }.should be_false   
+    TaggableModel.tagged_with('rails').all_tag_counts.any? { |tag| tag.name == 'java' }.should be_false
+    
+    # Test specific join syntaxes:
+    frank.untaggable_models.create!
+    TaggableModel.tagged_with('rails').scoped(:joins => :untaggable_models).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').scoped(:joins => { :untaggable_models => :taggable_model }).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').scoped(:joins => [:untaggable_models]).all_tag_counts.should have(2).items
   end
 
   it "should be able to set a custom tag context list" do
