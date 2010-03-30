@@ -144,6 +144,15 @@ describe "Taggable" do
     TaggableModel.tagged_with("ruby").all_tag_counts.first.count.should == 3 # ruby
   end
 
+  it 'should only return tag counts for the available scope' do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby, java")
+    
+    TaggableModel.tagged_with('rails').all_tag_counts.should have(3).items
+    TaggableModel.tagged_with('rails').all_tag_counts.any? { |tag| tag.name == 'java' }.should be_false   
+  end
+
   it "should be able to set a custom tag context list" do
     bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
