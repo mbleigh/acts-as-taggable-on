@@ -74,7 +74,7 @@ module ActsAsTaggableOn::Taggable
           scope[:conditions],
           start_at_conditions,
           end_at_conditions
-        ].compact
+        ].compact.reverse
         
         ## Generate joins:
         tagging_join  = "LEFT OUTER JOIN #{Tagging.table_name} ON #{Tag.table_name}.id = #{Tagging.table_name}.tag_id"
@@ -87,7 +87,7 @@ module ActsAsTaggableOn::Taggable
           tagging_join,
           taggable_join,
           scope[:joins]
-        ].compact
+        ].compact.reverse
 
 
         ## Generate scope:
