@@ -45,7 +45,7 @@ and Jelle Vandebeeck.
 
 To use it, add it to your Gemfile:
   
-  gem 'acts-as-taggable-on', '2.0.0.rc1'
+  gem 'acts-as-taggable-on'
 
 === Post Installation
 
