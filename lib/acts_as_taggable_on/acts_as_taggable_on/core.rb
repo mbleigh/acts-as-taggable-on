@@ -85,7 +85,7 @@ module ActsAsTaggableOn::Taggable
 
         else
           tags = Tag.named_any(tag_list)
-          return where("1 = 0") unless tags.length == tag_list.length
+          return scoped(:conditions => "1 = 0") unless tags.length == tag_list.length
 
           tags.each do |tag|
             safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')

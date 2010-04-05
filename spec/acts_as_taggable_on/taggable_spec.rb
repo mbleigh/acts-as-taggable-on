@@ -177,6 +177,11 @@ describe "Taggable" do
     TaggableModel.tagged_with("ruby, rails", :order => 'taggable_models.name').to_a.should == [bob, frank]
     TaggableModel.tagged_with(["ruby", "rails"], :order => 'taggable_models.name').to_a.should == [bob, frank]
   end
+  
+  it "should be able to find tagged with invalid tags" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive")    
+    TaggableModel.tagged_with("sad, happier").should_not include(bob)    
+  end
 
   it "should be able to find tagged with any tag" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive", :skill_list => "ruby, rails, css")
