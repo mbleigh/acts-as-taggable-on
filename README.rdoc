@@ -38,7 +38,7 @@ After that, you can run "rake gems:install" to install the gem if you don't alre
 1. script/generate acts_as_taggable_on_migration
 2. rake db:migrate
 
-== Rails 3.0
+=== Rails 3.0
 
 Acts As Taggable On is now useable in Rails 3.0, thanks to the excellent work of Szymon Nowak
 and Jelle Vandebeeck.
@@ -47,12 +47,12 @@ To use it, add it to your Gemfile:
   
   gem 'acts-as-taggable-on'
 
-=== Post Installation
+==== Post Installation
 
 1. rails generate acts_as_taggable_on:migration
 2. rake db:migrate
 
-= Testing
+== Testing
 
 Acts As Taggable On uses RSpec for its test coverage. Inside the plugin
 directory, you can run the specs for RoR 3.0.0 with:
@@ -68,7 +68,7 @@ If you already have RSpec on your application, the specs will run while using:
 rake spec:plugins
 
 
-= Usage
+== Usage
 
     class User < ActiveRecord::Base
       # Alias for <tt>acts_as_taggable_on :tags</tt>:
@@ -89,7 +89,7 @@ rake spec:plugins
     User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
     @frankie.skill_counts
 
-== Finding Tagged Objects
+=== Finding Tagged Objects
 
 Acts As Taggable On utilizes named_scopes to create an association for tags.
 This way you can mix and match to filter down your results, and it also improves
@@ -109,7 +109,7 @@ compatibility with the will_paginate gem:
     # Find a user with any of the tags:
     User.tagged_with(["awesome", "cool"], :any => true)
 
-== Relationships
+=== Relationships
 
 You can find objects of the same type based on similar tags on certain contexts.
 Also, objects will be returned in descending order based on the total number of 
@@ -128,7 +128,7 @@ matched tags.
     @bobby.find_related_skills # => [<User name="Tom">] 
     @frankie.find_related_skills # => [<User name="Tom">] 
 
-== Dynamic Tag Contexts
+=== Dynamic Tag Contexts
 
 In addition to the generated tag contexts in the definition, it is also possible
 to allow for dynamic tag contexts (this could be user generated tag contexts!)
@@ -141,7 +141,7 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
     @user.tag_counts_on(:customs)
     User.find_tagged_with("same", :on => :customs) # => [@user]
 
-== Tag Ownership
+=== Tag Ownership
 
 Tags can have owners:
 
@@ -158,7 +158,7 @@ Tags can have owners:
     @some_user.owned_tags
     @some_photo.locations_from(@some_user)
     
-== Tag cloud calculations
+=== Tag cloud calculations
 
 To construct tag clouds, the frequency of each tag needs to be calculated.
 Because we specified +acts_as_taggable_on+ on the <tt>User</tt> class, we can
@@ -198,7 +198,7 @@ CSS:
   .css3 { font-size: 1.4em; }
   .css4 { font-size: 1.6em; }
 
-= Contributors
+== Contributors
 
 * TomEric (i76) - Maintainer
 * Michael Bleigh - Original Author
@@ -208,7 +208,7 @@ CSS:
 * Pradeep Elankumaran - Taggers
 * Sinclair Bain - Patch King
 
-== Patch Contributors
+=== Patch Contributors
 
 * tristanzdunn - Related objects of other classes
 * azabaj - Fixed migrate down
