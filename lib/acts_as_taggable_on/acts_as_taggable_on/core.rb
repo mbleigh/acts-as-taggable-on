@@ -21,7 +21,7 @@ module ActsAsTaggableOn::Taggable
 
           class_eval do
             has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "Tagging",
-                     :conditions => ['#{Tagging.table_name}.tagger_id IS NULL AND #{Tagging.table_name}.context = ?', tags_type]
+                     :conditions => ["#{Tagging.table_name}.tagger_id IS NULL AND #{Tagging.table_name}.context = ?", tags_type]
             has_many context_tags, :through => context_taggings, :source => :tag
           end
 
