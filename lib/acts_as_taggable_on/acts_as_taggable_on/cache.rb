@@ -1,8 +1,8 @@
 module ActsAsTaggableOn::Taggable
   module Cache
     def self.included(base)
-      # Skip adding caching capabilities if no cache columns exist
-      return unless base.tag_types.any? { |context| base.column_names.include?("cached_#{context.to_s.singularize}_list") }
+      # Skip adding caching capabilities if table not exists or no cache columns exist
+      return unless base.table_exists? && base.tag_types.any? { |context| base.column_names.include?("cached_#{context.to_s.singularize}_list") }
 
       base.send :include, ActsAsTaggableOn::Taggable::Cache::InstanceMethods
       base.extend ActsAsTaggableOn::Taggable::Cache::ClassMethods
