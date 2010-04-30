@@ -16,7 +16,8 @@ class TagList < Array
   #   tag_list = TagList.from("One , Two,  Three")
   #   tag_list # ["One", "Two", "Three"]
   def self.from(string)
-    string = string.join(", ") if string.respond_to?(:join)
+    glue   = delimiter.ends_with?(" ") ? delimiter : "#{delimiter} "
+    string = string.join(glue) if string.respond_to?(:join)
 
     new.tap do |tag_list|
       string = string.to_s.dup
