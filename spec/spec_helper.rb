@@ -1,27 +1,31 @@
+$LOAD_PATH << "." unless $LOAD_PATH.include?(".")
+
 begin
-  # Try to require the preresolved locked set of gems.
-  require File.expand_path("../.bundle/environment", __FILE__)
-rescue LoadError
-  # Fall back on doing an unlocked resolve at runtime.
-  require "rubygems" unless RUBY_VERSION >= "1.9"
+  require "rubygems"
   require "bundler"
+
+  if Gem::Version.new(Bundler::VERSION) <= Gem::Version.new("0.9.5")
+    raise RuntimeError, "Your bundler version is too old." +
+     "Run `gem install bundler` to upgrade."
+  end
+
+  # Set up load paths for all bundled gems
   Bundler.setup
+rescue Bundler::GemNotFound
+  raise RuntimeError, "Bundler couldn't find some gems." +
+    "Did you run `bundle install`?"
 end
 
 Bundler.require
 require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
 
-if defined?(Rspec::Core::ExampleGroupSubject)
-  module Rspec::Core::ExampleGroupSubject
-    alias :context :describe
-  end
-end
-
-class Array
-  def freq
-    k=Hash.new(0)
-    each {|e| k[e]+=1}
-    k
+unless [].respond_to?(:freq)
+  class Array
+    def freq
+      k=Hash.new(0)
+      each {|e| k[e]+=1}
+      k
+    end
   end
 end
 
