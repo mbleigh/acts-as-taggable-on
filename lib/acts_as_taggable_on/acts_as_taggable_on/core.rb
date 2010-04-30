@@ -193,13 +193,13 @@ module ActsAsTaggableOn::Taggable
         custom_contexts + self.class.tag_types.map(&:to_s)
       end
 
-      def reload
+      def reload(*args)
         self.class.tag_types.each do |context|
           instance_variable_set("@#{context.to_s.singularize}_list", nil)
           instance_variable_set("@all_#{context.to_s.singularize}_list", nil)
         end
       
-        super
+        super(*args)
       end
 
       def save_tags

@@ -58,12 +58,12 @@ module ActsAsTaggableOn::Taggable
         cache[owner] = TagList.from(new_list)
       end
       
-      def reload
+      def reload(*args)
         self.class.tag_types.each do |context|
           instance_variable_set("@owned_#{context}_list", nil)
         end
       
-        super
+        super(*args)
       end
     
       def save_owned_tags
