@@ -51,7 +51,6 @@ def clean_database!
             AlteredInheritingTaggableModel, TaggableUser, UntaggableModel]
   models.each do |model|
     ActiveRecord::Base.connection.execute "DELETE FROM #{model.table_name}"
-    # model.destroy_all
   end
 end
 
