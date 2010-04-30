@@ -47,10 +47,11 @@ ActiveRecord::Base.silence do
 end
 
 def clean_database!
-  models = [Tag, Tagging, TaggableModel, OtherTaggableModel, InheritingTaggableModel,
+  models = [ActsAsTaggableOn::Tag, ActsAsTaggableOn::Tagging, TaggableModel, OtherTaggableModel, InheritingTaggableModel,
             AlteredInheritingTaggableModel, TaggableUser, UntaggableModel]
   models.each do |model|
-    model.destroy_all
+    ActiveRecord::Base.connection.execute "DELETE FROM #{model.table_name}"
+    # model.destroy_all
   end
 end
 

@@ -11,7 +11,7 @@ describe "Acts As Taggable On" do
 
   describe "Taggable Method Generation" do
     before(:each) do
-      [TaggableModel, Tag, Tagging, TaggableUser].each(&:delete_all)
+      clean_database!
       @taggable = TaggableModel.new(:name => "Bob Jones")
     end
 

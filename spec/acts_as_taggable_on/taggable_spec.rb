@@ -26,11 +26,11 @@ describe "Taggable" do
 
   it "should be able to create tags" do
     @taggable.skill_list = "ruby, rails, css"
-    @taggable.instance_variable_get("@skill_list").instance_of?(TagList).should be_true
+    @taggable.instance_variable_get("@skill_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
     
     lambda {
       @taggable.save
-    }.should change(Tag, :count).by(3)
+    }.should change(ActsAsTaggableOn::Tag, :count).by(3)
     
     @taggable.reload
     @taggable.skill_list.sort.should == %w(ruby rails css).sort
@@ -90,7 +90,7 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
 
-    Tag.find(:all).size.should == 1
+    ActsAsTaggableOn::Tag.find(:all).size.should == 1
     TaggableModel.tagged_with("ruby").to_a.should == TaggableModel.tagged_with("Ruby").to_a
   end
 
@@ -241,7 +241,7 @@ describe "Taggable" do
       bob.tag_list << "happier"
       bob.tag_list << "happier"
       bob.save
-    }.should change(Tagging, :count).by(1)
+    }.should change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
  
   describe "Associations" do
@@ -258,7 +258,7 @@ describe "Taggable" do
 
   describe "grouped_column_names_for method" do
     it "should return all column names joined for Tag GROUP clause" do
-      @taggable.grouped_column_names_for(Tag).should == "tags.id, tags.name"
+      @taggable.grouped_column_names_for(ActsAsTaggableOn::Tag).should == "tags.id, tags.name"
     end
 
     it "should return all column names joined for TaggableModel GROUP clause" do

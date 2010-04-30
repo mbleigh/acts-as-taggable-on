@@ -1,20 +1,20 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe Tag do
+describe ActsAsTaggableOn::Tag do
   before(:each) do
     clean_database!
-    @tag = Tag.new
+    @tag = ActsAsTaggableOn::Tag.new
     @user = TaggableModel.create(:name => "Pablo")
   end
 
   describe "named like any" do
     before(:each) do
-      Tag.create(:name => "awesome")
-      Tag.create(:name => "epic")
+      ActsAsTaggableOn::Tag.create(:name => "awesome")
+      ActsAsTaggableOn::Tag.create(:name => "epic")
     end
 
     it "should find both tags" do
-      Tag.named_like_any(["awesome", "epic"]).should have(2).items
+      ActsAsTaggableOn::Tag.named_like_any(["awesome", "epic"]).should have(2).items
     end
   end
 
@@ -25,17 +25,17 @@ describe Tag do
     end
 
     it "should find by name" do
-      Tag.find_or_create_with_like_by_name("awesome").should == @tag
+      ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("awesome").should == @tag
     end
 
     it "should find by name case insensitive" do
-      Tag.find_or_create_with_like_by_name("AWESOME").should == @tag
+      ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("AWESOME").should == @tag
     end
 
     it "should create by name" do
       lambda {
-        Tag.find_or_create_with_like_by_name("epic")
-      }.should change(Tag, :count).by(1)
+        ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("epic")
+      }.should change(ActsAsTaggableOn::Tag, :count).by(1)
     end
   end
 
@@ -46,27 +46,27 @@ describe Tag do
     end
 
     it "should find by name" do
-      Tag.find_or_create_all_with_like_by_name("awesome").should == [@tag]
+      ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("awesome").should == [@tag]
     end
 
     it "should find by name case insensitive" do
-      Tag.find_or_create_all_with_like_by_name("AWESOME").should == [@tag]
+      ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME").should == [@tag]
     end
 
     it "should create by name" do
       lambda {
-        Tag.find_or_create_all_with_like_by_name("epic")
-      }.should change(Tag, :count).by(1)
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("epic")
+      }.should change(ActsAsTaggableOn::Tag, :count).by(1)
     end
 
     it "should find or create by name" do
       lambda {
-        Tag.find_or_create_all_with_like_by_name("awesome", "epic").map(&:name).should == ["awesome", "epic"]
-      }.should change(Tag, :count).by(1)
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("awesome", "epic").map(&:name).should == ["awesome", "epic"]
+      }.should change(ActsAsTaggableOn::Tag, :count).by(1)
     end
 
     it "should return an empty array if no tags are specified" do
-      Tag.find_or_create_all_with_like_by_name([]).should == []
+      ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name([]).should == []
     end
   end
 
@@ -91,7 +91,7 @@ describe Tag do
 
   it "should equal a tag with the same name" do
     @tag.name = "awesome"
-    new_tag = Tag.new(:name => "awesome")
+    new_tag = ActsAsTaggableOn::Tag.new(:name => "awesome")
     new_tag.should == @tag
   end
 
@@ -103,13 +103,13 @@ describe Tag do
   it "have named_scope named(something)" do
     @tag.name = "cool"
     @tag.save!
-    Tag.named('cool').should include(@tag)
+    ActsAsTaggableOn::Tag.named('cool').should include(@tag)
   end
 
   it "have named_scope named_like(something)" do
     @tag.name = "cool"
     @tag.save!
-    @another_tag = Tag.create!(:name => "coolip")
-    Tag.named_like('cool').should include(@tag, @another_tag)
+    @another_tag = ActsAsTaggableOn::Tag.create!(:name => "coolip")
+    ActsAsTaggableOn::Tag.named_like('cool').should include(@tag, @another_tag)
   end
 end

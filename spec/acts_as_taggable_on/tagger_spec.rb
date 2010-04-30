@@ -22,7 +22,7 @@ describe "Tagger" do
     lambda{
       @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
       @user2.tag(@taggable, :with => 'java, python, lisp, ruby', :on => :tags)
-    }.should change(Tagging, :count).by(6)
+    }.should change(ActsAsTaggableOn::Tagging, :count).by(6)
 
     [@user, @user2, @taggable].each(&:reload)
 
@@ -43,7 +43,7 @@ describe "Tagger" do
     
     lambda {
       @user2.tag(@taggable, :with => 'java, python, lisp', :on => :tags)
-    }.should change(Tagging, :count).by(-1)
+    }.should change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
     [@user, @user2, @taggable].each(&:reload)
     
@@ -62,7 +62,7 @@ describe "Tagger" do
 
     lambda {
       @user2.tag(@taggable, :with => 'epic', :on => :tags)
-    }.should change(Tagging, :count).by(-1)
+    }.should change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
     @taggable.reload  
     @taggable.all_tags_list.should include('awesome')
@@ -79,7 +79,7 @@ describe "Tagger" do
     
     lambda {
       @taggable.update_attributes(:tag_list => "")
-    }.should change(Tagging, :count).by(-1)
+    }.should change(ActsAsTaggableOn::Tagging, :count).by(-1)
     
     @taggable.tag_list.should == []
     @taggable.all_tags_list.sort.should == %w(ruby scheme).sort
