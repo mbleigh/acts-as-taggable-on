@@ -178,6 +178,11 @@ describe "Taggable" do
     TaggableModel.tagged_with(["ruby", "rails"], :order => 'taggable_models.name').to_a.should == [bob, frank]
   end
   
+  it "should be able to find tagged with quotation marks" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive, 'I love the ,comma,'")
+    TaggableModel.tagged_with("'I love the ,comma,'").should include(bob)
+  end
+  
   it "should be able to find tagged with invalid tags" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive")    
     TaggableModel.tagged_with("sad, happier").should_not include(bob)    
