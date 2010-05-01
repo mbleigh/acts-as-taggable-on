@@ -174,7 +174,7 @@ Here is an example that generates a tag cloud.
 Helper:
 
   module PostsHelper
-    include TagsHelper
+    include ActsAsTaggableOn::TagsHelper
   end
 
 Controller:
