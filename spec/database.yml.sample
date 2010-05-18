@@ -1,0 +1,10 @@
+sqlite3:
+  adapter: sqlite3
+  database: acts_as_taggable_on.sqlite3
+
+mysql:
+  adapter: mysql
+  hostname: localhost
+  username: root
+  password:
+  database: acts_as_taggable_on
