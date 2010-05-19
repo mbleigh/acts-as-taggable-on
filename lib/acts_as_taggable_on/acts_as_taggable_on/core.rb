@@ -117,6 +117,7 @@ module ActsAsTaggableOn::Taggable
         scoped(:joins      => joins.join(" "),
                :group      => group,
                :conditions => conditions.join(" AND "),
+               :order      => options[:order],
                :readonly   => false)
       end
 
@@ -172,8 +173,11 @@ module ActsAsTaggableOn::Taggable
       ##
       # Returns all tags of a given context
       def all_tags_on(context)
-        opts =  ["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", context.to_s]
-        base_tags.where(opts).order("#{ActsAsTaggableOn::Tagging.table_name}.created_at").group("#{ActsAsTaggableOn::Tagging.table_name}.tag_id").all
+        tag_table_name = ActsAsTaggableOn::Tag.table_name
+        tagging_table_name = ActsAsTaggableOn::Tagging.table_name
+
+        opts =  ["#{tagging_table_name}.context = ?", context.to_s]
+        base_tags.where(opts).order("max(#{tagging_table_name}.created_at)").group("#{tag_table_name}.id, #{tag_table_name}.name").all
       end
 
       ##

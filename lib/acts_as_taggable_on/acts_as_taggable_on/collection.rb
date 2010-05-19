@@ -87,7 +87,9 @@ module ActsAsTaggableOn::Taggable
           tagging_join,
           taggable_join,
           scope[:joins]
-        ].compact.reverse
+        ].compact
+
+        joins = joins.reverse if ActiveRecord::VERSION::MAJOR < 3
 
 
         ## Generate scope:
