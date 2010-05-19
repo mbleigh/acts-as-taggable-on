@@ -108,7 +108,7 @@ describe "Taggable" do
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
     TaggableModel.all_tag_counts.all.should_not be_empty
-    TaggableModel.all_tag_counts.first.count.should == 3 # ruby
+    TaggableModel.all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
   if ActiveRecord::VERSION::MAJOR >= 3
@@ -132,7 +132,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.tagged_with("ruby").tag_counts.first.count.should == 2   # ruby
+    TaggableModel.tagged_with("ruby").tag_counts(:order => 'tags.id').first.count.should == 2   # ruby
     TaggableModel.tagged_with("ruby").skill_counts.first.count.should == 1 # ruby
   end
 
@@ -141,7 +141,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.tagged_with("ruby").all_tag_counts.first.count.should == 3 # ruby
+    TaggableModel.tagged_with("ruby").all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
   it 'should only return tag counts for the available scope' do
@@ -298,9 +298,9 @@ describe "Taggable" do
       @inherited_different.tag_list = "fork, spoon"
       @inherited_different.save!
   
-      InheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso)
-      AlteredInheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(fork spoon)
-      TaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso fork spoon)
+      InheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso)
+      AlteredInheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(fork spoon)
+      TaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso fork spoon)
     end
   
     it 'should store same tag without validation conflict' do
