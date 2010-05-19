@@ -176,15 +176,8 @@ module ActsAsTaggableOn::Taggable
         tag_table_name = ActsAsTaggableOn::Tag.table_name
         tagging_table_name = ActsAsTaggableOn::Tagging.table_name
 
-        taggable_type = self.class.name
-        ActsAsTaggableOn::Tag.find_by_sql([ "SELECT DISTINCT tags.* FROM (
-          SELECT #{tag_table_name}.* FROM #{tag_table_name}
-            INNER JOIN #{tagging_table_name} ON #{tag_table_name}.id = #{tagging_table_name}.tag_id
-          WHERE ((#{tagging_table_name}.taggable_id = ?) AND (#{tagging_table_name}.taggable_type = '#{taggable_type}'))
-            AND (#{tagging_table_name}.context = ?)
-          GROUP BY #{tag_table_name}.id, #{tag_table_name}.name, #{tagging_table_name}.tag_id, #{tagging_table_name}.created_at
-          ORDER BY #{tagging_table_name}.created_at
-          ) as tags", id, context.to_s ])
+        opts =  ["#{tagging_table_name}.context = ?", context.to_s]
+        base_tags.where(opts).order("max(#{tagging_table_name}.created_at)").group("#{tag_table_name}.id, #{tag_table_name}.name").all
       end
 
       ##
