@@ -16,19 +16,19 @@ module ActsAsTaggableOn
     ### SCOPES:
 
     def self.named(name)
-      where(["name LIKE ?", name])
+      where(["name #{like_operator} ?", name])
     end
   
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["name LIKE ?", tag.to_s]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", tag.to_s]) }.join(" OR "))
     end
   
     def self.named_like(name)
-      where(["name LIKE ?", "%#{name}%"])
+      where(["name #{like_operator} ?", "%#{name}%"])
     end
 
     def self.named_like_any(list)
-      where(list.map { |tag| sanitize_sql(["name LIKE ?", "%#{tag.to_s}%"]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", "%#{tag.to_s}%"]) }.join(" OR "))
     end
 
     ### CLASS METHODS:
@@ -61,6 +61,13 @@ module ActsAsTaggableOn
 
     def count
       read_attribute(:count).to_i
+    end
+
+    class << self
+      private
+        def like_operator
+          connection.adapter_name == 'PostgreSQL' ? 'ILIKE' : 'LIKE'
+        end
     end
 
   end
