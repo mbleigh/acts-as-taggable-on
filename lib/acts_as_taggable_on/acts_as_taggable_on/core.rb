@@ -117,6 +117,7 @@ module ActsAsTaggableOn::Taggable
         scoped(:joins      => joins.join(" "),
                :group      => group,
                :conditions => conditions.join(" AND "),
+               :order      => options[:order],
                :readonly   => false)
       end
 
