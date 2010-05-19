@@ -14,6 +14,10 @@ module ActsAsTaggableOn
     validates_uniqueness_of :name
 
     ### SCOPES:
+    
+    def self.using_postgresql?
+      connection.adapter_name == 'PostgreSQL'
+    end
 
     def self.named(name)
       where(["name #{like_operator} ?", name])
@@ -66,7 +70,7 @@ module ActsAsTaggableOn
     class << self
       private
         def like_operator
-          connection.adapter_name == 'PostgreSQL' ? 'ILIKE' : 'LIKE'
+          using_postgresql? ? 'ILIKE' : 'LIKE'
         end
     end
 

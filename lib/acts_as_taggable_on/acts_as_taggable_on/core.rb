@@ -110,7 +110,9 @@ module ActsAsTaggableOn::Taggable
                    "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
                    " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
 
-          group = "#{grouped_column_names_for(self)} HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
+
+          group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
+          group = "#{group_columns} HAVING COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
 
 
@@ -176,8 +178,17 @@ module ActsAsTaggableOn::Taggable
         tag_table_name = ActsAsTaggableOn::Tag.table_name
         tagging_table_name = ActsAsTaggableOn::Tagging.table_name
 
-        opts =  ["#{tagging_table_name}.context = ?", context.to_s]
-        base_tags.where(opts).order("max(#{tagging_table_name}.created_at)").group("#{tag_table_name}.id, #{tag_table_name}.name").all
+        opts  =  ["#{tagging_table_name}.context = ?", context.to_s]
+        scope = base_tags.where(opts)
+        
+        if ActsAsTaggableOn::Tag.using_postgresql?
+          group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
+          scope = scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
+        else
+          scope = scope.group("#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
+        end
+
+        scope.all
       end
 
       ##

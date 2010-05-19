@@ -91,7 +91,6 @@ module ActsAsTaggableOn::Taggable
 
         joins = joins.reverse if ActiveRecord::VERSION::MAJOR < 3
 
-
         ## Generate scope:
         scope = ActsAsTaggableOn::Tag.scoped(:select => "#{ActsAsTaggableOn::Tag.table_name}.*, COUNT(*) AS count").order(options[:order]).limit(options[:limit])   
         
@@ -104,6 +103,8 @@ module ActsAsTaggableOn::Taggable
         at_most   = sanitize_sql(['COUNT(*) <= ?', options.delete(:at_most)]) if options[:at_most]
         having    = [at_least, at_most].compact.join(' AND ')        
 
+        group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(ActsAsTaggableOn::Tag) : "#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}"
+
         if ActiveRecord::VERSION::MAJOR >= 3
           # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
           scoped_select = "#{table_name}.#{primary_key}"
@@ -111,10 +112,10 @@ module ActsAsTaggableOn::Taggable
           
           # We have having() in RoR 3.0 so use it:
           having = having.blank? ? "COUNT(*) > 0" : "COUNT(*) > 0 AND #{having}"
-          scope = scope.group(grouped_column_names_for(ActsAsTaggableOn::Tag)).having(having)
+          scope = scope.group(group_columns).having(having)
         else
           # Having is not available in 2.3.x:
-          group_by  = "#{grouped_column_names_for(ActsAsTaggableOn::Tag)} HAVING COUNT(*) > 0"
+          group_by  = "#{group_columns} HAVING COUNT(*) > 0"
           group_by << " AND #{having}" unless having.blank?
           scope = scope.group(group_by)
         end
