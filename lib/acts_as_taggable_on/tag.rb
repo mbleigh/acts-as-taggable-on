@@ -47,7 +47,10 @@ module ActsAsTaggableOn
       return [] if list.empty?
 
       existing_tags = Tag.named_any(list).all
-      new_tag_names = list.reject { |name| existing_tags.any? { |tag| tag.name.mb_chars.downcase == name.mb_chars.downcase } }
+      new_tag_names = list.reject do |name| 
+                        name = comparable_name(name)
+                        existing_tags.any? { |tag| comparable_name(tag.name) == name }
+                      end
       created_tags  = new_tag_names.map { |name| Tag.create(:name => name) }
 
       existing_tags + created_tags
@@ -72,7 +75,10 @@ module ActsAsTaggableOn
         def like_operator
           using_postgresql? ? 'ILIKE' : 'LIKE'
         end
+        
+        def comparable_name(str)
+          RUBY_VERSION >= "1.9" ? str.downcase : str.mb_chars.downcase
+        end
     end
-
   end
 end
