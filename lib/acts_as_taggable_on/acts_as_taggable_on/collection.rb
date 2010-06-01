@@ -115,9 +115,7 @@ module ActsAsTaggableOn::Taggable
         if ActiveRecord::VERSION::MAJOR >= 3
           # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
           scoped_select = "#{table_name}.#{primary_key}"
-          scoped_sql    = select(scoped_select).to_sql
-
-          tagging_scope = tagging_scope.joins("JOIN (#{scoped_sql}) AS conditional_join ON conditional_join.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id").
+          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})").
                                         group(group_columns).
                                         having(having)
         else
