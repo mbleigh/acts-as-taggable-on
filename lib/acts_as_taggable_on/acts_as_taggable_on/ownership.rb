@@ -30,9 +30,13 @@ module ActsAsTaggableOn::Taggable
     
     module InstanceMethods
       def owner_tags_on(owner, context)
-        base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND
-                           #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = ? AND
-                           #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = ?), context.to_s, owner.id, owner.class.to_s]).all
+        if owner.nil?
+          base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ?), context.to_s]).all                    
+        else
+          base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND
+                             #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = ? AND
+                             #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = ?), context.to_s, owner.id, owner.class.to_s]).all          
+        end
       end
 
       def cached_owned_tag_list_on(context)
