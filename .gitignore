@@ -1,4 +1,5 @@
 *.log
-test.sqlite3
+*.sqlite3
 /pkg/*
 .bundle
+spec/database.yml

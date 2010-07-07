@@ -30,9 +30,13 @@ module ActsAsTaggableOn::Taggable
     
     module InstanceMethods
       def owner_tags_on(owner, context)
-        base_tags.where([%(#{Tagging.table_name}.context = ? AND
-                           #{Tagging.table_name}.tagger_id = ? AND
-                           #{Tagging.table_name}.tagger_type = ?), context.to_s, owner.id, owner.class.to_s]).all
+        if owner.nil?
+          base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ?), context.to_s]).all                    
+        else
+          base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND
+                             #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = ? AND
+                             #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = ?), context.to_s, owner.id, owner.class.to_s]).all          
+        end
       end
 
       def cached_owned_tag_list_on(context)
@@ -46,7 +50,7 @@ module ActsAsTaggableOn::Taggable
         cache = cached_owned_tag_list_on(context)
         cache.delete_if { |key, value| key.id == owner.id && key.class == owner.class }
         
-        cache[owner] ||= TagList.new(*owner_tags_on(owner, context).map(&:name))
+        cache[owner] ||= ActsAsTaggableOn::TagList.new(*owner_tags_on(owner, context).map(&:name))
       end
       
       def set_owner_tag_list_on(owner, context, new_list)
@@ -55,22 +59,22 @@ module ActsAsTaggableOn::Taggable
         cache = cached_owned_tag_list_on(context)
         cache.delete_if { |key, value| key.id == owner.id && key.class == owner.class }
 
-        cache[owner] = TagList.from(new_list)
+        cache[owner] = ActsAsTaggableOn::TagList.from(new_list)
       end
       
-      def reload
+      def reload(*args)
         self.class.tag_types.each do |context|
           instance_variable_set("@owned_#{context}_list", nil)
         end
       
-        super
+        super(*args)
       end
     
       def save_owned_tags
         tagging_contexts.each do |context|
           cached_owned_tag_list_on(context).each do |owner, tag_list|
             # Find existing tags or create non-existing tags:
-            tag_list = Tag.find_or_create_all_with_like_by_name(tag_list.uniq)            
+            tag_list = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list.uniq)            
 
             owned_tags = owner_tags_on(owner, context)              
             old_tags   = owned_tags - tag_list
@@ -78,13 +82,13 @@ module ActsAsTaggableOn::Taggable
           
             # Find all taggings that belong to the taggable (self), are owned by the owner, 
             # have the correct context, and are removed from the list.
-            old_taggings = Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
-                                         :tagger_type => owner.class.to_s, :tagger_id => owner.id,
-                                         :tag_id => old_tags, :context => context).all
+            old_taggings = ActsAsTaggableOn::Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
+                                                           :tagger_type => owner.class.to_s, :tagger_id => owner.id,
+                                                           :tag_id => old_tags, :context => context).all
           
             if old_taggings.present?
               # Destroy old taggings:
-              Tagging.destroy_all(:id => old_taggings.map(&:id))
+              ActsAsTaggableOn::Tagging.destroy_all(:id => old_taggings.map(&:id))
             end
 
             # Create new taggings:

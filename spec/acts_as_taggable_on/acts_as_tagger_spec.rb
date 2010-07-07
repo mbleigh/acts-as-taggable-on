@@ -1,11 +1,11 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path('../../spec_helper', __FILE__)
 
 describe "acts_as_tagger" do
   before(:each) do
     clean_database!
   end
   
-  context "Tagger Method Generation" do
+  describe "Tagger Method Generation" do
     before(:each) do
       @tagger = TaggableUser.new()
     end
@@ -84,7 +84,7 @@ describe "acts_as_tagger" do
       end
     end
     
-    context "when called by multiple tagger's" do
+    describe "when called by multiple tagger's" do
       before(:each) do
         @user_x = TaggableUser.create(:name => "User X")
         @user_y = TaggableUser.create(:name => "User Y")

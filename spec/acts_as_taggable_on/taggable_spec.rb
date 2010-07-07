@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path('../../spec_helper', __FILE__)
 
 describe "Taggable" do
   before(:each) do
@@ -26,11 +26,11 @@ describe "Taggable" do
 
   it "should be able to create tags" do
     @taggable.skill_list = "ruby, rails, css"
-    @taggable.instance_variable_get("@skill_list").instance_of?(TagList).should be_true
+    @taggable.instance_variable_get("@skill_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
     
     lambda {
       @taggable.save
-    }.should change(Tag, :count).by(3)
+    }.should change(ActsAsTaggableOn::Tag, :count).by(3)
     
     @taggable.reload
     @taggable.skill_list.sort.should == %w(ruby rails css).sort
@@ -90,7 +90,7 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
 
-    Tag.find(:all).size.should == 1
+    ActsAsTaggableOn::Tag.find(:all).size.should == 1
     TaggableModel.tagged_with("ruby").to_a.should == TaggableModel.tagged_with("Ruby").to_a
   end
 
@@ -108,7 +108,7 @@ describe "Taggable" do
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
     TaggableModel.all_tag_counts.all.should_not be_empty
-    TaggableModel.all_tag_counts.first.count.should == 3 # ruby
+    TaggableModel.all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
   if ActiveRecord::VERSION::MAJOR >= 3
@@ -132,7 +132,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.tagged_with("ruby").tag_counts.first.count.should == 2   # ruby
+    TaggableModel.tagged_with("ruby").tag_counts(:order => 'tags.id').first.count.should == 2   # ruby
     TaggableModel.tagged_with("ruby").skill_counts.first.count.should == 1 # ruby
   end
 
@@ -141,7 +141,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.tagged_with("ruby").all_tag_counts.first.count.should == 3 # ruby
+    TaggableModel.tagged_with("ruby").all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
   it 'should only return tag counts for the available scope' do
@@ -176,6 +176,11 @@ describe "Taggable" do
     TaggableModel.tagged_with("ruby", :order => 'taggable_models.name').to_a.should == [bob, frank, steve]
     TaggableModel.tagged_with("ruby, rails", :order => 'taggable_models.name').to_a.should == [bob, frank]
     TaggableModel.tagged_with(["ruby", "rails"], :order => 'taggable_models.name').to_a.should == [bob, frank]
+  end
+  
+  it "should be able to find tagged with quotation marks" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive, 'I love the ,comma,'")
+    TaggableModel.tagged_with("'I love the ,comma,'").should include(bob)
   end
   
   it "should be able to find tagged with invalid tags" do
@@ -236,7 +241,7 @@ describe "Taggable" do
       bob.tag_list << "happier"
       bob.tag_list << "happier"
       bob.save
-    }.should change(Tagging, :count).by(1)
+    }.should change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
  
   describe "Associations" do
@@ -253,7 +258,7 @@ describe "Taggable" do
 
   describe "grouped_column_names_for method" do
     it "should return all column names joined for Tag GROUP clause" do
-      @taggable.grouped_column_names_for(Tag).should == "tags.id, tags.name"
+      @taggable.grouped_column_names_for(ActsAsTaggableOn::Tag).should == "tags.id, tags.name"
     end
 
     it "should return all column names joined for TaggableModel GROUP clause" do
@@ -293,9 +298,9 @@ describe "Taggable" do
       @inherited_different.tag_list = "fork, spoon"
       @inherited_different.save!
   
-      InheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso)
-      AlteredInheritingTaggableModel.tag_counts_on(:tags).map(&:name).should == %w(fork spoon)
-      TaggableModel.tag_counts_on(:tags).map(&:name).should == %w(bob kelso fork spoon)
+      InheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso)
+      AlteredInheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(fork spoon)
+      TaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso fork spoon)
     end
   
     it 'should store same tag without validation conflict' do

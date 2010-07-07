@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{acts-as-taggable-on}
-  s.version = "2.0.4"
+  s.version = "2.0.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Bleigh"]
-  s.date = %q{2010-04-05}
+  s.date = %q{2010-05-19}
   s.description = %q{With ActsAsTaggableOn, you could tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
   s.email = %q{michael@intridea.com}
   s.extra_rdoc_files = [
@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
      "lib/acts_as_taggable_on/acts_as_tagger.rb",
      "lib/acts_as_taggable_on/compatibility/Gemfile",
      "lib/acts_as_taggable_on/compatibility/active_record_backports.rb",
+     "lib/acts_as_taggable_on/compatibility/postgresql.rb",
      "lib/acts_as_taggable_on/tag.rb",
      "lib/acts_as_taggable_on/tag_list.rb",
      "lib/acts_as_taggable_on/tagging.rb",
@@ -50,9 +51,10 @@ Gem::Specification.new do |s|
      "spec/acts_as_taggable_on/tagging_spec.rb",
      "spec/acts_as_taggable_on/tags_helper_spec.rb",
      "spec/bm.rb",
+     "spec/database.yml",
+     "spec/database.yml.sample",
      "spec/models.rb",
      "spec/schema.rb",
-     "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/mbleigh/acts-as-taggable-on}

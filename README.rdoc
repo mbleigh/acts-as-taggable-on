@@ -139,7 +139,7 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
     @user.save
     @user.tags_on(:customs) # => [<Tag name='same'>,...]
     @user.tag_counts_on(:customs)
-    User.find_tagged_with("same", :on => :customs) # => [@user]
+    User.tagged_with("same", :on => :customs) # => [@user]
 
 === Tag Ownership
 
@@ -174,7 +174,7 @@ Here is an example that generates a tag cloud.
 Helper:
 
   module PostsHelper
-    include TagsHelper
+    include ActsAsTaggableOn::TagsHelper
   end
 
 Controller:
