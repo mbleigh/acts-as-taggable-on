@@ -4,6 +4,7 @@ describe "Taggable" do
   before(:each) do
     clean_database!
     @taggable = TaggableModel.new(:name => "Bob Jones")
+    @taggables = [@taggable, TaggableModel.new(:name => "John Doe")]
   end
 
   it "should have tag types" do
@@ -68,6 +69,22 @@ describe "Taggable" do
     @taggable.should have(2).skills
   end
 
+  it "should be able to select taggables by subset of tags using ActiveRelation methods" do
+    @taggables[0].tag_list = "bob"
+    @taggables[1].tag_list = "charlie"
+    @taggables[0].skill_list = "ruby"
+    @taggables[1].skill_list = "css"
+    @taggables.each{|taggable| taggable.save}
+    
+    @found_taggables_by_tag = TaggableModel.joins(:tags).where(:tags => {:name => ["bob"]})
+    @found_taggables_by_skill = TaggableModel.joins(:skills).where(:tags => {:name => ["ruby"]})
+
+    @found_taggables_by_tag.should include @taggables[0]
+    @found_taggables_by_tag.should_not include @taggables[1]
+    @found_taggables_by_skill.should include @taggables[0]
+    @found_taggables_by_skill.should_not include @taggables[1]
+  end
+  
   it "should be able to find by tag" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.save
