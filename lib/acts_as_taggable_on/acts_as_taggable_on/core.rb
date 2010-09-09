@@ -8,10 +8,10 @@ module ActsAsTaggableOn::Taggable
         attr_writer :custom_contexts
         after_save :save_tags
       end
-      
+
       base.initialize_acts_as_taggable_on_core
     end
-    
+
     module ClassMethods
       def initialize_acts_as_taggable_on_core
         tag_types.map(&:to_s).each do |tags_type|
@@ -38,14 +38,14 @@ module ActsAsTaggableOn::Taggable
               all_tags_list_on('#{tags_type}')
             end
           )
-        end        
+        end
       end
-      
+
       def acts_as_taggable_on(*args)
         super(*args)
         initialize_acts_as_taggable_on_core
       end
-      
+
       # all column names are necessary for PostgreSQL group clause
       def grouped_column_names_for(object)
         object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
@@ -68,7 +68,7 @@ module ActsAsTaggableOn::Taggable
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagList.from(tags)
 
-        return {} if tag_list.empty?
+        return scoped if tag_list.empty?
 
         joins = []
         conditions = []
@@ -126,8 +126,8 @@ module ActsAsTaggableOn::Taggable
       def is_taggable?
         true
       end
-    end    
-    
+    end
+
     module InstanceMethods
       # all column names are necessary for PostgreSQL group clause
       def grouped_column_names_for(object)
@@ -180,7 +180,7 @@ module ActsAsTaggableOn::Taggable
 
         opts  =  ["#{tagging_table_name}.context = ?", context.to_s]
         scope = base_tags.where(opts)
-        
+
         if ActsAsTaggableOn::Tag.using_postgresql?
           group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
           scope = scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
@@ -213,7 +213,7 @@ module ActsAsTaggableOn::Taggable
           instance_variable_set("@#{context.to_s.singularize}_list", nil)
           instance_variable_set("@all_#{context.to_s.singularize}_list", nil)
         end
-      
+
         super(*args)
       end
 
@@ -229,7 +229,7 @@ module ActsAsTaggableOn::Taggable
           current_tags = tags_on(context)
           old_tags     = current_tags - tag_list
           new_tags     = tag_list     - current_tags
-          
+
           # Find taggings to remove:
           old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil,
                                         :context => context.to_s, :tag_id => old_tags).all
