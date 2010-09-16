@@ -1,3 +1,7 @@
+== 2010-09-15
+* Fixed layout to prevent "Expected x to define y" error.
+
+
 == 2010-02-17
 * Converted the plugin to be compatible with Rails3
 

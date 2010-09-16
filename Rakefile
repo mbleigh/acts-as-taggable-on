@@ -36,7 +36,7 @@ end
 
 namespace 'rails2.3' do
   task :spec do
-    gemfile = File.join(File.dirname(__FILE__), 'lib', 'acts_as_taggable_on', 'compatibility', 'Gemfile')
+    gemfile = File.join(File.dirname(__FILE__), 'lib', 'compatibility', 'Gemfile')
     ENV['BUNDLE_GEMFILE'] = gemfile
     Rake::Task['spec'].invoke    
   end
@@ -51,7 +51,7 @@ begin
     gemspec.email = "michael@intridea.com"
     gemspec.homepage = "http://github.com/mbleigh/acts-as-taggable-on"
     gemspec.authors = ["Michael Bleigh"]
-    gemspec.files =  FileList["[A-Z]*", "{generators,lib,spec,rails}/**/*"] - FileList["**/*.log"]
+    gemspec.files =  FileList["[A-Z]*", "{generators,lib,spec}/**/*"] - FileList["**/*.log"]
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
