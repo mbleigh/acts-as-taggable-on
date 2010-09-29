@@ -89,7 +89,7 @@ module ActsAsTaggableOn::Taggable
                           "   ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id"
 
           tagging_join << "  AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", context.to_s]) if context
-          select_clause = "DISTINCT #{table_name}.*" unless context
+          select_clause = "DISTINCT #{table_name}.*" unless context and tag_types.one?
 
           joins << tagging_join
 
