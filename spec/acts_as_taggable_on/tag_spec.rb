@@ -9,12 +9,13 @@ describe ActsAsTaggableOn::Tag do
 
   describe "named like any" do
     before(:each) do
+      ActsAsTaggableOn::Tag.create(:name => "Awesome")
       ActsAsTaggableOn::Tag.create(:name => "awesome")
       ActsAsTaggableOn::Tag.create(:name => "epic")
     end
 
-    it "should find both tags" do
-      ActsAsTaggableOn::Tag.named_like_any(["awesome", "epic"]).should have(2).items
+    it "should find all three tags" do
+      ActsAsTaggableOn::Tag.named_like_any(["awesome", "epic"]).should have(3).items
     end
   end
 
