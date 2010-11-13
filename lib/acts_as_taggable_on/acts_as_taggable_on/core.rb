@@ -85,7 +85,7 @@ module ActsAsTaggableOn::Taggable
 
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
-          return scoped(:conditions => "1 = 0") unless tags.length == tag_list.length
+          return scoped(:conditions => "1 = 0") unless tags.map { |x| x.name.downcase }.uniq.length == tag_list.length
 
           tags.each do |tag|
             safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')
