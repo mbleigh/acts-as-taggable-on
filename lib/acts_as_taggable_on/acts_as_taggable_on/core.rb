@@ -196,14 +196,30 @@ module ActsAsTaggableOn::Taggable
       def tags_on(context)
         base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s]).all
       end
-
+      
       def set_tag_list_on(context, new_list)
         add_custom_context(context)
 
         variable_name = "@#{context.to_s.singularize}_list"
+        process_dirty_object(context, new_list)        
+        
         instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(new_list))
       end
-
+      
+      def process_dirty_object(context,new_list)
+        value = new_list.is_a?(Array) ? new_list.join(', ') : new_list
+        attr = "#{context.to_s.singularize}_list"
+        
+        if changed_attributes.include?(attr)
+          # The attribute already has an unsaved change.
+          old = changed_attributes[attr]
+          changed_attributes.delete(attr) if (old.to_s == value.to_s)
+        else
+          old = tag_list_on(context).to_s
+          changed_attributes[attr] = old if (old.to_s != value.to_s)
+        end
+      end
+      
       def tagging_contexts
         custom_contexts + self.class.tag_types.map(&:to_s)
       end

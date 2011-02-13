@@ -46,6 +46,7 @@ module ActsAsTaggableOn
           include ActsAsTaggableOn::Taggable::Cache
           include ActsAsTaggableOn::Taggable::Ownership
           include ActsAsTaggableOn::Taggable::Related
+          include ActsAsTaggableOn::Taggable::Dirty
         end
       end
     end
