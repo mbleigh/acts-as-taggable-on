@@ -20,9 +20,9 @@ module ActsAsTaggableOn::Taggable
           context_tags     = tags_type.to_sym
 
           class_eval do
-            has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "ActsAsTaggableOn::Tagging",
+            has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => '::ActsAsTaggableOn::Tagging',
                      :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type]
-            has_many context_tags, :through => context_taggings, :source => :tag, :class_name => "ActsAsTaggableOn::Tag"
+            has_many context_tags, :through => context_taggings, :source => :tag, :class_name => '::ActsAsTaggableOn::Tag'
           end
 
           class_eval %(

@@ -12,7 +12,7 @@ module ActsAsTaggableOn
                     :tagger_type,
                     :tagger_id
 
-    belongs_to :tag, :class_name => 'ActsAsTaggableOn::Tag'
+    belongs_to :tag, :class_name => '::ActsAsTaggableOn::Tag'
     belongs_to :taggable, :polymorphic => true
     belongs_to :tagger,   :polymorphic => true
 
