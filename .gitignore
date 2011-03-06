@@ -3,4 +3,5 @@
 /pkg/*
 .bundle
 .rvmrc
+Gemfile.lock
 spec/database.yml
