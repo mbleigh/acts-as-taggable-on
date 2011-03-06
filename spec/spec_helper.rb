@@ -13,7 +13,7 @@ begin
   Bundler.setup
 rescue Bundler::GemNotFound
   raise RuntimeError, "Bundler couldn't find some gems." +
-    "Did you run `bundle install`?"
+    "Did you run \`bundlee install\`?"
 end
 
 Bundler.require
