@@ -29,7 +29,11 @@ module ActsAsTaggableOn::Taggable
             def #{tag_type}_list
               tag_list_on('#{tags_type}')
             end
-
+            
+            def public_#{tag_type}_list
+              tag_list_on('#{tags_type}', false)
+            end
+            
             def #{tag_type}_list=(new_tags)
               set_tag_list_on('#{tags_type}', new_tags)
             end
@@ -155,14 +159,15 @@ module ActsAsTaggableOn::Taggable
         !instance_variable_get(variable_name).nil?
       end
 
-      def tag_list_cache_on(context)
+      def tag_list_cache_on(context, all = true)
         variable_name = "@#{context.to_s.singularize}_list"
-        instance_variable_get(variable_name) || instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
+        variable_name << "_public" unless all
+        instance_variable_get(variable_name) || instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context, all).map(&:name)))
       end
 
-      def tag_list_on(context)
+      def tag_list_on(context, all = true)
         add_custom_context(context)
-        tag_list_cache_on(context)
+        tag_list_cache_on(context, all)
       end
 
       def all_tags_list_on(context)
@@ -193,8 +198,8 @@ module ActsAsTaggableOn::Taggable
 
       ##
       # Returns all tags that are not owned of a given context
-      def tags_on(context)
-        base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s]).all
+      def tags_on(context, all = true)
+        base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL AND (? OR #{base_tags.table_name}.private = ?)", context.to_s, all, all]).all
       end
 
       def set_tag_list_on(context, new_list)
