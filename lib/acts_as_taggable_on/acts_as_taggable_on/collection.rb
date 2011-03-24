@@ -51,6 +51,7 @@ module ActsAsTaggableOn::Taggable
       #                       * :at_most    - Exclude tags with a frequency greater than the given value
       #                       * :on         - Scope the find to only include a certain context
       def all_tag_counts(options = {})
+        options.symbolize_keys!
         options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :on, :id
 
         scope = if ActiveRecord::VERSION::MAJOR >= 3
@@ -77,7 +78,8 @@ module ActsAsTaggableOn::Taggable
         ].compact.reverse
         
         tag_conditions = [
-          options[:conditions]        
+          options[:conditions],
+          sanitize_sql(["private = ?", false])
         ].compact.reverse
         
         ## Generate joins:
