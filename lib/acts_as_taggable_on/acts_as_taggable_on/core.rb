@@ -124,6 +124,7 @@ module ActsAsTaggableOn::Taggable
                :group      => group,
                :conditions => conditions.join(" AND "),
                :order      => options[:order],
+               :limit      => options[:limit],
                :readonly   => false)
       end
 
