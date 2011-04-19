@@ -251,6 +251,11 @@ describe "Taggable" do
 
     TaggableModel.tagged_with("lazy", :exclude => true).to_a.should == [frank, steve]
   end
+  
+  it "should return an empty scope for empty tags" do
+    TaggableModel.tagged_with('').should == []
+    TaggableModel.tagged_with(' ').should == []
+  end
 
   it "should not create duplicate taggings" do
     bob = TaggableModel.create(:name => "Bob")

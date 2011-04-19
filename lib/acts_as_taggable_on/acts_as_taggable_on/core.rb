@@ -67,8 +67,9 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagList.from(tags)
+        empty_result = scoped(:conditions => "1 = 0")
 
-        return {} if tag_list.empty?
+        return empty_result if tag_list.empty?
 
         joins = []
         conditions = []
@@ -95,7 +96,7 @@ module ActsAsTaggableOn::Taggable
 
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
-          return scoped(:conditions => "1 = 0") unless tags.length == tag_list.length
+          return empty_result unless tags.length == tag_list.length
 
           tags.each do |tag|
             safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')
