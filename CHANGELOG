@@ -1,3 +1,6 @@
+== 2011-05-21
+* Can now find tags recommended for a value of the class or associated (brunoarueira)
+
 == 2010-02-17
 * Converted the plugin to be compatible with Rails3
 

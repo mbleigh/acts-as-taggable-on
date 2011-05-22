@@ -24,6 +24,7 @@ ActiveRecord::Schema.define :version => 0 do
   create_table :untaggable_models, :force => true do |t|
     t.column :taggable_model_id, :integer
     t.column :name, :string
+    t.column :other_taggable_model_id, :integer
   end
   
   create_table :cached_models, :force => true do |t|

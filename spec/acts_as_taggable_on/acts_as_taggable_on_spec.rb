@@ -265,4 +265,28 @@ describe "Acts As Taggable On" do
     end
   end
 
+  describe 'Recommended' do
+    it 'should find recommended tags based on attribute of associated model' do
+      other_taggable1 = OtherTaggableModel.create!(:name => "Taggable 1")
+      other_taggable2 = OtherTaggableModel.create!(:name => "Taggable 2")
+      other_taggable3 = OtherTaggableModel.create!(:name => "Taggable 3")
+
+      untaggable1 = UntaggableModel.create!(:name => "Untaggable 1")
+
+      other_taggable1.tag_list = "one, two"
+      other_taggable1.untaggable_model = untaggable1
+      other_taggable1.save
+  
+      other_taggable2.tag_list = "three, four"
+      other_taggable2.untaggable_model = untaggable1
+      other_taggable2.save
+  
+      other_taggable3.tag_list = "one, four"
+      other_taggable3.untaggable_model = untaggable1
+      other_taggable3.save
+
+      other_taggable1.find_tags_recommended_for(:untaggable_model, :name, 'Untaggable 1').length.should == 4
+    end
+  end
+
 end

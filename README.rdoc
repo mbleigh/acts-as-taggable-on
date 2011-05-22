@@ -141,6 +141,34 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
     @user.tag_counts_on(:customs)
     User.tagged_with("same", :on => :customs) # => [@user]
 
+=== Finding Recommended tags
+
+Now you will find the recommended tags based on associated class:
+
+    class Product < ActiveRecord::Base
+      acts_as_taggable
+
+      has_one :producer
+    end
+
+    class Producer < ActiveRecord::Base
+    end
+
+    @producer = Producer.new(:name => "Strategy Distribution")
+    @producer.save
+
+    @paint = Product.new(:name => "Paint")
+    @paint.producer = @producer
+    @paint.tag_list = "brilliant, awesome, useful"
+    @paint.save
+
+    @tshirt = Product.new(:name => "T-shirt")
+    @tshirt.producer = @producer
+    @tshirt.tag_list = "cool, brilliant, useful"
+    @tshirt.save
+
+    @paint.find_tags_recommended_for(:producer, :name, "Strategy Distribution") # => "brilliant", "useful", "awesome", "cool"
+
 === Tag Ownership
 
 Tags can have owners:

@@ -29,7 +29,7 @@ unless [].respond_to?(:freq)
   end
 end
 
-ENV['DB'] ||= 'sqlite3'
+ENV['DB'] ||= 'postgresql'
 
 database_yml = File.expand_path('../database.yml', __FILE__)
 if File.exists?(database_yml)
