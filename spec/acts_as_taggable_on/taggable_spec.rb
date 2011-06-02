@@ -193,6 +193,7 @@ describe "Taggable" do
     TaggableModel.tagged_with("ruby", :order => 'taggable_models.name').to_a.should == [bob, frank, steve]
     TaggableModel.tagged_with("ruby, rails", :order => 'taggable_models.name').to_a.should == [bob, frank]
     TaggableModel.tagged_with(["ruby", "rails"], :order => 'taggable_models.name').to_a.should == [bob, frank]
+    TaggableModel.tagged_with([], :order => 'taggable_models.name').to_a.should == [bob, frank, steve]
   end
   
   it "should be able to find tagged with quotation marks" do
@@ -260,7 +261,7 @@ describe "Taggable" do
       bob.save
     }.should change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
- 
+
   describe "Associations" do
     before(:each) do
       @taggable = TaggableModel.create(:tag_list => "awesome, epic")
