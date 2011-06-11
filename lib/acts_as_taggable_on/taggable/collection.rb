@@ -61,72 +61,65 @@ module ActsAsTaggableOn::Taggable
 
         ## Generate conditions:
         options[:conditions] = sanitize_sql(options[:conditions]) if options[:conditions]     
-
+          
         start_at_conditions = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
         end_at_conditions   = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
-        
+
         taggable_conditions  = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options.delete(:id)])  if options[:id]
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
-        
-        tagging_conditions = [
+        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options.delete(:id)]) if options[:id]
+
+        conditions = [
           taggable_conditions,
+          options[:conditions],
           scope[:conditions],
           start_at_conditions,
           end_at_conditions
         ].compact.reverse
         
-        tag_conditions = [
-          options[:conditions]        
-        ].compact.reverse
-        
         ## Generate joins:
+        tagging_join  = "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tag.table_name}.id = #{ActsAsTaggableOn::Tagging.table_name}.tag_id"
+        tagging_join << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
+
         taggable_join = "INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
         taggable_join << " AND #{table_name}.#{inheritance_column} = '#{name}'" unless descends_from_active_record? # Current model is STI descendant, so add type checking to the join condition      
 
-        tagging_joins = [
+        joins = [
+          tagging_join,
           taggable_join,
           scope[:joins]
         ].compact
 
-        tag_joins = [
-        ].compact
+        joins = joins.reverse if ActiveRecord::VERSION::MAJOR < 3
 
-        [tagging_joins, tag_joins].each(&:reverse!) if ActiveRecord::VERSION::MAJOR < 3
 
         ## Generate scope:
-        tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id, COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) AS tags_count")
-        tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*, #{ActsAsTaggableOn::Tagging.table_name}.tags_count AS count").order(options[:order]).limit(options[:limit])   
-
+        scope = ActsAsTaggableOn::Tag.scoped(:select => "#{ActsAsTaggableOn::Tag.table_name}.*, COUNT(*) AS count").order(options[:order]).limit(options[:limit])   
+        
         # Joins and conditions
-        tagging_joins.each      { |join|      tagging_scope = tagging_scope.joins(join)      }        
-        tagging_conditions.each { |condition| tagging_scope = tagging_scope.where(condition) }
-
-        tag_joins.each          { |join|      tag_scope     = tag_scope.joins(join)          }
-        tag_conditions.each     { |condition| tag_scope     = tag_scope.where(condition)     }
-
+        joins.each      { |join|      scope = scope.joins(join)      }
+        conditions.each { |condition| scope = scope.where(condition) }
+        
         # GROUP BY and HAVING clauses:
-        at_least  = sanitize_sql(['tags_count >= ?', options.delete(:at_least)]) if options[:at_least]
-        at_most   = sanitize_sql(['tags_count <= ?', options.delete(:at_most)]) if options[:at_most]
-        having    = ["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) > 0", at_least, at_most].compact.join(' AND ')    
-
-        group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
+        at_least  = sanitize_sql(['COUNT(*) >= ?', options.delete(:at_least)]) if options[:at_least]
+        at_most   = sanitize_sql(['COUNT(*) <= ?', options.delete(:at_most)]) if options[:at_most]
+        having    = [at_least, at_most].compact.join(' AND ')        
 
         if ActiveRecord::VERSION::MAJOR >= 3
           # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
           scoped_select = "#{table_name}.#{primary_key}"
-          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})").
-                                        group(group_columns).
-                                        having(having)
+          scope = scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})")
+          
+          # We have having() in RoR 3.0 so use it:
+          having = having.blank? ? "COUNT(*) > 0" : "COUNT(*) > 0 AND #{having}"
+          scope = scope.group(grouped_column_names_for(ActsAsTaggableOn::Tag)).having(having)
         else
           # Having is not available in 2.3.x:
-          group_by  = "#{group_columns} HAVING COUNT(*) > 0"
+          group_by  = "#{grouped_column_names_for(ActsAsTaggableOn::Tag)} HAVING COUNT(*) > 0"
           group_by << " AND #{having}" unless having.blank?
-          tagging_scope = tagging_scope.group(group_by)
+          scope = scope.group(group_by)
         end
 
-        tag_scope = tag_scope.joins("JOIN (#{tagging_scope.to_sql}) AS taggings ON taggings.tag_id = tags.id")
-        tag_scope
+        scope
       end
     end
     

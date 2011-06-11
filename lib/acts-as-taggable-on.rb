@@ -5,12 +5,12 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require "acts_as_taggable_on/compatibility/active_record_backports" if ActiveRecord::VERSION::MAJOR < 3
 
-require "acts_as_taggable_on/acts_as_taggable_on"
-require "acts_as_taggable_on/acts_as_taggable_on/core"
-require "acts_as_taggable_on/acts_as_taggable_on/collection"
-require "acts_as_taggable_on/acts_as_taggable_on/cache"
-require "acts_as_taggable_on/acts_as_taggable_on/ownership"
-require "acts_as_taggable_on/acts_as_taggable_on/related"
+require "acts_as_taggable_on/taggable"
+require "acts_as_taggable_on/taggable/core"
+require "acts_as_taggable_on/taggable/collection"
+require "acts_as_taggable_on/taggable/cache"
+require "acts_as_taggable_on/taggable/ownership"
+require "acts_as_taggable_on/taggable/related"
 
 require "acts_as_taggable_on/acts_as_tagger"
 require "acts_as_taggable_on/tag"

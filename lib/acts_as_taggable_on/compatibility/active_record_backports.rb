@@ -9,11 +9,7 @@ module ActsAsTaggableOn
           named_scope :order,    lambda { |order|      { :order => order } }
           named_scope :select,   lambda { |select|     { :select => select } }
           named_scope :limit,    lambda { |limit|      { :limit => limit } }
-          named_scope :readonly, lambda { |readonly|   { :readonly => readonly } }
-          
-          def self.to_sql
-            construct_finder_sql({})
-          end
+          named_scope :readonly, lambda { |readonly|   { :readonly => readonly } }   
         end
       end
     end
