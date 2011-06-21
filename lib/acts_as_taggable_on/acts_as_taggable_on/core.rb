@@ -241,8 +241,8 @@ module ActsAsTaggableOn::Taggable
           new_tags     = tag_list     - current_tags
           
           # Find taggings to remove:
-          old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil,
-                                        :context => context.to_s, :tag_id => old_tags).all
+          old_taggings = ActsAsTaggableOn::Tagging.find(:all, :conditions => { :tagger_type => nil, :tagger_id => nil,
+                                        :context => context.to_s, :tag_id => old_tags })
 
           if old_taggings.present?
             # Destroy old taggings:
