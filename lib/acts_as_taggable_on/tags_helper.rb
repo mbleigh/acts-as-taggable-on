@@ -6,7 +6,7 @@ module ActsAsTaggableOn
 
       return [] if tags.empty?
 
-      max_count = tags.sort_by(&:count).last.count.to_f
+      max_count = [tags.sort_by(&:count).last.count.to_f,1].max
 
       tags.each do |tag|
         index = ((tag.count / max_count) * (classes.size - 1)).round
