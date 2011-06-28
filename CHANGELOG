@@ -1,3 +1,6 @@
+== 2011-28-06
+* resolved bug in tag cloud max count devision by zero
+
 == 2011-09-06
 * count cached
 
