@@ -74,6 +74,7 @@ module ActsAsTaggableOn::Taggable
         conditions = []
 
         context = options.delete(:on)
+        alias_base_name = undecorated_table_name.gsub('.','_')
 
         if options.delete(:exclude)
           tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
@@ -101,7 +102,7 @@ module ActsAsTaggableOn::Taggable
             safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')
             prefix   = "#{safe_tag}_#{rand(1024)}"
 
-            taggings_alias = "#{undecorated_table_name}_taggings_#{prefix}"
+            taggings_alias = "#{alias_base_name}_taggings_#{prefix}"
 
             tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                             "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
@@ -113,7 +114,7 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
-        taggings_alias, tags_alias = "#{undecorated_table_name}_taggings_group", "#{undecorated_table_name}_tags_group"
+        taggings_alias, tags_alias = "#{alias_base_name}_taggings_group", "#{alias_base_name}_tags_group"
 
         if options.delete(:match_all)
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
