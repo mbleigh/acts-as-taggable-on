@@ -70,6 +70,10 @@ module ActsAsTaggableOn
       read_attribute(:count).to_i
     end
 
+    def safe_name
+      name.gsub(/[^a-zA-Z0-9]/, '')
+    end
+
     class << self
       private
         def like_operator

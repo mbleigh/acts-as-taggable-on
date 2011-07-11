@@ -7,6 +7,14 @@ describe ActsAsTaggableOn::Tag do
     @user = TaggableModel.create(:name => "Pablo")
   end
 
+  describe "safe name" do
+    let(:tag) { ActsAsTaggableOn::Tag.create(:name => "c++space invaders1") }
+
+    it "should return the alphanumeric, de-spaced name" do
+      tag.safe_name.should == "cspaceinvaders1"
+    end
+  end
+
   describe "named like any" do
     before(:each) do
       ActsAsTaggableOn::Tag.create(:name => "awesome")
