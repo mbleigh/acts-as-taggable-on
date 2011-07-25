@@ -31,12 +31,16 @@ module ActsAsTaggableOn::Taggable
     module InstanceMethods
       def owner_tags_on(owner, context)
         if owner.nil?
-          base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ?), context.to_s]).all                    
+          scope = base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ?), context.to_s])
         else
-          base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND
-                             #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = ? AND
-                             #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = ?), context.to_s, owner.id, owner.class.to_s]).all          
+          scope = base_tags.where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND
+                                     #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = ? AND
+                                     #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = ?), context.to_s, owner.id, owner.class.to_s])
         end
+        # when preserving tag order, return tags in created order
+        # if we added the order to the association this would always apply
+        scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.created_at") if self.class.preserve_tag_order?
+        scope.all
       end
 
       def cached_owned_tag_list_on(context)
@@ -73,21 +77,38 @@ module ActsAsTaggableOn::Taggable
       def save_owned_tags
         tagging_contexts.each do |context|
           cached_owned_tag_list_on(context).each do |owner, tag_list|
+            
             # Find existing tags or create non-existing tags:
-            tag_list = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list.uniq)            
+            tags = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list.uniq)            
 
-            owned_tags = owner_tags_on(owner, context)              
-            old_tags   = owned_tags - tag_list
-            new_tags   = tag_list   - owned_tags
+            # Tag objects for owned tags
+            owned_tags = owner_tags_on(owner, context)
+               
+            # Tag maintenance based on whether preserving the created order of tags
+            if self.class.preserve_tag_order?
+              # First off order the array of tag objects to match the tag list
+              # rather than existing tags followed by new tags
+              tags = tag_list.uniq.map{|s| tags.detect{|t| t.name.downcase == s.downcase}}
+              # To preserve tags in the order in which they were added
+              # delete all owned tags and create new tags if the content or order has changed
+              old_tags = (tags == owned_tags ? [] : owned_tags)
+              new_tags = (tags == owned_tags ? [] : tags)
+            else
+              # Delete discarded tags and create new tags
+              old_tags = owned_tags - tags
+              new_tags = tags - owned_tags
+            end
           
             # Find all taggings that belong to the taggable (self), are owned by the owner, 
             # have the correct context, and are removed from the list.
-            old_taggings = ActsAsTaggableOn::Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
-                                                           :tagger_type => owner.class.to_s, :tagger_id => owner.id,
-                                                           :tag_id => old_tags, :context => context).all
+            if old_tags.present?
+              old_taggings = ActsAsTaggableOn::Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
+                                                             :tagger_type => owner.class.to_s, :tagger_id => owner.id,
+                                                             :tag_id => old_tags, :context => context).all
+            end
           
+            # Destroy old taggings:
             if old_taggings.present?
-              # Destroy old taggings:
               ActsAsTaggableOn::Tagging.destroy_all(:id => old_taggings.map(&:id))
             end
 
