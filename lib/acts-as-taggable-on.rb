@@ -1,4 +1,5 @@
 require "active_record"
+require "active_record/version"
 require "action_view"
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
