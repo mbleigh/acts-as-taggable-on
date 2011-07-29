@@ -1,8 +1,74 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
+describe "Taggable To Preserve Order" do
+  before(:each) do
+    clean_database!
+    TaggableModel.write_inheritable_attribute(:tag_types, [])
+    TaggableModel.acts_as_ordered_taggable_on(:tags)
+    @taggable = TaggableModel.new(:name => "Bob Jones")
+    @taggables = [@taggable, TaggableModel.new(:name => "John Doe")]
+  end
+
+  it "should return tag list in the order the tags were created" do
+    # create
+    @taggable.tag_list = "rails, ruby, css"
+    @taggable.instance_variable_get("@tag_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
+    
+    lambda {
+      @taggable.save
+    }.should change(ActsAsTaggableOn::Tag, :count).by(3)
+    
+    @taggable.reload
+    @taggable.tag_list.should == %w(rails ruby css)
+    
+    # update
+    @taggable.tag_list = "pow, ruby, rails"
+    @taggable.save
+        
+    @taggable.reload
+    @taggable.tag_list.should == %w(pow ruby rails)
+    
+    # update with no change
+    @taggable.tag_list = "pow, ruby, rails"
+    @taggable.save
+        
+    @taggable.reload
+    @taggable.tag_list.should == %w(pow ruby rails)
+    
+    # update to clear tags
+    @taggable.tag_list = ""
+    @taggable.save
+        
+    @taggable.reload
+    @taggable.tag_list.should == []
+  end
+  
+  it "should return tag objects in the order the tags were created" do
+    # create
+    @taggable.tag_list = "pow, ruby, rails"
+    @taggable.instance_variable_get("@tag_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
+    
+    lambda {
+      @taggable.save
+    }.should change(ActsAsTaggableOn::Tag, :count).by(3)
+    
+    @taggable.reload
+    @taggable.tags.map{|t| t.name}.should == %w(pow ruby rails)
+    
+    # update
+    @taggable.tag_list = "rails, ruby, css, pow"
+    @taggable.save
+        
+    @taggable.reload
+    @taggable.tags.map{|t| t.name}.should == %w(rails ruby css pow)
+  end
+end
+
 describe "Taggable" do
   before(:each) do
     clean_database!
+    TaggableModel.write_inheritable_attribute(:tag_types, [])
+    TaggableModel.acts_as_taggable_on(:tags, :languages, :skills, :needs, :offerings)
     @taggable = TaggableModel.new(:name => "Bob Jones")
     @taggables = [@taggable, TaggableModel.new(:name => "John Doe")]
   end
