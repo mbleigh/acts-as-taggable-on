@@ -277,4 +277,13 @@ describe "Acts As Taggable On" do
     end
   end
 
+  describe "taggings" do 
+    before(:each) do
+      @taggable = TaggableModel.new(:name => "Art Kram")
+    end
+    
+    it 'should return [] taggings' do
+      @taggable.taggings.should == []
+    end
+  end
 end
