@@ -20,19 +20,19 @@ module ActsAsTaggableOn
     end
 
     def self.named(name)
-      where(["name #{like_operator} ?", name])
+      where(["name #{like_operator} ?", escape_like(name)])
     end
   
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", tag.to_s]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", escape_like(tag)]) }.join(" OR "))
     end
   
     def self.named_like(name)
-      where(["name #{like_operator} ?", "%#{name}%"])
+      where(["name #{like_operator} ?", "%#{escape_like(name)}%"])
     end
 
     def self.named_like_any(list)
-      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", "%#{tag.to_s}%"]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", "%#{escape_like(tag)}%"]) }.join(" OR "))
     end
 
     ### CLASS METHODS:
@@ -72,6 +72,11 @@ module ActsAsTaggableOn
 
     class << self
       private
+        # escape _ and % characters in strings, since these are wildcards in SQL.
+        def escape_like(str)
+          str.to_s.gsub("_", "\\\_").gsub("%", "\\\%")
+        end
+        
         def like_operator
           using_postgresql? ? 'ILIKE' : 'LIKE'
         end
