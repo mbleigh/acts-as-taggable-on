@@ -1,7 +1,8 @@
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     include ActsAsTaggableOn::ActiveRecord::Backports if ::ActiveRecord::VERSION::MAJOR < 3
-  
+    include ActsAsTaggableOn::Utils
+      
     attr_accessible :name
 
     ### ASSOCIATIONS:
@@ -15,10 +16,6 @@ module ActsAsTaggableOn
 
     ### SCOPES:
     
-    def self.using_postgresql?
-      connection.adapter_name == 'PostgreSQL'
-    end
-
     def self.named(name)
       where(["name #{like_operator} ?", name])
     end
@@ -71,11 +68,7 @@ module ActsAsTaggableOn
     end
 
     class << self
-      private
-        def like_operator
-          using_postgresql? ? 'ILIKE' : 'LIKE'
-        end
-        
+      private        
         def comparable_name(str)
           RUBY_VERSION >= "1.9" ? str.downcase : str.mb_chars.downcase
         end

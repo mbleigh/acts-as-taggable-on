@@ -49,7 +49,8 @@ module ActsAsTaggableOn
           def self.taggable?
             true
           end
-        
+          
+          include ActsAsTaggableOn::Utils        
           include ActsAsTaggableOn::Taggable::Core
           include ActsAsTaggableOn::Taggable::Collection
           include ActsAsTaggableOn::Taggable::Cache
