@@ -80,15 +80,22 @@ module ActsAsTaggableOn::Taggable
           conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
         elsif options.delete(:any)
-          conditions << tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
+          # get tags, drop out if nothing returned (we need at least one)
+          tags = ActsAsTaggableOn::Tag.named_any(tag_list)
+          return scoped(:conditions => "1 = 0") unless tags.length > 0
 
-          tagging_join  = " JOIN #{ActsAsTaggableOn::Tagging.table_name}" +
-                          "   ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{table_name}.#{primary_key}" +
-                          "  AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}" +
-                          " JOIN #{ActsAsTaggableOn::Tag.table_name}" +
-                          "   ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id"
+          # setup taggings alias so we can chain, ex: items_locations_taggings_awesome_cool_123
+          # avoid ambiguous column name
+          taggings_context = context ? "_#{context}" : ''
+          taggings_alias   = "#{undecorated_table_name}#{taggings_context}_taggings_#{tags.map(&:safe_name).join('_')}_#{rand(1024)}"
 
-          tagging_join << "  AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", context.to_s]) if context
+          tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
+                          "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
+                          " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
+          tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
+
+          # don't need to sanitize sql, map all ids and join with OR logic
+          conditions << tags.map { |t| "#{taggings_alias}.tag_id = #{t.id}" }.join(" OR ")
           select_clause = "DISTINCT #{table_name}.*" unless context and tag_types.one?
 
           joins << tagging_join
@@ -98,7 +105,7 @@ module ActsAsTaggableOn::Taggable
           return scoped(:conditions => "1 = 0") unless tags.length == tag_list.length
 
           tags.each do |tag|
-            safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')
+            safe_tag = tag.safe_name
             prefix   = "#{safe_tag}_#{rand(1024)}"
 
             taggings_alias = "#{undecorated_table_name}_taggings_#{prefix}"
