@@ -67,7 +67,7 @@ module ActsAsTaggableOn
     end
 
     def count
-      read_attribute(:count).to_i
+      read_attribute(:taggings_count).to_i
     end
 
     class << self
