@@ -1,3 +1,6 @@
+== 2010-12-14
+* Improved performance with counter_cache for tags (tag.taggings_count)
+
 == 2010-02-17
 * Converted the plugin to be compatible with Rails3
 
