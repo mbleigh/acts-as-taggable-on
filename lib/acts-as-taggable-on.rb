@@ -1,6 +1,7 @@
 require "active_record"
 require "active_record/version"
 require "action_view"
+RAILS_3 = ActiveRecord::VERSION::MAJOR >= 3
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
@@ -20,6 +21,7 @@ require "acts_as_taggable_on/tags_helper"
 require "acts_as_taggable_on/tagging"
 
 $LOAD_PATH.shift
+
 
 if defined?(ActiveRecord::Base)
   ActiveRecord::Base.extend ActsAsTaggableOn::Taggable
