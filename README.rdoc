@@ -96,7 +96,7 @@ This way you can mix and match to filter down your results, and it also improves
 compatibility with the will_paginate gem:
 
     class User < ActiveRecord::Base
-      acts_as_taggable_on :tags
+      acts_as_taggable_on :tags, :skills
       named_scope :by_join_date, :order => "created_at DESC"
     end
 
@@ -108,7 +108,10 @@ compatibility with the will_paginate gem:
     
     # Find a user with any of the tags:
     User.tagged_with(["awesome", "cool"], :any => true)
-
+    
+    # Find a user with any of tags based on context:
+    User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
+    
 === Relationships
 
 You can find objects of the same type based on similar tags on certain contexts.
