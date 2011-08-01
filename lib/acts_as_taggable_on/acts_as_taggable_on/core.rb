@@ -85,7 +85,6 @@ module ActsAsTaggableOn::Taggable
           # get tags, drop out if nothing returned (we need at least one)
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
           return scoped(:conditions => "1 = 0") unless tags.length > 0
-#          conditions << tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ?", t]) }.join(" OR ")
 
           # setup taggings alias so we can chain, ex: items_locations_taggings_awesome_cool_123
           # avoid ambiguous column name
@@ -105,24 +104,12 @@ module ActsAsTaggableOn::Taggable
 
           joins << tagging_join
 
-          # tagging_join  = " JOIN #{ActsAsTaggableOn::Tagging.table_name}" +
-          #                 "   ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{table_name}.#{primary_key}" +
-          #                 "  AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}" +
-          #                 " JOIN #{ActsAsTaggableOn::Tag.table_name}" +
-          #                 "   ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id"
-          # 
-          # tagging_join << "  AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", context.to_s]) if context
-          # select_clause = "DISTINCT #{table_name}.*" unless context and tag_types.one?
-          # 
-          # joins << tagging_join
-
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
           return empty_result unless tags.length == tag_list.length
 
           tags.each do |tag|
-            safe_tag = tag.name.gsub(/[^a-zA-Z0-9]/, '')
-            prefix   = "#{safe_tag}_#{rand(1024)}"
+            prefix   = "#{tag.safe_name}_#{rand(1024)}"
 
             taggings_alias = "#{alias_base_name}_taggings_#{prefix}"
 
