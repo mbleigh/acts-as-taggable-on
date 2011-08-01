@@ -66,7 +66,11 @@ module ActsAsTaggableOn
     def count
       read_attribute(:count).to_i
     end
-
+    
+    def safe_name
+      name.gsub(/[^a-zA-Z0-9]/, '')
+    end
+    
     class << self
       private        
         def comparable_name(str)

@@ -128,6 +128,15 @@ describe "Taggable" do
     TaggableModel.all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
+  it "should be able to use named scopes to chain tag finds by any tags by context" do
+    bob   = TaggableModel.create(:name => "Bob",   :need_list => "rails", :offering_list => "c++")
+    frank = TaggableModel.create(:name => "Frank", :need_list => "css",   :offering_list => "css")
+    steve = TaggableModel.create(:name => 'Steve', :need_list => "c++",   :offering_list => "java")
+
+    # Let's only find those who need rails or css and are offering c++ or java
+    TaggableModel.tagged_with(['rails, css'], :on => :needs, :any => true).tagged_with(['c++', 'java'], :on => :offerings, :any => true).to_a.should == [bob]
+  end
+  
   if ActiveRecord::VERSION::MAJOR >= 3
     it "should not return read-only records" do
       TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
