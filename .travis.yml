@@ -1,4 +1,4 @@
-script: "cp spec/database.yml.example spec/database.yml && bundle install && bundle exec rake"
+script: "cp spec/database.yml.sample spec/database.yml && bundle install && bundle exec rake"
 rvm:
   - 1.8.7
   - ree
