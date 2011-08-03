@@ -30,14 +30,17 @@ unless [].respond_to?(:freq)
   end
 end
 
-ENV['DB'] ||= 'sqlite3'
-
+db_name = ENV['DB'] || 'sqlite3'
 database_yml = File.expand_path('../database.yml', __FILE__)
+
 if File.exists?(database_yml)
-  active_record_configuration = YAML.load_file(database_yml)[ENV['DB']]
+  active_record_configuration = YAML.load_file(database_yml)
   
-  ActiveRecord::Base.establish_connection(active_record_configuration)
+  ActiveRecord::Base.configurations = active_record_configuration
+  
+  ActiveRecord::Base.establish_connection(db_name)
   ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
+  ActiveRecord::Base.default_timezone = :utc
   
   ActiveRecord::Base.silence do
     ActiveRecord::Migration.verbose = false
