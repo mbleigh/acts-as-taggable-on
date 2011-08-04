@@ -1,0 +1,10 @@
+script: "cp spec/database.yml.sample spec/database.yml && bundle install && bundle exec rake"
+rvm:
+  - 1.8.7
+  - ree
+  - 1.9.2
+  - rbx
+env:
+  - DB=sqlite3
+  - DB=mysql
+  - DB=postgresql

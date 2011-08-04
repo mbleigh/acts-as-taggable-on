@@ -12,7 +12,7 @@ describe "Acts As Taggable On" do
   describe "Taggable Method Generation" do
     before(:each) do
       clean_database!
-      TaggableModel.write_inheritable_attribute(:tag_types, [])
+      RAILS_3 ? TaggableModel.tag_types = [] : TaggableModel.write_inheritable_attribute(:tag_types, [])
       TaggableModel.acts_as_taggable_on(:tags, :languages, :skills, :needs, :offerings)
       @taggable = TaggableModel.new(:name => "Bob Jones")
     end
@@ -212,24 +212,36 @@ describe "Acts As Taggable On" do
   describe 'Caching' do
     before(:each) do
       @taggable = CachedModel.new(:name => "Bob Jones")  
+      @another_taggable = OtherCachedModel.new(:name => "John Smith")
     end
     
     it "should add saving of tag lists and cached tag lists to the instance" do
       @taggable.should respond_to(:save_cached_tag_list)
+      @another_taggable.should respond_to(:save_cached_tag_list)
+      
       @taggable.should respond_to(:save_tags)
     end  
 
+    it "should add cached tag lists to the instance if cached column is not present" do
+      TaggableModel.new(:name => "Art Kram").should_not respond_to(:save_cached_tag_list)
+    end
+    
     it "should generate a cached column checker for each tag type" do
       CachedModel.should respond_to(:caching_tag_list?)
+      OtherCachedModel.should respond_to(:caching_language_list?)
     end  
     
     it 'should not have cached tags' do
       @taggable.cached_tag_list.should be_blank  
+      @another_taggable.cached_language_list.should be_blank      
     end
     
     it 'should cache tags' do
       @taggable.update_attributes(:tag_list => 'awesome, epic')
       @taggable.cached_tag_list.should == 'awesome, epic'
+      
+      @another_taggable.update_attributes(:language_list => 'ruby, .net')
+      @another_taggable.cached_language_list.should == 'ruby, .net'      
     end
     
     it 'should keep the cache' do
@@ -265,4 +277,13 @@ describe "Acts As Taggable On" do
     end
   end
 
+  describe "taggings" do 
+    before(:each) do
+      @taggable = TaggableModel.new(:name => "Art Kram")
+    end
+    
+    it 'should return [] taggings' do
+      @taggable.taggings.should == []
+    end
+  end
 end

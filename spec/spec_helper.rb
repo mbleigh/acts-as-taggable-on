@@ -1,4 +1,5 @@
 $LOAD_PATH << "." unless $LOAD_PATH.include?(".")
+require 'logger'
 
 begin
   require "rubygems"
@@ -29,14 +30,33 @@ unless [].respond_to?(:freq)
   end
 end
 
-ENV['DB'] ||= 'sqlite3'
-
+db_name = ENV['DB'] || 'sqlite3'
 database_yml = File.expand_path('../database.yml', __FILE__)
+
 if File.exists?(database_yml)
-  active_record_configuration = YAML.load_file(database_yml)[ENV['DB']]
+  active_record_configuration = YAML.load_file(database_yml)
   
-  ActiveRecord::Base.establish_connection(active_record_configuration)
+  ActiveRecord::Base.configurations = active_record_configuration
+  config = ActiveRecord::Base.configurations[db_name]
+  
+  begin
+    ActiveRecord::Base.establish_connection(db_name)
+    ActiveRecord::Base.connection
+  rescue
+    case db_name
+    when /mysql/      
+      ActiveRecord::Base.establish_connection(config.merge('database' => nil))
+      ActiveRecord::Base.connection.create_database(config['database'],  {:charset => 'utf8', :collation => 'utf8_unicode_ci'})
+    when 'postgresql'
+      ActiveRecord::Base.establish_connection(config.merge('database' => 'postgres', 'schema_search_path' => 'public'))
+      ActiveRecord::Base.connection.create_database(config['database'], config.merge('encoding' => 'utf8'))
+    end
+    
+    ActiveRecord::Base.establish_connection(config)
+  end
+    
   ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
+  ActiveRecord::Base.default_timezone = :utc
   
   ActiveRecord::Base.silence do
     ActiveRecord::Migration.verbose = false

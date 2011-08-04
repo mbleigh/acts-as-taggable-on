@@ -18,7 +18,11 @@ module ActsAsTaggableOn::Taggable
             def find_related_#{tag_type}_for(klass, options = {})
               related_tags_for('#{tag_type}', klass, options)
             end
-
+          )
+        end
+        
+        unless tag_types.empty?
+          class_eval %(
             def find_matching_contexts(search_context, result_context, options = {})
               matching_contexts_for(search_context.to_s, result_context.to_s, self.class, options)
             end

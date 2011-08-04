@@ -1,5 +1,5 @@
 module ActsAsTaggableOn::Taggable
-  module Core
+  module Core    
     def self.included(base)
       base.send :include, ActsAsTaggableOn::Taggable::Core::InstanceMethods
       base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
@@ -67,16 +67,18 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagList.from(tags)
+        empty_result = scoped(:conditions => "1 = 0")
 
-        return {} if tag_list.empty?
+        return empty_result if tag_list.empty?
 
         joins = []
         conditions = []
 
         context = options.delete(:on)
+        alias_base_name = undecorated_table_name.gsub('.','_')
 
         if options.delete(:exclude)
-          tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name LIKE ?", t]) }.join(" OR ")
+          tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ?", t]) }.join(" OR ")
           conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
         elsif options.delete(:any)
@@ -87,7 +89,8 @@ module ActsAsTaggableOn::Taggable
           # setup taggings alias so we can chain, ex: items_locations_taggings_awesome_cool_123
           # avoid ambiguous column name
           taggings_context = context ? "_#{context}" : ''
-          taggings_alias   = "#{undecorated_table_name}#{taggings_context}_taggings_#{tags.map(&:safe_name).join('_')}_#{rand(1024)}"
+          #TODO: fix alias to be smaller
+          taggings_alias   = "#{alias_base_name}#{taggings_context}_taggings_#{tags.map(&:safe_name).join('_')}_#{rand(1024)}"
 
           tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                           "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
@@ -102,13 +105,12 @@ module ActsAsTaggableOn::Taggable
 
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
-          return scoped(:conditions => "1 = 0") unless tags.length == tag_list.length
+          return empty_result unless tags.length == tag_list.length
 
           tags.each do |tag|
-            safe_tag = tag.safe_name
-            prefix   = "#{safe_tag}_#{rand(1024)}"
+            prefix   = "#{tag.safe_name}_#{rand(1024)}"
 
-            taggings_alias = "#{undecorated_table_name}_taggings_#{prefix}"
+            taggings_alias = "#{alias_base_name}_taggings_#{prefix}"
 
             tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                             "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
@@ -120,7 +122,7 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
-        taggings_alias, tags_alias = "#{undecorated_table_name}_taggings_group", "#{undecorated_table_name}_tags_group"
+        taggings_alias, tags_alias = "#{alias_base_name}_taggings_group", "#{alias_base_name}_tags_group"
 
         if options.delete(:match_all)
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +

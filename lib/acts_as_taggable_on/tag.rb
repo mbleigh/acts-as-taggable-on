@@ -1,7 +1,8 @@
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     include ActsAsTaggableOn::ActiveRecord::Backports if ::ActiveRecord::VERSION::MAJOR < 3
-  
+    include ActsAsTaggableOn::Utils
+      
     attr_accessible :name
 
     ### ASSOCIATIONS:
@@ -15,24 +16,20 @@ module ActsAsTaggableOn
 
     ### SCOPES:
     
-    def self.using_postgresql?
-      connection.adapter_name == 'PostgreSQL'
-    end
-
     def self.named(name)
-      where(["name #{like_operator} ?", name])
+      where(["name #{like_operator} ?", escape_like(name)])
     end
   
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", tag.to_s]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", escape_like(tag.to_s)]) }.join(" OR "))
     end
   
     def self.named_like(name)
-      where(["name #{like_operator} ?", "%#{name}%"])
+      where(["name #{like_operator} ?", "%#{escape_like(name)}%"])
     end
 
     def self.named_like_any(list)
-      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", "%#{tag.to_s}%"]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", "%#{escape_like(tag.to_s)}%"]) }.join(" OR "))
     end
 
     ### CLASS METHODS:
@@ -69,17 +66,13 @@ module ActsAsTaggableOn
     def count
       read_attribute(:count).to_i
     end
-
+    
     def safe_name
       name.gsub(/[^a-zA-Z0-9]/, '')
     end
-
+    
     class << self
-      private
-        def like_operator
-          using_postgresql? ? 'ILIKE' : 'LIKE'
-        end
-        
+      private        
         def comparable_name(str)
           RUBY_VERSION >= "1.9" ? str.downcase : str.mb_chars.downcase
         end
