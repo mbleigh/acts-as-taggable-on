@@ -294,7 +294,7 @@ describe "Taggable" do
     end
 
     it "should return all column names joined for TaggableModel GROUP clause" do
-      @taggable.grouped_column_names_for(TaggableModel).should == "taggable_models.id, taggable_models.name, taggable_models.type"
+      @taggable.grouped_column_names_for(TaggableModel).should == "taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type"
     end
   end
 
