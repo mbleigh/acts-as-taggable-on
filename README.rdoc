@@ -17,7 +17,9 @@ was used.
 
 === Rails 2.3.x
 
-Acts As Taggable On is tested to work in Rails 2.3.5. 
+The last version of gem that is compatible with Rails 2.3.x is 2.1.0.
+
+We are planning no longer to support Rails 2, but if you want to contribute something only for Rails 2, we left rails2 branch for that.
 
 ==== Plugin
 
@@ -29,7 +31,7 @@ traditional plugin you can install like so:
 Acts As Taggable On is also available as a gem plugin using Rails 2.1's gem dependencies.
 To install the gem, add this to your config/environment.rb:
   
-  config.gem "acts-as-taggable-on", :source => "http://gemcutter.org", :version => '2.0.0.rc1'
+  config.gem "acts-as-taggable-on", :source => "http://gemcutter.org", :version => '2.1.0'
   
 After that, you can run "rake gems:install" to install the gem if you don't already have it.
 
@@ -38,14 +40,11 @@ After that, you can run "rake gems:install" to install the gem if you don't alre
 1. script/generate acts_as_taggable_on_migration
 2. rake db:migrate
 
-=== Rails 3.0
-
-Acts As Taggable On is now useable in Rails 3.0, thanks to the excellent work of Szymon Nowak
-and Jelle Vandebeeck.
+=== Rails 3.x
 
 To use it, add it to your Gemfile:
   
-  gem 'acts-as-taggable-on'
+  gem 'acts-as-taggable-on', '~>2.1.0'
 
 ==== Post Installation
 
@@ -54,19 +53,10 @@ To use it, add it to your Gemfile:
 
 == Testing
 
-Acts As Taggable On uses RSpec for its test coverage. Inside the plugin
-directory, you can run the specs for RoR 3.0.0 with:
+Acts As Taggable On uses RSpec for its test coverage. Inside the gem
+directory, you can run the specs for RoR 3.x with:
 
   rake spec
-
-If you want to test the plugin for Rails 2.3.x, use:
-
-  rake rails2.3:spec
-
-If you already have RSpec on your application, the specs will run while using:
-
-rake spec:plugins
-
 
 == Usage
 
@@ -203,6 +193,7 @@ CSS:
 
 == Contributors
 
+* Artem Kramarenko (artemk) - Maintainer
 * TomEric (i76) - Maintainer
 * Michael Bleigh - Original Author
 * Szymon Nowak - Rails 3.0 compatibility
@@ -221,4 +212,4 @@ CSS:
 * lawrencepit - cached tag work
 * sobrinho - fixed tag_cloud helper
 
-Copyright (c) 2007-2010 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license
+Copyright (c) 2007-2011 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license
