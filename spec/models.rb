@@ -11,7 +11,7 @@ class CachedModel < ActiveRecord::Base
 end
 
 class OtherCachedModel < ActiveRecord::Base
-  acts_as_taggable_on :languages
+  acts_as_taggable_on :languages, :statuses, :glasses
 end
 
 class OtherTaggableModel < ActiveRecord::Base

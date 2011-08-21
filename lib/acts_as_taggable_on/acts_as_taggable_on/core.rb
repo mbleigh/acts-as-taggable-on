@@ -89,7 +89,6 @@ module ActsAsTaggableOn::Taggable
           # setup taggings alias so we can chain, ex: items_locations_taggings_awesome_cool_123
           # avoid ambiguous column name
           taggings_context = context ? "_#{context}" : ''
-          
           #TODO: fix alias to be smaller
           taggings_alias   = "#{alias_base_name}#{taggings_context}_taggings_#{tags.map(&:safe_name).join('_')}_#{rand(1024)}"
 
