@@ -294,6 +294,10 @@ describe "Taggable" do
     end
 
     it "should return all column names joined for TaggableModel GROUP clause" do
+      @taggable.grouped_column_names_for(TaggableModel).should == "taggable_models.id, taggable_models.name, taggable_models.type"
+    end
+
+    it "should return all column names joined for NonStandardIdTaggableModel GROUP clause" do
       @taggable.grouped_column_names_for(TaggableModel).should == "taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type"
     end
   end
@@ -345,4 +349,56 @@ describe "Taggable" do
       @inherited_same.update_attributes! :name => 'foo'
     end
   end
+
+  describe "NonStandardIdTaggable" do
+    before(:each) do
+      clean_database!
+      @taggable = NonStandardIdTaggableModel.new(:name => "Bob Jones")
+      @taggables = [@taggable, NonStandardIdTaggableModel.new(:name => "John Doe")]
+    end
+  
+    it "should have tag types" do
+      [:tags, :languages, :skills, :needs, :offerings].each do |type|
+        NonStandardIdTaggableModel.tag_types.should include type
+      end
+  
+      @taggable.tag_types.should == NonStandardIdTaggableModel.tag_types
+    end
+  
+    it "should have tag_counts_on" do
+      NonStandardIdTaggableModel.tag_counts_on(:tags).all.should be_empty
+  
+      @taggable.tag_list = ["awesome", "epic"]
+      @taggable.save
+  
+      NonStandardIdTaggableModel.tag_counts_on(:tags).length.should == 2
+      @taggable.tag_counts_on(:tags).length.should == 2
+    end
+  
+    it "should be able to create tags" do
+      @taggable.skill_list = "ruby, rails, css"
+      @taggable.instance_variable_get("@skill_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
+      
+      lambda {
+        @taggable.save
+      }.should change(ActsAsTaggableOn::Tag, :count).by(3)
+      
+      @taggable.reload
+      @taggable.skill_list.sort.should == %w(ruby rails css).sort
+    end
+  
+    it "should be able to create tags through the tag list directly" do
+      @taggable.tag_list_on(:test).add("hello")
+      @taggable.tag_list_cache_on(:test).should_not be_empty
+      @taggable.tag_list_on(:test).should == ["hello"]
+      
+      @taggable.save
+      @taggable.save_tags
+      
+      @taggable.reload
+      @taggable.tag_list_on(:test).should == ["hello"]
+    end
+  end
 end
+
+

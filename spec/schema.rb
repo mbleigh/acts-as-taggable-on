@@ -16,8 +16,12 @@ ActiveRecord::Schema.define :version => 0 do
     t.string "name"
   end
   
-#  create_table :taggable_models, :primary_key => "an_id", :force => true do |t|
   create_table :taggable_models, :force => true do |t|
+    t.column :name, :string
+    t.column :type, :string
+  end
+  
+  create_table :non_standard_id_taggable_models, :primary_key => "an_id", :force => true do |t|
     t.column :name, :string
     t.column :type, :string
   end
