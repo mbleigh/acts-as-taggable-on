@@ -95,6 +95,24 @@ describe "Acts As Taggable On" do
       taggable1.find_related_tags.should_not include(taggable2)
     end
   
+    it "should find related objects based on tag names on context - non standard id" do
+      taggable1 = NonStandardIdTaggableModel.create!(:name => "Taggable 1")
+      taggable2 = NonStandardIdTaggableModel.create!(:name => "Taggable 2")
+      taggable3 = NonStandardIdTaggableModel.create!(:name => "Taggable 3")
+  
+      taggable1.tag_list = "one, two"
+      taggable1.save
+  
+      taggable2.tag_list = "three, four"
+      taggable2.save
+  
+      taggable3.tag_list = "one, four"
+      taggable3.save
+  
+      taggable1.find_related_tags.should include(taggable3)
+      taggable1.find_related_tags.should_not include(taggable2)
+    end
+  
     it "should find other related objects based on tag names on context" do
       taggable1 = TaggableModel.create!(:name => "Taggable 1")
       taggable2 = OtherTaggableModel.create!(:name => "Taggable 2")
@@ -116,6 +134,20 @@ describe "Acts As Taggable On" do
     it "should not include the object itself in the list of related objects" do
       taggable1 = TaggableModel.create!(:name => "Taggable 1")
       taggable2 = TaggableModel.create!(:name => "Taggable 2")
+  
+      taggable1.tag_list = "one"
+      taggable1.save
+  
+      taggable2.tag_list = "one, two"
+      taggable2.save
+  
+      taggable1.find_related_tags.should include(taggable2)
+      taggable1.find_related_tags.should_not include(taggable1)
+    end
+
+    it "should not include the object itself in the list of related objects - non standard id" do
+      taggable1 = NonStandardIdTaggableModel.create!(:name => "Taggable 1")
+      taggable2 = NonStandardIdTaggableModel.create!(:name => "Taggable 2")
   
       taggable1.tag_list = "one"
       taggable1.save
