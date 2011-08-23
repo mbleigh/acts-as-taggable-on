@@ -40,7 +40,7 @@ module ActsAsTaggableOn::Taggable
         tag_types.map(&:to_s).each do |tag_type|
           if self.class.send("caching_#{tag_type.singularize}_list?")
             if tag_list_cache_set_on(tag_type)
-              list = tag_list_cache_on(tag_type.singularize).to_a.flatten.compact.join(', ')
+              list = tag_list_cache_on(tag_type).to_a.flatten.compact.join(', ')
               self["cached_#{tag_type.singularize}_list"] = list
             end
           end

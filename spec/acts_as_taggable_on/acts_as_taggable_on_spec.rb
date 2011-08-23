@@ -309,6 +309,51 @@ describe "Acts As Taggable On" do
     end
   end
 
+  context 'when tagging context ends in an "s" when singular (ex. "status", "glass", etc.)' do
+   describe 'caching' do
+     before  { @taggable = OtherCachedModel.new(:name => "John Smith") }
+     subject { @taggable }
+
+     it { should respond_to(:save_cached_tag_list) }
+     its(:cached_language_list) { should be_blank }
+     its(:cached_status_list)   { should be_blank }
+     its(:cached_glass_list)    { should be_blank }
+
+     context 'language taggings cache after update' do
+       before  { @taggable.update_attributes(:language_list => 'ruby, .net') }
+       subject { @taggable }
+
+       its(:language_list)        { should == ['ruby', '.net']}
+       its(:cached_language_list) { should == 'ruby, .net' }           # passes
+       its(:instance_variables)   { should     include('@language_list') }
+     end
+
+     context 'status taggings cache after update' do
+       before  { @taggable.update_attributes(:status_list => 'happy, married') }
+       subject { @taggable }
+
+       its(:status_list)        { should     == ['happy', 'married'] }
+       its(:cached_status_list) { should     == 'happy, married'     } # fails
+       its(:cached_status_list) { should_not == ''                   } # fails, is blank
+       its(:instance_variables) { should     include('@status_list') }
+       its(:instance_variables) { should_not include('@statu_list')  } # fails, note: one "s"
+     end
+
+     context 'glass taggings cache after update' do
+       before do
+         @taggable.update_attributes(:glass_list => 'rectangle, aviator')
+       end
+
+       subject { @taggable }
+       its(:glass_list)         { should     == ['rectangle', 'aviator'] }
+       its(:cached_glass_list)  { should     == 'rectangle, aviator'     } # fails
+       its(:cached_glass_list)  { should_not == ''                       } # fails, is blank
+       its(:instance_variables) { should     include('@glass_list')      }
+       its(:instance_variables) { should_not include('@glas_list')       } # fails, note: one "s"
+     end
+   end
+  end
+   
   describe "taggings" do 
     before(:each) do
       @taggable = TaggableModel.new(:name => "Art Kram")
