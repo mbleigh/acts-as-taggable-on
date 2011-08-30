@@ -10,7 +10,7 @@ module ActsAsTaggableOn
                     :tagger_type,
                     :tagger_id if defined?(ActiveModel::MassAssignmentSecurity)
 
-    belongs_to :tag, :class_name => 'ActsAsTaggableOn::Tag'
+    belongs_to :tag, :class_name => 'ActsAsTaggableOn::Tag', :counter_cache => true
     belongs_to :taggable, :polymorphic => true
     belongs_to :tagger,   :polymorphic => true
 
