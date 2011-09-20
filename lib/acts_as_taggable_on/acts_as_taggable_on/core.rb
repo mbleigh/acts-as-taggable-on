@@ -100,7 +100,7 @@ module ActsAsTaggableOn::Taggable
 
           # don't need to sanitize sql, map all ids and join with OR logic
           conditions << tags.map { |t| "#{taggings_alias}.tag_id = #{t.id}" }.join(" OR ")
-          select_clause = "DISTINCT \"#{table_name}\".*" unless context and tag_types.one?
+          select_clause = "DISTINCT  \"#{table_name}\".*" unless context and tag_types.one?
 
           joins << tagging_join
 
