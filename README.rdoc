@@ -193,7 +193,7 @@ CSS:
 
 == Why TaggableModel.joins(:tags) doesn't work (only for Rails >=3.0.10)?
 
-When you define acts_as_taggable_on in your model it add +has_many :through+ associations to your model. In this +has_many+ declaration we join 'tags' table using rails ":include" statement, also we use additional ":conditions" statement where we refer to joined 'tags' table. In rails 3.0.10 they changed logic, and {now}[https://github.com/rails/rails/commit/caec63929fabe0368da71128c96e74c174791eb9] 'joins' which is mode on model, substitutes 'include' from has_many declaration and place 'joins' at the end of sql, after 'conditions'. So Joining is happened but after 'Where'. 
+When you define acts_as_taggable_on in your model it add <tt>has_many :through</tt> associations to your model. In this +has_many+ declaration we join 'tags' table using rails ":include" statement, also we use additional ":conditions" statement where we refer to joined 'tags' table. In rails 3.0.10 they changed logic, and {now}[https://github.com/rails/rails/commit/caec63929fabe0368da71128c96e74c174791eb9] <tt>joins</tt> which is mode on model, substitutes 'include' from has_many declaration and place 'joins' at the end of sql, after 'conditions'. So Joining is happened but after 'Where'. 
 While we are trying to figure out how to fix this, please use Rails 3.0.9 or don't use Model.joins(:tags)
 
 == Contributors
