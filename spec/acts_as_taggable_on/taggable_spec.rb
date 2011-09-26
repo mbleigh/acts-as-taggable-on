@@ -24,7 +24,12 @@ describe "Taggable" do
     TaggableModel.tag_counts_on(:tags).length.should == 2
     @taggable.tag_counts_on(:tags).length.should == 2
   end
-
+  
+  it "should return [] right after create" do
+    blank_taggable = TaggableModel.new(:name => "Bob Jones")
+    blank_taggable.tag_list.should == []
+  end
+  
   it "should be able to create tags" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.instance_variable_get("@skill_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
