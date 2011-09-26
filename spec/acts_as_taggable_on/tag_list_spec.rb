@@ -62,6 +62,10 @@ describe ActsAsTaggableOn::TagList do
     @tag_list.to_s.should == "awesome, radical, cool, \"rad,bodacious\""
   end
   
+  it "#from should return empty array if empty array is passed" do
+    ActsAsTaggableOn::TagList.from([]).should == []
+  end
+  
   it "should be able to call to_s on a frozen tag list" do
     @tag_list.freeze
     lambda { @tag_list.add("cool","rad,bodacious") }.should raise_error

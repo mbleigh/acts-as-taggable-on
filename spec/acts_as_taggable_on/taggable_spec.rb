@@ -264,7 +264,8 @@ describe "Taggable" do
   it "should return an empty scope for empty tags" do
     TaggableModel.tagged_with('').should == []
     TaggableModel.tagged_with(' ').should == []
-    TaggableModel.tagged_with(nil).should == []    
+    TaggableModel.tagged_with(nil).should == [] 
+    TaggableModel.tagged_with([]).should == []       
   end
 
   it "should not create duplicate taggings" do
