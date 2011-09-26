@@ -59,12 +59,14 @@ module ActsAsTaggableOn::Taggable
       #                       * <tt>:exclude</tt> - if set to true, return objects that are *NOT* tagged with the specified tags
       #                       * <tt>:any</tt> - if set to true, return objects that are tagged with *ANY* of the specified tags
       #                       * <tt>:match_all</tt> - if set to true, return objects that are *ONLY* tagged with the specified tags
+      #                       * <tt>:owned_by</tt> - return objects that are *ONLY* owned by the owner
       #
       # Example:
       #   User.tagged_with("awesome", "cool")                     # Users that are tagged with awesome and cool
       #   User.tagged_with("awesome", "cool", :exclude => true)   # Users that are not tagged with awesome or cool
       #   User.tagged_with("awesome", "cool", :any => true)       # Users that are tagged with awesome or cool
       #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
+      #   User.tagged_with("awesome", "cool", :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagList.from(tags)
         empty_result = scoped(:conditions => "1 = 0")
@@ -75,6 +77,7 @@ module ActsAsTaggableOn::Taggable
         conditions = []
 
         context = options.delete(:on)
+        owned_by = options.delete(:owned_by)
         alias_base_name = undecorated_table_name.gsub('.','_')
 
         if options.delete(:exclude)
@@ -119,6 +122,15 @@ module ActsAsTaggableOn::Taggable
                             " AND #{taggings_alias}.tag_id = #{tag.id}"
             tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
+            if owned_by
+                tagging_join << " AND " + 
+                    sanitize_sql([ 
+                        "#{taggings_alias}.tagger_id = ? AND #{taggings_alias}.tagger_type = ?", 
+                        owned_by.id, 
+                        owned_by.class.to_s
+                    ]) 
+            end
+            
             joins << tagging_join
           end
         end

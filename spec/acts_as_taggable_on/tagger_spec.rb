@@ -17,6 +17,20 @@ describe "Tagger" do
     @user.owned_tags.size == 2
   end
   
+  it "should scope objects returned by tagged_with by owners" do
+    @taggable2 = TaggableModel.create(:name => "Jim Jones")
+    @taggable3 = TaggableModel.create(:name => "Jane Doe")
+
+    @user2 = TaggableUser.new
+    @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
+    @user2.tag(@taggable2, :with => 'ruby, scheme', :on => :tags)
+    @user2.tag(@taggable3, :with => 'ruby, scheme', :on => :tags)
+
+    TaggableModel.tagged_with(%w(ruby scheme), :owned_by => @user).count.should == 1
+    TaggableModel.tagged_with(%w(ruby scheme), :owned_by => @user2).count.should == 2
+
+  end
+  
   it "should not overlap tags from different taggers" do
     @user2 = TaggableUser.new
     lambda{
