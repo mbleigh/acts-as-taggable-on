@@ -12,6 +12,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'rails'
   gem.add_development_dependency 'rspec', '~> 2.5'
+  gem.add_development_dependency 'ammeter', '~> 0.1.3'
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'mysql2', '< 0.3'
   gem.add_development_dependency 'pg'
