@@ -19,6 +19,7 @@ end
 
 Bundler.require
 require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
+require 'ammeter/init'
 
 unless [].respond_to?(:freq)
   class Array

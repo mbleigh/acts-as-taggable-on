@@ -5,3 +5,4 @@
 .rvmrc
 Gemfile.lock
 spec/database.yml
+tmp
