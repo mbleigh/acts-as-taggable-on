@@ -183,10 +183,15 @@ describe "Acts As Taggable On" do
         @taggable1.find_related_tags.should include(@taggable3)
         @taggable1.find_related_tags.should_not include(@taggable2)
         @taggable1.find_related_tags.should_not include(@taggable4)
+        
+        @taggable1.find_related_tags_for(TaggableModel).should include(@taggable3)
+        @taggable1.find_related_tags_for(TaggableModel).should_not include(@taggable2)
+        @taggable1.find_related_tags_for(TaggableModel).should include(@taggable4)
       end
             
       it "should not include the object itself in the list of related objects" do
-        @taggable1.find_related_tags_for(TaggableModel).should include(@taggable4)
+        @taggable1.find_related_tags.should_not include(@taggable1)
+        @taggable1.find_related_tags_for(InheritingTaggableModel).should_not include(@taggable1)
         @taggable1.find_related_tags_for(TaggableModel).should_not include(@taggable1)
       end
     end
@@ -273,10 +278,17 @@ describe "Acts As Taggable On" do
         @taggable1.find_matching_contexts(:offerings, :needs).should include(@taggable2)
         @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable3)
         @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable4)
+        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable5)
+
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(@taggable2)
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable3)
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable4)
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(@taggable5)
       end
       
       it "should not include the object itself in the list of related objects with tags of matching contexts" do
-        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(@taggable5)
+        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable1)
+        @taggable1.find_matching_contexts_for(InheritingTaggableModel, :offerings, :needs).should_not include(@taggable1)
         @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable1)
       end
     end
