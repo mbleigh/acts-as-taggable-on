@@ -1,8 +1,0 @@
-source :gemcutter
-
-# Rails 2.3
-gem 'rails',        '2.3.5'
-gem 'rspec',        '1.3.0', :require => 'spec'
-gem 'sqlite3-ruby', '1.2.5', :require => 'sqlite3'
-gem 'mysql2',       '~> 0.2.7'
-gem 'pg'
