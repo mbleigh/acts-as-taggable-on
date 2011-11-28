@@ -1,8 +1,7 @@
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
-    include ActsAsTaggableOn::ActiveRecord::Backports if ::ActiveRecord::VERSION::MAJOR < 3
     include ActsAsTaggableOn::Utils
-      
+
     attr_accessible :name
 
     ### ASSOCIATIONS:
@@ -15,15 +14,15 @@ module ActsAsTaggableOn
     validates_uniqueness_of :name
 
     ### SCOPES:
-    
+
     def self.named(name)
       where(["name #{like_operator} ?", escape_like(name)])
     end
-  
+
     def self.named_any(list)
       where(list.map { |tag| sanitize_sql(["name #{like_operator} ?", escape_like(tag.to_s)]) }.join(" OR "))
     end
-  
+
     def self.named_like(name)
       where(["name #{like_operator} ?", "%#{escape_like(name)}%"])
     end
@@ -44,7 +43,7 @@ module ActsAsTaggableOn
       return [] if list.empty?
 
       existing_tags = Tag.named_any(list).all
-      new_tag_names = list.reject do |name| 
+      new_tag_names = list.reject do |name|
                         name = comparable_name(name)
                         existing_tags.any? { |tag| comparable_name(tag.name) == name }
                       end
@@ -66,13 +65,13 @@ module ActsAsTaggableOn
     def count
       read_attribute(:count).to_i
     end
-    
+
     def safe_name
       name.gsub(/[^a-zA-Z0-9]/, '')
     end
-    
+
     class << self
-      private        
+      private
         def comparable_name(str)
           RUBY_VERSION >= "1.9" ? str.downcase : str.mb_chars.downcase
         end
