@@ -19,31 +19,10 @@ was used.
 
 The last version of gem that is compatible with Rails 2.3.x is 2.1.0.
 
-We are planning no longer to support Rails 2, but if you want to contribute something only for Rails 2, we left rails2 branch for that.
-
-==== Plugin
-
-Acts As Taggable On is available both as a gem and as a traditional plugin. For the
-traditional plugin you can install like so:
-
-  script/plugin install git://github.com/mbleigh/acts-as-taggable-on.git
-
-Acts As Taggable On is also available as a gem plugin using Rails 2.1's gem dependencies.
-To install the gem, add this to your config/environment.rb:
-  
-  config.gem "acts-as-taggable-on", :source => "http://gemcutter.org", :version => '2.1.0'
-  
-After that, you can run "rake gems:install" to install the gem if you don't already have it.
-
-==== Post Installation
-
-1. script/generate acts_as_taggable_on_migration
-2. rake db:migrate
-
 === Rails 3.x
 
 To use it, add it to your Gemfile:
-  
+
   gem 'acts-as-taggable-on', '~>2.1.0'
 
 ==== Post Installation
@@ -95,17 +74,17 @@ compatibility with the will_paginate gem:
 
     # Find a user with matching all tags, not just one
     User.tagged_with(["awesome", "cool"], :match_all => :true)
-    
+
     # Find a user with any of the tags:
     User.tagged_with(["awesome", "cool"], :any => true)
-    
+
     # Find a user with any of tags based on context:
     User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
-    
+
 === Relationships
 
 You can find objects of the same type based on similar tags on certain contexts.
-Also, objects will be returned in descending order based on the total number of 
+Also, objects will be returned in descending order based on the total number of
 matched tags.
 
     @bobby = User.find_by_name("Bobby")
@@ -118,8 +97,8 @@ matched tags.
     @tom.skill_list # => ["hacking", "jogging", "diving"]
 
     @tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
-    @bobby.find_related_skills # => [<User name="Tom">] 
-    @frankie.find_related_skills # => [<User name="Tom">] 
+    @bobby.find_related_skills # => [<User name="Tom">]
+    @frankie.find_related_skills # => [<User name="Tom">]
 
 === Dynamic Tag Contexts
 
@@ -195,7 +174,7 @@ CSS:
 
 == Why TaggableModel.joins(:tags) doesn't work (only for Rails >=3.0.10)?
 
-When you define acts_as_taggable_on in your model it add <tt>has_many :through</tt> associations to your model. In this +has_many+ declaration we join 'tags' table using rails ":include" statement, also we use additional ":conditions" statement where we refer to joined 'tags' table. In rails 3.0.10 they changed logic, and {now}[https://github.com/rails/rails/commit/caec63929fabe0368da71128c96e74c174791eb9] <tt>joins</tt> which is mode on model, substitutes 'include' from has_many declaration and place 'joins' at the end of sql, after 'conditions'. So Joining is happened but after 'Where'. 
+When you define acts_as_taggable_on in your model it add <tt>has_many :through</tt> associations to your model. In this +has_many+ declaration we join 'tags' table using rails ":include" statement, also we use additional ":conditions" statement where we refer to joined 'tags' table. In rails 3.0.10 they changed logic, and {now}[https://github.com/rails/rails/commit/caec63929fabe0368da71128c96e74c174791eb9] <tt>joins</tt> which is mode on model, substitutes 'include' from has_many declaration and place 'joins' at the end of sql, after 'conditions'. So Joining is happened but after 'Where'.
 While we are trying to figure out how to fix this, please use Rails 3.0.9 or don't use Model.joins(:tags)
 
 == Contributors
