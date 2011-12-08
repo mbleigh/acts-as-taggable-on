@@ -325,7 +325,7 @@ describe "Acts As Taggable On" do
 
        its(:language_list)        { should == ['ruby', '.net']}
        its(:cached_language_list) { should == 'ruby, .net' }           # passes
-       its(:instance_variables)   { should     include('@language_list') }
+       its(:instance_variables)   { should     include((RUBY_VERSION < '1.9' ? '@language_list' : :@language_list)) }
      end
 
      context 'status taggings cache after update' do
@@ -335,8 +335,9 @@ describe "Acts As Taggable On" do
        its(:status_list)        { should     == ['happy', 'married'] }
        its(:cached_status_list) { should     == 'happy, married'     } # fails
        its(:cached_status_list) { should_not == ''                   } # fails, is blank
-       its(:instance_variables) { should     include('@status_list') }
-       its(:instance_variables) { should_not include('@statu_list')  } # fails, note: one "s"
+       its(:instance_variables) { should     include((RUBY_VERSION < '1.9' ? '@status_list' : :@status_list)) }
+       its(:instance_variables) { should_not include((RUBY_VERSION < '1.9' ? '@statu_list' : :@statu_list))  } # fails, note: one "s"
+
      end
 
      context 'glass taggings cache after update' do
@@ -348,8 +349,14 @@ describe "Acts As Taggable On" do
        its(:glass_list)         { should     == ['rectangle', 'aviator'] }
        its(:cached_glass_list)  { should     == 'rectangle, aviator'     } # fails
        its(:cached_glass_list)  { should_not == ''                       } # fails, is blank
-       its(:instance_variables) { should     include('@glass_list')      }
-       its(:instance_variables) { should_not include('@glas_list')       } # fails, note: one "s"
+       if RUBY_VERSION < '1.9'
+         its(:instance_variables) { should     include('@glass_list')      }
+         its(:instance_variables) { should_not include('@glas_list')       } # fails, note: one "s"
+       else
+         its(:instance_variables) { should     include(:@glass_list)      }
+         its(:instance_variables) { should_not include(:@glas_list)       } # fails, note: one "s"
+       end
+
      end
    end
   end
