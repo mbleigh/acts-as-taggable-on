@@ -1,7 +1,5 @@
 module ActsAsTaggableOn
   class Tagging < ::ActiveRecord::Base #:nodoc:
-    include ActsAsTaggableOn::ActiveRecord::Backports if ::ActiveRecord::VERSION::MAJOR < 3
-
     attr_accessible :tag,
                     :tag_id,
                     :context,
