@@ -179,23 +179,14 @@ While we are trying to figure out how to fix this, please use Rails 3.0.9 or don
 
 == Contributors
 
-* Artem Kramarenko (artemk) - Maintainer
-* TomEric (i76) - Maintainer
-* Michael Bleigh - Original Author
-* Szymon Nowak - Rails 3.0 compatibility
-* Jelle Vandebeeck - Rails 3.0 compatibility
-* Brendan Lim - Related Objects
-* Pradeep Elankumaran - Taggers
-* Sinclair Bain - Patch King
+We have a long list of valued contributors. {Check them all}[https://github.com/mbleigh/acts-as-taggable-on/contributors]
 
-=== Patch Contributors
+== Maintainers
 
-* tristanzdunn - Related objects of other classes
-* azabaj - Fixed migrate down
-* Peter Cooper - named_scope fix
-* slainer68 - STI fix
-* harrylove - migration instructions and fix-ups
-* lawrencepit - cached tag work
-* sobrinho - fixed tag_cloud helper
+* Artem Kramarenko (artemk)
+
+== Author
+
+* Michael Bleigh
 
 Copyright (c) 2007-2011 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the MIT license
