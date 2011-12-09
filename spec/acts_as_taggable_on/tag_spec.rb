@@ -9,7 +9,7 @@ describe ActsAsTaggableOn::Tag do
 
   describe "named like any" do
     before(:each) do
-      ActsAsTaggableOn::Tag.create(:name => "Awesome")      
+      ActsAsTaggableOn::Tag.create(:name => "Awesome")
       ActsAsTaggableOn::Tag.create(:name => "awesome")
       ActsAsTaggableOn::Tag.create(:name => "epic")
     end
@@ -73,7 +73,7 @@ describe ActsAsTaggableOn::Tag do
 
   it "should require a name" do
     @tag.valid?
-    
+
     if ActiveRecord::VERSION::MAJOR >= 3
       @tag.errors[:name].should == ["can't be blank"]
     else
@@ -82,8 +82,8 @@ describe ActsAsTaggableOn::Tag do
 
     @tag.name = "something"
     @tag.valid?
-    
-    if ActiveRecord::VERSION::MAJOR >= 3      
+
+    if ActiveRecord::VERSION::MAJOR >= 3
       @tag.errors[:name].should == []
     else
       @tag.errors[:name].should be_nil
@@ -113,24 +113,19 @@ describe ActsAsTaggableOn::Tag do
     @another_tag = ActsAsTaggableOn::Tag.create!(:name => "coolip")
     ActsAsTaggableOn::Tag.named_like('cool').should include(@tag, @another_tag)
   end
-  
+
   describe "escape wildcard symbols in like requests" do
     before(:each) do
       @tag.name = "cool"
       @tag.save
-      @another_tag = ActsAsTaggableOn::Tag.create!(:name => "coo%") 
-      @another_tag2 = ActsAsTaggableOn::Tag.create!(:name => "coolish")           
+      @another_tag = ActsAsTaggableOn::Tag.create!(:name => "coo%")
+      @another_tag2 = ActsAsTaggableOn::Tag.create!(:name => "coolish")
     end
-    
+
     it "return escaped result when '%' char present in tag" do
-      if @tag.using_sqlite?
-        ActsAsTaggableOn::Tag.named_like('coo%').should include(@tag)     
+        ActsAsTaggableOn::Tag.named_like('coo%').should_not include(@tag)
         ActsAsTaggableOn::Tag.named_like('coo%').should include(@another_tag)
-      else
-        ActsAsTaggableOn::Tag.named_like('coo%').should_not include(@tag)     
-        ActsAsTaggableOn::Tag.named_like('coo%').should include(@another_tag)
-      end
     end
-    
+
   end
 end
