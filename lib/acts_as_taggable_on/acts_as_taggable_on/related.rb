@@ -5,7 +5,7 @@ module ActsAsTaggableOn::Taggable
       base.extend ActsAsTaggableOn::Taggable::Related::ClassMethods
       base.initialize_acts_as_taggable_on_related
     end
-    
+
     module ClassMethods
       def initialize_acts_as_taggable_on_related
         tag_types.map(&:to_s).each do |tag_type|
@@ -20,7 +20,7 @@ module ActsAsTaggableOn::Taggable
             end
           )
         end
-        
+
         unless tag_types.empty?
           class_eval %(
             def find_matching_contexts(search_context, result_context, options = {})
@@ -31,40 +31,40 @@ module ActsAsTaggableOn::Taggable
               matching_contexts_for(search_context.to_s, result_context.to_s, klass, options)
             end
           )
-        end        
+        end
       end
-      
+
       def acts_as_taggable_on(*args)
         super(*args)
         initialize_acts_as_taggable_on_related
       end
     end
-    
+
     module InstanceMethods
       def matching_contexts_for(search_context, result_context, klass, options = {})
         tags_to_find = tags_on(search_context).collect { |t| t.name }
 
-        exclude_self = "#{klass.table_name}.#{klass.primary_key} != #{id} AND" if self.class == klass
-        
+        exclude_self = "#{klass.table_name}.#{klass.primary_key} != #{id} AND" if [self.class.base_class, self.class].include? klass
+
         group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(klass) : "#{klass.table_name}.#{klass.primary_key}"
-        
+
         klass.scoped({ :select     => "#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count",
                        :from       => "#{klass.table_name}, #{ActsAsTaggableOn::Tag.table_name}, #{ActsAsTaggableOn::Tagging.table_name}",
-                       :conditions => ["#{exclude_self} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?) AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_to_find, result_context],
+                       :conditions => ["#{exclude_self} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.base_class.to_s}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?) AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_to_find, result_context],
                        :group      => group_columns,
                        :order      => "count DESC" }.update(options))
       end
-      
+
       def related_tags_for(context, klass, options = {})
         tags_to_find = tags_on(context).collect { |t| t.name }
 
-        exclude_self = "#{klass.table_name}.#{klass.primary_key} != #{id} AND" if self.class == klass
+        exclude_self = "#{klass.table_name}.#{klass.primary_key} != #{id} AND" if [self.class.base_class, self.class].include? klass
 
 group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(klass) : "#{klass.table_name}.#{klass.primary_key}"
 
         klass.scoped({ :select     => "#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count",
                        :from       => "#{klass.table_name}, #{ActsAsTaggableOn::Tag.table_name}, #{ActsAsTaggableOn::Tagging.table_name}",
-                       :conditions => ["#{exclude_self} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.to_s}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?)", tags_to_find],
+                       :conditions => ["#{exclude_self} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.base_class.to_s}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?)", tags_to_find],
                        :group      => group_columns,
                        :order      => "count DESC" }.update(options))
       end

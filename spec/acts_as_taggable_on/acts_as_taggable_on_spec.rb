@@ -158,6 +158,44 @@ describe "Acts As Taggable On" do
       taggable1.find_related_tags.should include(taggable2)
       taggable1.find_related_tags.should_not include(taggable1)
     end
+
+    context "Inherited Models" do
+      before do
+        @taggable1 = InheritingTaggableModel.create!(:name => "InheritingTaggable 1")
+        @taggable2 = InheritingTaggableModel.create!(:name => "InheritingTaggable 2")
+        @taggable3 = InheritingTaggableModel.create!(:name => "InheritingTaggable 3")
+        @taggable4 = TaggableModel.create!(:name => "Taggable 4")
+
+        @taggable1.tag_list = "one, two"
+        @taggable1.save
+
+        @taggable2.tag_list = "three, four"
+        @taggable2.save
+
+        @taggable3.tag_list = "one, four"
+        @taggable3.save
+
+        @taggable4.tag_list = "one, two, three, four"
+        @taggable4.save
+      end
+
+      it "should find related objects based on tag names on context" do
+        @taggable1.find_related_tags.should include(@taggable3)
+        @taggable1.find_related_tags.should_not include(@taggable2)
+        @taggable1.find_related_tags.should_not include(@taggable4)
+
+        @taggable1.find_related_tags_for(TaggableModel).should include(@taggable3)
+        @taggable1.find_related_tags_for(TaggableModel).should_not include(@taggable2)
+        @taggable1.find_related_tags_for(TaggableModel).should include(@taggable4)
+      end
+
+      it "should not include the object itself in the list of related objects" do
+        @taggable1.find_related_tags.should_not include(@taggable1)
+        @taggable1.find_related_tags_for(InheritingTaggableModel).should_not include(@taggable1)
+        @taggable1.find_related_tags_for(TaggableModel).should_not include(@taggable1)
+      end
+    end
+
   end
 
   describe "Matching Contexts" do
@@ -197,18 +235,63 @@ describe "Acts As Taggable On" do
       taggable1.find_matching_contexts_for(OtherTaggableModel, :offerings, :needs).should_not include(taggable3)
     end
 
-    it "should not include the object itself in the list of related objects" do
+    it "should not include the object itself in the list of related objects with tags of matching contexts" do
       taggable1 = TaggableModel.create!(:name => "Taggable 1")
       taggable2 = TaggableModel.create!(:name => "Taggable 2")
 
-      taggable1.tag_list = "one"
+      taggable1.offering_list = "one, two"
+      taggable1.need_list = "one, two"
       taggable1.save
 
-      taggable2.tag_list = "one, two"
+      taggable2.need_list = "one, two"
       taggable2.save
 
-      taggable1.find_related_tags.should include(taggable2)
-      taggable1.find_related_tags.should_not include(taggable1)
+      taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(taggable2)
+      taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(taggable1)
+    end
+
+    context "Inherited Models" do
+      before do
+        @taggable1 = InheritingTaggableModel.create!(:name => "InheritingTaggable 1")
+        @taggable2 = InheritingTaggableModel.create!(:name => "InheritingTaggable 2")
+        @taggable3 = InheritingTaggableModel.create!(:name => "InheritingTaggable 3")
+        @taggable4 = InheritingTaggableModel.create!(:name => "InheritingTaggable 4")
+        @taggable5 = TaggableModel.create!(:name => "Taggable 5")
+
+        @taggable1.offering_list = "one, two"
+        @taggable1.need_list = "one, two"
+        @taggable1.save!
+
+        @taggable2.need_list = "one, two"
+        @taggable2.save!
+
+        @taggable3.offering_list = "one, two"
+        @taggable3.save!
+
+        @taggable4.tag_list = "one, two, three, four"
+        @taggable4.save!
+
+        @taggable5.need_list = "one, two"
+        @taggable5.save!
+      end
+
+      it "should find objects with tags of matching contexts" do
+        @taggable1.find_matching_contexts(:offerings, :needs).should include(@taggable2)
+        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable3)
+        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable4)
+        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable5)
+
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(@taggable2)
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable3)
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable4)
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(@taggable5)
+      end
+
+      it "should not include the object itself in the list of related objects with tags of matching contexts" do
+        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable1)
+        @taggable1.find_matching_contexts_for(InheritingTaggableModel, :offerings, :needs).should_not include(@taggable1)
+        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable1)
+      end
     end
   end
 
