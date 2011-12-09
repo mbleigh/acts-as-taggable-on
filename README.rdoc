@@ -18,13 +18,15 @@ was used.
 
 === Rails 2.3.x
 
-The last version of gem that is compatible with Rails 2.3.x is 2.1.0.
+To use it, add it to your Gemfile:
+
+  gem 'acts-as-taggable-on', '2.1.0'
 
 === Rails 3.x
 
 To use it, add it to your Gemfile:
 
-  gem 'acts-as-taggable-on', '~>2.1.0'
+  gem 'acts-as-taggable-on'
 
 ==== Post Installation
 
@@ -67,7 +69,7 @@ compatibility with the will_paginate gem:
 
     class User < ActiveRecord::Base
       acts_as_taggable_on :tags, :skills
-      named_scope :by_join_date, :order => "created_at DESC"
+      scope :by_join_date, order("created_at DESC")
     end
 
     User.tagged_with("awesome").by_date
@@ -81,6 +83,8 @@ compatibility with the will_paginate gem:
 
     # Find a user with any of tags based on context:
     User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
+
+    Note: User.tagged_with([]) or '' will return [], but not all records.
 
 === Relationships
 
@@ -172,11 +176,6 @@ CSS:
   .css2 { font-size: 1.2em; }
   .css3 { font-size: 1.4em; }
   .css4 { font-size: 1.6em; }
-
-== Why TaggableModel.joins(:tags) doesn't work (only for Rails >=3.0.10)?
-
-When you define acts_as_taggable_on in your model it add <tt>has_many :through</tt> associations to your model. In this +has_many+ declaration we join 'tags' table using rails ":include" statement, also we use additional ":conditions" statement where we refer to joined 'tags' table. In rails 3.0.10 they changed logic, and {now}[https://github.com/rails/rails/commit/caec63929fabe0368da71128c96e74c174791eb9] <tt>joins</tt> which is mode on model, substitutes 'include' from has_many declaration and place 'joins' at the end of sql, after 'conditions'. So Joining is happened but after 'Where'.
-While we are trying to figure out how to fix this, please use Rails 3.0.9 or don't use Model.joins(:tags)
 
 == Contributors
 
