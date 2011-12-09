@@ -123,13 +123,8 @@ describe ActsAsTaggableOn::Tag do
     end
     
     it "return escaped result when '%' char present in tag" do
-      if @tag.using_sqlite?
-        ActsAsTaggableOn::Tag.named_like('coo%').should include(@tag)     
-        ActsAsTaggableOn::Tag.named_like('coo%').should include(@another_tag)
-      else
-        ActsAsTaggableOn::Tag.named_like('coo%').should_not include(@tag)     
-        ActsAsTaggableOn::Tag.named_like('coo%').should include(@another_tag)
-      end
+      ActsAsTaggableOn::Tag.named_like('coo%').should_not include(@tag)     
+      ActsAsTaggableOn::Tag.named_like('coo%').should include(@another_tag)
     end
     
   end
