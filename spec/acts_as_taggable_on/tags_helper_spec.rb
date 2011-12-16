@@ -25,4 +25,20 @@ describe ActsAsTaggableOn::TagsHelper do
     tags["c++"].should == "sucky"
     tags["php"].should == "sucky"
   end
+  
+  it "should handle tags with zero counts (build for empty)" do
+    bob = ActsAsTaggableOn::Tag.create(:name => "php")
+    tom = ActsAsTaggableOn::Tag.create(:name => "java")
+    eve = ActsAsTaggableOn::Tag.create(:name => "c++")
+    
+    tags = { }
+    
+    @helper.tag_cloud(ActsAsTaggableOn::Tag.all, ["sucky", "awesome"]) do |tag, css_class|
+      tags[tag.name] = css_class
+    end
+    
+    tags["java"].should == "sucky"
+    tags["c++"].should == "sucky"
+    tags["php"].should == "sucky"
+  end
 end
