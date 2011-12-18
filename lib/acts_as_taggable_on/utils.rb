@@ -15,6 +15,10 @@ module ActsAsTaggableOn
         ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name == 'SQLite'
       end
 
+      def sha_prefix(string)
+        Digest::SHA1.hexdigest(string + Time.now.to_s)[0..6]
+      end
+      
       private
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'

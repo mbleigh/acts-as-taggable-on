@@ -2,6 +2,8 @@ require "active_record"
 require "active_record/version"
 require "action_view"
 
+require "digest/sha1"
+
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require "acts_as_taggable_on/utils"
