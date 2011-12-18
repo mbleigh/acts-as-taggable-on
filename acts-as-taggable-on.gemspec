@@ -4,7 +4,7 @@ require 'acts-as-taggable-on/version'
 Gem::Specification.new do |gem|
   gem.name = %q{acts-as-taggable-on}
   gem.authors = ["Michael Bleigh"]
-  gem.date = %q{2011-12-09}
+  gem.date = %q{2011-12-18}
   gem.description = %q{With ActsAsTaggableOn, you can tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
   gem.summary = "Advanced tagging for Rails."
   gem.email = %q{michael@intridea.com}
