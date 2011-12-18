@@ -74,20 +74,12 @@ describe ActsAsTaggableOn::Tag do
   it "should require a name" do
     @tag.valid?
 
-    if ActiveRecord::VERSION::MAJOR >= 3
-      @tag.errors[:name].should == ["can't be blank"]
-    else
-      @tag.errors[:name].should == "can't be blank"
-    end
+    @tag.errors[:name].should == ["can't be blank"]
 
     @tag.name = "something"
     @tag.valid?
 
-    if ActiveRecord::VERSION::MAJOR >= 3
-      @tag.errors[:name].should == []
-    else
-      @tag.errors[:name].should be_nil
-    end
+    @tag.errors[:name].should == []
   end
 
   it "should equal a tag with the same name" do

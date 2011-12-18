@@ -142,20 +142,9 @@ describe "Taggable" do
     TaggableModel.tagged_with(['rails, css'], :on => :needs, :any => true).tagged_with(['c++', 'java'], :on => :offerings, :any => true).to_a.should == [bob]
   end
 
-  if ActiveRecord::VERSION::MAJOR >= 3
-    it "should not return read-only records" do
-      TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
-      TaggableModel.tagged_with("ruby").first.should_not be_readonly
-    end
-  else
-    xit "should not return read-only records" do
-      # apparantly, there is no way to set readonly to false in a scope if joins are made
-    end
-
-    it "should be possible to return writable records" do
-      TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
-      TaggableModel.tagged_with("ruby").first(:readonly => false).should_not be_readonly
-    end
+  it "should not return read-only records" do
+    TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    TaggableModel.tagged_with("ruby").first.should_not be_readonly
   end
 
   it "should be able to get scoped tag counts" do

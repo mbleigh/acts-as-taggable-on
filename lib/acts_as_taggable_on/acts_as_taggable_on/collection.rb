@@ -53,11 +53,7 @@ module ActsAsTaggableOn::Taggable
       def all_tag_counts(options = {})
         options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :on, :id
 
-        scope = if ActiveRecord::VERSION::MAJOR >= 3
-                  {}
-                else
-                  scope(:find) || {}           
-                end
+        scope = {}
 
         ## Generate conditions:
         options[:conditions] = sanitize_sql(options[:conditions]) if options[:conditions]     
@@ -92,8 +88,6 @@ module ActsAsTaggableOn::Taggable
         tag_joins = [
         ].compact
 
-        [tagging_joins, tag_joins].each(&:reverse!) if ActiveRecord::VERSION::MAJOR < 3
-
         ## Generate scope:
         tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id, COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) AS tags_count")
         tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*, #{ActsAsTaggableOn::Tagging.table_name}.tags_count AS count").order(options[:order]).limit(options[:limit])   
@@ -112,18 +106,12 @@ module ActsAsTaggableOn::Taggable
 
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
 
-        if ActiveRecord::VERSION::MAJOR >= 3
-          # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
-          scoped_select = "#{table_name}.#{primary_key}"
-          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})").
-                                        group(group_columns).
-                                        having(having)
-        else
-          # Having is not available in 2.3.x:
-          group_by  = "#{group_columns} HAVING COUNT(*) > 0"
-          group_by << " AND #{having}" unless having.blank?
-          tagging_scope = tagging_scope.group(group_by)
-        end
+        # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
+        scoped_select = "#{table_name}.#{primary_key}"
+        tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})").
+                                      group(group_columns).
+                                      having(having)
+
 
         tag_scope = tag_scope.joins("JOIN (#{tagging_scope.to_sql}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
         tag_scope
