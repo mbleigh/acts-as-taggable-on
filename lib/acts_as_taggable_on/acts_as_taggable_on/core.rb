@@ -81,12 +81,22 @@ module ActsAsTaggableOn::Taggable
         alias_base_name = undecorated_table_name.gsub('.','_')
 
         if options.delete(:exclude)
-          tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ?", t]) }.join(" OR ")
+          if options.delete(:wild)
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ? ESCAPE '!'", "%#{escape_like(t)}%"]) }.join(" OR ")
+          else
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ?", t]) }.join(" OR ")
+          end 
+          
           conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
         elsif options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
-          tags = ActsAsTaggableOn::Tag.named_any(tag_list)
+          if options.delete(:wild)
+            tags = ActsAsTaggableOn::Tag.named_like_any(tag_list)
+          else
+            tags = ActsAsTaggableOn::Tag.named_any(tag_list)            
+          end
+          
           return scoped(:conditions => "1 = 0") unless tags.length > 0
 
           # setup taggings alias so we can chain, ex: items_locations_taggings_awesome_cool_123
@@ -107,8 +117,8 @@ module ActsAsTaggableOn::Taggable
           joins << tagging_join
 
         else
-          tags = ActsAsTaggableOn::Tag.named_any(tag_list)
-          return empty_result unless tags.length == tag_list.length
+          tags = ActsAsTaggableOn::Tag.named_any(tag_list)   
+          return empty_result unless tags.length == tag_list.length                     
 
           tags.each do |tag|
 

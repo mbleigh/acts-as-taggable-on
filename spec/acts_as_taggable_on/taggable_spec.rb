@@ -218,12 +218,26 @@ describe "Taggable" do
     TaggableModel.tagged_with(["depressed", "css"], :order => 'taggable_models.name', :any => true).to_a.should == [bob, frank]
   end
 
+  context "wild: true" do
+    it "should use params as wildcards" do
+      bob = TaggableModel.create(:name => "Bob", :tag_list => "bob, tricia")
+      frank = TaggableModel.create(:name => "Frank", :tag_list => "bobby, jim")
+      steve = TaggableModel.create(:name => "Steve", :tag_list => "john, patricia")
+      jim = TaggableModel.create(:name => "Jim", :tag_list => "jim, steve")
+      tricia = TaggableModel.create(:name => "Tricia", :tag_list => "bobby, patricia")
+      
+      
+      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :any => true).to_a.should == [bob, frank, steve, tricia]      
+      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :exclude => true).to_a.should == [jim]            
+    end
+  end
+  
   it "should be able to find tagged on a custom tag context" do
     bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
     bob.tag_list_on(:rotors).should == ["spinning","jumping"]
     bob.save
-
+    
     TaggableModel.tagged_with("spinning", :on => :rotors).to_a.should == [bob]
   end
 

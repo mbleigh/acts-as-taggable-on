@@ -81,10 +81,15 @@ compatibility with the will_paginate gem:
     # Find a user with any of the tags:
     User.tagged_with(["awesome", "cool"], :any => true)
 
+    # Find a user that not tags with awesome or cool:
+    User.tagged_with(["awesome", "cool"], :exclude => true)
+    
     # Find a user with any of tags based on context:
     User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 
-  Note: User.tagged_with([]) or '' will return [], but not all records.
+  You can also use :wild => true option along with :any or :exclude option. It will looking for %awesome% and %cool% in sql.
+  
+  Tip: User.tagged_with([]) or '' will return [], but not all records.
 
 === Relationships
 
