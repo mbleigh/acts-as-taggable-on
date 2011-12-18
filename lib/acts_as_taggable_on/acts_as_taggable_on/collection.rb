@@ -113,11 +113,19 @@ module ActsAsTaggableOn::Taggable
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
 
         if ActiveRecord::VERSION::MAJOR >= 3
-          # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
-          scoped_select = "#{table_name}.#{primary_key}"
-          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})").
-                                        group(group_columns).
-                                        having(having)
+          current_scope = scoped {}
+          
+          if current_scope.group_values.empty?
+            # Merge the current scope to the scope
+            current_scope = scoped {}
+            tagging_scope = tagging_scope.merge(current_scope)
+          else
+            # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
+            scoped_select = "#{table_name}.#{primary_key}"
+            tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})")
+          end
+          
+          tagging_scope = tagging_scope.group(group_columns).having(having)
         else
           # Having is not available in 2.3.x:
           group_by  = "#{group_columns} HAVING COUNT(*) > 0"
