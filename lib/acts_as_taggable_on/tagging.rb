@@ -18,5 +18,17 @@ module ActsAsTaggableOn
     validates_presence_of :tag_id
 
     validates_uniqueness_of :tag_id, :scope => [ :taggable_type, :taggable_id, :context, :tagger_id, :tagger_type ]
+
+    after_destroy :remove_unused_tags
+
+    private
+
+    def remove_unused_tags
+      if Tag.remove_unused
+        if tag.taggings.count.zero?
+          tag.destroy
+        end
+      end
+    end
   end
 end
