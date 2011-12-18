@@ -224,10 +224,9 @@ describe "Taggable" do
       frank = TaggableModel.create(:name => "Frank", :tag_list => "bobby, jim")
       steve = TaggableModel.create(:name => "Steve", :tag_list => "john, patricia")
       jim = TaggableModel.create(:name => "Jim", :tag_list => "jim, steve")
-      tricia = TaggableModel.create(:name => "Tricia", :tag_list => "bobby, patricia")
       
       
-      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :any => true).to_a.should == [bob, frank, steve, tricia]      
+      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :any => true).to_a.should == [bob, frank, steve]      
       TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :exclude => true).to_a.should == [jim]            
     end
   end
