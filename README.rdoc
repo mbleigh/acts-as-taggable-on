@@ -76,7 +76,7 @@ compatibility with the will_paginate gem:
     User.tagged_with("awesome").by_date.paginate(:page => params[:page], :per_page => 20)
 
     # Find a user with matching all tags, not just one
-    User.tagged_with(["awesome", "cool"], :match_all => :true)
+    User.tagged_with(["awesome", "cool"], :all => true)
 
     # Find a user with any of the tags:
     User.tagged_with(["awesome", "cool"], :any => true)
