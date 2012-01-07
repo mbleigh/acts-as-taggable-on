@@ -16,17 +16,15 @@ was used.
 
 == Installation
 
-=== Rails 2.3.x
+=== Rails 2.x
 
-To use it, add it to your Gemfile:
-
-  gem 'acts-as-taggable-on', '~>2.1.0'
+Not supported any more! It is time for update guys.
 
 === Rails 3.x
 
 To use it, add it to your Gemfile:
 
-  gem 'acts-as-taggable-on', '~>2.2.0'
+  gem 'acts-as-taggable-on', '~> 2.2.2'
 
 ==== Post Installation
 
@@ -76,19 +74,19 @@ compatibility with the will_paginate gem:
     User.tagged_with("awesome").by_date.paginate(:page => params[:page], :per_page => 20)
 
     # Find a user with matching all tags, not just one
-    User.tagged_with(["awesome", "cool"], :match_all => :true)
+    User.tagged_with(["awesome", "cool"], :match_all => true)
 
     # Find a user with any of the tags:
     User.tagged_with(["awesome", "cool"], :any => true)
 
     # Find a user that not tags with awesome or cool:
     User.tagged_with(["awesome", "cool"], :exclude => true)
-    
+
     # Find a user with any of tags based on context:
     User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 
   You can also use :wild => true option along with :any or :exclude option. It will looking for %awesome% and %cool% in sql.
-  
+
   Tip: User.tagged_with([]) or '' will return [], but not all records.
 
 === Relationships
@@ -184,12 +182,12 @@ CSS:
 
 == Remove unused tags
 
-If you would like to remove unused tag objects after removing taggings, add 
-  
-  ActsAsTaggableOn::Tag.remove_unused = true                  
-  
+If you would like to remove unused tag objects after removing taggings, add
+
+  ActsAsTaggableOn::Tag.remove_unused = true
+
 to initializer file.
-  
+
 == Contributors
 
 We have a long list of valued contributors. {Check them all}[https://github.com/mbleigh/acts-as-taggable-on/contributors]

@@ -224,19 +224,19 @@ describe "Taggable" do
       frank = TaggableModel.create(:name => "Frank", :tag_list => "bobby, jim")
       steve = TaggableModel.create(:name => "Steve", :tag_list => "john, patricia")
       jim = TaggableModel.create(:name => "Jim", :tag_list => "jim, steve")
-      
-      
-      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :any => true).to_a.should == [bob, frank, steve]      
-      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :exclude => true).to_a.should == [jim]            
+
+
+      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :any => true).to_a.sort_by{|o| o.id}.should == [bob, frank, steve]
+      TaggableModel.tagged_with(["bob", "tricia"], :wild => true, :exclude => true).to_a.should == [jim]
     end
   end
-  
+
   it "should be able to find tagged on a custom tag context" do
     bob = TaggableModel.create(:name => "Bob")
     bob.set_tag_list_on(:rotors, "spinning, jumping")
     bob.tag_list_on(:rotors).should == ["spinning","jumping"]
     bob.save
-    
+
     TaggableModel.tagged_with("spinning", :on => :rotors).to_a.should == [bob]
   end
 
