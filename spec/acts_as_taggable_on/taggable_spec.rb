@@ -407,6 +407,28 @@ describe "Taggable" do
       @taggable.tag_list_on(:test).should == ["hello"]
     end
   end
+
+  describe "Dirty Objects" do
+    before(:each) do
+      @taggable = TaggableModel.create(:tag_list => "awesome, epic")
+    end
+
+    it 'should show changes of dirty object' do
+      @taggable.changes.should == {}
+      @taggable.tag_list = 'one'
+      @taggable.changes.should == {"tag_list"=>["awesome, epic", ["one"]]}
+
+      @taggable.tag_list_changed?.should be_true
+      @taggable.tag_list_was.should == "awesome, epic"
+      @taggable.tag_list_change.should == ["awesome, epic", ["one"]]
+    end
+
+    it 'should show no changes if the same tag_list' do
+      @taggable.tag_list = "awesome, epic"
+      @taggable.tag_list_changed?.should be_false
+      @taggable.changes.should == {}
+    end
+  end
 end
 
 

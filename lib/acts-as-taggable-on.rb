@@ -37,6 +37,7 @@ require "acts_as_taggable_on/acts_as_taggable_on/collection"
 require "acts_as_taggable_on/acts_as_taggable_on/cache"
 require "acts_as_taggable_on/acts_as_taggable_on/ownership"
 require "acts_as_taggable_on/acts_as_taggable_on/related"
+require "acts_as_taggable_on/acts_as_taggable_on/dirty"
 
 require "acts_as_taggable_on/tagger"
 require "acts_as_taggable_on/tag"

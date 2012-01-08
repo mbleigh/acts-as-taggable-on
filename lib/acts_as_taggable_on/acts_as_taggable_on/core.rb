@@ -20,9 +20,9 @@ module ActsAsTaggableOn::Taggable
           context_tags     = tags_type.to_sym
 
           class_eval do
-                    has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "ActsAsTaggableOn::Tagging",
-                    :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type]
-                    has_many context_tags, :through => context_taggings, :source => :tag, :class_name => "ActsAsTaggableOn::Tag"
+            has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "ActsAsTaggableOn::Tagging",
+            :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type]
+            has_many context_tags, :through => context_taggings, :source => :tag, :class_name => "ActsAsTaggableOn::Tag"
           end
 
           class_eval %(
@@ -85,8 +85,8 @@ module ActsAsTaggableOn::Taggable
             tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ? ESCAPE '!'", "%#{escape_like(t)}%"]) }.join(" OR ")
           else
             tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ?", t]) }.join(" OR ")
-          end 
-          
+          end
+
           conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
         elsif options.delete(:any)
@@ -94,9 +94,9 @@ module ActsAsTaggableOn::Taggable
           if options.delete(:wild)
             tags = ActsAsTaggableOn::Tag.named_like_any(tag_list)
           else
-            tags = ActsAsTaggableOn::Tag.named_any(tag_list)            
+            tags = ActsAsTaggableOn::Tag.named_any(tag_list)
           end
-          
+
           return scoped(:conditions => "1 = 0") unless tags.length > 0
 
           # setup taggings alias so we can chain, ex: items_locations_taggings_awesome_cool_123
@@ -117,8 +117,8 @@ module ActsAsTaggableOn::Taggable
           joins << tagging_join
 
         else
-          tags = ActsAsTaggableOn::Tag.named_any(tag_list)   
-          return empty_result unless tags.length == tag_list.length                     
+          tags = ActsAsTaggableOn::Tag.named_any(tag_list)
+          return empty_result unless tags.length == tag_list.length
 
           tags.each do |tag|
 
@@ -241,11 +241,27 @@ module ActsAsTaggableOn::Taggable
         add_custom_context(context)
 
         variable_name = "@#{context.to_s.singularize}_list"
+        process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
+
         instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(new_list))
       end
 
       def tagging_contexts
         custom_contexts + self.class.tag_types.map(&:to_s)
+      end
+
+      def process_dirty_object(context,new_list)
+        value = new_list.is_a?(Array) ? new_list.join(', ') : new_list
+        attrib = "#{context.to_s.singularize}_list"
+
+        if changed_attributes.include?(attrib)
+          # The attribute already has an unsaved change.
+          old = changed_attributes[attrib]
+          changed_attributes.delete(attrib) if (old.to_s == value.to_s)
+        else
+          old = tag_list_on(context).to_s
+          changed_attributes[attrib] = old if (old.to_s != value.to_s)
+        end
       end
 
       def reload(*args)

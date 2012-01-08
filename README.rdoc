@@ -141,6 +141,20 @@ Tags can have owners:
     @some_photo.owner_tags_on(nil, :locations) # => Ownerships equivalent to saying @some_photo.locations
     @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations, :skip_save => true) #won't save @some_photo object
 
+=== Dirty objects
+
+    @bobby = User.find_by_name("Bobby")
+    @bobby.skill_list # => ["jogging", "diving"]
+
+    @boddy.skill_list_changed? #=> false
+    @boddy.changes #=> {}
+
+    @bobby.skill_list = "swimming"
+    @bobby.changes.should == {"skill_list"=>["jogging, diving", ["swimming"]]}
+    @boddy.skill_list_changed? #=> true
+
+    @bobby.skill_list_change.should == ["jogging, diving", ["swimming"]]
+
 === Tag cloud calculations
 
 To construct tag clouds, the frequency of each tag needs to be calculated.
