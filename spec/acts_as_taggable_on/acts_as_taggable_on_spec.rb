@@ -453,4 +453,36 @@ describe "Acts As Taggable On" do
       @taggable.taggings.should == []
     end
   end
+
+  describe "@@remove_unused_tags" do
+    before do
+      @taggable = TaggableModel.create(:name => "Bob Jones")
+      @tag = ActsAsTaggableOn::Tag.create(:name => "awesome")
+
+      @tagging = ActsAsTaggableOn::Tagging.create(:taggable => @taggable, :tag => @tag, :context => 'tags')
+    end
+
+    context "if set to true" do
+      before do
+        ActsAsTaggableOn.remove_unused_tags = true
+      end
+
+      it "should remove unused tags after removing taggings" do
+        @tagging.destroy
+        ActsAsTaggableOn::Tag.find_by_name("awesome").should be_nil
+      end
+    end
+
+    context "if set to false" do
+      before do
+        ActsAsTaggableOn.remove_unused_tags = false
+      end
+
+      it "should not remove unused tags after removing taggings" do
+        @tagging.destroy
+        ActsAsTaggableOn::Tag.find_by_name("awesome").should == @tag
+      end
+    end
+  end
+
 end

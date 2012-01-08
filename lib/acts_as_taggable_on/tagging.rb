@@ -24,7 +24,7 @@ module ActsAsTaggableOn
     private
 
     def remove_unused_tags
-      if Tag.remove_unused
+      if ActsAsTaggableOn.remove_unused_tags
         if tag.taggings.count.zero?
           tag.destroy
         end

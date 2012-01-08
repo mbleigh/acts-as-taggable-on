@@ -6,6 +6,29 @@ require "digest/sha1"
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
+module ActsAsTaggableOn
+  mattr_accessor :delimiter
+  @@delimiter = ','
+
+  mattr_accessor :force_lowercase
+  @@force_lowercase = false
+
+  mattr_accessor :force_parameterize
+  @@force_parameterize = false
+
+  mattr_accessor :remove_unused_tags
+  self.remove_unused_tags = false
+
+  def self.glue
+    @@delimiter.ends_with?(" ") ? @@delimiter : "#{@@delimiter} "
+  end
+
+  def self.setup
+    yield self
+  end
+end
+
+
 require "acts_as_taggable_on/utils"
 
 require "acts_as_taggable_on/taggable"
@@ -32,3 +55,4 @@ end
 if defined?(ActionView::Base)
   ActionView::Base.send :include, ActsAsTaggableOn::TagsHelper
 end
+

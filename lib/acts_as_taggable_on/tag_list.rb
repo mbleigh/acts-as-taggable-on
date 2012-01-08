@@ -1,14 +1,13 @@
+require 'active_support/core_ext/module/delegation'
+
 module ActsAsTaggableOn
   class TagList < Array
-    cattr_accessor :delimiter
-    self.delimiter = ','
-
     attr_accessor :owner
 
     def initialize(*args)
       add(*args)
     end
-  
+
     ##
     # Returns a new TagList using the given tag string.
     #
@@ -16,17 +15,16 @@ module ActsAsTaggableOn
     #   tag_list = TagList.from("One , Two,  Three")
     #   tag_list # ["One", "Two", "Three"]
     def self.from(string)
-      glue   = delimiter.ends_with?(" ") ? delimiter : "#{delimiter} "
-      string = string.join(glue) if string.respond_to?(:join)
+      string = string.join(ActsAsTaggableOn.glue) if string.respond_to?(:join)
 
       new.tap do |tag_list|
         string = string.to_s.dup
 
         # Parse the quoted tags
-        string.gsub!(/(\A|#{delimiter})\s*"(.*?)"\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
-        string.gsub!(/(\A|#{delimiter})\s*'(.*?)'\s*(#{delimiter}\s*|\z)/) { tag_list << $2; $3 }
+        string.gsub!(/(\A|#{ActsAsTaggableOn.delimiter})\s*"(.*?)"\s*(#{ActsAsTaggableOn.delimiter}\s*|\z)/) { tag_list << $2; $3 }
+        string.gsub!(/(\A|#{ActsAsTaggableOn.delimiter})\s*'(.*?)'\s*(#{ActsAsTaggableOn.delimiter}\s*|\z)/) { tag_list << $2; $3 }
 
-        tag_list.add(string.split(delimiter))
+        tag_list.add(string.split(ActsAsTaggableOn.delimiter))
       end
     end
 
@@ -69,16 +67,19 @@ module ActsAsTaggableOn
       tags.send(:clean!)
 
       tags.map do |name|
-        name.include?(delimiter) ? "\"#{name}\"" : name
-      end.join(delimiter.ends_with?(" ") ? delimiter : "#{delimiter} ")
+        name.include?(ActsAsTaggableOn.delimiter) ? "\"#{name}\"" : name
+      end.join(ActsAsTaggableOn.glue)
     end
 
     private
-  
+
     # Remove whitespace, duplicates, and blanks.
     def clean!
       reject!(&:blank?)
       map!(&:strip)
+      map!(&:downcase) if ActsAsTaggableOn.force_lowercase
+      map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
+
       uniq!
     end
 

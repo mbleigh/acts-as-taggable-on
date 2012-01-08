@@ -181,13 +181,20 @@ CSS:
   .css3 { font-size: 1.4em; }
   .css4 { font-size: 1.6em; }
 
-== Remove unused tags
+== Configuration
 
 If you would like to remove unused tag objects after removing taggings, add
 
-  ActsAsTaggableOn::Tag.remove_unused = true
+  ActsAsTaggableOn.remove_unused_tags = true
 
-to initializer file.
+If you want force tags to be saved downcased:
+
+  ActsAsTaggableOn.force_lowercase = true
+
+If you want tags to be saved parametrized (you can redefine to_param as well):
+
+  ActsAsTaggableOn.force_parameterize = true
+
 
 == Contributors
 
