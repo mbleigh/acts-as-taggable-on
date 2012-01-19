@@ -103,7 +103,7 @@ module ActsAsTaggableOn::Taggable
           # avoid ambiguous column name
           taggings_context = context ? "_#{context}" : ''
 
-          taggings_alias   = "#{alias_base_name[0..4]}#{taggings_context[0..6]}_taggings_#{sha_prefix(tags.map(&:safe_name).join('_'))}"
+          taggings_alias   = "#{alias_base_name[0..4]}#{taggings_context[0..6]}_taggings_#{sha_prefix(tags.map(&:name).join('_'))}"
 
           tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                           "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
@@ -122,7 +122,7 @@ module ActsAsTaggableOn::Taggable
 
           tags.each do |tag|
 
-            taggings_alias = "#{alias_base_name[0..11]}_taggings_#{sha_prefix(tag.safe_name)}"
+            taggings_alias = "#{alias_base_name[0..11]}_taggings_#{sha_prefix(tag.name)}"
 
             tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                             "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
