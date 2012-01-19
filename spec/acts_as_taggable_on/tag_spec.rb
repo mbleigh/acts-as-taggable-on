@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe ActsAsTaggableOn::Tag do
@@ -37,6 +39,23 @@ describe ActsAsTaggableOn::Tag do
       lambda {
         ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("epic")
       }.should change(ActsAsTaggableOn::Tag, :count).by(1)
+    end
+  end
+
+  unless ActsAsTaggableOn::Tag.using_sqlite?
+    describe "find or create by unicode name" do
+      before(:each) do
+        @tag.name = "привет"
+        @tag.save
+      end
+
+      it "should find by name" do
+        ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("привет").should == @tag
+      end
+
+      it "should find by name case insensitive" do
+        ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("ПРИВЕТ").should == @tag
+      end
     end
   end
 
