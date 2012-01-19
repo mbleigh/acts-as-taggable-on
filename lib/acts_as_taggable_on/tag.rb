@@ -66,14 +66,10 @@ module ActsAsTaggableOn
       read_attribute(:count).to_i
     end
 
-    def safe_name
-      name.gsub(/[^a-zA-Z0-9]/, '')
-    end
-
     class << self
       private
         def comparable_name(str)
-          RUBY_VERSION >= "1.9" ? str.downcase : str.mb_chars.downcase
+          str.mb_chars.downcase.to_s
         end
     end
   end
