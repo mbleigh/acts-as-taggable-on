@@ -30,6 +30,9 @@ class TaggableUser < ActiveRecord::Base
   acts_as_tagger
 end
 
+class InheritingTaggableUser < TaggableUser
+end
+
 class UntaggableModel < ActiveRecord::Base
   belongs_to :taggable_model
 end
