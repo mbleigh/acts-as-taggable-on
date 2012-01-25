@@ -103,10 +103,26 @@ describe "Tagger" do
     @user.is_tagger?.should(be_true)
   end
 
-  it "should skip save if skip_save is passed as option" do
-    lambda {
-      @user.tag(@taggable, :with => 'epic', :on => :tags, :skip_save => true)
-    }.should_not change(ActsAsTaggableOn::Tagging, :count)
+  describe "Single Table Inheritance" do
+    before do
+      @user3 = InheritingTaggableUser.create
+    end
 
+    it "should have taggings" do
+      @user3.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
+      @user3.owned_taggings.size == 2
+    end
+
+    it "should have tags" do
+      @user3.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
+      @user3.owned_tags.size == 2
+    end
+
+    it "should return tags for the inheriting tagger" do
+      @user3.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
+
+      @taggable.tags_from(@user3).sort.should == %w(ruby scheme).sort
+    end
   end
+
 end
