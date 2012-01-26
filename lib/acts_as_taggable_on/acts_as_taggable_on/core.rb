@@ -135,7 +135,7 @@ module ActsAsTaggableOn::Taggable
                     sanitize_sql([
                         "#{taggings_alias}.tagger_id = ? AND #{taggings_alias}.tagger_type = ?",
                         owned_by.id,
-                        owned_by.class.to_s
+                        owned_by.class.base_class.to_s
                     ])
             end
 
