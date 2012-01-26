@@ -120,8 +120,12 @@ describe "Tagger" do
 
     it "should return tags for the inheriting tagger" do
       @user3.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
-
       @taggable.tags_from(@user3).sort.should == %w(ruby scheme).sort
+    end
+
+    it "should scope objects returned by tagged_with by owners" do
+      @user3.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
+      TaggableModel.tagged_with(%w(ruby scheme), :owned_by => @user3).count.should == 1
     end
   end
 
