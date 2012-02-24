@@ -107,6 +107,8 @@ describe ActsAsTaggableOn::Tag do
     @tag.errors[:name].should == ["is too long (maximum is 255 characters)"]
 
     @tag.name = "fgkgnkkgjymkypbuozmwwghblmzpqfsgjasflblywhgkwndnkzeifalfcpeaeqychjuuowlacmuidnnrkprgpcpybarbkrmziqihcrxirlokhnzfvmtzixgvhlxzncyywficpraxfnjptxxhkqmvicbcdcynkjvziefqzyndxkjmsjlvyvbwraklbalykyxoliqdlreeykuphdtmzfdwpphmrqvwvqffojkqhlzvinqajsxbszyvrqqyzusxran"
+    @tag.valid?
+    @tag.errors[:name].should == []
   end
 
   it "should equal a tag with the same name" do
