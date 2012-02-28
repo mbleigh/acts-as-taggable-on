@@ -18,11 +18,22 @@ module ActsAsTaggableOn::Taggable
           tag_type         = tags_type.to_s.singularize
           context_taggings = "#{tag_type}_taggings".to_sym
           context_tags     = tags_type.to_sym
-
+          taggings_order   = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.created_at" : nil)
+          
           class_eval do
-            has_many context_taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "ActsAsTaggableOn::Tagging",
-            :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type]
-            has_many context_tags, :through => context_taggings, :source => :tag, :class_name => "ActsAsTaggableOn::Tag"
+            # when preserving tag order, include order option so that for a 'tags' context
+            # the associations tag_taggings & tags are always returned in created order
+            has_many context_taggings, :as => :taggable,
+                                       :dependent => :destroy,
+                                       :include => :tag,
+                                       :class_name => "ActsAsTaggableOn::Tagging",
+                                       :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type],
+                                       :order => taggings_order
+                                       
+            has_many context_tags, :through => context_taggings,
+                                   :source => :tag,
+                                   :class_name => "ActsAsTaggableOn::Tag",
+                                   :order => taggings_order
           end
 
           class_eval %(
@@ -234,7 +245,11 @@ module ActsAsTaggableOn::Taggable
       ##
       # Returns all tags that are not owned of a given context
       def tags_on(context)
-        base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s]).all
+        scope = base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s])
+        # when preserving tag order, return tags in created order
+        # if we added the order to the association this would always apply
+        scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.created_at") if self.class.preserve_tag_order?
+        scope.all
       end
 
       def set_tag_list_on(context, new_list)
@@ -277,21 +292,38 @@ module ActsAsTaggableOn::Taggable
         tagging_contexts.each do |context|
           next unless tag_list_cache_set_on(context)
 
+          # List of currently assigned tag names
           tag_list = tag_list_cache_on(context).uniq
 
           # Find existing tags or create non-existing tags:
-          tag_list = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
+          tags = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
 
+          # Tag objects for currently assigned tags
           current_tags = tags_on(context)
-          old_tags     = current_tags - tag_list
-          new_tags     = tag_list     - current_tags
+
+          # Tag maintenance based on whether preserving the created order of tags
+          if self.class.preserve_tag_order?
+            # First off order the array of tag objects to match the tag list
+            # rather than existing tags followed by new tags
+            tags = tag_list.map{|l| tags.detect{|t| t.name.downcase == l.downcase}}
+            # To preserve tags in the order in which they were added
+            # delete all current tags and create new tags if the content or order has changed
+            old_tags = (tags == current_tags ? [] : current_tags)
+            new_tags = (tags == current_tags ? [] : tags)
+          else
+            # Delete discarded tags and create new tags
+            old_tags = current_tags - tags
+            new_tags = tags - current_tags
+          end
 
           # Find taggings to remove:
-          old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil,
-                                        :context => context.to_s, :tag_id => old_tags).all
+          if old_tags.present?
+            old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil,
+                                          :context => context.to_s, :tag_id => old_tags).all
+          end
 
+          # Destroy old taggings:
           if old_taggings.present?
-            # Destroy old taggings:
             ActsAsTaggableOn::Tagging.destroy_all "#{ActsAsTaggableOn::Tagging.primary_key}".to_sym => old_taggings.map(&:id)
           end
 
