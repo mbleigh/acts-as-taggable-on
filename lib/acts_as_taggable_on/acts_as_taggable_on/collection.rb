@@ -77,7 +77,7 @@ module ActsAsTaggableOn::Taggable
         ].compact.reverse
         
         ## Generate joins:
-        taggable_join = "INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
+        taggable_join = "INNER JOIN `#{table_name}` ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
         taggable_join << " AND #{table_name}.#{inheritance_column} = '#{name}'" unless descends_from_active_record? # Current model is STI descendant, so add type checking to the join condition      
 
         tagging_joins = [
