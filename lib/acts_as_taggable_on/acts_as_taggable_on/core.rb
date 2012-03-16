@@ -106,7 +106,7 @@ module ActsAsTaggableOn::Taggable
           taggings_alias   = "#{alias_base_name[0..4]}#{taggings_context[0..6]}_taggings_#{sha_prefix(tags.map(&:name).join('_'))}"
 
           tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
-                          "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
+                          "  ON #{taggings_alias}.taggable_id = \"#{table_name}\".#{primary_key}" +
                           " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
           tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
@@ -125,7 +125,7 @@ module ActsAsTaggableOn::Taggable
             taggings_alias = "#{alias_base_name[0..11]}_taggings_#{sha_prefix(tag.name)}"
 
             tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
-                            "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
+                            "  ON #{taggings_alias}.taggable_id = \"#{table_name}\".#{primary_key}" +
                             " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}" +
                             " AND #{taggings_alias}.tag_id = #{tag.id}"
             tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
@@ -147,7 +147,7 @@ module ActsAsTaggableOn::Taggable
 
         if options.delete(:match_all)
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
-                   "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
+                   "  ON #{taggings_alias}.taggable_id = \"#{table_name}\".#{primary_key}" +
                    " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
 
 
