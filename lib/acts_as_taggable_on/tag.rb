@@ -17,11 +17,11 @@ module ActsAsTaggableOn
     ### SCOPES:
 
     def self.named(name)
-      where(["name #{like_operator} ? ESCAPE '!'", escape_like(name)])
+      where(["lower(name) = ?", name.downcase])
     end
 
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["name #{like_operator} ? ESCAPE '!'", escape_like(tag.to_s)]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.downcase]) }.join(" OR "))
     end
 
     def self.named_like(name)
