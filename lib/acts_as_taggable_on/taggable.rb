@@ -64,6 +64,9 @@ module ActsAsTaggableOn
       # as it's not possible to add another arguement to the method
       # without the tag_types being enclosed in square brackets
       #
+      # NB: method overridden in core module in order to create tag type
+      #     associations and methods after this logic has executed
+      #
       def taggable_on(preserve_tag_order, *tag_types)
         tag_types = tag_types.to_a.flatten.compact.map(&:to_sym)
 
