@@ -3,10 +3,37 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe "Taggable To Preserve Order" do
   before(:each) do
     clean_database!
-    TaggableModel.tag_types = []
-    TaggableModel.acts_as_ordered_taggable_on(:tags)
-    @taggable = TaggableModel.new(:name => "Bob Jones")
-    @taggables = [@taggable, TaggableModel.new(:name => "John Doe")]
+    @taggable = OrderedTaggableModel.new(:name => "Bob Jones")
+  end
+  
+  it "should have tag types" do
+    [:tags, :colours].each do |type|
+      OrderedTaggableModel.tag_types.should include type
+    end
+
+    @taggable.tag_types.should == OrderedTaggableModel.tag_types
+  end
+  
+  it "should have tag associations" do
+    [:tags, :colours].each do |type|
+      @taggable.respond_to?(type).should be_true
+      @taggable.respond_to?("#{type.to_s.singularize}_taggings").should be_true
+    end
+  end
+  
+  it "should have tag associations ordered by created_at" do
+    [:tags, :colours].each do |type|
+      OrderedTaggableModel.reflect_on_association(type).options[:order].should include('created_at')
+      OrderedTaggableModel.reflect_on_association("#{type.to_s.singularize}_taggings".to_sym).options[:order].should include('created_at')
+    end
+  end
+  
+  it "should have tag methods" do
+    [:tags, :colours].each do |type|
+      @taggable.respond_to?("#{type.to_s.singularize}_list").should be_true
+      @taggable.respond_to?("#{type.to_s.singularize}_list=").should be_true
+      @taggable.respond_to?("all_#{type.to_s}_list").should be_true
+    end
   end
 
   it "should return tag list in the order the tags were created" do
@@ -67,8 +94,6 @@ end
 describe "Taggable" do
   before(:each) do
     clean_database!
-    TaggableModel.tag_types = []
-    TaggableModel.acts_as_taggable_on(:tags, :languages, :skills, :needs, :offerings)
     @taggable = TaggableModel.new(:name => "Bob Jones")
     @taggables = [@taggable, TaggableModel.new(:name => "John Doe")]
   end
