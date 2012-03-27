@@ -52,11 +52,11 @@ module ActsAsTaggableOn::Taggable
         end
       end
 
-      def acts_as_taggable_on(*args)
-        super(*args)
+      def taggable_on(preserve_tag_order, *tag_types)
+        super(preserve_tag_order, *tag_types)
         initialize_acts_as_taggable_on_core
       end
-
+      
       # all column names are necessary for PostgreSQL group clause
       def grouped_column_names_for(object)
         object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
