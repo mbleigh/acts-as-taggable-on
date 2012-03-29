@@ -68,14 +68,14 @@ To preserve the order in which tags are created use acts_as_ordered_taggable:
 	end
 
 	@user = User.new(:name => "Bobby")
-	@user.tag_list = "south, east"
+	@user.tag_list = "east, south"
 	@user.save
 
-	@user.tag_list = "north, south, east, west"
+	@user.tag_list = "north, east, south, west"
 	@user.save
 	
 	@user.reload
-	@user.tag_list => ["north", "south", "east", "west"] 
+	@user.tag_list => ["north", "east", "south", "west"] 
 
 
 === Finding Tagged Objects
