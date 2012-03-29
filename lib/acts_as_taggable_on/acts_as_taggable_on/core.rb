@@ -164,7 +164,6 @@ module ActsAsTaggableOn::Taggable
 
           group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
           group = group_columns
-          group = "#{group_columns}"
           having = "COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
 
