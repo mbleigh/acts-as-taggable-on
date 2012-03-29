@@ -61,21 +61,21 @@ directory, you can run the specs for RoR 3.x with:
 
 To preserve the order in which tags are created use acts_as_ordered_taggable:
 
-	class User < ActiveRecord::Base
-	  # Alias for <tt>acts_as_ordered_taggable_on :tags</tt>:
-	  acts_as_ordered_taggable
-	  acts_as_ordered_taggable_on :skills, :interests
-	end
+    class User < ActiveRecord::Base
+      # Alias for <tt>acts_as_ordered_taggable_on :tags</tt>:
+      acts_as_ordered_taggable
+      acts_as_ordered_taggable_on :skills, :interests
+    end
 
-	@user = User.new(:name => "Bobby")
-	@user.tag_list = "east, south"
-	@user.save
+    @user = User.new(:name => "Bobby")
+    @user.tag_list = "east, south"
+    @user.save
 
-	@user.tag_list = "north, east, south, west"
-	@user.save
-	
-	@user.reload
-	@user.tag_list => ["north", "east", "south", "west"] 
+    @user.tag_list = "north, east, south, west"
+    @user.save
+
+    @user.reload
+    @user.tag_list # => ["north", "east", "south", "west"] 
 
 
 === Finding Tagged Objects
