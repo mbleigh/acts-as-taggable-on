@@ -21,10 +21,10 @@ describe "Taggable To Preserve Order" do
     end
   end
   
-  it "should have tag associations ordered by created_at" do
+  it "should have tag associations ordered by id" do
     [:tags, :colours].each do |type|
-      OrderedTaggableModel.reflect_on_association(type).options[:order].should include('created_at')
-      OrderedTaggableModel.reflect_on_association("#{type.to_s.singularize}_taggings".to_sym).options[:order].should include('created_at')
+      OrderedTaggableModel.reflect_on_association(type).options[:order].should include('id')
+      OrderedTaggableModel.reflect_on_association("#{type.to_s.singularize}_taggings".to_sym).options[:order].should include('id')
     end
   end
   
@@ -85,9 +85,27 @@ describe "Taggable To Preserve Order" do
     # update
     @taggable.tag_list = "rails, ruby, css, pow"
     @taggable.save
-        
+    
     @taggable.reload
     @taggable.tags.map{|t| t.name}.should == %w(rails ruby css pow)
+  end
+  
+  it "should return tag objects in tagging id order" do
+    # create
+    @taggable.tag_list = "pow, ruby, rails"
+    @taggable.save
+    
+    @taggable.reload
+    ids = @taggable.tags.map{|t| t.taggings.first.id}
+    ids.should == ids.sort
+    
+    # update
+    @taggable.tag_list = "rails, ruby, css, pow"
+    @taggable.save
+    
+    @taggable.reload
+    ids = @taggable.tags.map{|t| t.taggings.first.id}
+    ids.should == ids.sort
   end
 end
 

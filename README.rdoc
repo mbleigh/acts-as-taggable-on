@@ -59,6 +59,25 @@ directory, you can run the specs for RoR 3.x with:
     User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
     @frankie.skill_counts
 
+To preserve the order in which tags are created use acts_as_ordered_taggable:
+
+	class User < ActiveRecord::Base
+	  # Alias for <tt>acts_as_ordered_taggable_on :tags</tt>:
+	  acts_as_ordered_taggable
+	  acts_as_ordered_taggable_on :skills, :interests
+	end
+
+	@user = User.new(:name => "Bobby")
+	@user.tag_list = "east, south"
+	@user.save
+
+	@user.tag_list = "north, east, south, west"
+	@user.save
+	
+	@user.reload
+	@user.tag_list => ["north", "east", "south", "west"] 
+
+
 === Finding Tagged Objects
 
 Acts As Taggable On utilizes named_scopes to create an association for tags.
