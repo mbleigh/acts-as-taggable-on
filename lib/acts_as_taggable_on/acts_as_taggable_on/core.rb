@@ -18,7 +18,7 @@ module ActsAsTaggableOn::Taggable
           tag_type         = tags_type.to_s.singularize
           context_taggings = "#{tag_type}_taggings".to_sym
           context_tags     = tags_type.to_sym
-          taggings_order   = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.created_at" : nil)
+          taggings_order   = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.id" : nil)
           
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
@@ -248,7 +248,7 @@ module ActsAsTaggableOn::Taggable
         scope = base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s])
         # when preserving tag order, return tags in created order
         # if we added the order to the association this would always apply
-        scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.created_at") if self.class.preserve_tag_order?
+        scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
         scope.all
       end
 
