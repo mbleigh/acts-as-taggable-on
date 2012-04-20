@@ -114,7 +114,9 @@ module ActsAsTaggableOn::Taggable
           # avoid ambiguous column name
           taggings_context = context ? "_#{context}" : ''
 
-          taggings_alias   = "#{alias_base_name[0..4]}#{taggings_context[0..6]}_taggings_#{sha_prefix(tags.map(&:name).join('_'))}"
+          taggings_alias   = adjust_taggings_alias(
+            "#{alias_base_name[0..4]}#{taggings_context[0..6]}_taggings_#{sha_prefix(tags.map(&:name).join('_'))}"
+          )
 
           tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                           "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
@@ -133,7 +135,7 @@ module ActsAsTaggableOn::Taggable
 
           tags.each do |tag|
 
-            taggings_alias = "#{alias_base_name[0..11]}_taggings_#{sha_prefix(tag.name)}"
+            taggings_alias = adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{sha_prefix(tag.name)}")
 
             tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                             "  ON #{taggings_alias}.taggable_id = #{table_name}.#{primary_key}" +
@@ -154,7 +156,7 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
-        taggings_alias, tags_alias = "#{alias_base_name}_taggings_group", "#{alias_base_name}_tags_group"
+        taggings_alias, tags_alias = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
 
         if options.delete(:match_all)
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
@@ -176,6 +178,13 @@ module ActsAsTaggableOn::Taggable
 
       def is_taggable?
         true
+      end
+
+      def adjust_taggings_alias(taggings_alias)
+        if taggings_alias.size > 75
+          taggings_alias = 'taggings_alias_' + Digest::SHA1.hexdigest(taggings_alias)
+        end
+        taggings_alias
       end
     end
 
