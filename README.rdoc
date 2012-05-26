@@ -24,7 +24,7 @@ Not supported any more! It is time for update guys.
 
 To use it, add it to your Gemfile:
 
-  gem 'acts-as-taggable-on', '~> 2.2.2'
+  gem 'acts-as-taggable-on', '~> 2.3.1'
 
 ==== Post Installation
 
