@@ -35,7 +35,7 @@ class UntaggableModel < ActiveRecord::Base
 end
 
 class NonStandardIdTaggableModel < ActiveRecord::Base
-  set_primary_key "an_id"
+  primary_key = "an_id"
   acts_as_taggable
   acts_as_taggable_on :languages
   acts_as_taggable_on :skills
