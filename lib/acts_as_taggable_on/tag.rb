@@ -21,7 +21,7 @@ module ActsAsTaggableOn
     end
 
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.downcase]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
     end
 
     def self.named_like(name)
