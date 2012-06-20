@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     include ActsAsTaggableOn::Utils
@@ -29,7 +31,7 @@ module ActsAsTaggableOn
     end
 
     def self.named_like_any(list)
-      where(list.map { |tag| sanitize_sql(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(tag.to_s)}%"]) }.join(" OR "))
+      where(list.map { |tag| sanitize_sql(["#{remove_accents('name')} #{like_operator} #{remove_accents('?')} ESCAPE '!'", "%#{escape_like(tag.to_s)}%"]) }.join(" OR "))
     end
 
     ### CLASS METHODS:
@@ -71,6 +73,10 @@ module ActsAsTaggableOn
       private
         def comparable_name(str)
           str.mb_chars.downcase.to_s
+        end
+
+        def remove_accents(str)
+          %{translate(lower(#{str}),'âãäåāăąèééêëēĕėęěìíîïìĩīĭóôõöōŏőùúûüũūŭůçćčĉċ','aaaaaaaeeeeeeeeeeiiiiiiiiooooooouuuuuuuccccc')}
         end
     end
   end

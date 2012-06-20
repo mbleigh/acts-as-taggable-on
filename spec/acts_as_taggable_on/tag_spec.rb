@@ -14,10 +14,15 @@ describe ActsAsTaggableOn::Tag do
       ActsAsTaggableOn::Tag.create(:name => "Awesome")
       ActsAsTaggableOn::Tag.create(:name => "awesome")
       ActsAsTaggableOn::Tag.create(:name => "epic")
+      ActsAsTaggableOn::Tag.create(:name => "cliché")
     end
 
     it "should find both tags" do
       ActsAsTaggableOn::Tag.named_like_any(["awesome", "epic"]).should have(3).items
+    end
+
+    it "should find tags ignoring accents" do
+      ActsAsTaggableOn::Tag.named_like_any(["epíc", "cliche"]).should have(2).items
     end
   end
 
