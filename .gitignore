@@ -8,3 +8,4 @@ spec/database.yml
 tmp*.sw?
 *.sw?
 tmp
+*.gem

@@ -21,10 +21,12 @@ module ActsAsTaggableOn
         string = string.to_s.dup
 
         # Parse the quoted tags
-        string.gsub!(/(\A|#{ActsAsTaggableOn.delimiter})\s*"(.*?)"\s*(#{ActsAsTaggableOn.delimiter}\s*|\z)/) { tag_list << $2; $3 }
-        string.gsub!(/(\A|#{ActsAsTaggableOn.delimiter})\s*'(.*?)'\s*(#{ActsAsTaggableOn.delimiter}\s*|\z)/) { tag_list << $2; $3 }
+        d = ActsAsTaggableOn.delimiter
+        d = d.join("|") if d.kind_of?(Array) 
+        string.gsub!(/(\A|#{d})\s*"(.*?)"\s*(#{d}\s*|\z)/) { tag_list << $2; $3 }
+        string.gsub!(/(\A|#{d})\s*'(.*?)'\s*(#{d}\s*|\z)/) { tag_list << $2; $3 }
 
-        tag_list.add(string.split(ActsAsTaggableOn.delimiter))
+        tag_list.add(string.split(Regexp.new d))
       end
     end
 
@@ -67,7 +69,9 @@ module ActsAsTaggableOn
       tags.send(:clean!)
 
       tags.map do |name|
-        name.include?(ActsAsTaggableOn.delimiter) ? "\"#{name}\"" : name
+        d = ActsAsTaggableOn.delimiter
+        d = Regexp.new d.join("|") if d.kind_of? Array
+        name.index(d) ? "\"#{name}\"" : name
       end.join(ActsAsTaggableOn.glue)
     end
 
