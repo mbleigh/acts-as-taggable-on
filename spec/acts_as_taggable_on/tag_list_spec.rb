@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe ActsAsTaggableOn::TagList do
@@ -90,4 +91,36 @@ describe ActsAsTaggableOn::TagList do
     end
 
   end
+
+  describe "Multiple Delimiter" do
+    before do 
+      @old_delimiter = ActsAsTaggableOn.delimiter
+    end
+
+    after do 
+      ActsAsTaggableOn.delimiter = @old_delimiter
+    end
+
+    it "should separate tags by delimiters" do
+      ActsAsTaggableOn.delimiter = [',', ' ', '\|']
+      tag_list = ActsAsTaggableOn::TagList.from "cool, data|I have"
+      tag_list.to_s.should == 'cool, data, I, have'
+    end
+
+    it "should escape quote" do 
+      ActsAsTaggableOn.delimiter = [',', ' ', '\|']
+      tag_list = ActsAsTaggableOn::TagList.from "'I have'|cool, data"
+      tag_list.to_s.should == '"I have", cool, data'
+
+      tag_list = ActsAsTaggableOn::TagList.from '"I, have"|cool, data'
+      tag_list.to_s.should == '"I, have", cool, data'
+    end
+
+    it "should work for utf8 delimiter and long delimiter" do 
+      ActsAsTaggableOn.delimiter = ['，', '的', '可能是']
+      tag_list = ActsAsTaggableOn::TagList.from "我的东西可能是不见了，还好有备份"
+      tag_list.to_s.should == "我， 东西， 不见了， 还好有备份"
+    end
+  end
+
 end
