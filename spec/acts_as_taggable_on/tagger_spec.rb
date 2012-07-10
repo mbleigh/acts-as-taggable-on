@@ -107,6 +107,32 @@ describe "Tagger" do
     lambda {
       @user.tag(@taggable, :with => 'epic', :on => :tags, :skip_save => true)
     }.should_not change(ActsAsTaggableOn::Tagging, :count)
-
   end
+
+  describe "Single Table Inheritance" do
+    before do
+      @user3 = InheritingTaggableUser.create
+    end
+
+    it "should have taggings" do
+      @user3.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
+      @user3.owned_taggings.size == 2
+    end
+
+    it "should have tags" do
+      @user3.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
+      @user3.owned_tags.size == 2
+    end
+
+    it "should return tags for the inheriting tagger" do
+      @user3.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
+      @taggable.tags_from(@user3).sort.should == %w(ruby scheme).sort
+    end
+
+    it "should scope objects returned by tagged_with by owners" do
+      @user3.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
+      TaggableModel.tagged_with(%w(ruby scheme), :owned_by => @user3).count.should == 1
+    end
+  end
+
 end
