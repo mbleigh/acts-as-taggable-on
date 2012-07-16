@@ -21,15 +21,15 @@ module ActsAsTaggableOn
     end
 
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
-    end
-
-    def self.named_like(name)
-      where(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(name)}%"])
+      where(list.map { |tag| sanitize_sql(["lower(name) = #{using_mysql? ? 'BINARY(?)' : '?' }", tag.to_s.mb_chars.downcase]) }.join(" OR "))
     end
 
     def self.named_like_any(list)
       where(list.map { |tag| sanitize_sql(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(tag.to_s)}%"]) }.join(" OR "))
+    end
+
+    def self.named_like(name)
+      where(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(name)}%"])
     end
 
     ### CLASS METHODS:
