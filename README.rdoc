@@ -228,6 +228,9 @@ If you want tags to be saved parametrized (you can redefine to_param as well):
 
   ActsAsTaggableOn.force_parameterize = true
 
+If you would like tags to be case-sensitive and not use LIKE queries for creation:
+
+  ActsAsTaggableOn.strict_case_match = true
 
 == Contributors
 
