@@ -100,8 +100,8 @@ module ActsAsTaggableOn::Taggable
         tag_conditions.each     { |condition| tag_scope     = tag_scope.where(condition)     }
 
         # GROUP BY and HAVING clauses:
-        at_least  = sanitize_sql(['tags_count >= ?', options.delete(:at_least)]) if options[:at_least]
-        at_most   = sanitize_sql(['tags_count <= ?', options.delete(:at_most)]) if options[:at_most]
+        at_least  = sanitize_sql(["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) >= ?", options.delete(:at_least)]) if options[:at_least]
+        at_most   = sanitize_sql(["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) <= ?", options.delete(:at_most)]) if options[:at_most]
         having    = ["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) > 0", at_least, at_most].compact.join(' AND ')    
 
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
