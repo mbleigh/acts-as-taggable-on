@@ -5,8 +5,10 @@ module ActsAsTaggableOn
     attr_accessible :name
 
     ### ASSOCIATIONS:
-
-    has_many :taggings, :dependent => :destroy, :class_name => 'ActsAsTaggableOn::Tagging'
+    
+    class_attribute :tagging_class
+    self.tagging_class ||= "ActsAsTaggableOn::Tagging"
+    has_many :taggings, :dependent => :destroy, :class_name => tagging_class
 
     ### VALIDATIONS:
 

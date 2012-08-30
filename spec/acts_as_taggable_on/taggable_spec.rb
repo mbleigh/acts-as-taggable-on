@@ -1,5 +1,81 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
+describe "Applying Taggable Options" do
+  describe "without overriding tag_class and tagging_class" do
+    before :each do
+      clean_database!
+      @taggable = TaggableModel.new
+    end
+    it "should have applied the defaults" do
+      @taggable.class.tagging_class.should == "ActsAsTaggableOn::Tagging"
+      @taggable.class.tag_class.should == "ActsAsTaggableOn::Tag"
+    end
+  end
+
+  describe "customizing the tagging" do
+    before :each do
+      clean_database!
+      @taggable = TaggableModelCustomized.new
+      @taggable.skill_list = ["sewing","cooking"]
+      @taggable.save 
+    end
+
+    describe "specifying the tagging class and tag class" do
+      it "should have the custom classes" do
+        @taggable.class.tagging_class.should == "Tagging"
+        @taggable.class.tag_class.should == "Tag"
+      end
+
+      it "should have informed the tagging class about the tag class" do
+        Tagging.tag_class.should == "Tag"
+      end
+    end
+
+    describe "returning the tags" do
+      
+      it "should have used the right join model" do
+        @taggable.skills.first.taggings.first.should be_a_kind_of(Tagging)
+      end
+
+      it "should always return models from the specified type" do
+        @taggable.skills.first.should be_a_kind_of(Tag)
+      end
+    end
+
+
+  describe "customizing the model that should be returned from the tag lists" do
+    describe "setting the option as a hash" do
+      it "should have the option available " do
+        @taggable.tag_type_options.should == {:groups => "Group"} 
+      end
+    end
+
+    describe "returning the model" do
+      before :each do
+          @taggable.group_list = ["managers","friends"]
+          @taggable.skill_list = ["ruby"]
+          @taggable.save
+      end
+      it "should ownly return models from type group for groups" do
+        @taggable.groups.first.should be_a_kind_of(Group)
+      end
+      it "should still return normal tags for skills" do
+        @taggable.skills.first.should be_a_kind_of(Tag)
+      end
+    end
+
+  end
+
+
+
+  end
+
+
+end
+
+
+
+
 describe "Taggable To Preserve Order" do
   before(:each) do
     clean_database!
