@@ -31,7 +31,7 @@ module ActsAsTaggableOn
 
     module InstanceMethods
       ##
-      # Tag a taggable model with tags that are owned by the tagger. 
+      # Tag a taggable model with tags that are owned by the tagger.
       #
       # @param taggable The object that will be tagged
       # @param [Hash] options An hash with options. Available options are:
@@ -42,7 +42,7 @@ module ActsAsTaggableOn
       #   @user.tag(@photo, :with => "paris, normandy", :on => :locations)
       def tag(taggable, opts={})
         opts.reverse_merge!(:force => true)
-
+        skip_save = opts.delete(:skip_save)
         return false unless taggable.respond_to?(:is_taggable?) && taggable.is_taggable?
 
         raise "You need to specify a tag context using :on"                unless opts.has_key?(:on)
@@ -50,7 +50,7 @@ module ActsAsTaggableOn
         raise "No context :#{opts[:on]} defined in #{taggable.class.to_s}" unless (opts[:force] || taggable.tag_types.include?(opts[:on]))
 
         taggable.set_owner_tag_list_on(self, opts[:on].to_s, opts[:with])
-        taggable.save
+        taggable.save unless skip_save
       end
 
       def is_tagger?
