@@ -54,6 +54,22 @@ module ActsAsTaggableOn
       taggable_on(true, tag_types)
     end
     
+    #
+    # Set the base class used for tagging
+    # If you change that, you have to subclass it from
+    # ActsAsTaggableOn::Tagging
+    #
+    def set_tagging_class(klass)
+      class_attribute :tagging_class
+      self.tagging_class = klass
+    end
+
+
+    def set_tag_class(klass)
+      class_attribute :tag_class
+      self.tag_class = klass
+    end
+
     private
     
       # Make a model taggable on specified contexts
@@ -68,8 +84,18 @@ module ActsAsTaggableOn
       #     associations and methods after this logic has executed
       #
       def taggable_on(preserve_tag_order, *tag_types)
-        tag_types = tag_types.to_a.flatten.compact.map(&:to_sym)
-
+        
+        unless respond_to?(:tagging_class) && tagging_class
+          set_tagging_class("ActsAsTaggableOn::Tagging")
+        end
+        unless respond_to?(:tag_class) && tag_class
+          set_tag_class("ActsAsTaggableOn::Tag")
+        end
+        
+        class_attribute :tag_type_options unless respond_to?(:tag_type_options)
+        self.tag_type_options ||= {}
+        extract_tag_type_options!(tag_types)
+       
         if taggable?
           self.tag_types = (self.tag_types + tag_types).uniq
           self.preserve_tag_order = preserve_tag_order
@@ -79,9 +105,8 @@ module ActsAsTaggableOn
           class_attribute :preserve_tag_order
           self.preserve_tag_order = preserve_tag_order
         
+ 
           class_eval do
-            has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "ActsAsTaggableOn::Tagging"
-            has_many :base_tags, :through => :taggings, :source => :tag, :class_name => "ActsAsTaggableOn::Tag"
 
             def self.taggable?
               true
@@ -96,6 +121,30 @@ module ActsAsTaggableOn
             include ActsAsTaggableOn::Taggable::Dirty
           end
         end
+        prepare_tag_class!
+        prepare_tagging_class!
+      end
+
+
+      def extract_tag_type_options!(tag_types)
+        tag_types.flatten!
+        tag_types.compact!
+        tag_types.map! {|tt|
+          if tt.kind_of?(Hash)
+            tag_type_options[tt.keys.first] = tt.values.first
+            tt.keys.first              
+          else
+            tt
+          end
+          }
+      end
+      
+      def prepare_tag_class!
+        tag_class.constantize.tagging_class = self.tagging_class
+      end
+
+      def prepare_tagging_class!
+        tagging_class.constantize.tag_class = self.tag_class
       end
 
   end

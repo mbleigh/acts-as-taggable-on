@@ -6,6 +6,29 @@ class TaggableModel < ActiveRecord::Base
   has_many :untaggable_models
 end
 
+
+class Tag < ActsAsTaggableOn::Tag
+end
+
+class Tagging < ActsAsTaggableOn::Tagging
+end
+
+class Group < Tag
+
+end
+
+
+class TaggableModelCustomized < ActiveRecord::Base
+  set_tagging_class "Tagging"
+  set_tag_class "Tag"
+
+  acts_as_taggable
+  acts_as_taggable_on :languages, :skills, :needs, :offerings
+
+  acts_as_taggable_on(:groups => "Group")
+end
+
+
 class CachedModel < ActiveRecord::Base
   acts_as_taggable
 end

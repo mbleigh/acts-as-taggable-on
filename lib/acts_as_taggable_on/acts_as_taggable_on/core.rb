@@ -14,11 +14,19 @@ module ActsAsTaggableOn::Taggable
 
     module ClassMethods
       def initialize_acts_as_taggable_on_core
+
+        class_eval do
+            has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => tagging_class
+            has_many :base_tags, :through => :taggings, :source => :tag, :class_name => tag_class
+
+        end
+
         tag_types.map(&:to_s).each do |tags_type|
           tag_type         = tags_type.to_s.singularize
           context_taggings = "#{tag_type}_taggings".to_sym
           context_tags     = tags_type.to_sym
-          taggings_order   = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.id" : nil)
+          context_class_name = tag_type_options[context_tags] || tag_class 
+          taggings_order   = (preserve_tag_order? ? "#{tagging_class.constantize.table_name}.id" : nil)
           
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
@@ -26,13 +34,14 @@ module ActsAsTaggableOn::Taggable
             has_many context_taggings, :as => :taggable,
                                        :dependent => :destroy,
                                        :include => :tag,
-                                       :class_name => "ActsAsTaggableOn::Tagging",
-                                       :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type],
+                                       :class_name => tagging_class,
+                                       :conditions => ["#{tagging_class.constantize.table_name}.context = ?", tags_type],
                                        :order => taggings_order
                                        
+
             has_many context_tags, :through => context_taggings,
                                    :source => :tag,
-                                   :class_name => "ActsAsTaggableOn::Tag",
+                                   :class_name => context_class_name,
                                    :order => taggings_order
           end
 
@@ -57,6 +66,8 @@ module ActsAsTaggableOn::Taggable
         initialize_acts_as_taggable_on_core
       end
       
+      
+
       # all column names are necessary for PostgreSQL group clause
       def grouped_column_names_for(object)
         object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
