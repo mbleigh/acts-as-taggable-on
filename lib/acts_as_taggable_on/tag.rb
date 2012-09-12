@@ -17,11 +17,19 @@ module ActsAsTaggableOn
     ### SCOPES:
 
     def self.named(name)
-      where(["lower(name) = ?", name.downcase])
+      if ActsAsTaggableOn.strict_case_match
+        where(["name = ?", name])
+      else
+        where(["lower(name) = ?", name.downcase])
+      end
     end
 
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
+      if ActsAsTaggableOn.strict_case_match
+        where(list.map { |tag| sanitize_sql(["name = ?", tag.to_s.mb_chars]) }.join(" OR "))
+      else
+        where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
+      end
     end
 
     def self.named_like(name)
@@ -35,7 +43,11 @@ module ActsAsTaggableOn
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
-      named_like(name).first || create(:name => name)
+      if (ActsAsTaggableOn.strict_case_match)
+        self.find_or_create_all_with_like_by_name([name]).first
+      else
+        named_like(name).first || create(:name => name)
+      end
     end
 
     def self.find_or_create_all_with_like_by_name(*list)
@@ -45,9 +57,9 @@ module ActsAsTaggableOn
 
       existing_tags = Tag.named_any(list).all
       new_tag_names = list.reject do |name|
-                        name = comparable_name(name)
-                        existing_tags.any? { |tag| comparable_name(tag.name) == name }
-                      end
+        name = comparable_name(name)
+        existing_tags.any? { |tag| comparable_name(tag.name) == name }
+      end
       created_tags  = new_tag_names.map { |name| Tag.create(:name => name) }
 
       existing_tags + created_tags
@@ -69,9 +81,9 @@ module ActsAsTaggableOn
 
     class << self
       private
-        def comparable_name(str)
-          str.mb_chars.downcase.to_s
-        end
+      def comparable_name(str)
+        str.mb_chars.downcase.to_s
+      end
     end
   end
 end

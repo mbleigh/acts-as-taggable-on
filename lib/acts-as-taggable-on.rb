@@ -16,6 +16,9 @@ module ActsAsTaggableOn
   mattr_accessor :force_parameterize
   @@force_parameterize = false
 
+  mattr_accessor :strict_case_match
+  @@strict_case_match = false
+
   mattr_accessor :remove_unused_tags
   self.remove_unused_tags = false
 
