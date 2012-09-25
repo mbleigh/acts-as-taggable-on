@@ -89,8 +89,8 @@ compatibility with the will_paginate gem:
       scope :by_join_date, order("created_at DESC")
     end
 
-    User.tagged_with("awesome").by_date
-    User.tagged_with("awesome").by_date.paginate(:page => params[:page], :per_page => 20)
+    User.tagged_with("awesome").by_join_date
+    User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
     # Find a user with matching all tags, not just one
     User.tagged_with(["awesome", "cool"], :match_all => true)
