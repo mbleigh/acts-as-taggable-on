@@ -20,7 +20,7 @@ class ActsAsTaggableOnMigration < ActiveRecord::Migration
     end
 
     add_index :taggings, :tag_id
-    add_index :taggings, [:taggable_id, :taggable_type, :context]
+    add_index :taggings, [:taggable_id, :taggable_type, :tag_id, :context], :name => "index_taggings_on_keys"
   end
 
   def self.down
