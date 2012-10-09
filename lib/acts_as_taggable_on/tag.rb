@@ -18,7 +18,7 @@ module ActsAsTaggableOn
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
-        where(["name = ?", name])
+        where(["name = #{binary}?", name])
       else
         where(["lower(name) = ?", name.downcase])
       end
@@ -26,7 +26,7 @@ module ActsAsTaggableOn
 
     def self.named_any(list)
       if ActsAsTaggableOn.strict_case_match
-        where(list.map { |tag| sanitize_sql(["name = ?", tag.to_s.mb_chars]) }.join(" OR "))
+        where(list.map { |tag| sanitize_sql(["name = #{binary}?", tag.to_s.mb_chars]) }.join(" OR "))
       else
         where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
       end
@@ -81,8 +81,13 @@ module ActsAsTaggableOn
 
     class << self
       private
+
       def comparable_name(str)
         str.mb_chars.downcase.to_s
+      end
+
+      def binary
+        /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
       end
     end
   end
