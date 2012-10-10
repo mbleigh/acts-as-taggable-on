@@ -155,6 +155,7 @@ Tags can have owners:
     @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations)
     @some_user.owned_taggings
     @some_user.owned_tags
+    Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
     @some_photo.locations_from(@some_user) # => ["paris", "normandy"]
     @some_photo.owner_tags_on(@some_user, :locations) # => [#<ActsAsTaggableOn::Tag id: 1, name: "paris">...]
     @some_photo.owner_tags_on(nil, :locations) # => Ownerships equivalent to saying @some_photo.locations
