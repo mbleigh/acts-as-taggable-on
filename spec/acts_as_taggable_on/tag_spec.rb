@@ -153,6 +153,8 @@ describe ActsAsTaggableOn::Tag do
   describe "when using strict_case_match" do
     before do
       ActsAsTaggableOn.strict_case_match = true
+      @tag.name = "awesome"
+      @tag.save!
     end
 
     after do
@@ -164,17 +166,18 @@ describe ActsAsTaggableOn::Tag do
     end
 
     it "should find by name case sensitively" do
-      tag_count = ActsAsTaggableOn::Tag.count
-      tag       = ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("AWESOME")
+      expect {
+        ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("AWESOME")
+      }.to change(ActsAsTaggableOn::Tag, :count)
 
-      ActsAsTaggableOn::Tag.count.should == tag_count + 1
-      tag.name.should == "AWESOME"
+      ActsAsTaggableOn::Tag.last.name.should == "AWESOME"
     end
 
     it "should have a named_scope named(something) that matches exactly" do
       uppercase_tag = ActsAsTaggableOn::Tag.create(:name => "Cool")
       @tag.name     = "cool"
       @tag.save!
+
       ActsAsTaggableOn::Tag.named('cool').should include(@tag)
       ActsAsTaggableOn::Tag.named('cool').should_not include(uppercase_tag)
     end
