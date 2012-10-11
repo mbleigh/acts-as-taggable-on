@@ -37,7 +37,7 @@ module ActsAsTaggableOn::Taggable
                                    :order => taggings_order
           end
 
-          taggable_mixin.class_eval %(
+          taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{tag_type}_list
               tag_list_on('#{tags_type}')
             end
@@ -49,7 +49,7 @@ module ActsAsTaggableOn::Taggable
             def all_#{tags_type}_list
               all_tags_list_on('#{tags_type}')
             end
-          )
+          RUBY
         end
       end
 

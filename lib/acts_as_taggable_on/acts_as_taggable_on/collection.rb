@@ -9,7 +9,7 @@ module ActsAsTaggableOn::Taggable
     module ClassMethods
       def initialize_acts_as_taggable_on_collection
         tag_types.map(&:to_s).each do |tag_type|
-          class_eval %(
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def self.#{tag_type.singularize}_counts(options={})
               tag_counts_on('#{tag_type}', options)
             end
@@ -25,7 +25,7 @@ module ActsAsTaggableOn::Taggable
             def self.top_#{tag_type}(limit = 10)
               tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
             end        
-          )
+          RUBY
         end        
       end
       
