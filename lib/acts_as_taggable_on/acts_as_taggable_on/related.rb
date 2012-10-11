@@ -9,7 +9,7 @@ module ActsAsTaggableOn::Taggable
     module ClassMethods
       def initialize_acts_as_taggable_on_related
         tag_types.map(&:to_s).each do |tag_type|
-          class_eval %(
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def find_related_#{tag_type}(options = {})
               related_tags_for('#{tag_type}', self.class, options)
             end
@@ -18,11 +18,11 @@ module ActsAsTaggableOn::Taggable
             def find_related_#{tag_type}_for(klass, options = {})
               related_tags_for('#{tag_type}', klass, options)
             end
-          )
+          RUBY
         end
 
         unless tag_types.empty?
-          class_eval %(
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def find_matching_contexts(search_context, result_context, options = {})
               matching_contexts_for(search_context.to_s, result_context.to_s, self.class, options)
             end
@@ -30,7 +30,7 @@ module ActsAsTaggableOn::Taggable
             def find_matching_contexts_for(klass, search_context, result_context, options = {})
               matching_contexts_for(search_context.to_s, result_context.to_s, klass, options)
             end
-          )
+          RUBY
         end
       end
 
