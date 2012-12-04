@@ -215,12 +215,13 @@ module ActsAsTaggableOn::Taggable
 
       def tag_list_cache_set_on(context)
         variable_name = "@#{context.to_s.singularize}_list"
-        !instance_variable_get(variable_name).nil?
+        instance_variable_defined?(variable_name) && !instance_variable_get(variable_name).nil?
       end
 
       def tag_list_cache_on(context)
         variable_name = "@#{context.to_s.singularize}_list"
-        instance_variable_get(variable_name) || instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
+        return instance_variable_get(variable_name) if instance_variable_defined?(variable_name) && instance_variable_get(variable_name)
+        instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
       end
 
       def tag_list_on(context)
@@ -230,7 +231,7 @@ module ActsAsTaggableOn::Taggable
 
       def all_tags_list_on(context)
         variable_name = "@all_#{context.to_s.singularize}_list"
-        return instance_variable_get(variable_name) if instance_variable_get(variable_name)
+        return instance_variable_get(variable_name) if instance_variable_defined?(variable_name) && instance_variable_get(variable_name)
 
         instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(all_tags_on(context).map(&:name)).freeze)
       end
