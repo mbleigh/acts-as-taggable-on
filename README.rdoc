@@ -78,6 +78,13 @@ To preserve the order in which tags are created use acts_as_ordered_taggable:
     @user.tag_list # => ["north", "east", "south", "west"] 
 
 
+    @user.tag_list.add = "northeast"
+    @user.tag_list.remove = "east"
+    @user.save
+
+    @user.reload
+    @user.tag_list # => ["north", "south", "west", "northeast"]
+
 === Finding Tagged Objects
 
 Acts As Taggable On utilizes named_scopes to create an association for tags.
