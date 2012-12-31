@@ -23,7 +23,7 @@ module ActsAsTaggableOn::Taggable
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
-            has_many context_taggings, -> {includes(:tag).references(:tag).where("#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type).order(taggings_order)},
+            has_many context_taggings, -> {where("#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type).order(taggings_order)},
                                        :as => :taggable,
                                        :dependent => :destroy,
                                        :class_name => "ActsAsTaggableOn::Tagging"
@@ -78,7 +78,7 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with("awesome", "cool", :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagList.from(tags)
-        empty_result = scoped(:conditions => "1 = 0")
+        empty_result = where("1 = 0")
 
         return empty_result if tag_list.empty?
 
@@ -107,7 +107,7 @@ module ActsAsTaggableOn::Taggable
             tags = ActsAsTaggableOn::Tag.named_any(tag_list)
           end
 
-          return scoped(:conditions => "1 = 0") unless tags.length > 0
+          return where("1 = 0") unless tags.length > 0
 
           # setup taggings alias so we can chain, ex: items_locations_taggings_awesome_cool_123
           # avoid ambiguous column name
@@ -168,13 +168,13 @@ module ActsAsTaggableOn::Taggable
           having = "COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
 
-        scoped(:select     => select_clause,
+        all.apply_finder_options({:select     => select_clause,
                :joins      => joins.join(" "),
                :group      => group,
                :having     => having,
                :conditions => conditions.join(" AND "),
                :order      => options[:order],
-               :readonly   => false)
+               :readonly   => false}, true)
       end
 
       def is_taggable?
@@ -249,7 +249,7 @@ module ActsAsTaggableOn::Taggable
           scope = scope.group("#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
         end
 
-        scope.all
+        scope.to_a
       end
 
       ##
@@ -259,7 +259,7 @@ module ActsAsTaggableOn::Taggable
         # when preserving tag order, return tags in created order
         # if we added the order to the association this would always apply
         scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
-        scope.all
+        scope.to_a
       end
 
       def set_tag_list_on(context, new_list)
@@ -329,7 +329,7 @@ module ActsAsTaggableOn::Taggable
           # Find taggings to remove:
           if old_tags.present?
             old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil,
-                                          :context => context.to_s, :tag_id => old_tags).all
+                                          :context => context.to_s, :tag_id => old_tags).to_a
           end
 
           # Destroy old taggings:
