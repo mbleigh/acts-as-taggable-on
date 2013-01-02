@@ -2,8 +2,6 @@ module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     include ActsAsTaggableOn::Utils
 
-    #attr_accessible :name
-
     ### ASSOCIATIONS:
 
     has_many :taggings, :dependent => :destroy, :class_name => 'ActsAsTaggableOn::Tagging'
