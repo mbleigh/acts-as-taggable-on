@@ -17,11 +17,11 @@ module ActsAsTaggableOn::Taggable
     module ClassMethods
       def initialize_acts_as_taggable_on_cache      
         tag_types.map(&:to_s).each do |tag_type|
-          class_eval %(
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def self.caching_#{tag_type.singularize}_list?
               caching_tag_list_on?("#{tag_type}")
             end        
-          )
+          RUBY
         end        
       end
       

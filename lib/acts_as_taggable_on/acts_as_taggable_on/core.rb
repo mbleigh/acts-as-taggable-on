@@ -14,6 +14,7 @@ module ActsAsTaggableOn::Taggable
 
     module ClassMethods
       def initialize_acts_as_taggable_on_core
+        include taggable_mixin
         tag_types.map(&:to_s).each do |tags_type|
           tag_type         = tags_type.to_s.singularize
           context_taggings = "#{tag_type}_taggings".to_sym
@@ -36,7 +37,7 @@ module ActsAsTaggableOn::Taggable
                                    :order => taggings_order
           end
 
-          class_eval %(
+          taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{tag_type}_list
               tag_list_on('#{tags_type}')
             end
@@ -48,7 +49,7 @@ module ActsAsTaggableOn::Taggable
             def all_#{tags_type}_list
               all_tags_list_on('#{tags_type}')
             end
-          )
+          RUBY
         end
       end
 
@@ -188,6 +189,10 @@ module ActsAsTaggableOn::Taggable
           taggings_alias = 'taggings_alias_' + Digest::SHA1.hexdigest(taggings_alias)
         end
         taggings_alias
+      end
+
+      def taggable_mixin
+        @taggable_mixin ||= Module.new
       end
     end
 

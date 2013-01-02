@@ -19,11 +19,11 @@ module ActsAsTaggableOn::Taggable
       
       def initialize_acts_as_taggable_on_ownership      
         tag_types.map(&:to_s).each do |tag_type|
-          class_eval %(
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{tag_type}_from(owner)
               owner_tag_list_on(owner, '#{tag_type}')
             end      
-          )
+          RUBY
         end        
       end
     end
