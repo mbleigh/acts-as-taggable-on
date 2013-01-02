@@ -1,4 +1,4 @@
-#Gem needs new Maintainer. Please send me message if you are interested.
+##Gem needs new Maintainer. Please send me message if you are interested.
 
 # ActsAsTaggableOn
 [![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.png)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
