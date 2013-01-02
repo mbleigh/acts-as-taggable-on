@@ -118,7 +118,7 @@ describe "Taggable" do
   end
 
   it "should have tag_counts_on" do
-    TaggableModel.tag_counts_on(:tags).all.should be_empty
+    TaggableModel.tag_counts_on(:tags).to_a.should be_empty
 
     @taggable.tag_list = ["awesome", "epic"]
     @taggable.save
@@ -214,7 +214,7 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
 
-    ActsAsTaggableOn::Tag.find(:all).size.should == 1
+    ActsAsTaggableOn::Tag.all.size.should == 1
     TaggableModel.tagged_with("ruby").to_a.should == TaggableModel.tagged_with("Ruby").to_a
   end
 
@@ -222,8 +222,8 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
-    TaggableModel.tag_counts.all.should_not be_empty
-    TaggableModel.skill_counts.all.should_not be_empty
+    TaggableModel.tag_counts.to_a.should_not be_empty
+    TaggableModel.skill_counts.to_a.should_not be_empty
   end
 
   it "should be able to get all tag counts on model as whole" do
@@ -231,7 +231,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.all_tag_counts.all.should_not be_empty
+    TaggableModel.all_tag_counts.to_a.should_not be_empty
     TaggableModel.all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
@@ -276,9 +276,9 @@ describe "Taggable" do
 
     # Test specific join syntaxes:
     frank.untaggable_models.create!
-    TaggableModel.tagged_with('rails').scoped(:joins => :untaggable_models).all_tag_counts.should have(2).items
-    TaggableModel.tagged_with('rails').scoped(:joins => { :untaggable_models => :taggable_model }).all_tag_counts.should have(2).items
-    TaggableModel.tagged_with('rails').scoped(:joins => [:untaggable_models]).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').joins(:untaggable_models => :taggable_model).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tag_counts.should have(2).items
   end
 
   it "should be able to set a custom tag context list" do
@@ -476,7 +476,7 @@ describe "Taggable" do
     end
 
     it "should have tag_counts_on" do
-      NonStandardIdTaggableModel.tag_counts_on(:tags).all.should be_empty
+      NonStandardIdTaggableModel.tag_counts_on(:tags).to_a.should be_empty
 
       @taggable.tag_list = ["awesome", "epic"]
       @taggable.save
