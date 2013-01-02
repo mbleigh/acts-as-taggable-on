@@ -182,4 +182,31 @@ describe ActsAsTaggableOn::Tag do
       ActsAsTaggableOn::Tag.named('cool').should_not include(uppercase_tag)
     end
   end
+
+  describe "name uniqeness validation" do
+    let(:duplicate_tag) { ActsAsTaggableOn::Tag.new(:name => 'ror') }
+
+    before { ActsAsTaggableOn::Tag.create(:name => 'ror') }
+
+    context "when don't need unique names" do
+      it "should not run uniqueness validation" do
+        duplicate_tag.stub(:validates_name_uniqueness?).and_return(false)
+        duplicate_tag.save
+        duplicate_tag.should be_persisted
+      end  
+    end
+
+    context "when do need unique names" do
+      it "should run uniqueness validation" do
+        duplicate_tag.should_not be_valid        
+      end
+
+      it "add error to name" do
+        duplicate_tag.save
+
+        duplicate_tag.should have(1).errors
+        duplicate_tag.errors.messages[:name].should include('has already been taken')
+      end
+    end
+  end
 end
