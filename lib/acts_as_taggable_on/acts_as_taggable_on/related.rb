@@ -56,7 +56,9 @@ module ActsAsTaggableOn::Taggable
       end
 
       def related_tags_for(context, klass, options = {})
-        tags_to_find = tags_on(context).collect { |t| t.name }
+				tags_to_ignore = Array.wrap(options.delete(:ignore)) || []
+				tags_to_ignore.map! { |t| t.to_s }
+        tags_to_find = tags_on(context).collect { |t| t.name }.reject { |t| tags_to_ignore.include? t }
 
         exclude_self = "#{klass.table_name}.#{klass.primary_key} != #{id} AND" if [self.class.base_class, self.class].include? klass
 
