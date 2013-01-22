@@ -185,6 +185,39 @@ describe "Acts As Taggable On" do
       taggable1.find_related_tags.should_not include(taggable1)
     end
 
+		context "Ignored Tags" do
+			let(:taggable1) { TaggableModel.create!(:name => "Taggable 1") }
+			let(:taggable2) { TaggableModel.create!(:name => "Taggable 2") }
+			let(:taggable3) { TaggableModel.create!(:name => "Taggable 3") }
+			before(:each) do
+				taggable1.tag_list = "one, two, four"
+				taggable1.save
+
+				taggable2.tag_list = "two, three"
+				taggable2.save
+
+				taggable3.tag_list = "one, three"
+				taggable3.save
+			end
+			it "should not include ignored tags in related search" do
+				taggable1.find_related_tags(:ignore => 'two').should_not include(taggable2)
+				taggable1.find_related_tags(:ignore => 'two').should include(taggable3)
+			end
+
+			it "should accept array of ignored tags" do
+				taggable4 = TaggableModel.create!(:name => "Taggable 4")
+				taggable4.tag_list = "four"
+				taggable4.save
+
+				taggable1.find_related_tags(:ignore => ['two', 'four']).should_not include(taggable2)
+				taggable1.find_related_tags(:ignore => ['two', 'four']).should_not include(taggable4)
+			end
+
+			it "should accept symbols as ignored tags" do
+				taggable1.find_related_tags(:ignore => :two).should_not include(taggable2)
+			end
+		end
+
     context "Inherited Models" do
       before do
         @taggable1 = InheritingTaggableModel.create!(:name => "InheritingTaggable 1")
