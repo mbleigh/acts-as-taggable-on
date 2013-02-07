@@ -81,7 +81,7 @@ module ActsAsTaggableOn
     def clean!
       reject!(&:blank?)
       map!(&:strip)
-      map!(&:downcase) if ActsAsTaggableOn.force_lowercase
+      map! {|t| t.mb_chars.downcase} if ActsAsTaggableOn.force_lowercase
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
       uniq!
