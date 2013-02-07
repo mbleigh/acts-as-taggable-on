@@ -84,8 +84,8 @@ describe ActsAsTaggableOn::TagList do
     it "should lowercase if force_lowercase is set to true" do
       ActsAsTaggableOn.force_lowercase = true
 
-      tag_list = ActsAsTaggableOn::TagList.new("aweSomE","RaDicaL")
-      tag_list.to_s.should == "awesome, radical"
+      tag_list = ActsAsTaggableOn::TagList.new("aweSomE","RaDicaL","ПриВет")
+      tag_list.to_s.should == "awesome, radical, привет"
 
       ActsAsTaggableOn.force_lowercase = false
     end
