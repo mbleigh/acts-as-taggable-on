@@ -186,12 +186,12 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 @bobby = User.find_by_name("Bobby")
 @bobby.skill_list # => ["jogging", "diving"]
 
-@boddy.skill_list_changed? #=> false
-@boddy.changes #=> {}
+@bobby.skill_list_changed? #=> false
+@bobby.changes #=> {}
 
 @bobby.skill_list = "swimming"
 @bobby.changes.should == {"skill_list"=>["jogging, diving", ["swimming"]]}
-@boddy.skill_list_changed? #=> true
+@bobby.skill_list_changed? #=> true
 
 @bobby.skill_list_change.should == ["jogging, diving", ["swimming"]]
 ```
