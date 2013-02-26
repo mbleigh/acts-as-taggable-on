@@ -134,6 +134,16 @@ describe "Taggable" do
     @taggable.tag_counts_on(:tags).length.should == 2
   end
 
+  it "should have tags_on" do
+    TaggableModel.tags_on(:tags).all.should be_empty
+
+    @taggable.tag_list = ["awesome", "epic"]
+    @taggable.save
+
+    TaggableModel.tags_on(:tags).length.should == 2
+    @taggable.tags_on(:tags).length.should == 2
+  end
+
   it "should return [] right after create" do
     blank_taggable = TaggableModel.new(:name => "Bob Jones")
     blank_taggable.tag_list.should == []
@@ -242,6 +252,15 @@ describe "Taggable" do
     TaggableModel.all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
+  it "should be able to get all tags on model as whole" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
+
+    TaggableModel.all_tags.all.should_not be_empty
+    TaggableModel.all_tags(:order => 'tags.id').first.name.should == "ruby"
+  end
+
   it "should be able to use named scopes to chain tag finds by any tags by context" do
     bob   = TaggableModel.create(:name => "Bob",   :need_list => "rails", :offering_list => "c++")
     frank = TaggableModel.create(:name => "Frank", :need_list => "css",   :offering_list => "css")
@@ -273,6 +292,14 @@ describe "Taggable" do
     TaggableModel.tagged_with("ruby").all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
+  it "should be able to get all scoped tags" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
+
+    TaggableModel.tagged_with("ruby").all_tags(:order => 'tags.id').first.name.should == "ruby"
+  end
+
   it 'should only return tag counts for the available scope' do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
@@ -286,6 +313,21 @@ describe "Taggable" do
     TaggableModel.tagged_with('rails').scoped(:joins => :untaggable_models).all_tag_counts.should have(2).items
     TaggableModel.tagged_with('rails').scoped(:joins => { :untaggable_models => :taggable_model }).all_tag_counts.should have(2).items
     TaggableModel.tagged_with('rails').scoped(:joins => [:untaggable_models]).all_tag_counts.should have(2).items
+  end
+
+  it 'should only return tags for the available scope' do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby, java")
+
+    TaggableModel.tagged_with('rails').all_tags.should have(3).items
+    TaggableModel.tagged_with('rails').all_tags.any? { |tag| tag.name == 'java' }.should be_false
+
+    # Test specific join syntaxes:
+    frank.untaggable_models.create!
+    TaggableModel.tagged_with('rails').scoped(:joins => :untaggable_models).all_tags.should have(2).items
+    TaggableModel.tagged_with('rails').scoped(:joins => { :untaggable_models => :taggable_model }).all_tags.should have(2).items
+    TaggableModel.tagged_with('rails').scoped(:joins => [:untaggable_models]).all_tags.should have(2).items
   end
 
   it "should be able to set a custom tag context list" do
@@ -456,6 +498,17 @@ describe "Taggable" do
       TaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso fork spoon)
     end
 
+    it "should have different tags_on for inherited models" do
+      @inherited_same.tag_list = "bob, kelso"
+      @inherited_same.save!
+      @inherited_different.tag_list = "fork, spoon"
+      @inherited_different.save!
+
+      InheritingTaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso)
+      AlteredInheritingTaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name).should == %w(fork spoon)
+      TaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso fork spoon)
+    end
+
     it 'should store same tag without validation conflict' do
       @taggable.tag_list = 'one'
       @taggable.save!
@@ -490,6 +543,16 @@ describe "Taggable" do
 
       NonStandardIdTaggableModel.tag_counts_on(:tags).length.should == 2
       @taggable.tag_counts_on(:tags).length.should == 2
+    end
+
+    it "should have tags_on" do
+      NonStandardIdTaggableModel.tags_on(:tags).all.should be_empty
+
+      @taggable.tag_list = ["awesome", "epic"]
+      @taggable.save
+
+      NonStandardIdTaggableModel.tags_on(:tags).length.should == 2
+      @taggable.tags_on(:tags).length.should == 2
     end
 
     it "should be able to create tags" do
