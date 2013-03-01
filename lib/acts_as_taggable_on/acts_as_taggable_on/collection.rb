@@ -168,9 +168,8 @@ module ActsAsTaggableOn::Taggable
 
         res = ActiveRecord::Base.connection.select_all(select_query).map { |item| item.values }.flatten.join(",")
 
-        tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{res})").
-                                      group(group_columns).
-                                      having(having)
+        tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{res})") if res.present?
+        tagging_scope = tagging_scope.group(group_columns).having(having)
 
         tag_scope = tag_scope.joins("JOIN (#{tagging_scope.to_sql}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
         tag_scope
