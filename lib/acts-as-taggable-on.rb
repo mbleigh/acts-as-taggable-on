@@ -23,8 +23,7 @@ module ActsAsTaggableOn
   self.remove_unused_tags = false
 
   def self.glue
-    delimiter = @@delimiter.kind_of?(Array) ? @@delimiter[0] : @@delimiter
-    delimiter.ends_with?(" ") ? delimiter : "#{delimiter} "
+    @@delimiter.kind_of?(Array) ? @@delimiter[0] : @@delimiter
   end
 
   def self.setup
