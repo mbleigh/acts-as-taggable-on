@@ -146,7 +146,7 @@ module ActsAsTaggableOn::Taggable
 
         ## Generate scope:
         tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id, COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) AS tags_count")
-        tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*, #{ActsAsTaggableOn::Tagging.table_name}.tags_count AS count").order(options[:order]).limit(options[:limit])   
+        tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*, x#{ActsAsTaggableOn::Tagging.table_name}.tags_count AS count").order(options[:order]).limit(options[:limit])
 
         # Joins and conditions
         tagging_joins.each      { |join|      tagging_scope = tagging_scope.joins(join)      }        
@@ -169,7 +169,7 @@ module ActsAsTaggableOn::Taggable
                                       having(having)
 
 
-        tag_scope = tag_scope.joins("JOIN (#{tagging_scope.to_sql}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
+        tag_scope = tag_scope.joins("JOIN (#{tagging_scope.to_sql}) AS x#{ActsAsTaggableOn::Tagging.table_name} ON x#{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
         tag_scope
       end
     end
