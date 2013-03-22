@@ -10,9 +10,9 @@ Gem::Specification.new do |gem|
   gem.email = %q{michael@intridea.com}
   gem.homepage      = ''
 
-  gem.add_runtime_dependency 'rails', '~> 3.0'
+  gem.add_runtime_dependency 'rails', '~> 4.0.0.beta'
   gem.add_development_dependency 'rspec', '~> 2.6'
-  gem.add_development_dependency 'ammeter', '~> 0.1.3'
+  #gem.add_development_dependency 'ammeter', '~> 0.1.3'
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'mysql2', '~> 0.3.7'
   gem.add_development_dependency 'pg'
