@@ -272,6 +272,12 @@ If you would like tags to be case-sensitive and not use LIKE queries for creatio
 ActsAsTaggableOn.strict_case_match = true
 ```
 
+If you want to change the default delimiter (it defaults to ','). You can also pass in an array of delimiters such as ([',', '|']):
+
+```ruby
+ActsAsTaggableOn.delimiter = ','
+```
+
 ## Changelog
 
 See [CHANGELOG](https://github.com/mbleigh/acts-as-taggable-on/blob/master/CHANGELOG.md).
