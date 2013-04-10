@@ -59,6 +59,11 @@ end
 @user.skill_list                              # => ["joking","clowning","boxing"] as TagList
 @user.save
 
+@user.tag_list.remove("awesome")              # remove a single tag
+@user.tag_list.remove("awesome, slick")       # works with arrays too
+@user.tag_list.add("awesomer")                # add a single tag. alias for <<
+@user.tag_list.add("awesomer, slicker")       # also works with arrays
+
 @user.tags # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
 @user.skills # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
 
