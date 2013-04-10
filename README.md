@@ -56,20 +56,17 @@ end
 @user = User.new(:name => "Bobby")
 @user.tag_list = "awesome, slick, hefty"      # this should be familiar
 @user.skill_list = "joking, clowning, boxing" # but you can do it for any context!
+
+@user.tags                                    # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
+@user.skills                                  # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
 @user.skill_list                              # => ["joking","clowning","boxing"] as TagList
-@user.save
 
 @user.tag_list.remove("awesome")              # remove a single tag
 @user.tag_list.remove("awesome, slick")       # works with arrays too
 @user.tag_list.add("awesomer")                # add a single tag. alias for <<
 @user.tag_list.add("awesomer, slicker")       # also works with arrays
 
-@user.tags # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
-@user.skills # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
-
-@frankie = User.create(:name => "Frankie", :skill_list => "joking, flying, eating")
-User.skill_counts # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
-@frankie.skill_counts
+User.skill_counts                             # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
 ```
 
 To preserve the order in which tags are created use `acts_as_ordered_taggable`:
@@ -94,9 +91,8 @@ end
 
 ### Finding Tagged Objects
 
-Acts As Taggable On utilizes named_scopes to create an association for tags.
-This way you can mix and match to filter down your results, and it also improves
-compatibility with the [will_paginate](https://github.com/mislav/will_paginate) gem:
+Acts As Taggable On uses scopes to create an association for tags.
+This way you can mix and match to filter down your results.
 
 ```ruby
 class User < ActiveRecord::Base
