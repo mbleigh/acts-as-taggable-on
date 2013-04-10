@@ -1,5 +1,3 @@
-##Gem needs new Maintainer. Please send me message if you are interested.
-
 # ActsAsTaggableOn
 [![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.png)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
 
@@ -289,6 +287,7 @@ We have a long list of valued contributors. [Check them all](https://github.com/
 ## Maintainers
 
 * [Artem Kramarenko](https://github.com/artemk) (artemk)
+* [Joost Baaij](https://github.com/tilsammans)
 
 ## Author
 
