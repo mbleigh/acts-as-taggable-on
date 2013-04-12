@@ -129,8 +129,16 @@ module ActsAsTaggableOn::Taggable
           conditions << tags.map { |t| "#{taggings_alias}.tag_id = #{t.id}" }.join(" OR ")
           select_clause = "DISTINCT #{table_name}.*" unless context and tag_types.one?
 
-          joins << tagging_join
+          if owned_by
+              tagging_join << " AND " +
+                  sanitize_sql([
+                      "#{taggings_alias}.tagger_id = ? AND #{taggings_alias}.tagger_type = ?",
+                      owned_by.id,
+                      owned_by.class.base_class.to_s
+                  ])
+          end
 
+          joins << tagging_join
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
           return empty_result unless tags.length == tag_list.length
