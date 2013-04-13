@@ -18,7 +18,11 @@ module ActsAsTaggableOn
       def sha_prefix(string)
         Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
       end
-      
+
+      def rails_four?
+        Gem.loaded_specs['rails'].version.to_s.starts_with?("4.")
+      end
+
       private
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'
