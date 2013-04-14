@@ -14,18 +14,26 @@ Enter Acts as Taggable On. Rather than tying functionality to a specific keyword
 tag "contexts" that can be used locally or in combination in the same way steroids
 was used.
 
+## Compatibility
+
+Version 2.x is compatible with Ruby 1.8.7+ and Rails 3+.
+
+Version 3.x (currently unreleased) is compatible with Ruby 1.9+ and Rails 3+.
+
+For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/issues/milestones
+
 ## Installation
-
-### Rails 2.x
-
-Not supported any more! It is time for update guys.
-
-### Rails 3.x
 
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 2.3.1'
+gem 'acts-as-taggable-on'
+```
+
+and bundle:
+
+```ruby
+bundle
 ```
 
 #### Post Installation
