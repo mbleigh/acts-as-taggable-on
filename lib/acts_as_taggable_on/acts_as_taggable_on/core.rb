@@ -20,7 +20,7 @@ module ActsAsTaggableOn::Taggable
           context_taggings = "#{tag_type}_taggings".to_sym
           context_tags     = tags_type.to_sym
           taggings_order   = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.id" : nil)
-          
+
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
@@ -30,7 +30,7 @@ module ActsAsTaggableOn::Taggable
                                        :class_name => "ActsAsTaggableOn::Tagging",
                                        :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_type],
                                        :order => taggings_order
-                                       
+
             has_many context_tags, :through => context_taggings,
                                    :source => :tag,
                                    :class_name => "ActsAsTaggableOn::Tag",
@@ -57,7 +57,7 @@ module ActsAsTaggableOn::Taggable
         super(preserve_tag_order, *tag_types)
         initialize_acts_as_taggable_on_core
       end
-      
+
       # all column names are necessary for PostgreSQL group clause
       def grouped_column_names_for(object)
         object.column_names.map { |column| "#{object.table_name}.#{column}" }.join(", ")
