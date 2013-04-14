@@ -10,6 +10,10 @@ Gem::Specification.new do |gem|
   gem.email = %q{michael@intridea.com}
   gem.homepage      = ''
 
+  if File.exists?('UPGRADING')
+    gem.post_install_message = File.read("UPGRADING")
+  end
+
   gem.add_runtime_dependency 'rails', '~> 3.0'
   gem.add_development_dependency 'rspec', '~> 2.6'
   gem.add_development_dependency 'ammeter', '~> 0.1.3'

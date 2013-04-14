@@ -1,0 +1,14 @@
+
+** acts-as-taggable-on version 2.4.0
+
+Hello! This version is the first one released by me (@tilsammans),
+a new maintainer on the project. It's been a while since the last
+release and I am not 100% sure if any breaking changes have been
+introduced. Please test your tagging functionality carefully.
+
+From now on things should stabilize. Please check the project's
+milestones and compatibilities stated in the readme. If you have
+any questions, feel free to create an issue on github.
+
+https://github.com/mbleigh/acts-as-taggable-on
+
