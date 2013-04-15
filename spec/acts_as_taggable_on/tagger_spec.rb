@@ -28,7 +28,19 @@ describe "Tagger" do
 
     TaggableModel.tagged_with(%w(ruby scheme), :owned_by => @user).count.should == 1
     TaggableModel.tagged_with(%w(ruby scheme), :owned_by => @user2).count.should == 2
+  end
 
+  it "only returns objects tagged by owned_by when any is true" do
+    @user2 = TaggableUser.new
+    @taggable2 = TaggableModel.create(:name => "Jim Jones")
+    @taggable3 = TaggableModel.create(:name => "Jane Doe")
+
+    @user.tag(@taggable, :with => 'ruby', :on => :tags)
+    @user.tag(@taggable2, :with => 'java', :on => :tags)
+    @user2.tag(@taggable3, :with => 'ruby', :on => :tags)
+
+    tags = TaggableModel.tagged_with(%w(ruby java), :owned_by => @user, :any => true)
+    tags.should match_array [@taggable, @taggable2]
   end
 
   it "should not overlap tags from different taggers" do
