@@ -16,9 +16,11 @@ was used.
 
 ## Compatibility
 
-Version 2.x is compatible with Ruby 1.8.7+ and Rails 3, but not 4.
+Versions 2.x are compatible with Ruby 1.8.7+ and Rails 3.
 
-Version 3.x (currently unreleased) is compatible with Ruby 1.9+ and Rails 3 and 4.
+Versions 2.4.1 and up are compatible with Rails 4 too (thanks cwoodcox!).
+
+Versions 3.x (currently unreleased) are compatible with Ruby 1.9+ and Rails 3 and 4.
 
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/issues/milestones
 
