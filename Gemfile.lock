@@ -136,7 +136,7 @@ PLATFORMS
 
 DEPENDENCIES
   acts-as-taggable-on!
-  ammeter (~> 0.1.3)
+  ammeter
   appraisal
   guard
   guard-rspec
