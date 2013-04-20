@@ -16,9 +16,9 @@ was used.
 
 ## Compatibility
 
-Version 2.x is compatible with Ruby 1.8.7+ and Rails 3+.
+Version 2.x is compatible with Ruby 1.8.7+ and Rails 3, but not 4.
 
-Version 3.x (currently unreleased) is compatible with Ruby 1.9+ and Rails 3+.
+Version 3.x (currently unreleased) is compatible with Ruby 1.9+ and Rails 3 and 4.
 
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/issues/milestones
 
@@ -46,11 +46,14 @@ rake db:migrate
 ## Testing
 
 Acts As Taggable On uses RSpec for its test coverage. Inside the gem
-directory, you can run the specs for RoR 3.x with:
+directory, you can run the specs with:
 
 ```shell
+bundle
 rake spec
 ```
+
+If you want, add a `.ruby-version` file in the project root (and use rbenv or RVM) to work on a specific version of Ruby.
 
 ## Usage
 
@@ -285,21 +288,14 @@ If you want to change the default delimiter (it defaults to ','). You can also p
 ActsAsTaggableOn.delimiter = ','
 ```
 
-## Changelog
-
-See [CHANGELOG](https://github.com/mbleigh/acts-as-taggable-on/blob/master/CHANGELOG.md).
-
 ## Contributors
 
 We have a long list of valued contributors. [Check them all](https://github.com/mbleigh/acts-as-taggable-on/contributors)
 
-## Maintainers
+## Maintainer
 
-* [Artem Kramarenko](https://github.com/artemk) (artemk)
 * [Joost Baaij](https://github.com/tilsammans)
 
-## Author
+## License
 
-* [Michael Bleigh](https://github.com/mbleigh)
-
-Copyright (c) 2007-2011 Michael Bleigh (http://mbleigh.com/) and Intridea Inc. (http://intridea.com/), released under the [MIT license](https://github.com/mbleigh/acts-as-taggable-on/blob/master/MIT-LICENSE.md)
+See [LICENSE](https://github.com/mbleigh/acts-as-taggable-on/blob/master/LICENSE.md)
