@@ -1,6 +1,6 @@
 require 'rubygems'
-require 'bundler'
-Bundler.setup :default, :development
+require 'bundler/setup'
+require 'appraisal'
 
 desc 'Default: run specs'
 task :default => :spec  
