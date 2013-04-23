@@ -41,7 +41,7 @@ describe "Taggable To Preserve Order" do
     @taggable.tag_list = "rails, ruby, css"
     @taggable.instance_variable_get("@tag_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
 
-    -> {
+    lambda {
       @taggable.save
     }.should change(ActsAsTaggableOn::Tag, :count).by(3)
 
