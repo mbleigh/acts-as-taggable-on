@@ -1,6 +1,5 @@
-#encoding: utf-8
-
-require File.expand_path('../../spec_helper', __FILE__)
+# encoding: utf-8
+require 'spec_helper'
 
 describe ActsAsTaggableOn::Tag do
   before(:each) do

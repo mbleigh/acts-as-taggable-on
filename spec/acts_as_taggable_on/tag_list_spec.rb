@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-require File.expand_path('../../spec_helper', __FILE__)
+# encoding: utf-8
+require 'spec_helper'
 
 describe ActsAsTaggableOn::TagList do
   let(:tag_list) { ActsAsTaggableOn::TagList.new("awesome","radical") }
