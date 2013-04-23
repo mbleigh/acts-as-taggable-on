@@ -1,5 +1,5 @@
 PATH
-  remote: /Users/joost/Gems/acts-as-taggable-on
+  remote: /Users/iamakingbee/apps/acts-as-taggable-on
   specs:
     acts-as-taggable-on (2.4.1.pre)
       rails (>= 3, < 5)

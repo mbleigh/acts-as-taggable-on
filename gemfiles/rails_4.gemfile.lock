@@ -1,7 +1,6 @@
 GIT
-  remote: git://github.com/arabonradar/rails.git
-  revision: 746a9992f0a842ded7a15cc5ce0afd0fa00f2ada
-  ref: ar_having_values_bug_fix
+  remote: git://github.com/rails/rails.git
+  revision: e58f11683003ec1515113103895e18a8c9003aa3
   specs:
     actionmailer (4.0.0.beta1)
       actionpack (= 4.0.0.beta1)

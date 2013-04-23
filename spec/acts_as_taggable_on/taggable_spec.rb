@@ -125,7 +125,7 @@ describe "Taggable" do
   end
 
   it "should have tag_counts_on" do
-    TaggableModel.tag_counts_on(:tags).load.should be_empty
+    TaggableModel.tag_counts_on(:tags).should be_empty
 
     @taggable.tag_list = ["awesome", "epic"]
     @taggable.save
@@ -135,7 +135,7 @@ describe "Taggable" do
   end
 
   it "should have tags_on" do
-    TaggableModel.tags_on(:tags).load.should be_empty
+    TaggableModel.tags_on(:tags).should be_empty
 
     @taggable.tag_list = ["awesome", "epic"]
     @taggable.save
@@ -231,7 +231,7 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
 
-    ActsAsTaggableOn::Tag.all.load.size.should == 1
+    ActsAsTaggableOn::Tag.all.size.should == 1
     TaggableModel.tagged_with("ruby").to_a.should == TaggableModel.tagged_with("Ruby").to_a
   end
 
@@ -239,8 +239,8 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
-    TaggableModel.tag_counts.load.should_not be_empty
-    TaggableModel.skill_counts.load.should_not be_empty
+    TaggableModel.tag_counts.should_not be_empty
+    TaggableModel.skill_counts.should_not be_empty
   end
 
   it "should be able to get all tag counts on model as whole" do
@@ -248,7 +248,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.all_tag_counts.load.should_not be_empty
+    TaggableModel.all_tag_counts.should_not be_empty
     TaggableModel.all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
@@ -257,7 +257,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.all_tags.load.should_not be_empty
+    TaggableModel.all_tags.should_not be_empty
     TaggableModel.all_tags(:order => 'tags.id').first.name.should == "ruby"
   end
 
@@ -536,7 +536,7 @@ describe "Taggable" do
     end
 
     it "should have tag_counts_on" do
-      NonStandardIdTaggableModel.tag_counts_on(:tags).load.should be_empty
+      NonStandardIdTaggableModel.tag_counts_on(:tags).should be_empty
 
       @taggable.tag_list = ["awesome", "epic"]
       @taggable.save
@@ -546,7 +546,7 @@ describe "Taggable" do
     end
 
     it "should have tags_on" do
-      NonStandardIdTaggableModel.tags_on(:tags).load.should be_empty
+      NonStandardIdTaggableModel.tags_on(:tags).should be_empty
 
       @taggable.tag_list = ["awesome", "epic"]
       @taggable.save
