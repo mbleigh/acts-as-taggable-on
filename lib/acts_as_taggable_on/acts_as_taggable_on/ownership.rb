@@ -52,7 +52,6 @@ module ActsAsTaggableOn::Taggable
         add_custom_context(context)
 
         cache = cached_owned_tag_list_on(context)
-        cache.delete_if { |key, value| key.id == owner.id && key.class == owner.class }
         
         cache[owner] ||= ActsAsTaggableOn::TagList.new(*owner_tags_on(owner, context).map(&:name))
       end
@@ -61,7 +60,6 @@ module ActsAsTaggableOn::Taggable
         add_custom_context(context)
         
         cache = cached_owned_tag_list_on(context)
-        cache.delete_if { |key, value| key.id == owner.id && key.class == owner.class }
 
         cache[owner] = ActsAsTaggableOn::TagList.from(new_list)
       end
