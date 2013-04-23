@@ -24,6 +24,24 @@ describe "Acts As Taggable On" do
       taggable1.find_related_tags.should_not include(taggable2)
     end
 
+    it "finds related tags for ordered taggable on" do
+      taggable1 = OrderedTaggableModel.create!(:name => "Taggable 1")
+      taggable2 = OrderedTaggableModel.create!(:name => "Taggable 2")
+      taggable3 = OrderedTaggableModel.create!(:name => "Taggable 3")
+
+      taggable1.colour_list = "one, two"
+      taggable1.save
+
+      taggable2.colour_list = "three, four"
+      taggable2.save
+
+      taggable3.colour_list = "one, four"
+      taggable3.save
+
+      taggable1.find_related_colours.should include(taggable3)
+      taggable1.find_related_colours.should_not include(taggable2)
+    end
+
     it "should find related objects based on tag names on context - non standard id" do
       taggable1 = NonStandardIdTaggableModel.create!(:name => "Taggable 1")
       taggable2 = NonStandardIdTaggableModel.create!(:name => "Taggable 2")
