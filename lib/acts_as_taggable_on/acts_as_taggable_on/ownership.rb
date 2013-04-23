@@ -40,7 +40,7 @@ module ActsAsTaggableOn::Taggable
         # when preserving tag order, return tags in created order
         # if we added the order to the association this would always apply
         scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
-        scope.all
+        scope.load
       end
 
       def cached_owned_tag_list_on(context)
@@ -104,7 +104,7 @@ module ActsAsTaggableOn::Taggable
             if old_tags.present?
               old_taggings = ActsAsTaggableOn::Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
                                                              :tagger_type => owner.class.base_class.to_s, :tagger_id => owner.id,
-                                                             :tag_id => old_tags, :context => context).all
+                                                             :tag_id => old_tags, :context => context).load
             end
           
             # Destroy old taggings:

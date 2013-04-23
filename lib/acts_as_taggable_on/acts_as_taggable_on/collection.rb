@@ -87,7 +87,7 @@ module ActsAsTaggableOn::Taggable
 
         # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
         scoped_select = "#{table_name}.#{primary_key}"
-        tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{select(scoped_select).to_sql})").
+        tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(?)", select(scoped_select).map(&:id)).
                                       group(group_columns)
 
         tag_scope = tag_scope.joins("JOIN (#{tagging_scope.to_sql}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
@@ -166,7 +166,7 @@ module ActsAsTaggableOn::Taggable
         scoped_select = "#{table_name}.#{primary_key}"
         select_query = "#{select(scoped_select).to_sql}"
 
-        res = ActiveRecord::Base.connection.select_all(select_query).map { |item| item.values }.flatten.join(",")
+        res = ActiveRecord::Base.connection.select_all(select_query).map { |item| item.values }.flatten.compact.join(",")
         res = "NULL" if res.blank?
 
         tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{res})")

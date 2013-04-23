@@ -3,6 +3,6 @@
 source "https://rubygems.org"
 
 gem "appraisal"
-gem "rails", "4.0.0.beta1"
+gem "rails", github: 'arabonradar/rails', ref: 'ar_having_values_bug_fix'
 
 gemspec :path=>"../"

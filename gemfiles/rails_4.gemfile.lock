@@ -1,11 +1,7 @@
-PATH
-  remote: /Users/joost/Gems/acts-as-taggable-on
-  specs:
-    acts-as-taggable-on (2.4.1.pre)
-      rails (>= 3, < 5)
-
-GEM
-  remote: https://rubygems.org/
+GIT
+  remote: git://github.com/arabonradar/rails.git
+  revision: 746a9992f0a842ded7a15cc5ce0afd0fa00f2ada
+  ref: ar_having_values_bug_fix
   specs:
     actionmailer (4.0.0.beta1)
       actionpack (= 4.0.0.beta1)
@@ -21,16 +17,39 @@ GEM
       builder (~> 3.1.0)
     activerecord (4.0.0.beta1)
       activemodel (= 4.0.0.beta1)
-      activerecord-deprecated_finders (~> 0.0.3)
+      activerecord-deprecated_finders (~> 1.0.1)
       activesupport (= 4.0.0.beta1)
-      arel (~> 4.0.0.beta1)
-    activerecord-deprecated_finders (0.0.3)
+      arel (~> 4.0.0)
     activesupport (4.0.0.beta1)
-      i18n (~> 0.6.2)
+      i18n (~> 0.6, >= 0.6.4)
       minitest (~> 4.2)
       multi_json (~> 1.3)
       thread_safe (~> 0.1)
-      tzinfo (~> 0.3.33)
+      tzinfo (~> 0.3.37)
+    rails (4.0.0.beta1)
+      actionmailer (= 4.0.0.beta1)
+      actionpack (= 4.0.0.beta1)
+      activerecord (= 4.0.0.beta1)
+      activesupport (= 4.0.0.beta1)
+      bundler (>= 1.3.0, < 2.0)
+      railties (= 4.0.0.beta1)
+      sprockets-rails (~> 2.0.0.rc4)
+    railties (4.0.0.beta1)
+      actionpack (= 4.0.0.beta1)
+      activesupport (= 4.0.0.beta1)
+      rake (>= 0.8.7)
+      thor (>= 0.18.1, < 2.0)
+
+PATH
+  remote: /Users/iamakingbee/apps/acts-as-taggable-on
+  specs:
+    acts-as-taggable-on (2.4.1.pre)
+      rails (>= 3, < 5)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activerecord-deprecated_finders (1.0.1)
     ammeter (0.2.8)
       activesupport (>= 3.0)
       railties (>= 3.0)
@@ -58,7 +77,6 @@ GEM
       rspec (~> 2.11)
     hike (1.2.2)
     i18n (0.6.4)
-    json (1.7.7)
     listen (1.0.0)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -69,8 +87,8 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     method_source (0.8.1)
-    mime-types (1.22)
-    minitest (4.7.2)
+    mime-types (1.23)
+    minitest (4.7.3)
     multi_json (1.7.2)
     mysql2 (0.3.11)
     pg (0.15.1)
@@ -82,28 +100,12 @@ GEM
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
-    rails (4.0.0.beta1)
-      actionmailer (= 4.0.0.beta1)
-      actionpack (= 4.0.0.beta1)
-      activerecord (= 4.0.0.beta1)
-      activesupport (= 4.0.0.beta1)
-      bundler (>= 1.3.0, < 2.0)
-      railties (= 4.0.0.beta1)
-      sprockets-rails (~> 2.0.0.rc3)
-    railties (4.0.0.beta1)
-      actionpack (= 4.0.0.beta1)
-      activesupport (= 4.0.0.beta1)
-      rake (>= 0.8.7)
-      rdoc (~> 3.4)
-      thor (>= 0.17.0, < 2.0)
     rake (10.0.4)
     rb-fsevent (0.9.3)
     rb-inotify (0.9.0)
       ffi (>= 0.5.0)
     rb-kqueue (0.2.0)
       ffi (>= 0.5.0)
-    rdoc (3.12.2)
-      json (~> 1.4)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -150,6 +152,6 @@ DEPENDENCIES
   guard-rspec
   mysql2 (~> 0.3.7)
   pg
-  rails (= 4.0.0.beta1)
+  rails!
   rspec (~> 2.6)
   sqlite3
