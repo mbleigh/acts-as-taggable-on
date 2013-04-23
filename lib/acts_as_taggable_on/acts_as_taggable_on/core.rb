@@ -102,6 +102,14 @@ module ActsAsTaggableOn::Taggable
 
           conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
+          if owned_by
+            joins <<  "JOIN #{ActsAsTaggableOn::Tagging.table_name}" +
+                      "  ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = #{owned_by.id}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = #{quote_value(owned_by.class.base_class.to_s)}"
+          end
+
         elsif options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
           if options.delete(:wild)
