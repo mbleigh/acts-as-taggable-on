@@ -61,13 +61,13 @@ module ActsAsTaggableOn
       return [] if list.empty?
 
       existing_tags = Tag.named_any(list)
-      new_tag_names = list.reject do |name|
-        name = comparable_name(name)
-        existing_tags.any? { |tag| comparable_name(tag.name) == name }
-      end
-      created_tags  = new_tag_names.map { |name| Tag.create(:name => name) }
 
-      existing_tags + created_tags
+      list.map do |tag_name|
+        comparable_tag_name = comparable_name(tag_name)
+        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
+
+        existing_tag || Tag.create(:name => tag_name)
+      end
     end
 
     ### INSTANCE METHODS:
