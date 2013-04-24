@@ -346,8 +346,8 @@ module ActsAsTaggableOn::Taggable
               index = shared_tags.each_with_index { |_, i| break i unless shared_tags[i] == tags[i] }
 
               # Update arrays of tag objects
-              old_tags |= current_tags[index..current_tags.size]
-              new_tags |= current_tags[index..current_tags.size] & shared_tags
+              old_tags |= current_tags[index...current_tags.size]
+              new_tags |= current_tags[index...current_tags.size] & shared_tags
 
               # Order the array of tag objects to match the tag list
               new_tags = tags.map do |t| 
