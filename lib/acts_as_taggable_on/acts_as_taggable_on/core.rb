@@ -13,6 +13,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     module ClassMethods
+
       def initialize_acts_as_taggable_on_core
         include taggable_mixin
         tag_types.map(&:to_s).each do |tags_type|
@@ -24,16 +25,16 @@ module ActsAsTaggableOn::Taggable
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
-            has_many context_taggings, :as => :taggable,
-                                       :dependent => :destroy,
-                                       :class_name => "ActsAsTaggableOn::Tagging",
-                                       :order => taggings_order,
-                                       :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = (?)", tags_type]
+            has_many_with_compatibility context_taggings, :as => :taggable,
+                                        :dependent => :destroy,
+                                        :class_name => "ActsAsTaggableOn::Tagging",
+                                        :order => taggings_order,
+                                        :conditions => ["#{ActsAsTaggableOn::Tagging.table_name}.context = (?)", tags_type]
 
-            has_many context_tags, :through => context_taggings,
-                                   :source => :tag,
-                                   :class_name => "ActsAsTaggableOn::Tag",
-                                   :order => taggings_order
+            has_many_with_compatibility context_tags, :through => context_taggings,
+                                        :source => :tag,
+                                        :class_name => "ActsAsTaggableOn::Tag",
+                                        :order => taggings_order
           end
 
           taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -264,7 +265,7 @@ module ActsAsTaggableOn::Taggable
           scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
         else
           scope.group("#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
-        end.all
+        end.to_a
       end
 
       ##

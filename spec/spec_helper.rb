@@ -58,15 +58,18 @@ if File.exists?(database_yml)
     ActiveRecord::Base.establish_connection(config)
   end
     
-  ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
+  logger = ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))
   ActiveRecord::Base.default_timezone = :utc
   
-  ActiveRecord::Base.silence do
+  begin
+    old_logger_level, logger.level = logger.level, ::Logger::ERROR
     ActiveRecord::Migration.verbose = false
     
     load(File.dirname(__FILE__) + '/schema.rb')
     load(File.dirname(__FILE__) + '/models.rb')
-  end  
+  ensure
+    logger.level = old_logger_level
+  end
   
 else
   raise "Please create #{database_yml} first to configure your database. Take a look at: #{database_yml}.sample"
