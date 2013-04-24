@@ -84,13 +84,20 @@ module ActsAsTaggableOn::Taggable
                
             # Tag maintenance based on whether preserving the created order of tags
             if self.class.preserve_tag_order?
-              # First off order the array of tag objects to match the tag list
-              # rather than existing tags followed by new tags
-              tags = tag_list.uniq.map{|s| tags.detect{|t| t.name.downcase == s.downcase}}
-              # To preserve tags in the order in which they were added
-              # delete all owned tags and create new tags if the content or order has changed
-              old_tags = (tags == owned_tags ? [] : owned_tags)
-              new_tags = (tags == owned_tags ? [] : tags)
+              old_tags, new_tags = owned_tags - tags, tags - owned_tags
+
+              shared_tags = owned_tags & tags
+
+              if shared_tags.any? && tags[0...shared_tags.size] != shared_tags
+                index = shared_tags.each_with_index { |_, i| break i unless shared_tags[i] == tags[i] }
+
+                # Update arrays of tag objects
+                old_tags |= owned_tags.from(index)
+                new_tags |= owned_tags.from(index) & shared_tags
+
+                # Order the array of tag objects to match the tag list
+                new_tags = tags.map { |t| new_tags.find { |n| n.name.downcase == t.name.downcase } }.compact
+              end
             else
               # Delete discarded tags and create new tags
               old_tags = owned_tags - tags
