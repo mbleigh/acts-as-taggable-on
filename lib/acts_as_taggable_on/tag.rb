@@ -14,6 +14,9 @@ module ActsAsTaggableOn
     validates_uniqueness_of :name, :if => :validates_name_uniqueness?
     validates_length_of :name, :maximum => 255
 
+    ### CALLBACKS:
+    after_save :clean_quotes_magic
+
     # monkey patch this method if don't need name uniqueness validation
     def validates_name_uniqueness?
       true
@@ -95,5 +98,14 @@ module ActsAsTaggableOn
         /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
       end
     end
+
+    private
+      def clean_quotes_magic
+        if name =~ /^\\?'/
+          self.update_attributes(
+            name: name.gsub(/[\\']/, '')
+          )
+        end
+      end
   end
 end
