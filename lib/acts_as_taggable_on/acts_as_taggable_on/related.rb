@@ -42,6 +42,7 @@ module ActsAsTaggableOn::Taggable
 
     module InstanceMethods
       def matching_contexts_for(search_context, result_context, klass, options = {})
+        # TODO consider options for scopes
         tags_to_find = tags_on(search_context).collect { |t| t.name }
 
         klass.select("#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count") \
@@ -53,6 +54,7 @@ module ActsAsTaggableOn::Taggable
       end
 
       def related_tags_for(context, klass, options = {})
+        # TODO consider options for scopes
 				tags_to_ignore = Array.wrap(options.delete(:ignore)).map(&:to_s) || []
         tags_to_find = tags_on(context).collect { |t| t.name }.reject { |t| tags_to_ignore.include? t }
 
