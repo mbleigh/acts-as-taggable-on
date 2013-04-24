@@ -77,23 +77,6 @@ describe "Acts As Taggable On" do
     end
   end
 
-  describe "Single Table Inheritance" do
-    before do
-      @taggable = TaggableModel.new(:name => "taggable")
-      @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
-      @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")
-    end
-
-    it "should pass on tag contexts to STI-inherited models" do
-      @inherited_same.should respond_to(:tag_list, :skill_list, :language_list)
-      @inherited_different.should respond_to(:tag_list, :skill_list, :language_list)
-    end
-
-    it "should have tag contexts added in altered STI models" do
-      @inherited_different.should respond_to(:part_list)
-    end
-  end
-
   describe "Reloading" do
     it "should save a model instantiated by Model.find" do
       taggable = TaggableModel.create!(:name => "Taggable")
@@ -154,49 +137,6 @@ describe "Acts As Taggable On" do
       taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(taggable1)
     end
 
-    context "Inherited Models" do
-      before do
-        @taggable1 = InheritingTaggableModel.create!(:name => "InheritingTaggable 1")
-        @taggable2 = InheritingTaggableModel.create!(:name => "InheritingTaggable 2")
-        @taggable3 = InheritingTaggableModel.create!(:name => "InheritingTaggable 3")
-        @taggable4 = InheritingTaggableModel.create!(:name => "InheritingTaggable 4")
-        @taggable5 = TaggableModel.create!(:name => "Taggable 5")
-
-        @taggable1.offering_list = "one, two"
-        @taggable1.need_list = "one, two"
-        @taggable1.save!
-
-        @taggable2.need_list = "one, two"
-        @taggable2.save!
-
-        @taggable3.offering_list = "one, two"
-        @taggable3.save!
-
-        @taggable4.tag_list = "one, two, three, four"
-        @taggable4.save!
-
-        @taggable5.need_list = "one, two"
-        @taggable5.save!
-      end
-
-      it "should find objects with tags of matching contexts" do
-        @taggable1.find_matching_contexts(:offerings, :needs).should include(@taggable2)
-        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable3)
-        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable4)
-        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable5)
-
-        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(@taggable2)
-        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable3)
-        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable4)
-        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should include(@taggable5)
-      end
-
-      it "should not include the object itself in the list of related objects with tags of matching contexts" do
-        @taggable1.find_matching_contexts(:offerings, :needs).should_not include(@taggable1)
-        @taggable1.find_matching_contexts_for(InheritingTaggableModel, :offerings, :needs).should_not include(@taggable1)
-        @taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs).should_not include(@taggable1)
-      end
-    end
   end
 
   describe 'Tagging Contexts' do
