@@ -42,7 +42,6 @@ module ActsAsTaggableOn::Taggable
 
     module InstanceMethods
       def matching_contexts_for(search_context, result_context, klass, options = {})
-        # TODO consider options for scopes
         tags_to_find = tags_on(search_context).collect { |t| t.name }
 
         klass.select("#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count") \
@@ -50,11 +49,9 @@ module ActsAsTaggableOn::Taggable
              .where(["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.base_class.to_s}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?) AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_to_find, result_context]) \
              .group(group_columns(klass)) \
              .order("count DESC")
-             #.update(options)
       end
 
       def related_tags_for(context, klass, options = {})
-        # TODO consider options for scopes
 				tags_to_ignore = Array.wrap(options.delete(:ignore)).map(&:to_s) || []
         tags_to_find = tags_on(context).collect { |t| t.name }.reject { |t| tags_to_ignore.include? t }
 
@@ -62,7 +59,7 @@ module ActsAsTaggableOn::Taggable
              .from("#{klass.table_name}, #{ActsAsTaggableOn::Tag.table_name}, #{ActsAsTaggableOn::Tagging.table_name}") \
              .where(["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.base_class.to_s}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?)", tags_to_find]) \
              .group(group_columns(klass)) \
-             .order("count DESC")#.update(options)
+             .order("count DESC")
       end
 
       private
