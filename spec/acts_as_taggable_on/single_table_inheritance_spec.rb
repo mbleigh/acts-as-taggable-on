@@ -15,7 +15,7 @@ describe "Single Table Inheritance" do
     let(:"inheriting_#{n}") { InheritingTaggableModel.new(:name => "Inheriting Model #{n}") }
   end
 
-  let(:user)                { Student.create! }
+  let(:student)             { Student.create! }
 
   describe "tag contexts" do
     it "should pass on to STI-inherited models" do
@@ -159,23 +159,28 @@ describe "Single Table Inheritance" do
 
   describe "ownership" do
     it "should have taggings" do
-      user.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
-      user.owned_taggings.size == 2
+      student.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
+      student.owned_taggings.should have(2).tags
     end
 
     it "should have tags" do
-      user.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
-      user.owned_tags.size == 2
+      student.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
+      student.owned_tags.should have(2).tags
     end
 
     it "should return tags for the inheriting tagger" do
-      user.tag(taggable, :with => 'ruby, scheme', :on => :tags)
-      taggable.tags_from(user).sort.should == %w(ruby scheme).sort
+      student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
+      taggable.tags_from(student).should match_array(%w(ruby scheme))
+    end
+
+    it "returns owner tags on the tagger" do
+      student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
+      taggable.owner_tags_on(student, :tags).should have(2).tags
     end
 
     it "should scope objects returned by tagged_with by owners" do
-      user.tag(taggable, :with => 'ruby, scheme', :on => :tags)
-      TaggableModel.tagged_with(%w(ruby scheme), :owned_by => user).count.should == 1
+      student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
+      TaggableModel.tagged_with(%w(ruby scheme), :owned_by => student).should have(1).tag
     end
   end
 
