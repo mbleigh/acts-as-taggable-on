@@ -106,6 +106,14 @@ module ActsAsTaggableOn::Taggable
 
           conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)})"
 
+          if owned_by
+            joins <<  "JOIN #{ActsAsTaggableOn::Tagging.table_name}" +
+                      "  ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = #{owned_by.id}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = #{quote_value(owned_by.class.base_class.to_s)}"
+          end
+
         elsif options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
           tags = if options.delete(:wild)
@@ -319,7 +327,6 @@ module ActsAsTaggableOn::Taggable
       def save_tags
         tagging_contexts.each do |context|
           next unless tag_list_cache_set_on(context)
-
           # List of currently assigned tag names
           tag_list = tag_list_cache_on(context).uniq
 
@@ -331,13 +338,22 @@ module ActsAsTaggableOn::Taggable
 
           # Tag maintenance based on whether preserving the created order of tags
           if self.class.preserve_tag_order?
-            # First off order the array of tag objects to match the tag list
-            # rather than existing tags followed by new tags
-            tags = tag_list.map { |l| tags.detect { |t| t.name.downcase == l.downcase } }
-            # To preserve tags in the order in which they were added
-            # delete all current tags and create new tags if the content or order has changed
-            old_tags = (tags == current_tags ? [] : current_tags)
-            new_tags = (tags == current_tags ? [] : tags)
+            old_tags, new_tags = current_tags - tags, tags - current_tags
+
+            shared_tags = current_tags & tags
+
+            if shared_tags.any? && tags[0...shared_tags.size] != shared_tags
+              index = shared_tags.each_with_index { |_, i| break i unless shared_tags[i] == tags[i] }
+
+              # Update arrays of tag objects
+              old_tags |= current_tags[index..current_tags.size]
+              new_tags |= current_tags[index..current_tags.size] & shared_tags
+
+              # Order the array of tag objects to match the tag list
+              new_tags = tags.map do |t| 
+                new_tags.find { |n| n.name.downcase == t.name.downcase }
+              end.compact
+            end
           else
             # Delete discarded tags and create new tags
             old_tags = current_tags - tags

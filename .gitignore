@@ -8,3 +8,4 @@ tmp*.sw?
 *.sw?
 tmp
 *.gem
+*.lock

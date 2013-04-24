@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe ActsAsTaggableOn::TagsHelper do
   before(:each) do

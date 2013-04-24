@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Taggable To Preserve Order" do
   before(:each) do
@@ -458,65 +458,6 @@ describe "Taggable" do
 
     it "should return all column names joined for NonStandardIdTaggableModel GROUP clause" do
       @taggable.grouped_column_names_for(TaggableModel).should == "taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type"
-    end
-  end
-
-  describe "Single Table Inheritance" do
-    before do
-      @taggable = TaggableModel.new(:name => "taggable")
-      @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
-      @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")
-    end
-
-    it "should be able to save tags for inherited models" do
-      @inherited_same.tag_list = "bob, kelso"
-      @inherited_same.save
-      InheritingTaggableModel.tagged_with("bob").first.should == @inherited_same
-    end
-
-    it "should find STI tagged models on the superclass" do
-      @inherited_same.tag_list = "bob, kelso"
-      @inherited_same.save
-      TaggableModel.tagged_with("bob").first.should == @inherited_same
-    end
-
-    it "should be able to add on contexts only to some subclasses" do
-      @inherited_different.part_list = "fork, spoon"
-      @inherited_different.save
-      InheritingTaggableModel.tagged_with("fork", :on => :parts).should be_empty
-      AlteredInheritingTaggableModel.tagged_with("fork", :on => :parts).first.should == @inherited_different
-    end
-
-    it "should have different tag_counts_on for inherited models" do
-      @inherited_same.tag_list = "bob, kelso"
-      @inherited_same.save!
-      @inherited_different.tag_list = "fork, spoon"
-      @inherited_different.save!
-
-      InheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso)
-      AlteredInheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(fork spoon)
-      TaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso fork spoon)
-    end
-
-    it "should have different tags_on for inherited models" do
-      @inherited_same.tag_list = "bob, kelso"
-      @inherited_same.save!
-      @inherited_different.tag_list = "fork, spoon"
-      @inherited_different.save!
-
-      InheritingTaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso)
-      AlteredInheritingTaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name).should == %w(fork spoon)
-      TaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso fork spoon)
-    end
-
-    it 'should store same tag without validation conflict' do
-      @taggable.tag_list = 'one'
-      @taggable.save!
-
-      @inherited_same.tag_list = 'one'
-      @inherited_same.save!
-
-      @inherited_same.update_attributes! :name => 'foo'
     end
   end
 

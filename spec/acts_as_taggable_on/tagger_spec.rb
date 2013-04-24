@@ -1,9 +1,9 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Tagger" do
   before(:each) do
     clean_database!
-    @user = TaggableUser.create
+    @user = User.create
     @taggable = TaggableModel.create(:name => "Bob Jones")
   end
 
@@ -21,7 +21,7 @@ describe "Tagger" do
     @taggable2 = TaggableModel.create(:name => "Jim Jones")
     @taggable3 = TaggableModel.create(:name => "Jane Doe")
 
-    @user2 = TaggableUser.new
+    @user2 = User.new
     @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
     @user2.tag(@taggable2, :with => 'ruby, scheme', :on => :tags)
     @user2.tag(@taggable3, :with => 'ruby, scheme', :on => :tags)
@@ -31,7 +31,7 @@ describe "Tagger" do
   end
 
   it "only returns objects tagged by owned_by when any is true" do
-    @user2 = TaggableUser.new
+    @user2 = User.new
     @taggable2 = TaggableModel.create(:name => "Jim Jones")
     @taggable3 = TaggableModel.create(:name => "Jane Doe")
 
@@ -43,8 +43,21 @@ describe "Tagger" do
     tags.should match_array [@taggable, @taggable2]
   end
 
+  it "only returns objects tagged by owned_by when exclude is true" do
+    @user2 = User.new
+    @taggable2 = TaggableModel.create(:name => "Jim Jones")
+    @taggable3 = TaggableModel.create(:name => "Jane Doe")
+
+    @user.tag(@taggable, :with => 'ruby', :on => :tags)
+    @user.tag(@taggable2, :with => 'java', :on => :tags)
+    @user2.tag(@taggable3, :with => 'java', :on => :tags)
+
+    tags = TaggableModel.tagged_with(%w(ruby), :owned_by => @user, :exclude => true)
+    tags.should match_array [@taggable2]
+  end
+
   it "should not overlap tags from different taggers" do
-    @user2 = TaggableUser.new
+    @user2 = User.new
     lambda{
       @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
       @user2.tag(@taggable, :with => 'java, python, lisp, ruby', :on => :tags)
@@ -63,7 +76,7 @@ describe "Tagger" do
   end
 
   it "should not lose tags from different taggers" do
-    @user2 = TaggableUser.create
+    @user2 = User.create
     @user2.tag(@taggable, :with => 'java, python, lisp, ruby', :on => :tags)
     @user.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
 
@@ -81,7 +94,7 @@ describe "Tagger" do
   end
 
   it "should not lose tags" do
-    @user2 = TaggableUser.create
+    @user2 = User.create
 
     @user.tag(@taggable, :with => 'awesome', :on => :tags)
     @user2.tag(@taggable, :with => 'awesome, epic', :on => :tags)
@@ -119,32 +132,6 @@ describe "Tagger" do
     lambda {
       @user.tag(@taggable, :with => 'epic', :on => :tags, :skip_save => true)
     }.should_not change(ActsAsTaggableOn::Tagging, :count)
-  end
-
-  describe "Single Table Inheritance" do
-    before do
-      @user3 = InheritingTaggableUser.create
-    end
-
-    it "should have taggings" do
-      @user3.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
-      @user3.owned_taggings.size == 2
-    end
-
-    it "should have tags" do
-      @user3.tag(@taggable, :with=>'ruby,scheme', :on=>:tags)
-      @user3.owned_tags.size == 2
-    end
-
-    it "should return tags for the inheriting tagger" do
-      @user3.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
-      @taggable.tags_from(@user3).sort.should == %w(ruby scheme).sort
-    end
-
-    it "should scope objects returned by tagged_with by owners" do
-      @user3.tag(@taggable, :with => 'ruby, scheme', :on => :tags)
-      TaggableModel.tagged_with(%w(ruby scheme), :owned_by => @user3).count.should == 1
-    end
   end
 
 end
