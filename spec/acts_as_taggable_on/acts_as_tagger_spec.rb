@@ -7,15 +7,15 @@ describe "acts_as_tagger" do
   
   describe "Tagger Method Generation" do
     before(:each) do
-      @tagger = TaggableUser.new()
+      @tagger = User.new
     end
 
     it "should add #is_tagger? query method to the class-side" do
-      TaggableUser.should respond_to(:is_tagger?)
+      User.should respond_to(:is_tagger?)
     end
     
     it "should return true from the class-side #is_tagger?" do
-      TaggableUser.is_tagger?.should be_true
+      User.is_tagger?.should be_true
     end
     
     it "should return false from the base #is_tagger?" do
@@ -38,7 +38,7 @@ describe "acts_as_tagger" do
   describe "#tag" do
     context 'when called with a non-existent tag context' do
       before(:each) do
-        @tagger = TaggableUser.new()
+        @tagger = User.new
         @taggable = TaggableModel.new(:name=>"Richard Prior")
       end
       
@@ -86,8 +86,8 @@ describe "acts_as_tagger" do
     
     describe "when called by multiple tagger's" do
       before(:each) do
-        @user_x = TaggableUser.create(:name => "User X")
-        @user_y = TaggableUser.create(:name => "User Y")
+        @user_x = User.create(:name => "User X")
+        @user_y = User.create(:name => "User Y")
         @taggable = TaggableModel.create(:name => 'acts_as_taggable_on', :tag_list => 'plugin')
         
         @user_x.tag(@taggable, :with => 'ruby, rails',  :on => :tags)

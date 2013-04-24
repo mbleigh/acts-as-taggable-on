@@ -15,7 +15,7 @@ describe "Single Table Inheritance" do
     let(:"inheriting_#{n}") { InheritingTaggableModel.new(:name => "Inheriting Model #{n}") }
   end
 
-  let(:user)                { InheritingTaggableUser.create! }
+  let(:user)                { Student.create! }
 
   describe "tag contexts" do
     it "should pass on to STI-inherited models" do
