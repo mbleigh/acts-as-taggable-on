@@ -16,6 +16,9 @@ module ActsAsTaggableOn
   mattr_accessor :force_parameterize
   @@force_parameterize = false
 
+  mattr_accessor :force_alphanumeric
+  @@force_alphanumeric = false
+
   mattr_accessor :strict_case_match
   @@strict_case_match = false
 
