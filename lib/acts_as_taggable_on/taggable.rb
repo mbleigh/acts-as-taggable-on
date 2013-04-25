@@ -80,7 +80,7 @@ module ActsAsTaggableOn
           self.preserve_tag_order = preserve_tag_order
         
           class_eval do
-            has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag, :class_name => "ActsAsTaggableOn::Tagging"
+            has_many :taggings, :as => :taggable, :dependent => :destroy, :class_name => "ActsAsTaggableOn::Tagging"
             has_many :base_tags, :through => :taggings, :source => :tag, :class_name => "ActsAsTaggableOn::Tag"
 
             def self.taggable?
