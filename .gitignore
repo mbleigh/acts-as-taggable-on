@@ -3,9 +3,9 @@
 /pkg/*
 .bundle
 .ruby-version
-Gemfile.lock
 spec/database.yml
 tmp*.sw?
 *.sw?
 tmp
 *.gem
+*.lock

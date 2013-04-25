@@ -32,11 +32,11 @@ class AlteredInheritingTaggableModel < TaggableModel
   acts_as_taggable_on :parts
 end
 
-class TaggableUser < ActiveRecord::Base
+class User < ActiveRecord::Base
   acts_as_tagger
 end
 
-class InheritingTaggableUser < TaggableUser
+class Student < User
 end
 
 class UntaggableModel < ActiveRecord::Base
