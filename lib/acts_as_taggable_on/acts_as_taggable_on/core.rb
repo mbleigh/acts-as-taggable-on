@@ -89,7 +89,7 @@ module ActsAsTaggableOn::Taggable
 
         joins = []
         conditions = []
-        having = []
+        having = {}
         select_clause = []
 
         context = options.delete(:on)
