@@ -1,0 +1,8 @@
+When upgrading
+
+Re-run the migrations generator
+
+    rails generate acts_as_taggable_on:migration
+    rake db:migrate
+
+It will create any new migrations and skip existing ones
