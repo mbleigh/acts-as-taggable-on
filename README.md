@@ -65,6 +65,10 @@ If you want, add a `.ruby-version` file in the project root (and use rbenv or RV
 
 ## Usage
 
+*Note: The following examples with delimiters inside string argument all
+depend on `ActsAsTaggableOn.delimiter` being set to ',' which is the
+default. See [configuration](#configuration) for more about delimiter.*
+
 ```ruby
 class User < ActiveRecord::Base
   # Alias for acts_as_taggable_on :tags
@@ -73,19 +77,42 @@ class User < ActiveRecord::Base
 end
 
 @user = User.new(:name => "Bobby")
-@user.tag_list = "awesome, slick, hefty"      # this should be familiar
-@user.skill_list = "joking, clowning, boxing" # but you can do it for any context!
 
-@user.tags                                    # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
-@user.skills                                  # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
-@user.skill_list                              # => ["joking","clowning","boxing"] as TagList
+# this should be familiar
+@user.tag_list = "awesome, slick, hefty"
 
-@user.tag_list.remove("awesome")              # remove a single tag
-@user.tag_list.remove("awesome, slick")       # works with arrays too
-@user.tag_list.add("awesomer")                # add a single tag. alias for <<
-@user.tag_list.add("awesomer, slicker")       # also works with arrays
+# but you can do it for any context!
+@user.skill_list = "joking, clowning, boxing"
 
-User.skill_counts                             # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
+@user.tags
+# => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
+
+@user.skills
+# => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
+
+@user.skill_list
+# => ["joking","clowning","boxing"] as TagList
+
+# remove a single tag
+@user.tag_list.remove("awesome")
+
+# "remove" works with arrays too
+@user.tag_list.remove("awesome", "slick")
+
+# "remove" works with string too, needing "parse: true" option.
+@user.tag_list.remove("awesome, slick", parse: true)
+
+# add a single tag. alias for <<
+@user.tag_list.add("awesomer")
+
+# "add" also works with arrays
+@user.tag_list.add("awesomer", "slicker")
+
+# "add" works with string too, needing "parse: true" option.
+@user.tag_list.add("awesomer, slicker", parse: true)
+
+User.skill_counts
+# => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
 ```
 
 To preserve the order in which tags are created use `acts_as_ordered_taggable`:
