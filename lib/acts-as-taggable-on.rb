@@ -48,6 +48,7 @@ require "acts_as_taggable_on/tag"
 require "acts_as_taggable_on/tag_list"
 require "acts_as_taggable_on/tags_helper"
 require "acts_as_taggable_on/tagging"
+require 'acts_as_taggable_on/engine'
 
 ActiveSupport.on_load(:active_record) do
   extend ActsAsTaggableOn::Compatibility
@@ -57,4 +58,3 @@ end
 ActiveSupport.on_load(:action_view) do
   include ActsAsTaggableOn::TagsHelper
 end
-

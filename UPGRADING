@@ -2,7 +2,6 @@ When upgrading
 
 Re-run the migrations generator
 
-    rails generate acts_as_taggable_on:migration
-    rake db:migrate
+    rake railties:install:migrations FROM=acts_as_taggable_on_engine db:migrate
 
 It will create any new migrations and skip existing ones
