@@ -5,8 +5,6 @@ require 'rails'
 
 require "digest/sha1"
 
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-
 module ActsAsTaggableOn
   mattr_accessor :delimiter
   @@delimiter = ','
@@ -50,8 +48,6 @@ require "acts_as_taggable_on/tag"
 require "acts_as_taggable_on/tag_list"
 require "acts_as_taggable_on/tags_helper"
 require "acts_as_taggable_on/tagging"
-
-$LOAD_PATH.shift
 
 
 if defined?(ActiveRecord::Base)
