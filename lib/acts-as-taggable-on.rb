@@ -49,14 +49,12 @@ require "acts_as_taggable_on/tag_list"
 require "acts_as_taggable_on/tags_helper"
 require "acts_as_taggable_on/tagging"
 
-
-if defined?(ActiveRecord::Base)
-  ActiveRecord::Base.extend ActsAsTaggableOn::Compatibility
-  ActiveRecord::Base.extend ActsAsTaggableOn::Taggable
-  ActiveRecord::Base.send :include, ActsAsTaggableOn::Tagger
+ActiveSupport.on_load(:active_record) do
+  extend ActsAsTaggableOn::Compatibility
+  extend ActsAsTaggableOn::Taggable
+  include ActsAsTaggableOn::Tagger
 end
-
-if defined?(ActionView::Base)
-  ActionView::Base.send :include, ActsAsTaggableOn::TagsHelper
+ActiveSupport.on_load(:action_view) do
+  include ActsAsTaggableOn::TagsHelper
 end
 
