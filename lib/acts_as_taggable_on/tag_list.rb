@@ -32,15 +32,16 @@ module ActsAsTaggableOn
           \s*"          # quote (") optionally preceded by whitespace
           (.*?)         # Tag ($2)
           "\s*          # quote (") optionally followed by whitespace
-          (             # Tag end delimiter ($3)
+          (?=           # Tag end delimiter (not consumed; is zero-length lookahead)
             #{d}\s*  |  # Either a delimiter optionally followed by whitespace or
             \z          # string end
           )
         }x
         string.gsub!(double_quote_pattern) {
           # Append the matched tag to the tag list
+          tag_list << $2
           # Return the matched delimiter ($3) to replace the matched items
-          tag_list << $2; $3
+          ''
         }
         single_quote_pattern = %r{
           (             # Tag start delimiter ($1)
@@ -50,15 +51,16 @@ module ActsAsTaggableOn
           \s*'          # quote (') optionally preceded by whitespace
           (.*?)         # Tag ($2)
           '\s*          # quote (') optionally followed by whitespace
-          (             # Tag end delimiter ($3)
+          (?=           # Tag end delimiter (not consumed; is zero-length lookahead)
             #{d}\s*  |  # Either a delimiter optionally followed by whitespace or
             \z          # string end
           )
         }x
         string.gsub!(single_quote_pattern) {
           # Append the matched tag ($2) to the tag list
-          # Return the matched delimiter ($3) to replace the matched items
-          tag_list << $2; $3
+          tag_list << $2
+          # Return an empty string to replace the matched items
+          ''
         }
 
         # split the string by the delimiter
