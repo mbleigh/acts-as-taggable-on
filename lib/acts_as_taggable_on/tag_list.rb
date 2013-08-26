@@ -22,9 +22,9 @@ module ActsAsTaggableOn
 
         # Parse the quoted tags
         d = ActsAsTaggableOn.delimiter
-        d = d.join("|") if d.kind_of?(Array) 
-        string.gsub!(/(\A|#{d})\s*"(.*?)"\s*(#{d}\s*|\z)/) { tag_list << $2; $3 }
-        string.gsub!(/(\A|#{d})\s*'(.*?)'\s*(#{d}\s*|\z)/) { tag_list << $2; $3 }
+        d = d.join("|") if d.kind_of?(Array)
+        string.gsub!(/(\A|#{d})\s*"(.*?)"\s*(?=#{d}\s*|\z)/) { tag_list << $2; '' }
+        string.gsub!(/(\A|#{d})\s*'(.*?)'\s*(?=#{d}\s*|\z)/) { tag_list << $2; '' }
 
         tag_list.add(string.split(Regexp.new d))
       end
