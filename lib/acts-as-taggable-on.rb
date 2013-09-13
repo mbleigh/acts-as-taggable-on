@@ -1,6 +1,7 @@
 require "active_record"
 require "active_record/version"
 require "action_view"
+require 'active_support/core_ext/module/attribute_accessors'
 
 require "digest/sha1"
 
