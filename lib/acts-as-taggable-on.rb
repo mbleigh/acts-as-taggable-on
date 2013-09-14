@@ -6,29 +6,23 @@ require 'active_support/all'
 require "digest/sha1"
 
 module ActsAsTaggableOn
-  mattr_accessor :delimiter
-  @@delimiter = ','
+  include ActiveSupport::Configurable
 
-  mattr_accessor :force_lowercase
-  @@force_lowercase = false
-
-  mattr_accessor :force_parameterize
-  @@force_parameterize = false
-
-  mattr_accessor :strict_case_match
-  @@strict_case_match = false
-
-  mattr_accessor :remove_unused_tags
-  self.remove_unused_tags = false
+  config_accessor(:delimiter)           { ',' }
+  config_accessor(:force_lowercase)    { false }
+  config_accessor(:force_parameterize) { false }
+  config_accessor(:strict_case_match)  { false }
+  config_accessor(:remove_unused_tags) { false }
 
   def self.glue
-    delimiter = @@delimiter.kind_of?(Array) ? @@delimiter[0] : @@delimiter
-    delimiter.ends_with?(" ") ? delimiter : "#{delimiter} "
+    del = delimiter.kind_of?(Array) ? delimiter[0] : delimiter
+    del.ends_with?(" ") ? del : "#{del} "
   end
 
   def self.setup
     yield self
   end
+
 end
 
 
