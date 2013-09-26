@@ -190,13 +190,13 @@ module ActsAsTaggableOn::Taggable
           having = "COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
 
-        select(select_clause) \
-          .joins(joins.join(" ")) \
-          .where(conditions.join(" AND ")) \
-          .group(group) \
-          .having(having) \
-          .order(options[:order]) \
-          .readonly(false)
+        select(select_clause).
+          joins(joins.join(" ")).
+          where(conditions.join(" AND ")).
+          group(group).
+          having(having).
+          order(options[:order]).
+          readonly(false)
       end
 
       def is_taggable?
