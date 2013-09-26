@@ -1,5 +1,6 @@
 require "active_record"
 require "active_record/version"
+require "active_support/core_ext/module"
 require "action_view"
 require 'active_support/all'
 

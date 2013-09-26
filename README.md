@@ -53,6 +53,7 @@ directory, you can run the specs with:
 
 ```shell
 bundle
+cp spec/database.yml{.sample,}
 rake spec
 ```
 
