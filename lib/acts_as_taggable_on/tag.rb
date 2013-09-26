@@ -1,7 +1,7 @@
 # coding: utf-8
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
-    include ActsAsTaggableOn::Utils
+    extend ActsAsTaggableOn::Utils
 
     attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
 

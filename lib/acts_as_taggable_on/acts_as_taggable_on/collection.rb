@@ -1,7 +1,6 @@
 module ActsAsTaggableOn::Taggable
   module Collection
     def self.included(base)
-      base.send :include, ActsAsTaggableOn::Taggable::Collection::InstanceMethods
       base.extend ActsAsTaggableOn::Taggable::Collection::ClassMethods
       base.initialize_acts_as_taggable_on_collection
     end
@@ -178,10 +177,8 @@ module ActsAsTaggableOn::Taggable
       end
     end
 
-    module InstanceMethods
-      def tag_counts_on(context, options={})
-        self.class.tag_counts_on(context, options.merge(:id => id))
-      end
+    def tag_counts_on(context, options={})
+      self.class.tag_counts_on(context, options.merge(:id => id))
     end
 
     module CalculationMethods
