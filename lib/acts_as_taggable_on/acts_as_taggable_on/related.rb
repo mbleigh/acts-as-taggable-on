@@ -20,18 +20,6 @@ module ActsAsTaggableOn::Taggable
             end
           RUBY
         end
-
-        unless tag_types.empty?
-          class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def find_matching_contexts(search_context, result_context, options = {})
-              matching_contexts_for(search_context.to_s, result_context.to_s, self.class, options)
-            end
-
-            def find_matching_contexts_for(klass, search_context, result_context, options = {})
-              matching_contexts_for(search_context.to_s, result_context.to_s, klass, options)
-            end
-          RUBY
-        end
       end
 
       def acts_as_taggable_on(*args)
@@ -41,6 +29,14 @@ module ActsAsTaggableOn::Taggable
     end
 
     module InstanceMethods
+      def find_matching_contexts(search_context, result_context, options = {})
+        matching_contexts_for(search_context.to_s, result_context.to_s, self.class, options)
+      end
+
+      def find_matching_contexts_for(klass, search_context, result_context, options = {})
+        matching_contexts_for(search_context.to_s, result_context.to_s, klass, options)
+      end
+
       def matching_contexts_for(search_context, result_context, klass, options = {})
         tags_to_find = tags_on(search_context).collect { |t| t.name }
 
