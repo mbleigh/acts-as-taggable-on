@@ -2,6 +2,7 @@ ActiveRecord::Schema.define version: 0 do
   create_table :tags, force: true do |t|
     t.string :name
     t.integer :taggings_count, default: 0
+    t.string :type
   end
   add_index 'tags', ['name'], name: 'index_tags_on_name', unique: true
 
@@ -53,6 +54,10 @@ ActiveRecord::Schema.define version: 0 do
     t.column :cached_language_list, :string
     t.column :cached_status_list, :string
     t.column :cached_glass_list, :string
+  end
+
+  create_table :companies, force: true do |t|
+    t.column :name, :string
   end
 
   create_table :users, force: true do |t|

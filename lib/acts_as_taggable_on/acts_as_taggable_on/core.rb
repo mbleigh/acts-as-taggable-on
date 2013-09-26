@@ -352,7 +352,7 @@ module ActsAsTaggableOn::Taggable
         tag_list = tag_list_cache_on(context).uniq
 
         # Find existing tags or create non-existing tags:
-        tags = load_tags(tag_list)
+        tags = find_or_create_tags_from_list_with_context(tag_list, context)
 
         # Tag objects for currently assigned tags
         current_tags = tags_on(context)
@@ -394,5 +394,31 @@ module ActsAsTaggableOn::Taggable
 
       true
     end
+
+    private
+
+    ##
+    # Override this hook if you wish to subclass {ActsAsTaggableOn::Tag} --
+    # context is provided so that you may conditionally use a Tag subclass
+    # only for some contexts.
+    #
+    # @example Custom Tag class for one context
+    #   class Company < ActiveRecord::Base
+    #     acts_as_taggable_on :markets, :locations
+    #
+    #     def find_or_create_tags_from_list_with_context(tag_list, context)
+    #       if context.to_sym == :markets
+    #         MarketTag.find_or_create_all_with_like_by_name(tag_list)
+    #       else
+    #         super
+    #       end
+    #     end
+    #
+    # @param [Array<String>] tag_list Tags to find or create
+    # @param [Symbol] context The tag context for the tag_list
+    def find_or_create_tags_from_list_with_context(tag_list, context)
+      load_tags(tag_list)
+    end
   end
 end
+

@@ -71,13 +71,13 @@ module ActsAsTaggableOn
 
       return [] if list.empty?
 
-      existing_tags = Tag.named_any(list)
+      existing_tags = named_any(list)
 
       list.map do |tag_name|
         comparable_tag_name = comparable_name(tag_name)
         existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
         begin
-          existing_tag || Tag.create(name: tag_name)
+          existing_tag || create(name: tag_name)
         rescue ActiveRecord::RecordNotUnique
           # Postgres aborts the current transaction with
           # PG::InFailedSqlTransaction: ERROR:  current transaction is aborted, commands ignored until end of transaction block
