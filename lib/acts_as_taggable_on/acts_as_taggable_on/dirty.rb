@@ -10,7 +10,6 @@ module ActsAsTaggableOn::Taggable
       def initialize_acts_as_taggable_on_dirty
         tag_types.map(&:to_s).each do |tags_type|
           tag_type         = tags_type.to_s.singularize
-          context_tags     = tags_type.to_sym
 
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{tag_type}_list_changed?

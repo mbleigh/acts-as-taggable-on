@@ -49,7 +49,7 @@ module ActsAsTaggableOn::Taggable
 
       def cached_owned_tag_list_on(context)
         variable_name = "@owned_#{context}_list"
-        cache = (instance_variable_defined?(variable_name) && instance_variable_get(variable_name)) || instance_variable_set(variable_name, {})
+        (instance_variable_defined?(variable_name) && instance_variable_get(variable_name)) || instance_variable_set(variable_name, {})
       end
       
       def owner_tag_list_on(owner, context)

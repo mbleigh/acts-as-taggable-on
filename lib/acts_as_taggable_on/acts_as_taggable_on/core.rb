@@ -178,7 +178,7 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
-        taggings_alias, tags_alias = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
+        taggings_alias, _ = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
 
         if options.delete(:match_all)
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
@@ -269,7 +269,6 @@ module ActsAsTaggableOn::Taggable
       ##
       # Returns all tags of a given context
       def all_tags_on(context)
-        tag_table_name = ActsAsTaggableOn::Tag.table_name
         tagging_table_name = ActsAsTaggableOn::Tagging.table_name
 
         opts  =  ["#{tagging_table_name}.context = ?", context.to_s]
