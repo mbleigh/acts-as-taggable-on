@@ -18,7 +18,7 @@ module ActsAsTaggableOn
       def sha_prefix(string)
         Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
       end
-      
+
       private
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'

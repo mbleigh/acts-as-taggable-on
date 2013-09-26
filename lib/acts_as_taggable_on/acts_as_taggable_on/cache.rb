@@ -7,9 +7,9 @@ module ActsAsTaggableOn::Taggable
         # @private
         def _has_tags_cache_columns?(db_columns)
           db_column_names = db_columns.map(&:name)
-          tag_types.any? {|context|
+          tag_types.any? do |context|
             db_column_names.include?("cached_#{context.to_s.singularize}_list")
-          }
+          end
         end
 
         # @private

@@ -48,7 +48,7 @@ module ActsAsTaggableOn::Taggable
       end
 
       def related_tags_for(context, klass, options = {})
-				tags_to_ignore = Array.wrap(options.delete(:ignore)).map(&:to_s) || []
+        tags_to_ignore = Array.wrap(options.delete(:ignore)).map(&:to_s) || []
         tags_to_find = tags_on(context).collect { |t| t.name }.reject { |t| tags_to_ignore.include? t }
 
         klass.select("#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count") \
@@ -59,17 +59,17 @@ module ActsAsTaggableOn::Taggable
       end
 
       private
-      
+
       def exclude_self(klass, id)
         if [self.class.base_class, self.class].include? klass
-          "#{klass.table_name}.#{klass.primary_key} != #{id} AND" 
+          "#{klass.table_name}.#{klass.primary_key} != #{id} AND"
         else
           nil
         end
       end
 
       def group_columns(klass)
-        if ActsAsTaggableOn::Tag.using_postgresql? 
+        if ActsAsTaggableOn::Tag.using_postgresql?
           grouped_column_names_for(klass)
         else
           "#{klass.table_name}.#{klass.primary_key}"
