@@ -1,4 +1,3 @@
-# coding: utf-8
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     include ActsAsTaggableOn::Utils
@@ -72,14 +71,27 @@ module ActsAsTaggableOn
 
       return [] if list.empty?
 
-      existing_tags = Tag.named_any(list)
+      existing_tags = existing_tags_by_list_name(list)
 
       list.map do |tag_name|
-        comparable_tag_name = comparable_name(tag_name)
-        existing_tag = existing_tags.detect { |tag| comparable_name(tag.name) == comparable_tag_name }
+        existing_tag = existing_tags[comparable_name(tag_name)]
 
         existing_tag || Tag.create(:name => tag_name)
       end
+    end
+
+    def self.existing_tags_by_list_name(*list)
+      list = [list].flatten
+
+      return [] if list.empty?
+
+      if !ActsAsTaggableOn.strict_case_match && using_case_insensitive_collation?
+        names_to_find = list.map { |name| "SELECT '#{name}' AS list_name" }.join(" UNION ALL ")
+        tags = ActsAsTaggableOn::Tag.named_any(list).select("#{all_columns}, names.list_name").joins("INNER JOIN (#{names_to_find}) AS names ON #{name_column} = names.list_name")
+      else
+        tags = named_any(list).select("#{all_columns}, #{name_column} AS list_name")
+      end
+      Hash[tags.group_by { |tag| comparable_name(tag.list_name) }.map{|k,v| [k,v.first]}]
     end
 
     ### INSTANCE METHODS:
@@ -99,12 +111,20 @@ module ActsAsTaggableOn
     class << self
       private
 
+      def all_columns
+        "#{ActsAsTaggableOn::Tag.table_name}.*"
+      end
+
+      def name_column
+        "#{ActsAsTaggableOn::Tag.table_name}.name"
+      end
+
       def comparable_name(str)
         as_8bit_ascii(str).downcase
       end
 
       def binary
-        /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
+        using_mysql ? "BINARY " : nil
       end
 
       def as_8bit_ascii(string)
