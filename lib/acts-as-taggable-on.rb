@@ -15,13 +15,14 @@ module ActsAsTaggableOn
   config_accessor(:remove_unused_tags) { false }
 
   def self.glue
-    del = delimiter.kind_of?(Array) ? delimiter[0] : delimiter
-    del.ends_with?(" ") ? del : "#{del} "
+    glue = delimiter.kind_of?(Array) ? delimiter[0] : delimiter
+    glue.ends_with?(" ") ? glue : "#{glue} "
   end
 
-  def self.setup
+  def self.configure
     yield self
   end
+  alias :setup :configure
 
 end
 
