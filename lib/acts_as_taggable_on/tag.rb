@@ -2,7 +2,7 @@ module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     include ActsAsTaggableOn::Utils
 
-    attr_accessible :name
+    attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
 
     ### ASSOCIATIONS:
 
@@ -11,17 +11,30 @@ module ActsAsTaggableOn
     ### VALIDATIONS:
 
     validates_presence_of :name
-    validates_uniqueness_of :name
+    validates_uniqueness_of :name, :if => :validates_name_uniqueness?
     validates_length_of :name, :maximum => 255
+
+    # monkey patch this method if don't need name uniqueness validation
+    def validates_name_uniqueness?
+      true
+    end
 
     ### SCOPES:
 
     def self.named(name)
-      where(["lower(name) = ?", name.downcase])
+      if ActsAsTaggableOn.strict_case_match
+        where(["name = #{binary}?", name])
+      else
+        where(["lower(name) = ?", name.downcase])
+      end
     end
 
     def self.named_any(list)
-      where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
+      if ActsAsTaggableOn.strict_case_match
+        where(list.map { |tag| sanitize_sql(["name = #{binary}?", tag.to_s.mb_chars]) }.join(" OR "))
+      else
+        where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
+      end
     end
 
     def self.named_like(name)
@@ -35,7 +48,11 @@ module ActsAsTaggableOn
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
-      named_like(name).first || create(:name => name)
+      if (ActsAsTaggableOn.strict_case_match)
+        self.find_or_create_all_with_like_by_name([name]).first
+      else
+        named_like(name).first || create(:name => name)
+      end
     end
 
     def self.find_or_create_all_with_like_by_name(*list)
@@ -43,14 +60,14 @@ module ActsAsTaggableOn
 
       return [] if list.empty?
 
-      existing_tags = Tag.named_any(list).all
-      new_tag_names = list.reject do |name|
-                        name = comparable_name(name)
-                        existing_tags.any? { |tag| comparable_name(tag.name) == name }
-                      end
-      created_tags  = new_tag_names.map { |name| Tag.create(:name => name) }
+      existing_tags = Tag.named_any(list)
 
-      existing_tags + created_tags
+      list.map do |tag_name|
+        comparable_tag_name = comparable_name(tag_name)
+        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
+
+        existing_tag || Tag.create(:name => tag_name)
+      end
     end
 
     ### INSTANCE METHODS:
@@ -69,9 +86,14 @@ module ActsAsTaggableOn
 
     class << self
       private
-        def comparable_name(str)
-          str.mb_chars.downcase.to_s
-        end
+
+      def comparable_name(str)
+        str.mb_chars.downcase.to_s
+      end
+
+      def binary
+        /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
+      end
     end
   end
 end

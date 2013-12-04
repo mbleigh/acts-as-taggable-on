@@ -1,6 +1,5 @@
-#encoding: utf-8
-
-require File.expand_path('../../spec_helper', __FILE__)
+# encoding: utf-8
+require 'spec_helper'
 
 describe ActsAsTaggableOn::Tag do
   before(:each) do
@@ -150,4 +149,63 @@ describe ActsAsTaggableOn::Tag do
 
   end
 
+  describe "when using strict_case_match" do
+    before do
+      ActsAsTaggableOn.strict_case_match = true
+      @tag.name = "awesome"
+      @tag.save!
+    end
+
+    after do
+      ActsAsTaggableOn.strict_case_match = false
+    end
+
+    it "should find by name" do
+      ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("awesome").should == @tag
+    end
+
+    it "should find by name case sensitively" do
+      expect {
+        ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("AWESOME")
+      }.to change(ActsAsTaggableOn::Tag, :count)
+
+      ActsAsTaggableOn::Tag.last.name.should == "AWESOME"
+    end
+
+    it "should have a named_scope named(something) that matches exactly" do
+      uppercase_tag = ActsAsTaggableOn::Tag.create(:name => "Cool")
+      @tag.name     = "cool"
+      @tag.save!
+
+      ActsAsTaggableOn::Tag.named('cool').should include(@tag)
+      ActsAsTaggableOn::Tag.named('cool').should_not include(uppercase_tag)
+    end
+  end
+
+  describe "name uniqeness validation" do
+    let(:duplicate_tag) { ActsAsTaggableOn::Tag.new(:name => 'ror') }
+
+    before { ActsAsTaggableOn::Tag.create(:name => 'ror') }
+
+    context "when don't need unique names" do
+      it "should not run uniqueness validation" do
+        duplicate_tag.stub(:validates_name_uniqueness?).and_return(false)
+        duplicate_tag.save
+        duplicate_tag.should be_persisted
+      end  
+    end
+
+    context "when do need unique names" do
+      it "should run uniqueness validation" do
+        duplicate_tag.should_not be_valid        
+      end
+
+      it "add error to name" do
+        duplicate_tag.save
+
+        duplicate_tag.should have(1).errors
+        duplicate_tag.errors.messages[:name].should include('has already been taken')
+      end
+    end
+  end
 end

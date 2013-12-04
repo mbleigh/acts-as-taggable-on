@@ -1,28 +1,35 @@
-$:.push File.dirname(__FILE__) + '/lib'
-require 'acts-as-taggable-on/version'
+# coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'acts_as_taggable_on/version'
 
 Gem::Specification.new do |gem|
-  gem.name = %q{acts-as-taggable-on}
-  gem.authors = ["Michael Bleigh"]
-  gem.date = %q{2012-07-16}
-  gem.description = %q{With ActsAsTaggableOn, you can tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
-  gem.summary = "Advanced tagging for Rails."
-  gem.email = %q{michael@intridea.com}
-  gem.homepage      = ''
+  gem.name          = "acts-as-taggable-on"
+  gem.version       = ActsAsTaggableOn::VERSION
+  gem.authors       = ["Michael Bleigh", "Joost Baaij"]
+  gem.email         = ["michael@intridea.com", "joost@spacebabies.nl"]
+  gem.description   = %q{With ActsAsTaggableOn, you can tag a single model on several contexts, such as skills, interests, and awards. It also provides other advanced functionality.}
+  gem.summary       = "Advanced tagging for Rails."
+  gem.homepage      = 'https://github.com/mbleigh/acts-as-taggable-on'
+  gem.license       = "MIT"
 
-  gem.add_runtime_dependency 'rails', '~> 3.0'
+  gem.files         = `git ls-files`.split($/)
+  gem.executables   = gem.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
+  gem.require_paths = ["lib"]
+
+  if File.exists?('UPGRADING')
+    gem.post_install_message = File.read('UPGRADING')
+  end
+
+  gem.add_runtime_dependency 'rails', ['>= 3', '< 5']
+
+  gem.add_development_dependency 'rspec-rails', '2.13.0' # 2.13.1 is broken
   gem.add_development_dependency 'rspec', '~> 2.6'
-  gem.add_development_dependency 'ammeter', '~> 0.1.3'
+  gem.add_development_dependency 'ammeter'
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'mysql2', '~> 0.3.7'
   gem.add_development_dependency 'pg'
   gem.add_development_dependency 'guard'
   gem.add_development_dependency 'guard-rspec'
-
-  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  gem.files         = `git ls-files`.split("\n")
-  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  gem.name          = "acts-as-taggable-on"
-  gem.require_paths = ['lib']
-  gem.version       = ActsAsTaggableOn::VERSION
 end

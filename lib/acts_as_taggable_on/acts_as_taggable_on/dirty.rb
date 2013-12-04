@@ -12,7 +12,7 @@ module ActsAsTaggableOn::Taggable
           tag_type         = tags_type.to_s.singularize
           context_tags     = tags_type.to_sym
 
-          class_eval %(
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{tag_type}_list_changed?
               changed_attributes.include?("#{tag_type}_list")
             end
@@ -28,7 +28,7 @@ module ActsAsTaggableOn::Taggable
             def #{tag_type}_list_changes
               [changed_attributes['#{tag_type}_list'], __send__('#{tag_type}_list')] if changed_attributes.include?("#{tag_type}_list")
             end
-          )
+          RUBY
 
         end
       end

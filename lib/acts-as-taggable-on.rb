@@ -16,6 +16,9 @@ module ActsAsTaggableOn
   mattr_accessor :force_parameterize
   @@force_parameterize = false
 
+  mattr_accessor :strict_case_match
+  @@strict_case_match = false
+
   mattr_accessor :remove_unused_tags
   self.remove_unused_tags = false
 
@@ -33,6 +36,7 @@ end
 require "acts_as_taggable_on/utils"
 
 require "acts_as_taggable_on/taggable"
+require "acts_as_taggable_on/acts_as_taggable_on/compatibility"
 require "acts_as_taggable_on/acts_as_taggable_on/core"
 require "acts_as_taggable_on/acts_as_taggable_on/collection"
 require "acts_as_taggable_on/acts_as_taggable_on/cache"
@@ -50,6 +54,7 @@ $LOAD_PATH.shift
 
 
 if defined?(ActiveRecord::Base)
+  ActiveRecord::Base.extend ActsAsTaggableOn::Compatibility
   ActiveRecord::Base.extend ActsAsTaggableOn::Taggable
   ActiveRecord::Base.send :include, ActsAsTaggableOn::Tagger
 end

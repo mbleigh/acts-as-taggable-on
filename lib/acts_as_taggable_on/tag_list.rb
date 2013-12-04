@@ -58,7 +58,7 @@ module ActsAsTaggableOn
     end
 
     ##
-    # Transform the tag_list into a tag string suitable for edting in a form.
+    # Transform the tag_list into a tag string suitable for editing in a form.
     # The tags are joined with <tt>TagList.delimiter</tt> and quoted if necessary.
     #
     # Example:
@@ -81,7 +81,7 @@ module ActsAsTaggableOn
     def clean!
       reject!(&:blank?)
       map!(&:strip)
-      map!(&:downcase) if ActsAsTaggableOn.force_lowercase
+      map!{ |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
       uniq!

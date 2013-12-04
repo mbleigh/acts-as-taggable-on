@@ -19,11 +19,11 @@ module ActsAsTaggableOn::Taggable
       
       def initialize_acts_as_taggable_on_ownership      
         tag_types.map(&:to_s).each do |tag_type|
-          class_eval %(
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{tag_type}_from(owner)
               owner_tag_list_on(owner, '#{tag_type}')
             end      
-          )
+          RUBY
         end        
       end
     end
@@ -37,22 +37,25 @@ module ActsAsTaggableOn::Taggable
                                      #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = ? AND
                                      #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = ?), context.to_s, owner.id, owner.class.base_class.to_s])          
         end
+
         # when preserving tag order, return tags in created order
         # if we added the order to the association this would always apply
-        scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
-        scope.all
+        if self.class.preserve_tag_order?
+          scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id")
+        else 
+          scope
+        end
       end
 
       def cached_owned_tag_list_on(context)
         variable_name = "@owned_#{context}_list"
-        cache = instance_variable_get(variable_name) || instance_variable_set(variable_name, {})
+        cache = (instance_variable_defined?(variable_name) && instance_variable_get(variable_name)) || instance_variable_set(variable_name, {})
       end
       
       def owner_tag_list_on(owner, context)
         add_custom_context(context)
 
         cache = cached_owned_tag_list_on(context)
-        cache.delete_if { |key, value| key.id == owner.id && key.class == owner.class }
         
         cache[owner] ||= ActsAsTaggableOn::TagList.new(*owner_tags_on(owner, context).map(&:name))
       end
@@ -61,7 +64,6 @@ module ActsAsTaggableOn::Taggable
         add_custom_context(context)
         
         cache = cached_owned_tag_list_on(context)
-        cache.delete_if { |key, value| key.id == owner.id && key.class == owner.class }
 
         cache[owner] = ActsAsTaggableOn::TagList.from(new_list)
       end
@@ -86,13 +88,20 @@ module ActsAsTaggableOn::Taggable
                
             # Tag maintenance based on whether preserving the created order of tags
             if self.class.preserve_tag_order?
-              # First off order the array of tag objects to match the tag list
-              # rather than existing tags followed by new tags
-              tags = tag_list.uniq.map{|s| tags.detect{|t| t.name.downcase == s.downcase}}
-              # To preserve tags in the order in which they were added
-              # delete all owned tags and create new tags if the content or order has changed
-              old_tags = (tags == owned_tags ? [] : owned_tags)
-              new_tags = (tags == owned_tags ? [] : tags)
+              old_tags, new_tags = owned_tags - tags, tags - owned_tags
+
+              shared_tags = owned_tags & tags
+
+              if shared_tags.any? && tags[0...shared_tags.size] != shared_tags
+                index = shared_tags.each_with_index { |_, i| break i unless shared_tags[i] == tags[i] }
+
+                # Update arrays of tag objects
+                old_tags |= owned_tags.from(index)
+                new_tags |= owned_tags.from(index) & shared_tags
+
+                # Order the array of tag objects to match the tag list
+                new_tags = tags.map { |t| new_tags.find { |n| n.name.downcase == t.name.downcase } }.compact
+              end
             else
               # Delete discarded tags and create new tags
               old_tags = owned_tags - tags
@@ -104,7 +113,7 @@ module ActsAsTaggableOn::Taggable
             if old_tags.present?
               old_taggings = ActsAsTaggableOn::Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
                                                              :tagger_type => owner.class.base_class.to_s, :tagger_id => owner.id,
-                                                             :tag_id => old_tags, :context => context).all
+                                                             :tag_id => old_tags, :context => context)
             end
           
             # Destroy old taggings:

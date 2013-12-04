@@ -1,11 +1,11 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Taggable To Preserve Order" do
   before(:each) do
     clean_database!
     @taggable = OrderedTaggableModel.new(:name => "Bob Jones")
   end
-  
+
   it "should have tag types" do
     [:tags, :colours].each do |type|
       OrderedTaggableModel.tag_types.should include type
@@ -13,21 +13,21 @@ describe "Taggable To Preserve Order" do
 
     @taggable.tag_types.should == OrderedTaggableModel.tag_types
   end
-  
+
   it "should have tag associations" do
     [:tags, :colours].each do |type|
       @taggable.respond_to?(type).should be_true
       @taggable.respond_to?("#{type.to_s.singularize}_taggings").should be_true
     end
   end
-  
-  it "should have tag associations ordered by id" do
-    [:tags, :colours].each do |type|
-      OrderedTaggableModel.reflect_on_association(type).options[:order].should include('id')
-      OrderedTaggableModel.reflect_on_association("#{type.to_s.singularize}_taggings".to_sym).options[:order].should include('id')
-    end
-  end
-  
+
+  # it "should have tag associations ordered by id" do
+  #   [:tags, :colours].each do |type|
+  #     OrderedTaggableModel.reflect_on_association(type).options[:order].should include('id')
+  #     OrderedTaggableModel.reflect_on_association("#{type.to_s.singularize}_taggings".to_sym).options[:order].should include('id')
+  #   end
+  # end
+
   it "should have tag methods" do
     [:tags, :colours].each do |type|
       @taggable.respond_to?("#{type.to_s.singularize}_list").should be_true
@@ -40,69 +40,69 @@ describe "Taggable To Preserve Order" do
     # create
     @taggable.tag_list = "rails, ruby, css"
     @taggable.instance_variable_get("@tag_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
-    
+
     lambda {
       @taggable.save
     }.should change(ActsAsTaggableOn::Tag, :count).by(3)
-    
+
     @taggable.reload
     @taggable.tag_list.should == %w(rails ruby css)
-    
+
     # update
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.save
-        
+
     @taggable.reload
     @taggable.tag_list.should == %w(pow ruby rails)
-    
+
     # update with no change
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.save
-        
+
     @taggable.reload
     @taggable.tag_list.should == %w(pow ruby rails)
-    
+
     # update to clear tags
     @taggable.tag_list = ""
     @taggable.save
-        
+
     @taggable.reload
     @taggable.tag_list.should == []
   end
-  
+
   it "should return tag objects in the order the tags were created" do
     # create
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.instance_variable_get("@tag_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
-    
+
     lambda {
       @taggable.save
     }.should change(ActsAsTaggableOn::Tag, :count).by(3)
-    
+
     @taggable.reload
     @taggable.tags.map{|t| t.name}.should == %w(pow ruby rails)
-    
+
     # update
     @taggable.tag_list = "rails, ruby, css, pow"
     @taggable.save
-    
+
     @taggable.reload
     @taggable.tags.map{|t| t.name}.should == %w(rails ruby css pow)
   end
-  
+
   it "should return tag objects in tagging id order" do
     # create
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.save
-    
+
     @taggable.reload
     ids = @taggable.tags.map{|t| t.taggings.first.id}
     ids.should == ids.sort
-    
+
     # update
     @taggable.tag_list = "rails, ruby, css, pow"
     @taggable.save
-    
+
     @taggable.reload
     ids = @taggable.tags.map{|t| t.taggings.first.id}
     ids.should == ids.sort
@@ -125,13 +125,23 @@ describe "Taggable" do
   end
 
   it "should have tag_counts_on" do
-    TaggableModel.tag_counts_on(:tags).all.should be_empty
+    TaggableModel.tag_counts_on(:tags).should be_empty
 
     @taggable.tag_list = ["awesome", "epic"]
     @taggable.save
 
     TaggableModel.tag_counts_on(:tags).length.should == 2
     @taggable.tag_counts_on(:tags).length.should == 2
+  end
+
+  it "should have tags_on" do
+    TaggableModel.tags_on(:tags).should be_empty
+
+    @taggable.tag_list = ["awesome", "epic"]
+    @taggable.save
+
+    TaggableModel.tags_on(:tags).length.should == 2
+    @taggable.tags_on(:tags).length.should == 2
   end
 
   it "should return [] right after create" do
@@ -221,7 +231,7 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "Ruby")
 
-    ActsAsTaggableOn::Tag.find(:all).size.should == 1
+    ActsAsTaggableOn::Tag.all.size.should == 1
     TaggableModel.tagged_with("ruby").to_a.should == TaggableModel.tagged_with("Ruby").to_a
   end
 
@@ -229,8 +239,8 @@ describe "Taggable" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
-    TaggableModel.tag_counts.all.should_not be_empty
-    TaggableModel.skill_counts.all.should_not be_empty
+    TaggableModel.tag_counts.should_not be_empty
+    TaggableModel.skill_counts.should_not be_empty
   end
 
   it "should be able to get all tag counts on model as whole" do
@@ -238,8 +248,17 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
     charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
 
-    TaggableModel.all_tag_counts.all.should_not be_empty
+    TaggableModel.all_tag_counts.should_not be_empty
     TaggableModel.all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
+  end
+
+  it "should be able to get all tags on model as whole" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
+
+    TaggableModel.all_tags.should_not be_empty
+    TaggableModel.all_tags(:order => 'tags.id').first.name.should == "ruby"
   end
 
   it "should be able to use named scopes to chain tag finds by any tags by context" do
@@ -273,6 +292,14 @@ describe "Taggable" do
     TaggableModel.tagged_with("ruby").all_tag_counts(:order => 'tags.id').first.count.should == 3 # ruby
   end
 
+  it "should be able to get all scoped tags" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby")
+
+    TaggableModel.tagged_with("ruby").all_tags(:order => 'tags.id').first.name.should == "ruby"
+  end
+
   it 'should only return tag counts for the available scope' do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
@@ -283,9 +310,24 @@ describe "Taggable" do
 
     # Test specific join syntaxes:
     frank.untaggable_models.create!
-    TaggableModel.tagged_with('rails').scoped(:joins => :untaggable_models).all_tag_counts.should have(2).items
-    TaggableModel.tagged_with('rails').scoped(:joins => { :untaggable_models => :taggable_model }).all_tag_counts.should have(2).items
-    TaggableModel.tagged_with('rails').scoped(:joins => [:untaggable_models]).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').joins(:untaggable_models => :taggable_model).all_tag_counts.should have(2).items
+    TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tag_counts.should have(2).items
+  end
+
+  it 'should only return tags for the available scope' do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby, java")
+
+    TaggableModel.tagged_with('rails').all_tags.should have(3).items
+    TaggableModel.tagged_with('rails').all_tags.any? { |tag| tag.name == 'java' }.should be_false
+
+    # Test specific join syntaxes:
+    frank.untaggable_models.create!
+    TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tags.should have(2).items
+    TaggableModel.tagged_with('rails').joins({ :untaggable_models => :taggable_model }).all_tags.should have(2).items
+    TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tags.should have(2).items
   end
 
   it "should be able to set a custom tag context list" do
@@ -419,54 +461,6 @@ describe "Taggable" do
     end
   end
 
-  describe "Single Table Inheritance" do
-    before do
-      @taggable = TaggableModel.new(:name => "taggable")
-      @inherited_same = InheritingTaggableModel.new(:name => "inherited same")
-      @inherited_different = AlteredInheritingTaggableModel.new(:name => "inherited different")
-    end
-
-    it "should be able to save tags for inherited models" do
-      @inherited_same.tag_list = "bob, kelso"
-      @inherited_same.save
-      InheritingTaggableModel.tagged_with("bob").first.should == @inherited_same
-    end
-
-    it "should find STI tagged models on the superclass" do
-      @inherited_same.tag_list = "bob, kelso"
-      @inherited_same.save
-      TaggableModel.tagged_with("bob").first.should == @inherited_same
-    end
-
-    it "should be able to add on contexts only to some subclasses" do
-      @inherited_different.part_list = "fork, spoon"
-      @inherited_different.save
-      InheritingTaggableModel.tagged_with("fork", :on => :parts).should be_empty
-      AlteredInheritingTaggableModel.tagged_with("fork", :on => :parts).first.should == @inherited_different
-    end
-
-    it "should have different tag_counts_on for inherited models" do
-      @inherited_same.tag_list = "bob, kelso"
-      @inherited_same.save!
-      @inherited_different.tag_list = "fork, spoon"
-      @inherited_different.save!
-
-      InheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso)
-      AlteredInheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(fork spoon)
-      TaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name).should == %w(bob kelso fork spoon)
-    end
-
-    it 'should store same tag without validation conflict' do
-      @taggable.tag_list = 'one'
-      @taggable.save!
-
-      @inherited_same.tag_list = 'one'
-      @inherited_same.save!
-
-      @inherited_same.update_attributes! :name => 'foo'
-    end
-  end
-
   describe "NonStandardIdTaggable" do
     before(:each) do
       clean_database!
@@ -483,13 +477,23 @@ describe "Taggable" do
     end
 
     it "should have tag_counts_on" do
-      NonStandardIdTaggableModel.tag_counts_on(:tags).all.should be_empty
+      NonStandardIdTaggableModel.tag_counts_on(:tags).should be_empty
 
       @taggable.tag_list = ["awesome", "epic"]
       @taggable.save
 
       NonStandardIdTaggableModel.tag_counts_on(:tags).length.should == 2
       @taggable.tag_counts_on(:tags).length.should == 2
+    end
+
+    it "should have tags_on" do
+      NonStandardIdTaggableModel.tags_on(:tags).should be_empty
+
+      @taggable.tag_list = ["awesome", "epic"]
+      @taggable.save
+
+      NonStandardIdTaggableModel.tags_on(:tags).length.should == 2
+      @taggable.tags_on(:tags).length.should == 2
     end
 
     it "should be able to create tags" do
@@ -518,24 +522,100 @@ describe "Taggable" do
   end
 
   describe "Dirty Objects" do
-    before(:each) do
-      @taggable = TaggableModel.create(:tag_list => "awesome, epic")
+    context "with un-contexted tags" do
+      before(:each) do
+        @taggable = TaggableModel.create(:tag_list => "awesome, epic")
+      end
+
+      context "when tag_list changed" do
+        before(:each) do
+          @taggable.changes.should == {}
+          @taggable.tag_list = 'one'
+        end
+
+        it 'should show changes of dirty object' do
+          @taggable.changes.should == {"tag_list"=>["awesome, epic", ["one"]]}
+        end
+
+        it 'flags tag_list as changed' do
+          @taggable.tag_list_changed?.should be_true
+        end
+
+        it 'preserves original value' do
+          @taggable.tag_list_was.should == "awesome, epic"
+        end
+
+        it 'shows what the change was' do
+          @taggable.tag_list_change.should == ["awesome, epic", ["one"]]
+        end
+      end
+
+      context 'when tag_list is the same' do
+        before(:each) do
+          @taggable.tag_list = "awesome, epic"
+        end
+
+        it 'is not flagged as changed' do
+          @taggable.tag_list_changed?.should be_false
+        end
+
+        it 'does not show any changes to the taggable item' do
+          @taggable.changes.should == {}
+        end
+      end
     end
 
-    it 'should show changes of dirty object' do
-      @taggable.changes.should == {}
-      @taggable.tag_list = 'one'
-      @taggable.changes.should == {"tag_list"=>["awesome, epic", ["one"]]}
+    context "with context tags" do
+      before(:each) do
+        @taggable = TaggableModel.create(:language_list => "awesome, epic")
+      end
 
-      @taggable.tag_list_changed?.should be_true
-      @taggable.tag_list_was.should == "awesome, epic"
-      @taggable.tag_list_change.should == ["awesome, epic", ["one"]]
+      context "when language_list changed" do
+        before(:each) do
+          @taggable.changes.should == {}
+          @taggable.language_list = 'one'
+        end
+
+        it 'should show changes of dirty object' do
+          @taggable.changes.should == {"language_list"=>["awesome, epic", ["one"]]}
+        end
+
+        it 'flags language_list as changed' do
+          @taggable.language_list_changed?.should be_true
+        end
+
+        it 'preserves original value' do
+          @taggable.language_list_was.should == "awesome, epic"
+        end
+
+        it 'shows what the change was' do
+          @taggable.language_list_change.should == ["awesome, epic", ["one"]]
+        end
+
+        it 'shows what the changes were' do
+          @taggable.language_list_changes.should == ["awesome, epic", ["one"]]
+        end
+      end
+
+      context 'when language_list is the same' do
+        before(:each) do
+          @taggable.language_list = "awesome, epic"
+        end
+
+        it 'is not flagged as changed' do
+          @taggable.language_list_changed?.should be_false
+        end
+
+        it 'does not show any changes to the taggable item' do
+          @taggable.changes.should == {}
+        end
+      end
     end
+  end
 
-    it 'should show no changes if the same tag_list' do
-      @taggable.tag_list = "awesome, epic"
-      @taggable.tag_list_changed?.should be_false
-      @taggable.changes.should == {}
+  describe "Autogenerated methods" do
+    it "should be overridable" do
+      TaggableModel.create(:tag_list=>'woo').tag_list_submethod_called.should be_true
     end
   end
 end

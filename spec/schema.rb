@@ -45,7 +45,7 @@ ActiveRecord::Schema.define :version => 0 do
     t.column :cached_glass_list, :string
   end
   
-  create_table :taggable_users, :force => true do |t|
+  create_table :users, :force => true do |t|
     t.column :name, :string
   end
   

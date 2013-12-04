@@ -2,10 +2,10 @@
 *.sqlite3
 /pkg/*
 .bundle
-.rvmrc
-Gemfile.lock
+.ruby-version
 spec/database.yml
 tmp*.sw?
 *.sw?
 tmp
 *.gem
+*.lock
