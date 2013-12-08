@@ -138,7 +138,7 @@ module ActsAsTaggableOn::Taggable
           tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
           # don't need to sanitize sql, map all ids and join with OR logic
-          conditions << tags.map { |t| "#{taggings_alias}.tag_id = #{t.id}" }.join(" OR ")
+          conditions << tags.map { |t| "#{taggings_alias}.tag_id = '#{t.id}'" }.join(" OR ")
           select_clause = "DISTINCT #{table_name}.*" unless context and tag_types.one?
 
           if owned_by
@@ -161,7 +161,7 @@ module ActsAsTaggableOn::Taggable
             tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                             "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
                             " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}" +
-                            " AND #{taggings_alias}.tag_id = #{tag.id}"
+                            " AND #{taggings_alias}.tag_id = '#{tag.id}'"
 
             tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
