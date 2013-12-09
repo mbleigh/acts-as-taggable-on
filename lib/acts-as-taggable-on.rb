@@ -1,7 +1,7 @@
 require "active_record"
 require "active_record/version"
 require "action_view"
-require 'rails'
+require 'active_support/all'
 
 require "digest/sha1"
 
