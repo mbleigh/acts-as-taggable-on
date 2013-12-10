@@ -519,6 +519,13 @@ describe "Taggable" do
       @taggable.reload
       @taggable.tag_list_on(:test).should == ["hello"]
     end
+
+    it "should be able to create tags containing a comma" do
+      @taggable.skill_list = ["Watfiv, watfor",'hello']
+      @taggable.save
+      @taggable.reload
+      @taggable.skill_list.should == ['Watfiv, watfor', 'hello']
+    end
   end
 
   describe "Dirty Objects" do
