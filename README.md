@@ -46,6 +46,10 @@ rails generate acts_as_taggable_on:migration
 rake db:migrate
 ```
 
+#### Upgrading
+
+see [UPGRADING](UPGRADING)
+
 ## Testing
 
 Acts As Taggable On uses RSpec for its test coverage. Inside the gem
