@@ -261,7 +261,7 @@ CSS:
 
 ## Configuration
 
-Configuration can be done using the initializer provided by running `rails generate acts_as_taggable_on:install`. The below options can be set in the configure block provided or directly on `ActsAsTaggableOn`. Options are as follows:
+Configuration can be done using the initializer provided by running `rails generate acts_as_taggable_on:install`. The below options can be set in the setup block provided or directly on `ActsAsTaggableOn`. Options are as follows:
 
 If you would like to remove unused tag objects after removing taggings, add:
 

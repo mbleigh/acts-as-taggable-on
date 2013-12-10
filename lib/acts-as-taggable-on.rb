@@ -19,11 +19,9 @@ module ActsAsTaggableOn
     glue.ends_with?(" ") ? glue : "#{glue} "
   end
 
-  def self.configure
+  def self.setup
     yield self
   end
-  alias :setup :configure
-
 end
 
 

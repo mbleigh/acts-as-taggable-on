@@ -1,4 +1,4 @@
-ActsAsTaggableOn.configure do |config|
+ActsAsTaggableOn.setup do |config|
   # The delimiter can be set as a single string or an array or strings.
   # If an array is set, any of the strings in the array can be used to separate
   # tags, but the first item in the array will be used as the default when
