@@ -1,4 +1,5 @@
 $LOAD_PATH << "." unless $LOAD_PATH.include?(".")
+$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 require 'logger'
 
 begin

@@ -5,3 +5,4 @@ env:
   - DB=sqlite3
   - DB=mysql
   - DB=postgresql
+cache: bundler

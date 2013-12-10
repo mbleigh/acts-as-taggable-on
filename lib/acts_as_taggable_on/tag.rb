@@ -1,3 +1,4 @@
+# coding: utf-8
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     include ActsAsTaggableOn::Utils
@@ -31,18 +32,29 @@ module ActsAsTaggableOn
 
     def self.named_any(list)
       if ActsAsTaggableOn.strict_case_match
-        where(list.map { |tag| sanitize_sql(["name = #{binary}?", tag.to_s.mb_chars]) }.join(" OR "))
+        clause = list.map { |tag|
+          sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
+        }.join(" OR ")
+        where(clause)
       else
-        where(list.map { |tag| sanitize_sql(["lower(name) = ?", tag.to_s.mb_chars.downcase]) }.join(" OR "))
+        clause = list.map { |tag|
+          lowercase_ascii_tag = as_8bit_ascii(tag).downcase
+          sanitize_sql(["lower(name) = ?", lowercase_ascii_tag])
+        }.join(" OR ")
+        where(clause)
       end
     end
 
     def self.named_like(name)
-      where(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(name)}%"])
+      clause = ["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(name)}%"]
+      where(clause)
     end
 
     def self.named_like_any(list)
-      where(list.map { |tag| sanitize_sql(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(tag.to_s)}%"]) }.join(" OR "))
+      clause = list.map { |tag|
+        sanitize_sql(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(tag.to_s)}%"])
+      }.join(" OR ")
+      where(clause)
     end
 
     ### CLASS METHODS:
@@ -56,7 +68,7 @@ module ActsAsTaggableOn
     end
 
     def self.find_or_create_all_with_like_by_name(*list)
-      list = [list].flatten
+      list = Array(list).flatten
 
       return [] if list.empty?
 
@@ -64,7 +76,7 @@ module ActsAsTaggableOn
 
       list.map do |tag_name|
         comparable_tag_name = comparable_name(tag_name)
-        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
+        existing_tag = existing_tags.detect { |tag| comparable_name(tag.name) == comparable_tag_name }
 
         existing_tag || Tag.create(:name => tag_name)
       end
@@ -88,11 +100,19 @@ module ActsAsTaggableOn
       private
 
       def comparable_name(str)
-        str.mb_chars.downcase.to_s
+        as_8bit_ascii(str).downcase
       end
 
       def binary
         /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
+      end
+
+      def as_8bit_ascii(string)
+        if defined?(Encoding)
+          string.to_s.force_encoding('BINARY')
+        else
+          string.to_s.mb_chars
+        end
       end
     end
   end

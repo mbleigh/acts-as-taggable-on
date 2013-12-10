@@ -1,10 +1,9 @@
 require "active_record"
 require "active_record/version"
 require "action_view"
+require 'active_support/all'
 
 require "digest/sha1"
-
-$LOAD_PATH.unshift(File.dirname(__FILE__))
 
 module ActsAsTaggableOn
   mattr_accessor :delimiter
@@ -50,16 +49,12 @@ require "acts_as_taggable_on/tag_list"
 require "acts_as_taggable_on/tags_helper"
 require "acts_as_taggable_on/tagging"
 
-$LOAD_PATH.shift
-
-
-if defined?(ActiveRecord::Base)
-  ActiveRecord::Base.extend ActsAsTaggableOn::Compatibility
-  ActiveRecord::Base.extend ActsAsTaggableOn::Taggable
-  ActiveRecord::Base.send :include, ActsAsTaggableOn::Tagger
+ActiveSupport.on_load(:active_record) do
+  extend ActsAsTaggableOn::Compatibility
+  extend ActsAsTaggableOn::Taggable
+  include ActsAsTaggableOn::Tagger
 end
-
-if defined?(ActionView::Base)
-  ActionView::Base.send :include, ActsAsTaggableOn::TagsHelper
+ActiveSupport.on_load(:action_view) do
+  include ActsAsTaggableOn::TagsHelper
 end
 
