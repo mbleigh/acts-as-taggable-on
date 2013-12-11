@@ -329,6 +329,12 @@ module ActsAsTaggableOn::Taggable
         super(*args)
       end
 
+      ##
+      # Find existing tags or create non-existing tags
+      def load_tags(tag_list)
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
+      end
+
       def save_tags
         tagging_contexts.each do |context|
           next unless tag_list_cache_set_on(context)
@@ -336,7 +342,7 @@ module ActsAsTaggableOn::Taggable
           tag_list = tag_list_cache_on(context).uniq
 
           # Find existing tags or create non-existing tags:
-          tags = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
+          tags = load_tags(tag_list)
 
           # Tag objects for currently assigned tags
           current_tags = tags_on(context)
@@ -355,7 +361,7 @@ module ActsAsTaggableOn::Taggable
               new_tags |= current_tags[index...current_tags.size] & shared_tags
 
               # Order the array of tag objects to match the tag list
-              new_tags = tags.map do |t| 
+              new_tags = tags.map do |t|
                 new_tags.find { |n| n.name.downcase == t.name.downcase }
               end.compact
             end
