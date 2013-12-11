@@ -86,8 +86,8 @@ module ActsAsTaggableOn
       return [] if list.empty?
 
       if !ActsAsTaggableOn.strict_case_match && using_case_insensitive_collation?
-        names_to_find = list.map { |name| "SELECT '#{name}' AS list_name" }.join(" UNION ALL ")
-        tags = ActsAsTaggableOn::Tag.named_any(list).select("#{all_columns}, names.list_name").joins("INNER JOIN (#{names_to_find}) AS names ON #{name_column} = names.list_name")
+        names_to_find = sanitize_sql([(["SELECT '%s' AS name"]  * list.length).join( " UNION ALL " ), *list])
+        tags = ActsAsTaggableOn::Tag.select("#{all_columns}, names.name AS list_name").joins("INNER JOIN (#{names_to_find}) AS names ON tags.name = names.name")
       else
         tags = named_any(list).select("#{all_columns}, #{name_column} AS list_name")
       end
@@ -124,7 +124,7 @@ module ActsAsTaggableOn
       end
 
       def binary
-        using_mysql ? "BINARY " : nil
+        using_mysql? ? "BINARY " : nil
       end
 
       def as_8bit_ascii(string)

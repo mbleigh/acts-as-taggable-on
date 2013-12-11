@@ -103,6 +103,10 @@ describe ActsAsTaggableOn::Tag do
       it "should find existing tags accent insensitivly" do
         ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("iñupiat").should == [@tag]
       end
+
+      it "should not let tags with single quotes break the query" do
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("their's").map(&:name).should == ["their's"]
+      end
     end
   end
 
