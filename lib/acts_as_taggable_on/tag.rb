@@ -72,27 +72,27 @@ module ActsAsTaggableOn
 
       return [] if list.empty?
 
-      existing_tags = existing_tags_by_list_name(list)
-
-      list.map do |tag_name|
+      duplicates = []
+      result = []
+      existing_tags = named_any_by_comparable_name(list)
+      list.each do |tag_name|
         existing_tag = existing_tags[comparable_name(tag_name)]
-
-        existing_tag || Tag.create(:name => tag_name)
+        if existing_tag
+          result << existing_tag
+        else
+          begin
+            result << Tag.create(:name => tag_name)
+          rescue ActiveRecord::RecordNotUnique
+            duplicates << tag_name
+          end
+        end
       end
-    end
 
-    def self.existing_tags_by_list_name(*list)
-      list = [list].flatten
-
-      return [] if list.empty?
-
-      if !ActsAsTaggableOn.strict_case_match && using_case_insensitive_collation?
-        names_to_find = sanitize_sql([(["SELECT '%s' AS name"]  * list.length).join( " UNION ALL " ), *list])
-        tags = ActsAsTaggableOn::Tag.select("#{all_columns}, names.name AS list_name").joins("INNER JOIN (#{names_to_find}) AS names ON tags.name = names.name")
+      if duplicates.empty?
+        result
       else
-        tags = named_any(list).select("#{all_columns}, #{name_column} AS list_name")
+        result + Tag.named_any(duplicates)
       end
-      Hash[tags.group_by { |tag| comparable_name(tag.list_name) }.map{|k,v| [k,v.first]}]
     end
 
     ### INSTANCE METHODS:
@@ -112,16 +112,16 @@ module ActsAsTaggableOn
     class << self
       private
 
-      def all_columns
-        "#{ActsAsTaggableOn::Tag.table_name}.*"
-      end
-
-      def name_column
-        "#{ActsAsTaggableOn::Tag.table_name}.name"
-      end
-
       def comparable_name(str)
         as_8bit_ascii(str).downcase
+      end
+
+      # Get the list of tags and index them by the comparable_name for faster lookup
+      #
+      # @param *list [Array<Array>] Array of tag lists
+      # @return [Hash<comparable_name, tag_name>]
+      def named_any_by_comparable_name(list)
+        Hash[Tag.named_any(list).group_by{|tag| comparable_name(tag.name)}.map{|k,v| [k,v.first]}]
       end
 
       def binary
