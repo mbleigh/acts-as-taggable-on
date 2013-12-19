@@ -2,7 +2,11 @@ module ActsAsTaggableOn
   module TagsHelper
     # See the README for an example using tag_cloud.
     def tag_cloud(tags, classes)
-      return [] if tags.count(:all).zero?
+      if tags.is_a?(Array)
+        return [] if tags.empty?
+      else
+        return [] if tags.count(:all).zero?
+      end
 
       max_count = tags.sort_by(&:count).last.count.to_f
 
