@@ -1,9 +1,14 @@
-script: "cp spec/database.yml.sample spec/database.yml && bundle install && bundle exec rake"
 rvm:
   - 1.9.3
   - 2.0.0
+gemfile:
+  - gemfiles/rails_3.gemfile
+  - gemfiles/rails_4.0.gemfile
+  - gemfiles/rails_4.1.gemfile
 env:
   - DB=sqlite3
   - DB=mysql
   - DB=postgresql
 cache: bundler
+before_script:
+  - cp spec/database.yml.sample spec/database.yml
