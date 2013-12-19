@@ -1,41 +1,69 @@
 module ActsAsTaggableOn::Taggable
   module Cache
     def self.included(base)
-      # Skip adding caching capabilities if table not exists or no cache columns exist
-      return unless base.connected? && base.table_exists? && base.tag_types.any? { |context| base.column_names.include?("cached_#{context.to_s.singularize}_list") }
+      # When included, conditionally adds tag caching methods when the model
+      #   has any "cached_#{tag_type}_list" column
+      base.instance_eval do
+        # @private
+        def _has_acts_as_taggable_on_cache_columns?(db_columns)
+          db_column_names = db_columns.map(&:name)
+          tag_types.any? {|context|
+            db_column_names.include?("cached_#{context.to_s.singularize}_list")
+          }
+        end
 
-      base.send :include, ActsAsTaggableOn::Taggable::Cache::InstanceMethods
-      base.extend ActsAsTaggableOn::Taggable::Cache::ClassMethods
-      
-      base.class_eval do
-        before_save :save_cached_tag_list        
+        # @private
+        def _add_acts_as_taggable_on_caching_methods
+          send :include, ActsAsTaggableOn::Taggable::Cache::InstanceMethods
+          extend ActsAsTaggableOn::Taggable::Cache::ClassMethods
+
+          before_save :save_cached_tag_list
+
+          initialize_acts_as_taggable_on_cache
+        end
+
+        # ActiveRecord::Base.columns makes a database connection and caches the calculated
+        #   columns hash for the record as @columns.  Since we don't want to add caching
+        #   methods until we confirm the presence of a caching column, and we don't
+        #   want to force opening a database connection when the class is loaded,
+        #   here we intercept and cache the call to :columns as @acts_as_taggable_on_columns
+        #   to mimic the underlying behavior.  While processing this first call to columns,
+        #   we do the caching column check and dynamically add the class and instance methods
+        def columns
+          @acts_as_taggable_on_columns ||= begin
+            db_columns = super
+            if _has_acts_as_taggable_on_cache_columns?(db_columns)
+              _add_acts_as_taggable_on_caching_methods
+            end
+            db_columns
+          end
+        end
+
       end
-      
-      base.initialize_acts_as_taggable_on_cache
     end
-    
+
     module ClassMethods
-      def initialize_acts_as_taggable_on_cache      
+      def initialize_acts_as_taggable_on_cache
         tag_types.map(&:to_s).each do |tag_type|
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def self.caching_#{tag_type.singularize}_list?
               caching_tag_list_on?("#{tag_type}")
-            end        
+            end
           RUBY
-        end        
+        end
       end
-      
+
       def acts_as_taggable_on(*args)
         super(*args)
         initialize_acts_as_taggable_on_cache
       end
-      
+
       def caching_tag_list_on?(context)
         column_names.include?("cached_#{context.to_s.singularize}_list")
       end
     end
-    
-    module InstanceMethods      
+
+    module InstanceMethods
       def save_cached_tag_list
         tag_types.map(&:to_s).each do |tag_type|
           if self.class.send("caching_#{tag_type.singularize}_list?")
@@ -45,9 +73,10 @@ module ActsAsTaggableOn::Taggable
             end
           end
         end
-        
+
         true
       end
     end
+
   end
 end
