@@ -90,7 +90,7 @@ module ActsAsTaggableOn::Taggable
         tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(scoped_select))})").group(group_columns)
 
         tag_scope = tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
-        tag_scope
+        tag_scope.extending(CalculationMethods)
       end
 
       ##
@@ -170,7 +170,7 @@ module ActsAsTaggableOn::Taggable
         tagging_scope = tagging_scope.group(group_columns).having(having)
 
         tag_scope = tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
-        tag_scope
+        tag_scope.extending(CalculationMethods)
       end
 
       def safe_to_sql(relation)
@@ -181,6 +181,13 @@ module ActsAsTaggableOn::Taggable
     module InstanceMethods
       def tag_counts_on(context, options={})
         self.class.tag_counts_on(context, options.merge(:id => id))
+      end
+    end
+
+    module CalculationMethods
+      def count
+        # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
+        super(:all)
       end
     end
   end
