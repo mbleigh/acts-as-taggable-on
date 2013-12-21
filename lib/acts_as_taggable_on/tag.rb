@@ -100,7 +100,11 @@ module ActsAsTaggableOn
       private
 
       def comparable_name(str)
-        as_8bit_ascii(str).downcase
+        if ActsAsTaggableOn.strict_case_match
+          as_8bit_ascii(str)
+        else
+          as_8bit_ascii(str).downcase
+        end
       end
 
       def binary
