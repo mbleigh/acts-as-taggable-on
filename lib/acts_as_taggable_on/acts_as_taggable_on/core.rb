@@ -97,7 +97,16 @@ module ActsAsTaggableOn::Taggable
         alias_base_name = undecorated_table_name.gsub('.','_')
         quote = ActsAsTaggableOn::Tag.using_postgresql? ? '"' : ''
 
-        if options.delete(:exclude)
+        if options.delete(:expression)
+          
+          result = self
+          ActsAsTaggableOn::Expression::next_batch(tag_list[0], options) do |op, list|
+            result = result.tagged_with(list, ActsAsTaggableOn::Expression::option_from_operator[op] => true)
+          end
+
+          return result
+
+        elsif options.delete(:exclude)
           if options.delete(:wild)
             tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ? ESCAPE '!'", "%#{escape_like(t)}%"]) }.join(" OR ")
           else
