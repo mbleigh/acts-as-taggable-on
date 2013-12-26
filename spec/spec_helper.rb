@@ -19,7 +19,7 @@ rescue Bundler::GemNotFound
 end
 
 Bundler.require
-require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
+require File.expand_path('../../lib/acts_as_taggable_on', __FILE__)
 require 'ammeter/init'
 
 unless [].respond_to?(:freq)
