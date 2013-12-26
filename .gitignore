@@ -9,3 +9,4 @@ tmp*.sw?
 tmp
 *.gem
 *.lock
+.DS_Store
