@@ -24,13 +24,14 @@ describe "Tag Expressions" do
     ActsAsTaggableOn::Expression::Parse::fixed_expression_array(list2).length.should equal(12)
   end
 
-  it "should handle repeated operators" do
-    parse1 = ActsAsTaggableOn::Expression::Parse::parse_expression("tag++tag3--tag3&&tag4")
-    parse2 = ActsAsTaggableOn::Expression::Parse::parse_expression("tag+tag3-tag3&tag4")
+  it "should handle repeated operators if Ruby version >= 1.9" do
+    if RUBY_VERSION.to_f >= 1.9 
+      parse1 = ActsAsTaggableOn::Expression::Parse::parse_expression("tag++tag3--tag3&&tag4")
+      parse2 = ActsAsTaggableOn::Expression::Parse::parse_expression("tag+tag3-tag3&tag4")
 
-    parse1.should == parse2
+      parse1.should == parse2
+    end
   end
-
 
   it "should permit  operators preceded by a backward slash in tag name if Ruby version >= 1.9" do
     if RUBY_VERSION.to_f >= 1.9 
