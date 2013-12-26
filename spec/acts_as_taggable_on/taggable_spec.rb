@@ -419,6 +419,22 @@ describe "Taggable" do
     TaggableModel.tagged_with("lazy", :exclude => true).to_a.should == [frank, steve]
   end
 
+  it "should be able to chain excluded tags" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "sad, lazy")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "happy")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => "happy, lazy")
+
+    TaggableModel.tagged_with("lazy, happy", :any => true).tagged_with("sad", :exclude => true).to_a.should == [frank, steve]
+  end
+
+  it "should be able to evaluate complex expressions from left to right" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "sad, lazy, strong")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "happy, strong")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => "happy, lazy")
+    dina = TaggableModel.create(:name => 'Steve', :tag_list => "sad, strong, lazy, grumpy")
+    TaggableModel.tagged_with("sad, happy", :any => true).tagged_with("lazy").tagged_with("grumpy", :exclude => true).tagged_with("strong").to_a.should == [bob]
+  end
+
   it "should return an empty scope for empty tags" do
     TaggableModel.tagged_with('').should == []
     TaggableModel.tagged_with(' ').should == []
