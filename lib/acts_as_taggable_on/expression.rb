@@ -41,8 +41,10 @@ module ActsAsTaggableOn
       # looks for consecutive operators and subsitutes in the first 
       # prevents expression from being broken e.g. java++ruby => java+ruby
       def self.fix_operator_syntax(expression_string)
-        expression_string.scan(/#{REGEX_OPS}{2,}/).each do |ops|
-          expression_string.gsub!(ops, ops[0])
+         if RUBY_VERSION.to_f >= 1.9
+          expression_string.scan(/(?<!\\)#{REGEX_OPS}{2,}/).each do |ops|
+            expression_string.gsub!(ops, ops[0])
+          end
         end
       end
 
