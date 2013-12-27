@@ -96,24 +96,5 @@ module ActsAsTaggableOn
       read_attribute(:count).to_i
     end
 
-    class << self
-      private
-
-      def comparable_name(str)
-        as_8bit_ascii(str).downcase
-      end
-
-      def binary
-        /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
-      end
-
-      def as_8bit_ascii(string)
-        if defined?(Encoding)
-          string.to_s.force_encoding('BINARY')
-        else
-          string.to_s.mb_chars
-        end
-      end
-    end
   end
 end

@@ -9,13 +9,13 @@ describe ActsAsTaggableOn::Utils do
     end
 
     it "should return 'ILIKE' when the adapter is PostgreSQL" do
-      TaggableModel.connection.stub(:adapter_name).and_return("PostgreSQL")
-      TaggableModel.send(:like_operator).should == "ILIKE"
+      TaggableModel.should_receive(:db_adapter_name).and_return("postgresql")
+      TaggableModel.like_operator.should == "ILIKE"
     end
 
     it "should return 'LIKE' when the adapter is not PostgreSQL" do
-      TaggableModel.connection.stub(:adapter_name).and_return("MySQL")
-      TaggableModel.send(:like_operator).should == "LIKE"
+      TaggableModel.should_receive(:db_adapter_name).and_return("mysql")
+      TaggableModel.like_operator.should == "LIKE"
     end
   end
 end

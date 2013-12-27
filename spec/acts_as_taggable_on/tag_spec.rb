@@ -53,6 +53,7 @@ describe ActsAsTaggableOn::Tag do
       end
 
       it "should find by name case insensitive" do
+        ActsAsTaggableOn.strict_case_match.should be_false
         ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("ПРИВЕТ").should == @tag
       end
     end
