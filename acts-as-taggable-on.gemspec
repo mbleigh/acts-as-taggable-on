@@ -22,7 +22,9 @@ Gem::Specification.new do |gem|
     gem.post_install_message = File.read('UPGRADING')
   end
 
-  gem.add_runtime_dependency 'rails', ['>= 3', '< 5']
+  gem.add_runtime_dependency 'activerecord',  ['>= 3', '< 5']
+  gem.add_runtime_dependency 'activesupport', ['>= 3', '< 5']
+  gem.add_runtime_dependency 'actionpack',    ['>= 3', '< 5']
 
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'mysql2', '~> 0.3.7'
