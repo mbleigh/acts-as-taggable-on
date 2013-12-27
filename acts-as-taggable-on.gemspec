@@ -24,12 +24,12 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'rails', ['>= 3', '< 5']
 
-  gem.add_development_dependency 'rspec-rails', '2.13.0' # 2.13.1 is broken
-  gem.add_development_dependency 'rspec', '~> 2.6'
-  gem.add_development_dependency 'ammeter'
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'mysql2', '~> 0.3.7'
   gem.add_development_dependency 'pg'
-  gem.add_development_dependency 'guard'
-  gem.add_development_dependency 'guard-rspec'
+
+  gem.add_development_dependency 'rspec-rails', '2.13.0' # 2.13.1 is broken
+  gem.add_development_dependency 'rspec', '~> 2.6'
+  gem.add_development_dependency 'ammeter'
+
 end

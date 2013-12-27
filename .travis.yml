@@ -7,5 +7,4 @@ env:
   - DB=mysql
   - DB=postgresql
 cache: bundler
-matrix:
-  fast_finish: true
+bundler_args: '--without local_development'
