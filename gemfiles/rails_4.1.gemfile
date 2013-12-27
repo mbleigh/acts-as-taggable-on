@@ -3,6 +3,6 @@
 source "https://rubygems.org"
 
 gem "appraisal"
-gem "rails", :github => 'rails/rails'
+gem "rails", '4.1.0.beta1'
 
 gemspec :path=>"../"
