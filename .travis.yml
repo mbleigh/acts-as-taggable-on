@@ -1,4 +1,3 @@
-script: "cp spec/database.yml.sample spec/database.yml && bundle install && bundle exec rake"
 rvm:
   - 1.9.3
   - 2.0.0
@@ -6,5 +5,13 @@ env:
   - DB=sqlite3
   - DB=mysql
   - DB=postgresql
+gemfile:
+  - gemfiles/rails_3.2.gemfile
+  - gemfiles/rails_4.0.gemfile
 cache: bundler
+script: bundle exec rake
+before_install:
+  - gem install bundler
 bundler_args: '--without local_development'
+matrix:
+  fast_finish: true
