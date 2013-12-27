@@ -96,6 +96,7 @@ module ActsAsTaggableOn::Taggable
         owned_by = options.delete(:owned_by)
         alias_base_name = undecorated_table_name.gsub('.','_')
         quote = ActsAsTaggableOn::Tag.using_postgresql? ? '"' : ''
+        quoted_table_name = quote + table_name.gsub('.', quote + '.' + quote) + quote
 
         if options.delete(:exclude)
           if options.delete(:wild)
@@ -108,7 +109,7 @@ module ActsAsTaggableOn::Taggable
 
           if owned_by
             joins <<  "JOIN #{ActsAsTaggableOn::Tagging.table_name}" +
-                      "  ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
+                      "  ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{quoted_table_name}.#{primary_key}" +
                       " AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}" +
                       " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = #{quote_value(owned_by.id)}" +
                       " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = #{quote_value(owned_by.class.base_class.to_s)}"
@@ -133,7 +134,7 @@ module ActsAsTaggableOn::Taggable
           )
 
           tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
-                          "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
+                          "  ON #{taggings_alias}.taggable_id = #{quoted_table_name}.#{primary_key}" +
                           " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
           tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
@@ -159,7 +160,7 @@ module ActsAsTaggableOn::Taggable
           tags.each do |tag|
             taggings_alias = adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{sha_prefix(tag.name)}")
             tagging_join  = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
-                            "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
+                            "  ON #{taggings_alias}.taggable_id = #{quoted_table_name}.#{primary_key}" +
                             " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}" +
                             " AND #{taggings_alias}.tag_id = #{quote_value(tag.id)}"
 
@@ -182,7 +183,7 @@ module ActsAsTaggableOn::Taggable
 
         if options.delete(:match_all)
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
-                   "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
+                   "  ON #{taggings_alias}.taggable_id = #{quoted_table_name}.#{primary_key}" +
                    " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name)}"
 
 
@@ -250,8 +251,8 @@ module ActsAsTaggableOn::Taggable
         elsif cached_tag_list_on(context) && self.class.caching_tag_list_on?(context)
           instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(cached_tag_list_on(context)))
         else
-          instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
-        end
+        instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
+      end
       end
 
       def tag_list_on(context)
