@@ -5,7 +5,7 @@ module ActsAsTaggableOn::Taggable
       #   has any "cached_#{tag_type}_list" column
       base.instance_eval do
         # @private
-        def _has_acts_as_taggable_on_cache_columns?(db_columns)
+        def _has_tags_cache_columns?(db_columns)
           db_column_names = db_columns.map(&:name)
           tag_types.any? {|context|
             db_column_names.include?("cached_#{context.to_s.singularize}_list")
@@ -13,13 +13,13 @@ module ActsAsTaggableOn::Taggable
         end
 
         # @private
-        def _add_acts_as_taggable_on_caching_methods
+        def _add_tags_caching_methods
           send :include, ActsAsTaggableOn::Taggable::Cache::InstanceMethods
           extend ActsAsTaggableOn::Taggable::Cache::ClassMethods
 
           before_save :save_cached_tag_list
 
-          initialize_acts_as_taggable_on_cache
+          initialize_tags_cache
         end
 
         # ActiveRecord::Base.columns makes a database connection and caches the calculated
@@ -32,8 +32,8 @@ module ActsAsTaggableOn::Taggable
         def columns
           @acts_as_taggable_on_columns ||= begin
             db_columns = super
-            if _has_acts_as_taggable_on_cache_columns?(db_columns)
-              _add_acts_as_taggable_on_caching_methods
+            if _has_tags_cache_columns?(db_columns)
+              _add_tags_caching_methods
             end
             db_columns
           end
@@ -43,7 +43,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     module ClassMethods
-      def initialize_acts_as_taggable_on_cache
+      def initialize_tags_cache
         tag_types.map(&:to_s).each do |tag_type|
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def self.caching_#{tag_type.singularize}_list?
@@ -55,7 +55,7 @@ module ActsAsTaggableOn::Taggable
 
       def acts_as_taggable_on(*args)
         super(*args)
-        initialize_acts_as_taggable_on_cache
+        initialize_tags_cache
       end
 
       def caching_tag_list_on?(context)
