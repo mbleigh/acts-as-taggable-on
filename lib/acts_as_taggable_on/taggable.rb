@@ -25,7 +25,7 @@ module ActsAsTaggableOn
     def acts_as_ordered_taggable
       acts_as_ordered_taggable_on :tags
     end
-    
+
     ##
     # Make a model taggable on specified contexts.
     #
@@ -38,8 +38,8 @@ module ActsAsTaggableOn
     def acts_as_taggable_on(*tag_types)
       taggable_on(false, tag_types)
     end
-    
-    
+
+
     ##
     # Make a model taggable on specified contexts
     # and preserves the order in which tags are created
@@ -53,9 +53,9 @@ module ActsAsTaggableOn
     def acts_as_ordered_taggable_on(*tag_types)
       taggable_on(true, tag_types)
     end
-    
+
     private
-    
+
       # Make a model taggable on specified contexts
       # and optionally preserves the order in which tags are created
       #
@@ -78,7 +78,7 @@ module ActsAsTaggableOn
           self.tag_types = tag_types
           class_attribute :preserve_tag_order
           self.preserve_tag_order = preserve_tag_order
-        
+
           class_eval do
             has_many :taggings, :as => :taggable, :dependent => :destroy, :class_name => "ActsAsTaggableOn::Tagging"
             has_many :base_tags, :through => :taggings, :source => :tag, :class_name => "ActsAsTaggableOn::Tag"
