@@ -108,10 +108,14 @@ module ActsAsTaggableOn
       end
 
       def as_8bit_ascii(string)
-        if defined?(Encoding)
-          string.to_s.force_encoding('BINARY')
+        string = string.to_s
+        if string.respond_to?(:b)
+          # ruby >= 2.0.0 has String#b.
+          string.b
+        elsif defined?(Encoding)
+          string.force_encoding('BINARY')
         else
-          string.to_s.mb_chars
+          string.mb_chars
         end
       end
     end
