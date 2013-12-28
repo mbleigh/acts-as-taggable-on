@@ -12,8 +12,17 @@ describe "Tag Expressions" do
     ActsAsTaggableOn::Expression::Parse::parse_expression("tag+tag2-tag3-tag4&tag5&tag6").length.should equal(11)
   end
 
-  it "should ignore whitespace" do
-    ActsAsTaggableOn::Expression::Parse::parse_expression("tag  +  tag2 - tag4- tag4& tag5 & tag  6").length.should equal(11)
+  it "should ignore whitespace between tags and operators" do
+    ActsAsTaggableOn::Expression::Parse::parse_expression("tag  +  tag2 - tag4- tag4& tag5 & tag6").length.should equal(11)
+  end
+
+  it "should allow the use of whitespace to separate tags and operators" do
+    TaggableModel.create(:name => "Bob", :tag_list => "c++, java, ruby")
+    TaggableModel.create(:name => 'Steve', :tag_list => "ruby, python")
+
+    TaggableModel.tagged_with("c++ + python", :expression => true, :use_whitespace => true).to_a.length.should == 2
+    TaggableModel.tagged_with("c++ ++++++++++ python", :expression => true, :use_whitespace => true).to_a.length.should == 2
+
   end
 
   it "should ensure first index is an operator" do
@@ -30,16 +39,32 @@ describe "Tag Expressions" do
       parse2 = ActsAsTaggableOn::Expression::Parse::parse_expression("tag+tag3-tag3&tag4")
 
       parse1.should == parse2
+
+    TaggableModel.create(:name => "Bob", :tag_list => "c++, java, ruby")
+    TaggableModel.create(:name => 'Steve', :tag_list => "ruby, python")
+
+    TaggableModel.tagged_with("c\\+\\+++++python", :expression => true, :use_whitespace => false).to_a.length.should == 2
+    TaggableModel.tagged_with("c++ ++++++++++ python", :expression => true, :use_whitespace => true).to_a.length.should == 2
+
     end
   end
 
-  it "should permit  operators preceded by a backward slash in tag name if Ruby version >= 1.9" do
+  it "should permit operators preceded by a backward slash in tag name if Ruby version >= 1.9" do
     if RUBY_VERSION.to_f >= 1.9 
       bob = TaggableModel.create(:name => "Bob", :tag_list => "sad, lazy+strong")
       frank = TaggableModel.create(:name => "Frank", :tag_list => "happy, strong")
       TaggableModel.tagged_with("lazy\\+strong+happy", :expression => true).to_a.should == [bob, frank]
     end
   end
+
+  it "should allow + and | operators to perform unions" do
+      TaggableModel.create(:name => "Bob", :tag_list => "sad, strong")
+      TaggableModel.create(:name => "Frank", :tag_list => "happy, strong")
+      result1 = TaggableModel.tagged_with("sad+happy", :expression => true).to_a
+      result2 = TaggableModel.tagged_with("sad|happy", :expression => true).to_a
+      result1.should == result2
+  end
+
 
   it "should produce same result as ActiveRecord chaining in simple cases" do
     TaggableModel.create(:name => "Bob", :tag_list => "sad, lazy, strong")
@@ -68,5 +93,4 @@ describe "Tag Expressions" do
     default_chain.length.should == 0
     fixed_chain.length.should == 3
   end
-
 end
