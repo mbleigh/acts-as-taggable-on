@@ -100,8 +100,8 @@ module ActsAsTaggableOn::Taggable
         if options.delete(:expression)
           
           result = self
-          ActsAsTaggableOn::Expression::next_batch(tag_list[0], options) do |op, list|
-            result = result.tagged_with(list, ActsAsTaggableOn::Expression::option_from_operator[op] => true)
+          ActsAsTaggableOn::Expression::next_batch(tag_list[0], options) do |option, list|
+            result = result.tagged_with(list, option => true)
           end
 
           return result
