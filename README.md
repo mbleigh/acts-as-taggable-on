@@ -42,6 +42,10 @@ bundle
 #### Post Installation
 
 ```shell
+# For the latest versions
+rake railties:install:migrations FROM=acts_as_taggable_on_engine db:migrate
+
+# For versions 2.4.1 and earlier
 rails generate acts_as_taggable_on:migration
 rake db:migrate
 ```
