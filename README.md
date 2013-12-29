@@ -199,7 +199,10 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 ```
 ### Expressions
 
-You may input tags as an expression. 
+You may input tags as an expression using the following operators: 
+- +, | (union)
+- - (difference)
+- & (intersection)
 
 ```ruby
 class Language < ActiveRecord::Base
@@ -211,13 +214,14 @@ end
 Language.tagged_with("oop & fun - java", :expression => true)
 
 # Find all languages tagged with interpreted and all languages tagged with c++ as long as they are object-oriented
-# Note that operators within tags must be preceded by a backslash
+# Note that operators within tags must be preceded by a backslash in absence of :use_whitespace => true
 Language.tagged_with("interpreted+c\+\+\&oop", :expression => true)
 
-# Preserve the default chaining order by ActiveRecord, although your results may be unsatisfactory
-# This will return 0 results. 
-Language.tagged_with("interpreted & oop + c\+\+", :expression => true, :default_chaining => true)
+# Using whitespace
+Language.tagged_with("interpreted + c++ & oop", :expression => true, :use_whitespace => true)
 ```
+
+For more usage notes, [see source](https://github.com/jakemh/acts-as-taggable-on/blob/42e318cff3a35f7073771d93a76d7c91ac99bd23/lib/acts_as_taggable_on/expression.rb).
 
 ### Dirty objects
 
