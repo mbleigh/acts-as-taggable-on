@@ -10,6 +10,10 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 * Fixes
 * Misc
 
+### 3.0.0.rc2 [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/fork-v3.0.0.rc1...fork-v3.0.0.rc2)
+
+### 3.0.0.rc1 [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v2.4.1...fork-v3.0.0.rc1)
+
 ### [2.4.1 / 2013-05-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v2.4.0...v2.4.1)
 
 * Features
