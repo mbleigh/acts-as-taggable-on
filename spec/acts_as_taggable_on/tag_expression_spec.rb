@@ -53,7 +53,7 @@ describe "Tag Expressions" do
     if RUBY_VERSION.to_f >= 1.9 
       bob = TaggableModel.create(:name => "Bob", :tag_list => "sad, lazy+strong")
       frank = TaggableModel.create(:name => "Frank", :tag_list => "happy, strong")
-      TaggableModel.tagged_with("lazy\\+strong+happy", :expression => true).to_a.should == [bob, frank]
+      TaggableModel.tagged_with("lazy\\+strong+happy", :expression => true).to_a.should include(bob, frank)
     end
   end
 

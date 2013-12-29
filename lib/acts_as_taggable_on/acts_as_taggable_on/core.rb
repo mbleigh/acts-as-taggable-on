@@ -98,7 +98,6 @@ module ActsAsTaggableOn::Taggable
         quote = ActsAsTaggableOn::Tag.using_postgresql? ? '"' : ''
 
         if options.delete(:expression)
-          
           result = self
           ActsAsTaggableOn::Expression::next_batch(tag_list[0], options) do |option, list|
             result = result.tagged_with(list, option => true)
