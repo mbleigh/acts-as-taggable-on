@@ -424,7 +424,7 @@ describe "Taggable" do
     frank = TaggableModel.create(:name => "Frank", :tag_list => "happy")
     steve = TaggableModel.create(:name => 'Steve', :tag_list => "happy, lazy")
 
-    TaggableModel.tagged_with("lazy, happy", :any => true).tagged_with("sad", :exclude => true).to_a.should == [frank, steve]
+    TaggableModel.tagged_with("lazy, happy", :any => true).tagged_with("sad", :exclude => true).to_a.should include(frank, steve)
   end
 
   it "should be able to evaluate complex expressions from left to right" do
