@@ -54,19 +54,6 @@ rake db:migrate
 
 see [UPGRADING](UPGRADING)
 
-## Testing
-
-Acts As Taggable On uses RSpec for its test coverage. Inside the gem
-directory, you can run the specs with:
-
-```shell
-bundle
-cp spec/database.yml{.sample,}
-rake spec
-```
-
-If you want, add a `.ruby-version` file in the project root (and use rbenv or RVM) to work on a specific version of Ruby.
-
 ## Usage
 
 ```ruby
@@ -307,6 +294,19 @@ We have a long list of valued contributors. [Check them all](https://github.com/
 ## Maintainer
 
 * [Joost Baaij](https://github.com/tilsammans)
+
+## Testing
+
+Acts As Taggable On uses RSpec for its test coverage. Inside the gem
+directory, you can run the specs with:
+
+```shell
+bundle
+rake spec
+```
+
+You can run all the tests across all the Rails versions by running `rake appraise`.  If you'd also like to [run the tests across all rubies and databases as configured for Travis CI, install and run `wwtd`](https://github.com/grosser/wwtd).
+
 
 ## License
 
