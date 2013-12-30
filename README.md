@@ -221,7 +221,7 @@ Language.tagged_with("interpreted+c\+\+\&oop", :expression => true)
 Language.tagged_with("interpreted + c++ & oop", :expression => true, :use_whitespace => true)
 ```
 
-For more usage notes, [see source](https://github.com/jakemh/acts-as-taggable-on/blob/42e318cff3a35f7073771d93a76d7c91ac99bd23/lib/acts_as_taggable_on/expression.rb).
+For more usage notes, [see source](https://github.com/mbleigh/acts-as-taggable-on/blob/42e318cff3a35f7073771d93a76d7c91ac99bd23/lib/acts_as_taggable_on/expression.rb#L8).
 
 ### Dirty objects
 
