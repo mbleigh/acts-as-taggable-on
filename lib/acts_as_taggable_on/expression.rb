@@ -22,7 +22,7 @@ module ActsAsTaggableOn
     #   "you\\ + me + them"
     #   a "\\" (double quotes) or '\' (single quotes) to bypass parser
     #
-    # Example:
+    # Examples:
     # - Item.tagged_with("c\\+\\+-java&fun" , :expression => true)
     #   => returns programming languages tagged with c++ and languages tagged with c++ as long as they are tagged with fun and they are not java.
     #
@@ -70,39 +70,29 @@ module ActsAsTaggableOn
       # looks for consecutive operators and subsitutes in the first 
       # prevents expression from being broken e.g. java++ruby => java+ruby
       def self.fix_operator_syntax(expression_string)
-        if RUBY_VERSION.to_f >= 1.9
-          expression_string.scan(/(?<!\\)#{REGEX_OPS}{2,}/).each do |ops|
-            expression_string.gsub!(ops, ops[0])
-          end
+        expression_string.scan(/(?<!\\)#{REGEX_OPS}{2,}/).each do |ops|
+          expression_string.gsub!(ops, ops[0])
         end
       end
 
       def self.fix_operator_syntax_whitespace(expression_string)
-        if RUBY_VERSION.to_f >= 1.9
-          expression_string.scan(/(?<!\\)\s#{REGEX_OPS}{2,}\s/).each do |ops|
-            expression_string.gsub!(ops, " #{ops.strip[0]} ")
-          end
+        expression_string.scan(/(?<!\\)\s#{REGEX_OPS}{2,}\s/).each do |ops|
+          expression_string.gsub!(ops, " #{ops.strip[0]} ")
         end
       end
 
       # splits string at valid operators
-      # if Ruby version >= 1.9, does not split if preceded by backslash
       def self.parse_expression(tag_list)
         expression_string = tag_list
         expression_array = []
         if !ActsAsTaggableOn::Expression.options.delete(:use_whitespace)
           fix_operator_syntax(expression_string)
-          expression_array = expression_string.split(/#{get_lookbehind + SPLIT_REGEX}/)
+          expression_array = expression_string.split(/(?<!\\)#{SPLIT_REGEX}/)
         else
           fix_operator_syntax_whitespace(expression_string)
-          expression_array = expression_string.split(/#{get_lookbehind + SPLIT_REGEX_WHITESPACE}/)
+          expression_array = expression_string.split(/(?<!\\)#{SPLIT_REGEX_WHITESPACE}/)
         end
         return unescape_tags(expression_array)
-      end
-
-      #look behinds are only available since Ruby 1.9
-      def self.get_lookbehind
-        '(?<!\\\)' if RUBY_VERSION.to_f >= 1.9
       end
 
       # looks for operators preceded by backslashes and replaces with empty string
