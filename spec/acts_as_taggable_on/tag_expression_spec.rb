@@ -33,8 +33,7 @@ describe "Tag Expressions" do
     ActsAsTaggableOn::Expression::Parse::fixed_expression_array(list2).length.should equal(12)
   end
 
-  it "should handle repeated operators if Ruby version >= 1.9" do
-    if RUBY_VERSION.to_f >= 1.9 
+  it "should handle repeated operators" do
       parse1 = ActsAsTaggableOn::Expression::Parse::parse_expression("tag++tag3--tag3&&tag4")
       parse2 = ActsAsTaggableOn::Expression::Parse::parse_expression("tag+tag3-tag3&tag4")
 
@@ -45,16 +44,12 @@ describe "Tag Expressions" do
 
     TaggableModel.tagged_with("c\\+\\+++++python", :expression => true, :use_whitespace => false).to_a.length.should == 2
     TaggableModel.tagged_with("c++ ++++++++++ python", :expression => true, :use_whitespace => true).to_a.length.should == 2
-
-    end
   end
 
-  it "should permit operators preceded by a backward slash in tag name if Ruby version >= 1.9" do
-    if RUBY_VERSION.to_f >= 1.9 
+  it "should permit operators preceded by a backward slash in tag name" do
       bob = TaggableModel.create(:name => "Bob", :tag_list => "sad, lazy+strong")
       frank = TaggableModel.create(:name => "Frank", :tag_list => "happy, strong")
       TaggableModel.tagged_with("lazy\\+strong+happy", :expression => true).to_a.should include(bob, frank)
-    end
   end
 
   it "should allow + and | operators to perform unions" do
