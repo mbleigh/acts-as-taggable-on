@@ -35,14 +35,12 @@ module ActsAsTaggableOn
     # will return c++ regardless of whether it's tagged with fun, you'd be mistaken! It will only return c++ if it's tagged with fun, since 
     # intersection is evaluated last. 
     #
-    # *LET ME KNOW* if anyone would like a solution using server memory or a solution that uses set operators to eliminate this shortcoming. 
-
 
     def self.options
       @options ||= {}
     end
 
-    #provides a batch of tags from the Parse::build_each_batch method with the inputed tag as a parameter
+    # provides a batch of tags from the Parse::build_each_batch method with the inputed tag as a parameter
     def self.next_batch(tag_list, options = {})
       @options = options
       parsed_expression = Parse.parse_expression(tag_list)
