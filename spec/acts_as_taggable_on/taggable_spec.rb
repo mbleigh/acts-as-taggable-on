@@ -562,6 +562,22 @@ describe "Taggable" do
         it 'does not show any changes to the taggable item' do
           @taggable.changes.should == {}
         end
+
+        context "and using a delimiter different from a ','" do
+          before do
+            @old_delimiter = ActsAsTaggableOn.delimiter
+            ActsAsTaggableOn.delimiter = ';'
+          end
+
+          after do
+            ActsAsTaggableOn.delimiter = @old_delimiter
+          end
+
+          it 'does not show any changes to the taggable item when using array assignments' do
+            @taggable.tag_list = ["awesome", "epic"]
+            @taggable.changes.should == {}
+          end
+        end
       end
     end
 

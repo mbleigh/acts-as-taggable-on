@@ -307,7 +307,7 @@ module ActsAsTaggableOn::Taggable
       end
 
       def process_dirty_object(context,new_list)
-        value = new_list.is_a?(Array) ? new_list.join(', ') : new_list
+        value = new_list.is_a?(Array) ? ActsAsTaggableOn::TagList.new(new_list) : new_list
         attrib = "#{context.to_s.singularize}_list"
 
         if changed_attributes.include?(attrib)
