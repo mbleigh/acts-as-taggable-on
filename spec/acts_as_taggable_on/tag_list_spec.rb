@@ -121,6 +121,12 @@ describe ActsAsTaggableOn::TagList do
       tag_list = ActsAsTaggableOn::TagList.from "我的东西可能是不见了，还好有备份"
       tag_list.to_s.should == "我， 东西， 不见了， 还好有备份"
     end
+
+    it "should work for multiple quoted tags" do 
+      ActsAsTaggableOn.delimiter = [',']
+      tag_list = ActsAsTaggableOn::TagList.from '"Ruby Monsters","eat Katzenzungen"'
+      tag_list.to_s.should == 'Ruby Monsters, eat Katzenzungen'
+    end
   end
 
 end
