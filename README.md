@@ -35,24 +35,29 @@ gem 'acts-as-taggable-on'
 
 and bundle:
 
-```ruby
+```shell
 bundle
 ```
 
 #### Post Installation
 
-```shell
-# For the latest versions
-rake railties:install:migrations FROM=acts_as_taggable_on_engine db:migrate
+Install migrations
 
-# For versions 2.4.1 and earlier
+```shell
+# For the latest versions :
+rake acts_as_taggable_on_engine:install:migrations
+# For versions 2.4.1 and earlier :
 rails generate acts_as_taggable_on:migration
+```
+
+Review the generated migrations then migrate :
+```shell
 rake db:migrate
 ```
 
 #### Upgrading
 
-see [UPGRADING](UPGRADING)
+see [UPGRADING](UPGRADING.md)
 
 ## Usage
 
