@@ -72,16 +72,30 @@ describe ActsAsTaggableOn::Tag do
       ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME").should == [@tag]
     end
 
+    it "should find by name case sensitive" do
+      ActsAsTaggableOn.strict_case_match = true
+      expect {
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME")
+      }.to change(ActsAsTaggableOn::Tag, :count).by(1)  
+    end
+
     it "should create by name" do
-      lambda {
+      expect {
         ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("epic")
-      }.should change(ActsAsTaggableOn::Tag, :count).by(1)
+      }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+    end
+
+    it "should find or create by name case sensitive" do
+      ActsAsTaggableOn.strict_case_match = true
+      expect {
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME", 'awesome').map(&:name).should == ["AWESOME", "awesome"]
+      }.to change(ActsAsTaggableOn::Tag, :count).by(1)
     end
 
     it "should find or create by name" do
-      lambda {
+      expect {
         ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("awesome", "epic").map(&:name).should == ["awesome", "epic"]
-      }.should change(ActsAsTaggableOn::Tag, :count).by(1)
+      }.to change(ActsAsTaggableOn::Tag, :count).by(1)
     end
 
     it "should return an empty array if no tags are specified" do
