@@ -34,8 +34,10 @@ module ActsAsTaggableOn::Taggable
         end
       end
 
-      def acts_as_taggable_on(*args)
-        super(*args)
+      private
+
+      def taggable_on(ordered, *tag_types)
+        super(ordered, *tag_types)
         initialize_acts_as_taggable_on_related
       end
     end
