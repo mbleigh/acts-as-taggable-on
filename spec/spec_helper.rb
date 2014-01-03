@@ -3,6 +3,7 @@ $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 require 'logger'
 
 require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
+I18n.enforce_available_locales = true
 require 'ammeter/init'
 
 unless [].respond_to?(:freq)
