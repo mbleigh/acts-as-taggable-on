@@ -18,8 +18,8 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  if File.exists?('UPGRADING')
-    gem.post_install_message = File.read('UPGRADING')
+  if File.exists?('UPGRADING.md')
+    gem.post_install_message = File.read('UPGRADING.md')
   end
 
   gem.add_runtime_dependency 'rails', ['>= 3', '< 5']
