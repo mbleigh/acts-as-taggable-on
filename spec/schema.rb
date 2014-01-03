@@ -1,7 +1,6 @@
 ActiveRecord::Schema.define :version => 0 do
   create_table :tags, :force => true do |t|
     t.string :name
-    t.integer :taggings_count, :default => 0
   end
 
   create_table :taggings, :force => true do |t|
