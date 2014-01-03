@@ -7,8 +7,11 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 ### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.0...master)
 
 * Breaking Changes
+  * [dgilperez #390](https://github.com/mbleigh/acts-as-taggable-on/pull/390) requires to run the migrations for existing applications.
 * Features
 * Fixes
+* Performance
+  * [dgilperez #390](https://github.com/mbleigh/acts-as-taggable-on/pull/390)
 * Misc
 
 ### [3.0.0 / 2014-01-01](https://github.com/mbleigh/acts-as-taggable-on/compare/v2.4.1...v3.0.0)
