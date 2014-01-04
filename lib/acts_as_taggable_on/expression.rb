@@ -3,7 +3,7 @@ module ActsAsTaggableOn
     
     # Executes a tag search using +, |, - and & operators.
     # This module parses and re-orders the tag expression to generate an SQL query 
-    # without the need for subqueries and SQL set operators. 
+    # without the use of subqueries and SQL set operators. 
     #
     # Usage: 
     # - Item.tagged_with("this+is&my-expression", :expression => true)
@@ -12,44 +12,55 @@ module ActsAsTaggableOn
     # Options:
     #  :use_whitespace - use whitespace between tags and operators as delimiter; 
     #     this makes using tags with operators in them a bit easier
-    #  :default_chaining - do not reorder expression
+    #  :default_chaining - do not regroup ore reorder expression
+    #
+    # Examples:
+    # - Item.tagged_with("programming languages - java & fun" , :expression => { :use_whitespace => true} )
+    #   => returns programming langauges tagged with fun that are not java; spaces that do not separate operators are ignored
+    #
+    # - Item.tagged_with("programming languages + fun + java" , :expression => { :use_whitespace => true, :default_chaining => true} )
+    #   => this will find the intersection of programming languages, fun and java, since the chaining is handled as follows:
+    #      Item.tagged_with("programming_langugages", :any => true).tagged_with("fun", :any => true).tagged_with("java", :any => true)
+    #      :default_chaining means each tag will not be reordered and will be handled individually. 
     #
     # Notes:
-    # - With :use_whitespace => false, if a tag contains an +/-/|/& operator, precede
+    # - With :use_whitespace => false, if a tag contains a +/-/|/& operator, precede operator
     #   with a "\\" or '\' to bypass parser. e.g. "c\\+\\++java" to union c++ and java. 
     # - With :use_whitespace => true, if a tag contains a space, the parser should be able to 
     #   handle it. For a tag like "you + me", precede the space in the same manner as above:
     #   "you\\ + me + them"
-    #   a "\\" (double quotes) or '\' (single quotes) to bypass parser
+    # - Use "\\" (double quotes) or '\' (single quotes) to bypass parser
     #
-    # Examples:
+    # Example:
     # - Item.tagged_with("c\\+\\+-java&fun" , :expression => true)
     #   => returns programming languages tagged with c++ and languages tagged with c++ as long as they are tagged with fun and they are not java.
     #
-    # - Item.tagged_with("programming languages - java&fun" , :expression => true, :use_whitespace => true)
-    #   => returns programming langauges tagged with fun that are not java.
-    #
-    # Limitations: 
-    # - Since this is a purely SQL solution and it doesn't use set operators, it will evaluate + => - => & from left to right,
-    # so if you think expression 'Item.tagged_with("programming_languages-java&fun+c\\+\\+" , :expression => true)'
-    # will return c++ regardless of whether it's tagged with fun, you'd be mistaken! It will only return c++ if it's tagged with fun, since 
-    # intersection is evaluated last. 
-    #
-    # *LET ME KNOW* if anyone would like a solution using server memory or a solution that uses set operators to eliminate this shortcoming. 
+    # Limitations and future development: 
+    # - Since this is a purely SQL solution and doesn't use set operators, it will evaluate + => - => & from left to right;
+    # therefore 'Item.tagged_with("programming_languages-java&fun+c\\+\\+" , :expression => true)'
+    # will return c++ regardless of whether it's tagged with fun. It will only return c++ if it's tagged with fun, since 
+    # intersection is evaluated last. This could be improved using SQL set operators or a solution using server memory.  
 
 
     def self.options
       @options ||= {}
     end
 
-    #provides a batch of tags from the Parse::build_each_batch method with the inputed tag as a parameter
+    # provides a batch of tags from the Parse::build_each_batch method with the inputed tag as a parameter
+    # with :default_chaining, use individual tuples instead of batches
     def self.next_batch(tag_list, options = {})
       @options = options
       parsed_expression = Parse.parse_expression(tag_list)
       formatted_expression = Parse.fixed_expression_array(parsed_expression)
       tuples = Parse::tuple_list(formatted_expression)
-      Parse::build_each_batch(tuples) do |op, tag|
-        yield op, tag
+      if !options[:default_chaining] == true
+        Parse::build_each_batch(tuples) do |op, tag|
+          yield op, tag
+        end
+      else
+        tuples.each do |op, tag|
+          yield op, tag
+        end
       end
     end
 
@@ -85,7 +96,7 @@ module ActsAsTaggableOn
       def self.parse_expression(tag_list)
         expression_string = tag_list
         expression_array = []
-        if !ActsAsTaggableOn::Expression.options.delete(:use_whitespace)
+        if !Expression.options.delete(:use_whitespace)
           fix_operator_syntax(expression_string)
           expression_array = expression_string.split(/(?<!\\)#{SPLIT_REGEX}/)
         else
@@ -98,7 +109,7 @@ module ActsAsTaggableOn
       # looks for operators preceded by backslashes and replaces with empty string
       # this returns string to original unescaped form, enabling tag operators inside of strings 
       def self.unescape_tags(expression_array)
-        if !ActsAsTaggableOn::Expression.options.delete(:use_whitespace)
+        if !Expression.options.delete(:use_whitespace)
           unescape_with_regex(expression_array, /\\(?=#{REGEX_OPS})/)
         else
           unescape_with_regex(expression_array, /\\(?=\s)/)
@@ -122,9 +133,9 @@ module ActsAsTaggableOn
       # provides option of using default ActiveRecord chaining order using :default_chaining option 
       def self.tuple_list(expression_array)
         expression_array = expression_array.each_slice(2).map { |op, tag|  [op.strip, tag.strip]}
-        if !ActsAsTaggableOn::Expression.options.delete(:default_chaining)
-          return sorted_expression_array(expression_array) # move & to the back
-        else sorted_expression_array(expression_array)
+        if !Expression.options[:default_chaining] == true
+          return sorted_expression_array(expression_array)
+        else 
           return expression_array
         end
       end
@@ -148,6 +159,7 @@ module ActsAsTaggableOn
         current_option = nil
         tag_list = []
         tuples.each do |operator, tag|
+
           if  current_option != nil and current_option != option_from_operator[operator]
             yield current_option, tag_list
             tag_list = []          
