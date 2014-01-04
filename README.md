@@ -200,9 +200,9 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 ### Expressions
 
 You may input tags as an expression using the following operators: 
-- +, | (union)
-- - (difference)
-- & (intersection)
+- `+`, `|` (union)
+- `-` (difference)
+- `&` (intersection)
 
 ```ruby
 class Language < ActiveRecord::Base
@@ -218,10 +218,10 @@ Language.tagged_with("oop & fun - java", :expression => true)
 Language.tagged_with("interpreted+c\+\+\&oop", :expression => true)
 
 # Using whitespace
-Language.tagged_with("interpreted + c++ & oop", :expression => true, :use_whitespace => true)
+Language.tagged_with("interpreted + c++ & oop", :expression => { :use_whitespace => true })
 ```
 
-For more usage notes, [see source](https://github.com/mbleigh/acts-as-taggable-on/blob/42e318cff3a35f7073771d93a76d7c91ac99bd23/lib/acts_as_taggable_on/expression.rb#L8).
+For more usage notes, [see source](https://github.com/mbleigh/acts-as-taggable-on/blob/e8e043a91d13463673446f4a160e770854d942ef/lib/acts_as_taggable_on/expression.rb).
 
 ### Dirty objects
 
