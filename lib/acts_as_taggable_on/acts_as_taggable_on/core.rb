@@ -81,6 +81,7 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with("awesome", "cool", :any => true)       # Users that are tagged with awesome or cool
       #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
       #   User.tagged_with("awesome", "cool", :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
+      
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagList.from(tags)
         empty_result = where("1 = 0")
@@ -97,7 +98,8 @@ module ActsAsTaggableOn::Taggable
         alias_base_name = undecorated_table_name.gsub('.','_')
         quote = ActsAsTaggableOn::Tag.using_postgresql? ? '"' : ''
 
-        if options.delete(:expression)
+        if expression_options = options.delete(:expression)
+          options = expression_options if expression_options.kind_of? Hash
           result = self
           ActsAsTaggableOn::Expression::next_batch(tag_list[0], options) do |option, list|
             result = result.tagged_with(list, option => true)
