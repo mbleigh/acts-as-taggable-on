@@ -180,7 +180,7 @@ User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['sm
 
 You can also use `:wild => true` option along with `:any` or `:exclude` option. It will looking for `%awesome%` and `%cool%` in sql.
 
-__Tip:__ `User.tagged_with([])` or '' will return `[]`, but not all records.
+__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, but not all records.
 
 ### Relationships
 
