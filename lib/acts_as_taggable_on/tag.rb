@@ -113,7 +113,7 @@ module ActsAsTaggableOn
 
       def as_8bit_ascii(string)
         if defined?(Encoding)
-          string.to_s.force_encoding('BINARY')
+          string.to_s.dup.force_encoding('BINARY')
         else
           string.to_s.mb_chars
         end

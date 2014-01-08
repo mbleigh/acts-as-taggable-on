@@ -194,6 +194,13 @@ describe ActsAsTaggableOn::Tag do
       ActsAsTaggableOn::Tag.named('cool').should include(@tag)
       ActsAsTaggableOn::Tag.named('cool').should_not include(uppercase_tag)
     end
+
+    it "should not change enconding" do
+      name = "\u3042"
+      original_encoding = name.encoding
+      ActsAsTaggableOn::Tag.find_or_create_with_like_by_name(name)
+      name.encoding.should == original_encoding
+    end
   end
 
   describe "name uniqeness validation" do
