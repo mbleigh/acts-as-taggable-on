@@ -2,8 +2,12 @@ require 'spec_helper'
 
 describe "Acts As Taggable On" do
 
-  before(:each) do
-    clean_database!
+  before :each do
+    DatabaseCleaner.start
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   describe 'Caching' do

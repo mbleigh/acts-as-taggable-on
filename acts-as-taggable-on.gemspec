@@ -30,8 +30,9 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'mysql2', '~> 0.3.7'
   gem.add_development_dependency 'pg'
 
-  gem.add_development_dependency 'rspec-rails', '2.13.0' # 2.13.1 is broken
-  gem.add_development_dependency 'rspec', '~> 2.6'
-  gem.add_development_dependency 'ammeter'
+  gem.add_development_dependency 'rspec-rails'
+  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'combustion'
+  gem.add_development_dependency 'database_cleaner'
 
 end

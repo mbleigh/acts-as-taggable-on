@@ -2,8 +2,12 @@
 require 'spec_helper'
 
 describe "Acts As Taggable On" do
-  before(:each) do
-    clean_database!
+  before :each do
+    DatabaseCleaner.start
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   it "should provide a class method 'taggable?' that is false for untaggable models" do
@@ -12,7 +16,6 @@ describe "Acts As Taggable On" do
 
   describe "Taggable Method Generation To Preserve Order" do
     before(:each) do
-      clean_database!
       TaggableModel.tag_types = []
       TaggableModel.preserve_tag_order = false
       TaggableModel.acts_as_ordered_taggable_on(:ordered_tags)
@@ -26,7 +29,6 @@ describe "Acts As Taggable On" do
 
   describe "Taggable Method Generation" do
     before(:each) do
-      clean_database!
       TaggableModel.tag_types = []
       TaggableModel.acts_as_taggable_on(:tags, :languages, :skills, :needs, :offerings)
       @taggable = TaggableModel.new(:name => "Bob Jones")
