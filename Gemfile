@@ -7,5 +7,6 @@ group :local_development do
   gem 'guard-rspec'
   gem 'appraisal'
   gem 'rake'
+  gem 'pry'
 end
 

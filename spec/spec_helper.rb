@@ -1,6 +1,7 @@
 $LOAD_PATH << "." unless $LOAD_PATH.include?(".")
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 require 'logger'
+require 'pry'
 
 require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
 I18n.enforce_available_locales = true
@@ -18,7 +19,7 @@ end
 
 # set adapter to use, default is sqlite3
 # to use an alternative adapter run => rake spec DB='postgresql'
-db_name = ENV['DB'] || 'sqlite3'
+db_name = 'mysql'
 database_yml = File.expand_path('../database.yml', __FILE__)
 
 if File.exists?(database_yml)
