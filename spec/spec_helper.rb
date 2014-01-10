@@ -18,7 +18,7 @@ end
 
 # set adapter to use, default is sqlite3
 # to use an alternative adapter run => rake spec DB='postgresql'
-db_name = ENV['DB'] || 'sqlite3'
+db_name = 'mysql'
 database_yml = File.expand_path('../database.yml', __FILE__)
 
 if File.exists?(database_yml)
