@@ -15,6 +15,11 @@ module ActsAsTaggableOn
         ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name == 'SQLite'
       end
 
+      def using_mysql?
+        ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name =~ /Mysql/
+      end
+
+
       def sha_prefix(string)
         Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
       end

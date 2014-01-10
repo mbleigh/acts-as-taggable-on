@@ -86,8 +86,12 @@ module ActsAsTaggableOn::Taggable
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
 
         # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
-        scoped_select = "#{table_name}.#{primary_key}"
-        tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(scoped_select))})").group(group_columns)
+        
+
+
+        
+        tagging_scope = generate_tagging_scope_in_clause(tagging_scope, table_name, primary_key).group(group_columns)
+
 
         tag_scope = tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
         tag_scope.extending(CalculationMethods)
@@ -163,8 +167,7 @@ module ActsAsTaggableOn::Taggable
 
         unless options[:id]
           # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
-          scoped_select = "#{table_name}.#{primary_key}"
-          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(scoped_select))})")
+          tagging_scope = generate_tagging_scope_in_clause(tagging_scope, table_name, primary_key)
         end
 
         tagging_scope = tagging_scope.group(group_columns).having(having)
@@ -176,6 +179,21 @@ module ActsAsTaggableOn::Taggable
       def safe_to_sql(relation)
         connection.respond_to?(:unprepared_statement) ? connection.unprepared_statement{relation.to_sql} : relation.to_sql
       end
+
+      private
+
+      def generate_tagging_scope_in_clause(tagging_scope, table_name, primary_key)
+        table_name_pkey = "#{table_name}.#{primary_key}"
+        if ActsAsTaggableOn::Tag.using_mysql?
+          scoped_ids = select(table_name_pkey).map(&:id)
+          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(?)", scoped_ids)
+        else
+          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(table_name_pkey))})")
+        end
+
+        return tagging_scope
+      end
+
     end
 
     module InstanceMethods

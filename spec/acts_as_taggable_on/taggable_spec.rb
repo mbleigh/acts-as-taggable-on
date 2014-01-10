@@ -135,46 +135,7 @@ describe "Taggable" do
   end
 
 
-  context 'tag_counts and aggreating scopes, compatability with MySQL ' do
-# re: ActiveRecord::StatementInvalid: Mysql2::Error: This version of 
-# MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery':
-    before(:each) do
-      clean_database!
-      TaggableModel.new(:name => "Barb Jones").tap{|t| t.tag_list = ['awesome', 'fun'] }.save
-      TaggableModel.new(:name => "John Doe").tap{|t| t.tag_list = ['cool', 'fun', 'hella'] }.save
-      TaggableModel.new(:name => "Jo Doe").tap{|t| t.tag_list = ['curious', 'young', 'naive', 'sharp'] }.save
 
-      TaggableModel.all.each{|t| t.save }
-    end
-    
-
-    context 'Model.tag_counts.limit(x)' do 
-      it 'should limit the tag objects (not very useful, of course)' do
-        array_of_tag_counts = TaggableModel.tag_counts.limit(2)
-        expect(array_of_tag_counts.count).to eq 2
-      end
-    end
-
-    context 'Model.tag_counts.sum(:tags_count)' do
-      it 'should limit the total tags used' do
-        expect( TaggableModel.tag_counts.sum(:tags_count) ).to eq 9
-      end 
-    end
-
-    context 'Model.tag_counts.limit(2).sum(:tags_count)' do
-      it 'limit should have no effect; this is just a sanity check' do
-        expect( TaggableModel.tag_counts.limit(2).sum(:tags_count) ).to eq 9
-      end
-    end
-
-    context 'Model.limit(x).tag_counts.sum(:tags_count)' do 
-      it 'should not try a LIMIT IN/ALL/ANY/SOME on mysql2 ' do
-        expect( TaggableModel.limit(2).tag_counts.sum('tags_count') ).to eq 5
-        #TaggableModel.limit(2).tag_counts.sum('tags_count')
-      end
-    end
-
-  end
 
   it "should have tags_on" do
     TaggableModel.tags_on(:tags).should be_empty
@@ -676,6 +637,94 @@ describe "Taggable" do
       TaggableModel.create(:tag_list=>'woo').tag_list_submethod_called.should be_true
     end
   end
+
+
+# Context for this test
+
+  # 2.x, this works:
+
+  # SELECT tags.*, taggings.tags_count AS count FROM "tags" JOIN (SELECT taggings.tag_id, COUNT(taggings.tag_id) 
+  #   AS tags_count FROM "taggings" 
+  #   INNER JOIN taggable_models ON taggable_models.id = taggings.taggable_id 
+  #   WHERE (taggings.taggable_type = 'TaggableModel' 
+  #     AND taggings.context = 'tags') 
+  #   AND (taggings.taggable_id 
+
+  ###    IN(10,11)) 
+
+
+  # GROUP BY taggings.tag_id HAVING COUNT(taggings.tag_id) > 0) 
+  #   AS taggings ON taggings.tag_id = tags.id
+
+  # In 3.x, this did not:
+
+  # re: ActiveRecord::StatementInvalid: Mysql2::Error: This version of 
+  # MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery':
+
+  # SELECT tags.*, taggings.tags_count AS count FROM `tags` JOIN (SELECT taggings.tag_id, COUNT(taggings.tag_id) 
+  #   AS tags_count FROM `taggings` 
+  #     INNER JOIN taggable_models ON taggable_models.id = taggings.taggable_id 
+  #     WHERE (taggings.taggable_type = 'TaggableModel' 
+  #       AND taggings.context = 'tags') 
+  #       AND (taggings.taggable_id 
+
+
+  ##      IN(SELECT  taggable_models.id FROM `taggable_models`  LIMIT 2)) 
+
+
+  #       GROUP BY taggings.tag_id HAVING COUNT(taggings.tag_id) > 0) 
+  #       AS taggings ON taggings.tag_id = tags.id
+
+
+  # Solution: Add a ActsAsTaggableOn::Tag.using_mysql?  method and then revert to the 2.x way of doing a group count in 
+  #           .all_tags and .all_tags_count
+
+  #
+  #           collection.rb now has a private class method to switch between the 2.x and 3.x code
+  #             .generate_tagging_scope_in_clause
+  # 
+  context 'tag_counts and aggreating scopes, compatability with MySQL ' do
+    before(:each) do
+      clean_database!
+      TaggableModel.new(:name => "Barb Jones").tap{|t| t.tag_list = ['awesome', 'fun'] }.save
+      TaggableModel.new(:name => "John Doe").tap{|t| t.tag_list = ['cool', 'fun', 'hella'] }.save
+      TaggableModel.new(:name => "Jo Doe").tap{|t| t.tag_list = ['curious', 'young', 'naive', 'sharp'] }.save
+
+      TaggableModel.all.each{|t| t.save }
+    end
+    
+
+    context 'Model.limit(x).tag_counts.sum(:tags_count)' do 
+      it 'should not break on Mysql' do
+        expect( TaggableModel.limit(2).tag_counts.sum('tags_count') ).to eq 5
+      end
+    end
+
+
+
+    context 'regression prevention, just making sure these esoteric queries still work' do 
+      context 'Model.tag_counts.limit(x)' do 
+        it 'should limit the tag objects (not very useful, of course)' do
+          array_of_tag_counts = TaggableModel.tag_counts.limit(2)
+          expect(array_of_tag_counts.count).to eq 2
+        end
+      end
+
+      context 'Model.tag_counts.sum(:tags_count)' do
+        it 'should limit the total tags used' do
+          expect( TaggableModel.tag_counts.sum(:tags_count) ).to eq 9
+        end 
+      end
+
+      context 'Model.tag_counts.limit(2).sum(:tags_count)' do
+        it 'limit should have no effect; this is just a sanity check' do
+          expect( TaggableModel.tag_counts.limit(2).sum(:tags_count) ).to eq 9
+        end
+      end
+    end
+  end
+
+
 end
 
 
