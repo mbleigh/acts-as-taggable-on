@@ -16,7 +16,7 @@ module ActsAsTaggableOn
       end
 
       def using_mysql?
-        ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name.downcase =~ /mysql/
+        /mysql/ === ActiveRecord::Base.connection_config[:adapter]
       end
 
       def using_case_insensitive_collation?

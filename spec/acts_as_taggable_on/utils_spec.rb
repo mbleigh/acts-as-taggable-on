@@ -21,12 +21,12 @@ describe ActsAsTaggableOn::Utils do
 
   describe "using_mysql?" do
     it "should return true when the adapter is mysql" do
-      TaggableModel.connection.stub(:adapter_name).and_return("MySQL2")
+      ActiveRecord::Base.stub(:connection_config).and_return(adapter: "mysql2")
       TaggableModel.using_mysql?.should be_true
     end
 
     it "should return false when the adapter is not mysql" do
-      TaggableModel.connection.stub(:adapter_name).and_return("PostgreSQL")
+      ActiveRecord::Base.stub(:connection_config).and_return(adapter: "postgresql")
       TaggableModel.using_mysql?.should be_false
     end
   end
@@ -34,7 +34,7 @@ describe ActsAsTaggableOn::Utils do
   describe "using_case_insensitive_collation?" do
     context "when the adapter is mysql" do
       before do
-        TaggableModel.connection.stub(:adapter_name).and_return("MySQL2")
+        ActiveRecord::Base.stub(:connection_config).and_return(adapter: "mysql2")
       end
 
       it "should return true when the collation is case insensitive" do
@@ -49,7 +49,7 @@ describe ActsAsTaggableOn::Utils do
     end
 
     it "should return false when the adapter is not mysql" do
-      TaggableModel.connection.stub(:adapter_name).and_return("PostgreSQL")
+      TaggableModel.stub(:using_mysql?).and_return(false)
       TaggableModel.using_case_insensitive_collation?.should be_false
     end
   end
