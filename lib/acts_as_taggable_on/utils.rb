@@ -15,10 +15,18 @@ module ActsAsTaggableOn
         ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name == 'SQLite'
       end
 
+      def using_mysql?
+        /mysql/ === ActiveRecord::Base.connection_config[:adapter]
+      end
+
+      def using_case_insensitive_collation?
+        using_mysql? && ::ActiveRecord::Base.connection.collation =~ /_ci\Z/
+      end
+
       def sha_prefix(string)
         Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
       end
-      
+
       private
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'

@@ -18,4 +18,39 @@ describe ActsAsTaggableOn::Utils do
       TaggableModel.send(:like_operator).should == "LIKE"
     end
   end
+
+  describe "using_mysql?" do
+    it "should return true when the adapter is mysql" do
+      ActiveRecord::Base.stub(:connection_config).and_return(adapter: "mysql2")
+      TaggableModel.using_mysql?.should be_true
+    end
+
+    it "should return false when the adapter is not mysql" do
+      ActiveRecord::Base.stub(:connection_config).and_return(adapter: "postgresql")
+      TaggableModel.using_mysql?.should be_false
+    end
+  end
+
+  describe "using_case_insensitive_collation?" do
+    context "when the adapter is mysql" do
+      before do
+        ActiveRecord::Base.stub(:connection_config).and_return(adapter: "mysql2")
+      end
+
+      it "should return true when the collation is case insensitive" do
+        TaggableModel.connection.stub(:collation).and_return("utf8_unicode_ci")
+        TaggableModel.using_case_insensitive_collation?.should be_true
+      end
+
+      it "should return false when the adapter is case sensitive" do
+        TaggableModel.connection.stub(:collation).and_return("utf8_bin")
+        TaggableModel.using_case_insensitive_collation?.should be_false
+      end
+    end
+
+    it "should return false when the adapter is not mysql" do
+      TaggableModel.stub(:using_mysql?).and_return(false)
+      TaggableModel.using_case_insensitive_collation?.should be_false
+    end
+  end
 end
