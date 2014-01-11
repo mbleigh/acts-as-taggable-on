@@ -19,6 +19,10 @@ module ActsAsTaggableOn
         ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name.downcase =~ /mysql/
       end
 
+      def using_case_insensitive_collation?
+        using_mysql? && ::ActiveRecord::Base.connection.collation =~ /_ci\Z/
+      end
+
       def sha_prefix(string)
         Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
       end

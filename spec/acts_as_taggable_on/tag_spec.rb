@@ -89,6 +89,27 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
+  if ActsAsTaggableOn::Tag.using_case_insensitive_collation?
+    describe "find or create with a case insensitive and accent insensitive database" do
+      before(:each) do
+        @tag.name = "inupiat"
+        @tag.save
+      end
+
+      it "should find existing tags case and accent insensitivly" do
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("IÑUPIAT").should == [@tag]
+      end
+
+      it "should find existing tags accent insensitivly" do
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("iñupiat").should == [@tag]
+      end
+
+      it "should not let tags with single quotes break the query" do
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("their's").map(&:name).should == ["their's"]
+      end
+    end
+  end
+
   it "should require a name" do
     @tag.valid?
 
