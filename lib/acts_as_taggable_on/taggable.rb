@@ -87,7 +87,7 @@ module ActsAsTaggableOn
               true
             end
 
-            include ActsAsTaggableOn::Utils
+            extend ActsAsTaggableOn::Utils
           end
         end
 

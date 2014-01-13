@@ -12,7 +12,7 @@ module ActsAsTaggableOn::Compatibility
     scope_opts, opts = parse_options(opts)
 
     unless scope_opts.empty?
-      scope = lambda do 
+      scope = lambda do
         scope_opts.inject(self) { |result, hash| result.send *hash }
       end
     end

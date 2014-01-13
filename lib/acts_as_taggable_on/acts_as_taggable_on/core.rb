@@ -1,7 +1,6 @@
 module ActsAsTaggableOn::Taggable
   module Core
     def self.included(base)
-      base.send :include, ActsAsTaggableOn::Taggable::Core::InstanceMethods
       base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
 
       base.class_eval do
@@ -178,7 +177,7 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
-        taggings_alias, tags_alias = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
+        taggings_alias, _ = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
 
         if options.delete(:match_all)
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
@@ -191,13 +190,13 @@ module ActsAsTaggableOn::Taggable
           having = "COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
 
-        select(select_clause) \
-          .joins(joins.join(" ")) \
-          .where(conditions.join(" AND ")) \
-          .group(group) \
-          .having(having) \
-          .order(options[:order]) \
-          .readonly(false)
+        select(select_clause).
+          joins(joins.join(" ")).
+          where(conditions.join(" AND ")).
+          group(group).
+          having(having).
+          order(options[:order]).
+          readonly(false)
       end
 
       def is_taggable?
@@ -216,179 +215,176 @@ module ActsAsTaggableOn::Taggable
       end
     end
 
-    module InstanceMethods
-      # all column names are necessary for PostgreSQL group clause
-      def grouped_column_names_for(object)
-        self.class.grouped_column_names_for(object)
+    # all column names are necessary for PostgreSQL group clause
+    def grouped_column_names_for(object)
+      self.class.grouped_column_names_for(object)
+    end
+
+    def custom_contexts
+      @custom_contexts ||= []
+    end
+
+    def is_taggable?
+      self.class.is_taggable?
+    end
+
+    def add_custom_context(value)
+      custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
+    end
+
+    def cached_tag_list_on(context)
+      self["cached_#{context.to_s.singularize}_list"]
+    end
+
+    def tag_list_cache_set_on(context)
+      variable_name = "@#{context.to_s.singularize}_list"
+      instance_variable_defined?(variable_name) && !instance_variable_get(variable_name).nil?
+    end
+
+    def tag_list_cache_on(context)
+      variable_name = "@#{context.to_s.singularize}_list"
+      if instance_variable_get(variable_name)
+        instance_variable_get(variable_name)
+      elsif cached_tag_list_on(context) && self.class.caching_tag_list_on?(context)
+        instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(cached_tag_list_on(context)))
+      else
+        instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
+      end
+    end
+
+    def tag_list_on(context)
+      add_custom_context(context)
+      tag_list_cache_on(context)
+    end
+
+    def all_tags_list_on(context)
+      variable_name = "@all_#{context.to_s.singularize}_list"
+      return instance_variable_get(variable_name) if instance_variable_defined?(variable_name) && instance_variable_get(variable_name)
+
+      instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(all_tags_on(context).map(&:name)).freeze)
+    end
+
+    ##
+    # Returns all tags of a given context
+    def all_tags_on(context)
+      tagging_table_name = ActsAsTaggableOn::Tagging.table_name
+
+      opts  =  ["#{tagging_table_name}.context = ?", context.to_s]
+      scope = base_tags.where(opts)
+
+      if ActsAsTaggableOn::Tag.using_postgresql?
+        group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
+        scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
+      else
+        scope.group("#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
+      end.to_a
+    end
+
+    ##
+    # Returns all tags that are not owned of a given context
+    def tags_on(context)
+      scope = base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s])
+      # when preserving tag order, return tags in created order
+      # if we added the order to the association this would always apply
+      scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
+      scope
+    end
+
+    def set_tag_list_on(context, new_list)
+      add_custom_context(context)
+
+      variable_name = "@#{context.to_s.singularize}_list"
+      process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
+
+      instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(new_list))
+    end
+
+    def tagging_contexts
+      custom_contexts + self.class.tag_types.map(&:to_s)
+    end
+
+    def process_dirty_object(context,new_list)
+      value = new_list.is_a?(Array) ? ActsAsTaggableOn::TagList.new(new_list) : new_list
+      attrib = "#{context.to_s.singularize}_list"
+
+      if changed_attributes.include?(attrib)
+        # The attribute already has an unsaved change.
+        old = changed_attributes[attrib]
+        changed_attributes.delete(attrib) if (old.to_s == value.to_s)
+      else
+        old = tag_list_on(context).to_s
+        changed_attributes[attrib] = old if (old.to_s != value.to_s)
+      end
+    end
+
+    def reload(*args)
+      self.class.tag_types.each do |context|
+        instance_variable_set("@#{context.to_s.singularize}_list", nil)
+        instance_variable_set("@all_#{context.to_s.singularize}_list", nil)
       end
 
-      def custom_contexts
-        @custom_contexts ||= []
-      end
+      super(*args)
+    end
 
-      def is_taggable?
-        self.class.is_taggable?
-      end
+    ##
+    # Find existing tags or create non-existing tags
+    def load_tags(tag_list)
+      ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
+    end
 
-      def add_custom_context(value)
-        custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
-      end
+    def save_tags
+      tagging_contexts.each do |context|
+        next unless tag_list_cache_set_on(context)
+        # List of currently assigned tag names
+        tag_list = tag_list_cache_on(context).uniq
 
-      def cached_tag_list_on(context)
-        self["cached_#{context.to_s.singularize}_list"]
-      end
+        # Find existing tags or create non-existing tags:
+        tags = load_tags(tag_list)
 
-      def tag_list_cache_set_on(context)
-        variable_name = "@#{context.to_s.singularize}_list"
-        instance_variable_defined?(variable_name) && !instance_variable_get(variable_name).nil?
-      end
+        # Tag objects for currently assigned tags
+        current_tags = tags_on(context)
 
-      def tag_list_cache_on(context)
-        variable_name = "@#{context.to_s.singularize}_list"
-        if instance_variable_get(variable_name)
-          instance_variable_get(variable_name)
-        elsif cached_tag_list_on(context) && self.class.caching_tag_list_on?(context)
-          instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(cached_tag_list_on(context)))
+        # Tag maintenance based on whether preserving the created order of tags
+        if self.class.preserve_tag_order?
+          old_tags, new_tags = current_tags - tags, tags - current_tags
+
+          shared_tags = current_tags & tags
+
+          if shared_tags.any? && tags[0...shared_tags.size] != shared_tags
+            index = shared_tags.each_with_index { |_, i| break i unless shared_tags[i] == tags[i] }
+
+            # Update arrays of tag objects
+            old_tags |= current_tags[index...current_tags.size]
+            new_tags |= current_tags[index...current_tags.size] & shared_tags
+
+            # Order the array of tag objects to match the tag list
+            new_tags = tags.map do |t|
+              new_tags.find { |n| n.name.downcase == t.name.downcase }
+            end.compact
+          end
         else
-          instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
+          # Delete discarded tags and create new tags
+          old_tags = current_tags - tags
+          new_tags = tags - current_tags
+        end
+
+        # Find taggings to remove:
+        if old_tags.present?
+          old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil, :context => context.to_s, :tag_id => old_tags)
+        end
+
+        # Destroy old taggings:
+        if old_taggings.present?
+          ActsAsTaggableOn::Tagging.destroy_all "#{ActsAsTaggableOn::Tagging.primary_key}".to_sym => old_taggings.map(&:id)
+        end
+
+        # Create new taggings:
+        new_tags.each do |tag|
+          taggings.create!(:tag_id => tag.id, :context => context.to_s, :taggable => self)
         end
       end
 
-      def tag_list_on(context)
-        add_custom_context(context)
-        tag_list_cache_on(context)
-      end
-
-      def all_tags_list_on(context)
-        variable_name = "@all_#{context.to_s.singularize}_list"
-        return instance_variable_get(variable_name) if instance_variable_defined?(variable_name) && instance_variable_get(variable_name)
-
-        instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(all_tags_on(context).map(&:name)).freeze)
-      end
-
-      ##
-      # Returns all tags of a given context
-      def all_tags_on(context)
-        tag_table_name = ActsAsTaggableOn::Tag.table_name
-        tagging_table_name = ActsAsTaggableOn::Tagging.table_name
-
-        opts  =  ["#{tagging_table_name}.context = ?", context.to_s]
-        scope = base_tags.where(opts)
-
-        if ActsAsTaggableOn::Tag.using_postgresql?
-          group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
-          scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
-        else
-          scope.group("#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
-        end.to_a
-      end
-
-      ##
-      # Returns all tags that are not owned of a given context
-      def tags_on(context)
-        scope = base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s])
-        # when preserving tag order, return tags in created order
-        # if we added the order to the association this would always apply
-        scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
-        scope
-      end
-
-      def set_tag_list_on(context, new_list)
-        add_custom_context(context)
-
-        variable_name = "@#{context.to_s.singularize}_list"
-        process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
-
-        instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(new_list))
-      end
-
-      def tagging_contexts
-        custom_contexts + self.class.tag_types.map(&:to_s)
-      end
-
-      def process_dirty_object(context,new_list)
-        value = new_list.is_a?(Array) ? ActsAsTaggableOn::TagList.new(new_list) : new_list
-        attrib = "#{context.to_s.singularize}_list"
-
-        if changed_attributes.include?(attrib)
-          # The attribute already has an unsaved change.
-          old = changed_attributes[attrib]
-          changed_attributes.delete(attrib) if (old.to_s == value.to_s)
-        else
-          old = tag_list_on(context).to_s
-          changed_attributes[attrib] = old if (old.to_s != value.to_s)
-        end
-      end
-
-      def reload(*args)
-        self.class.tag_types.each do |context|
-          instance_variable_set("@#{context.to_s.singularize}_list", nil)
-          instance_variable_set("@all_#{context.to_s.singularize}_list", nil)
-        end
-
-        super(*args)
-      end
-
-      ##
-      # Find existing tags or create non-existing tags
-      def load_tags(tag_list)
-        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
-      end
-
-      def save_tags
-        tagging_contexts.each do |context|
-          next unless tag_list_cache_set_on(context)
-          # List of currently assigned tag names
-          tag_list = tag_list_cache_on(context).uniq
-
-          # Find existing tags or create non-existing tags:
-          tags = load_tags(tag_list)
-
-          # Tag objects for currently assigned tags
-          current_tags = tags_on(context)
-
-          # Tag maintenance based on whether preserving the created order of tags
-          if self.class.preserve_tag_order?
-            old_tags, new_tags = current_tags - tags, tags - current_tags
-
-            shared_tags = current_tags & tags
-
-            if shared_tags.any? && tags[0...shared_tags.size] != shared_tags
-              index = shared_tags.each_with_index { |_, i| break i unless shared_tags[i] == tags[i] }
-
-              # Update arrays of tag objects
-              old_tags |= current_tags[index...current_tags.size]
-              new_tags |= current_tags[index...current_tags.size] & shared_tags
-
-              # Order the array of tag objects to match the tag list
-              new_tags = tags.map do |t|
-                new_tags.find { |n| n.name.downcase == t.name.downcase }
-              end.compact
-            end
-          else
-            # Delete discarded tags and create new tags
-            old_tags = current_tags - tags
-            new_tags = tags - current_tags
-          end
-
-          # Find taggings to remove:
-          if old_tags.present?
-            old_taggings = taggings.where(:tagger_type => nil, :tagger_id => nil, :context => context.to_s, :tag_id => old_tags)
-          end
-
-          # Destroy old taggings:
-          if old_taggings.present?
-            ActsAsTaggableOn::Tagging.destroy_all "#{ActsAsTaggableOn::Tagging.primary_key}".to_sym => old_taggings.map(&:id)
-          end
-
-          # Create new taggings:
-          new_tags.each do |tag|
-            taggings.create!(:tag_id => tag.id, :context => context.to_s, :taggable => self)
-          end
-        end
-
-        true
-      end
+      true
     end
   end
 end
