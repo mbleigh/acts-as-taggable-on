@@ -16,7 +16,7 @@ module ActsAsTaggableOn
       end
 
       def using_mysql?
-        ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name =~ /Mysql/
+        !binary.nil?
       end
 
 
