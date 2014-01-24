@@ -71,6 +71,7 @@ module ActsAsTaggableOn::Taggable
       # @param [Hash] options A hash of options to alter you query:
       #                       * <tt>:exclude</tt> - if set to true, return objects that are *NOT* tagged with the specified tags
       #                       * <tt>:any</tt> - if set to true, return objects that are tagged with *ANY* of the specified tags
+      #                       * <tt>:order_by_matching_tag_count</tt> - if set to true and used with :any, sort by objects matching the most tags, descending
       #                       * <tt>:match_all</tt> - if set to true, return objects that are *ONLY* tagged with the specified tags
       #                       * <tt>:owned_by</tt> - return objects that are *ONLY* owned by the owner
       #
@@ -78,6 +79,7 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with("awesome", "cool")                     # Users that are tagged with awesome and cool
       #   User.tagged_with("awesome", "cool", :exclude => true)   # Users that are not tagged with awesome or cool
       #   User.tagged_with("awesome", "cool", :any => true)       # Users that are tagged with awesome or cool
+      #   User.tagged_with("awesome", "cool", :any => true, :order_by_matching_tag_count => true)  # Sort by users who match the most tags, descending
       #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
       #   User.tagged_with("awesome", "cool", :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
       def tagged_with(tags, options = {})
@@ -90,6 +92,7 @@ module ActsAsTaggableOn::Taggable
         conditions = []
         having = []
         select_clause = []
+        order_by = []
 
         context = options.delete(:on)
         owned_by = options.delete(:owned_by)
@@ -177,25 +180,31 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
-        taggings_alias, _ = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
+        if options.delete(:order_by_matching_tag_count)
+          select_clause = "#{table_name}.*, COUNT(#{taggings_alias}.tag_id) AS #{taggings_alias}_count"
+          group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
+          group = group_columns
+          order_by << "#{taggings_alias}_count DESC"
 
-        if options.delete(:match_all)
+        elsif options.delete(:match_all)
+          taggings_alias, _ = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                    "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
                    " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}"
-
 
           group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
           group = group_columns
           having = "COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
 
+        order_by << options[:order] if options[:order].present?
+
         select(select_clause).
           joins(joins.join(" ")).
           where(conditions.join(" AND ")).
           group(group).
           having(having).
-          order(options[:order]).
+          order(order_by.join(", ")).
           readonly(false)
       end
 
