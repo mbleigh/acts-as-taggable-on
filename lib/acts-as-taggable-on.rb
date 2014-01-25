@@ -6,29 +6,40 @@ require "action_view"
 require "digest/sha1"
 
 module ActsAsTaggableOn
-  mattr_accessor :delimiter
-  @@delimiter = ','
+  def self.setup
+    @configuration ||= Configuration.new
+    yield @configuration if block_given?
+  end
 
-  mattr_accessor :force_lowercase
-  @@force_lowercase = false
+  def self.method_missing(method_name, *args, &block)
+    @configuration.respond_to?(method_name) ?
+      @configuration.send(method_name, *args, &block) : super
+  end
 
-  mattr_accessor :force_parameterize
-  @@force_parameterize = false
-
-  mattr_accessor :strict_case_match
-  @@strict_case_match = false
-
-  mattr_accessor :remove_unused_tags
-  self.remove_unused_tags = false
+  def self.respond_to?(method_name, include_private=false)
+    @configuration.respond_to? method_name
+  end
 
   def self.glue
-    delimiter = @@delimiter.kind_of?(Array) ? @@delimiter[0] : @@delimiter
+    setting = @configuration.delimiter
+    delimiter = setting.kind_of?(Array) ? setting[0] : setting
     delimiter.ends_with?(" ") ? delimiter : "#{delimiter} "
   end
 
-  def self.setup
-    yield self
+  class Configuration
+    attr_accessor :delimiter, :force_lowercase, :force_parameterize,
+      :strict_case_match, :remove_unused_tags
+
+    def initialize
+      @delimiter = ','
+      @force_lowercase = false
+      @force_parameterize = false
+      @strict_case_match = false
+      @remove_unused_tags = false
+    end
   end
+
+  setup
 end
 
 
