@@ -180,6 +180,7 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
+        group = [] # Rails interprets this as a no-op in the group() call below
         if options.delete(:order_by_matching_tag_count)
           select_clause = "#{table_name}.*, COUNT(#{taggings_alias}.tag_id) AS #{taggings_alias}_count"
           group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"

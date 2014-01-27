@@ -13,6 +13,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   * [@rafael #406 Dirty attributes not correctly derived](https://github.com/mbleigh/acts-as-taggable-on/pull/406)
   * [@bzbnhang #440 Did not respect strict_case_match](https://github.com/mbleigh/acts-as-taggable-on/pull/440)
   * [@znz #456 Fix breaking encoding of tag](https://github.com/mbleigh/acts-as-taggable-on/pull/456)
+  * [@rgould #417 Let '.count' work when tagged_with is accompanied by a group clause](https://github.com/mbleigh/acts-as-taggable-on/pull/417)
 * Misc
   * [@billychan #463 Thread safe support](https://github.com/mbleigh/acts-as-taggable-on/pull/463)
   * [@billychan #386 Add parse:true instructions to README](https://github.com/mbleigh/acts-as-taggable-on/pull/386)
