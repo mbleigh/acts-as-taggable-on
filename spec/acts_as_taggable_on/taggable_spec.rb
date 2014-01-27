@@ -369,6 +369,18 @@ describe "Taggable" do
     TaggableModel.tagged_with(["depressed", "css"], :order => 'taggable_models.name', :any => true).to_a.should == [bob, frank]
   end
 
+  it "should be able to order by number of matching tags when matching any" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "fitter, happier, more productive", :skill_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
+
+    TaggableModel.tagged_with(["ruby", "java"], :any => true, :order_by_matching_tag_count => true, :order => 'taggable_models.name').to_a.should == [steve, bob, frank]
+    TaggableModel.tagged_with(["c++", "fitter"], :any => true, :order_by_matching_tag_count => true, :order => 'taggable_models.name').to_a.should == [steve, bob]
+    TaggableModel.tagged_with(["depressed", "css"], :any => true, :order_by_matching_tag_count => true, :order => 'taggable_models.name').to_a.should == [frank, bob]
+    TaggableModel.tagged_with(["fitter", "happier", "more productive", "c++", "java", "ruby"], :any => true, :order_by_matching_tag_count => true, :order => 'taggable_models.name').to_a.should == [steve, bob, frank]
+    TaggableModel.tagged_with(["c++", "java", "ruby", "fitter"], :any => true, :order_by_matching_tag_count => true, :order => 'taggable_models.name').to_a.should == [steve, bob, frank]
+  end
+
   context "wild: true" do
     it "should use params as wildcards" do
       bob = TaggableModel.create(:name => "Bob", :tag_list => "bob, tricia")
