@@ -141,7 +141,7 @@ module ActsAsTaggableOn::Taggable
 
           # don't need to sanitize sql, map all ids and join with OR logic
           conditions << tags.map { |t| "#{taggings_alias}.tag_id = #{quote_value(t.id, nil)}" }.join(" OR ")
-          select_clause = "DISTINCT #{table_name}.*" unless context and tag_types.one?
+          select_clause = " #{table_name}.*" unless context and tag_types.one?
 
           if owned_by
               tagging_join << " AND " +
@@ -200,13 +200,15 @@ module ActsAsTaggableOn::Taggable
 
         order_by << options[:order] if options[:order].present?
 
-        select(select_clause).
+        request = select(select_clause).
           joins(joins.join(" ")).
           where(conditions.join(" AND ")).
           group(group).
           having(having).
           order(order_by.join(", ")).
           readonly(false)
+
+        ((context and tag_types.one?) && options.delete(:any)) ? request : request.uniq
       end
 
       def is_taggable?
