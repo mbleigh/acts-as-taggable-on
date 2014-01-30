@@ -26,7 +26,7 @@ module ActsAsTaggableOn
       if ActsAsTaggableOn.strict_case_match
         where(["name = #{binary}?", name])
       else
-        where(["lower(name) = ?", name.downcase])
+        where(["lower(name) = ?", as_8bit_ascii(name).downcase])
       end
     end
 
