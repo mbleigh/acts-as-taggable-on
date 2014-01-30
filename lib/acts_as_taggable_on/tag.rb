@@ -40,7 +40,7 @@ module ActsAsTaggableOn
       else
         clause = list.map { |tag|
           lowercase_ascii_tag = as_8bit_ascii(tag).downcase
-          sanitize_sql(["lower(name) = ?", lowercase_ascii_tag])
+          sanitize_sql(["lower(name) = lower(?)", lowercase_ascii_tag])
         }.join(" OR ")
         where(clause)
       end
