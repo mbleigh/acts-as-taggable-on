@@ -26,7 +26,7 @@ module ActsAsTaggableOn
       if ActsAsTaggableOn.strict_case_match
         where(["name = #{binary}?", name])
       else
-        where(["lower(name) = ?", name.downcase])
+        where(["lower(name) = lower(?)", name])
       end
     end
 
@@ -39,7 +39,7 @@ module ActsAsTaggableOn
       else
         clause = list.map { |tag|
           lowercase_ascii_tag = as_8bit_ascii(tag).downcase
-          sanitize_sql(["lower(name) = ?", lowercase_ascii_tag])
+          sanitize_sql(["lower(name) = lower(?)", lowercase_ascii_tag])
         }.join(" OR ")
         where(clause)
       end
