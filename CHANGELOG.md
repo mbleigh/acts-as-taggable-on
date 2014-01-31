@@ -15,6 +15,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   * [@znz #456 Fix breaking encoding of tag](https://github.com/mbleigh/acts-as-taggable-on/pull/456)
   * [@rgould #417 Let '.count' work when tagged_with is accompanied by a group clause](https://github.com/mbleigh/acts-as-taggable-on/pull/417)
   * [@developer88 #461 Move 'Distinct' out of select string and use .uniq instead](https://github.com/mbleigh/acts-as-taggable-on/pull/461)
+  * [@gerard-leijdekkers #473 Fixed down migration index name](https://github.com/mbleigh/acts-as-taggable-on/pull/473)
 * Misc
   * [@billychan #463 Thread safe support](https://github.com/mbleigh/acts-as-taggable-on/pull/463)
   * [@billychan #386 Add parse:true instructions to README](https://github.com/mbleigh/acts-as-taggable-on/pull/386)
