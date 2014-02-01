@@ -1,5 +1,11 @@
 # encoding: utf-8
 require 'spec_helper'
+require 'db/migrate/2_add_missing_unique_indices.rb'
+
+shared_examples_for 'without unique index' do
+  before { AddMissingUniqueIndices.down }
+  after { ActsAsTaggableOn::Tag.delete_all; AddMissingUniqueIndices.up }
+end
 
 describe ActsAsTaggableOn::Tag do
   before(:each) do
@@ -9,14 +15,33 @@ describe ActsAsTaggableOn::Tag do
   end
 
   describe "named like any" do
-    before(:each) do
-      ActsAsTaggableOn::Tag.create(:name => "Awesome")
-      ActsAsTaggableOn::Tag.create(:name => "awesome")
-      ActsAsTaggableOn::Tag.create(:name => "epic")
+    context "case insensitive collation and unique index on tag name" do
+      if described_class.using_case_insensitive_collation?
+        before(:each) do
+          ActsAsTaggableOn::Tag.create(:name => "Awesome")
+          ActsAsTaggableOn::Tag.create(:name => "epic")
+        end
+
+        it "should find both tags" do
+          ActsAsTaggableOn::Tag.named_like_any(["awesome", "epic"]).should have(2).items
+        end
+      end
     end
 
-    it "should find both tags" do
-      ActsAsTaggableOn::Tag.named_like_any(["awesome", "epic"]).should have(3).items
+    context "case insensitive collation without indexes or case sensitive collation with indexes" do
+      if described_class.using_case_insensitive_collation?
+        include_context 'without unique index'
+      end
+
+      before(:each) do
+        ActsAsTaggableOn::Tag.create(:name => "Awesome")
+        ActsAsTaggableOn::Tag.create(:name => "awesome")
+        ActsAsTaggableOn::Tag.create(:name => "epic")
+      end
+
+      it "should find both tags" do
+        ActsAsTaggableOn::Tag.named_like_any(["awesome", "epic"]).should have(3).items
+      end
     end
   end
 
@@ -72,11 +97,17 @@ describe ActsAsTaggableOn::Tag do
       ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME").should == [@tag]
     end
 
-    it "should find by name case sensitive" do
-      ActsAsTaggableOn.strict_case_match = true
-      expect {
-        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME")
-      }.to change(ActsAsTaggableOn::Tag, :count).by(1)  
+    context "case sensitive" do
+      if described_class.using_case_insensitive_collation?
+        include_context 'without unique index'
+      end
+
+      it "should find by name case sensitive" do
+        ActsAsTaggableOn.strict_case_match = true
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME")
+        }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+      end
     end
 
     it "should create by name" do
@@ -85,11 +116,17 @@ describe ActsAsTaggableOn::Tag do
       }.to change(ActsAsTaggableOn::Tag, :count).by(1)
     end
 
-    it "should find or create by name case sensitive" do
-      ActsAsTaggableOn.strict_case_match = true
-      expect {
-        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME", 'awesome').map(&:name).should == ["AWESOME", "awesome"]
-      }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+    context "case sensitive" do
+      if described_class.using_case_insensitive_collation?
+        include_context 'without unique index'
+      end
+
+      it "should find or create by name case sensitive" do
+        ActsAsTaggableOn.strict_case_match = true
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name("AWESOME", 'awesome').map(&:name).should == ["AWESOME", "awesome"]
+        }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+      end
     end
 
     it "should find or create by name" do
@@ -178,21 +215,33 @@ describe ActsAsTaggableOn::Tag do
       ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("awesome").should == @tag
     end
 
-    it "should find by name case sensitively" do
-      expect {
-        ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("AWESOME")
-      }.to change(ActsAsTaggableOn::Tag, :count)
+    context "case sensitive" do
+      if described_class.using_case_insensitive_collation?
+        include_context 'without unique index'
+      end
 
-      ActsAsTaggableOn::Tag.last.name.should == "AWESOME"
+      it "should find by name case sensitively" do
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("AWESOME")
+        }.to change(ActsAsTaggableOn::Tag, :count)
+
+        ActsAsTaggableOn::Tag.last.name.should == "AWESOME"
+      end
     end
 
-    it "should have a named_scope named(something) that matches exactly" do
-      uppercase_tag = ActsAsTaggableOn::Tag.create(:name => "Cool")
-      @tag.name     = "cool"
-      @tag.save!
+    context "case sensitive" do
+      if described_class.using_case_insensitive_collation?
+        include_context 'without unique index'
+      end
 
-      ActsAsTaggableOn::Tag.named('cool').should include(@tag)
-      ActsAsTaggableOn::Tag.named('cool').should_not include(uppercase_tag)
+      it "should have a named_scope named(something) that matches exactly" do
+        uppercase_tag = ActsAsTaggableOn::Tag.create(:name => "Cool")
+        @tag.name     = "cool"
+        @tag.save!
+
+        ActsAsTaggableOn::Tag.named('cool').should include(@tag)
+        ActsAsTaggableOn::Tag.named('cool').should_not include(uppercase_tag)
+      end
     end
 
     it "should not change enconding" do
@@ -209,16 +258,17 @@ describe ActsAsTaggableOn::Tag do
     before { ActsAsTaggableOn::Tag.create(:name => 'ror') }
 
     context "when don't need unique names" do
+      include_context 'without unique index'
       it "should not run uniqueness validation" do
         duplicate_tag.stub(:validates_name_uniqueness?).and_return(false)
         duplicate_tag.save
         duplicate_tag.should be_persisted
-      end  
+      end
     end
 
     context "when do need unique names" do
       it "should run uniqueness validation" do
-        duplicate_tag.should_not be_valid        
+        duplicate_tag.should_not be_valid
       end
 
       it "add error to name" do
