@@ -240,6 +240,31 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 @some_photo.owner_tags_on(nil, :locations) # => Ownerships equivalent to saying @some_photo.locations
 @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations, :skip_save => true) #won't save @some_photo object
 ```
+### Expressions
+
+You may input tags as an expression using the following operators: 
+- `+`, `|` (union)
+- `-` (difference)
+- `&` (intersection)
+
+```ruby
+class Language < ActiveRecord::Base
+  acts_as_taggable_on 
+end
+
+# Find a language tagged with fun AND OOP but not java
+# Whitespace is ignored
+Language.tagged_with("oop & fun - java", :expression => true)
+
+# Find all languages tagged with interpreted and all languages tagged with c++ as long as they are object-oriented
+# Note that operators within tags must be preceded by a backslash in absence of :use_whitespace => true
+Language.tagged_with("interpreted+c\+\+\&oop", :expression => true)
+
+# Using whitespace
+Language.tagged_with("interpreted + c++ & oop", :expression => { :use_whitespace => true })
+```
+
+For more usage notes, [see source](https://github.com/mbleigh/acts-as-taggable-on/blob/e8e043a91d13463673446f4a160e770854d942ef/lib/acts_as_taggable_on/expression.rb).
 
 ### Dirty objects
 
