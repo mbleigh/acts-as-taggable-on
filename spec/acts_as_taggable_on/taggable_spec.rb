@@ -32,6 +32,7 @@ describe "Taggable To Preserve Order" do
     [:tags, :colours].each do |type|
       @taggable.respond_to?("#{type.to_s.singularize}_list").should be_true
       @taggable.respond_to?("#{type.to_s.singularize}_list=").should be_true
+      @taggable.respond_to?("reset_#{type.to_s.singularize}_list").should be_true
       @taggable.respond_to?("all_#{type.to_s}_list").should be_true
     end
   end
@@ -537,6 +538,13 @@ describe "Taggable" do
 
       @taggable.reload
       @taggable.tag_list_on(:test).should == ["hello"]
+    end
+
+    it "should be able to reset tag list" do
+      @taggable.update_attributes(:tag_list => 'awesome')
+      @taggable.tags.first.update_attributes(:name => 'epic')
+      @taggable.reset_tag_list
+      @taggable.tag_list.should == %w(epic)
     end
   end
 
