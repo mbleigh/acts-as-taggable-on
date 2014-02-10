@@ -9,6 +9,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 * Breaking Changes
 * Features
   * [@jamesburke-examtime #467 Add :order_by_matching_tag_count option](https://github.com/mbleigh/acts-as-taggable-on/pull/469)
+  * [@DmitryTsepelev #482 Add :separate_owned_tags option](https://github.com/mbleigh/acts-as-taggable-on/pull/482)
 * Fixes
   * [@rafael #406 Dirty attributes not correctly derived](https://github.com/mbleigh/acts-as-taggable-on/pull/406)
   * [@bzbnhang #440 Did not respect strict_case_match](https://github.com/mbleigh/acts-as-taggable-on/pull/440)

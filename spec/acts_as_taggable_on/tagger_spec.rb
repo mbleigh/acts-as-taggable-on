@@ -124,6 +124,24 @@ describe "Tagger" do
     @taggable.all_tags_list.sort.should == %w(ruby scheme).sort
   end
 
+  it "should not separate owned taggings if separate_owned_tags option disabled" do
+    @taggable.update_attributes(:tag_list => 'general')
+    @user.tag(@taggable, :with => 'owned', :on => :tags)
+
+    @taggable.reload
+    @taggable.tag_list.should == %w(general)
+
+    ActsAsTaggableOn.separate_owned_tags = false
+
+    @taggable.reload
+    @taggable.tag_list.should == %w(general owned)
+
+    ActsAsTaggableOn.separate_owned_tags = true
+
+    @taggable.reload
+    @taggable.tag_list.should == %w(general)
+  end
+
   it "is tagger" do
     @user.is_tagger?.should(be_true)
   end

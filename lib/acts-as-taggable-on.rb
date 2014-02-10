@@ -28,7 +28,7 @@ module ActsAsTaggableOn
 
   class Configuration
     attr_accessor :delimiter, :force_lowercase, :force_parameterize,
-      :strict_case_match, :remove_unused_tags
+      :strict_case_match, :remove_unused_tags, :separate_owned_tags
 
     def initialize
       @delimiter = ','
@@ -36,6 +36,7 @@ module ActsAsTaggableOn
       @force_parameterize = false
       @strict_case_match = false
       @remove_unused_tags = false
+      @separate_owned_tags = true
     end
   end
 

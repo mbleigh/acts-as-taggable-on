@@ -339,6 +339,12 @@ If you want to change the default delimiter (it defaults to ','). You can also p
 ActsAsTaggableOn.delimiter = ','
 ```
 
+Owned tags are not included into tag_list by default. If you want to change this behaviour:
+
+```ruby
+ActsAsTaggableOn.separate_owned_tags = false
+```
+
 ## Contributors
 
 We have a long list of valued contributors. [Check them all](https://github.com/mbleigh/acts-as-taggable-on/contributors)
