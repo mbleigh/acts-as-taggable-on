@@ -1,7 +1,12 @@
 class AddTimestampToTags < ActiveRecord::Migration
   def up
-    add_column :tags, :updated_at, :datetime
-    add_column :tags, :aggregated_at, :datetime
+    unless column_exists? :tags, :updated_at
+      add_column :tags, :updated_at, :datetime
+    end
+
+    unlesss column_exists? :tags, :aggregated_at
+      add_column :tags, :aggregated_at, :datetime
+    end
   end
 
   def down
