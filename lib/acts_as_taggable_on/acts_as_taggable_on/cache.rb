@@ -22,15 +22,17 @@ module ActsAsTaggableOn::Taggable
           initialize_tags_cache
         end
 
-        # ActiveRecord::Base.columns makes a database connection and caches the calculated
-        #   columns hash for the record as @columns.  Since we don't want to add caching
-        #   methods until we confirm the presence of a caching column, and we don't
-        #   want to force opening a database connection when the class is loaded,
-        #   here we intercept and cache the call to :columns as @acts_as_taggable_on_columns
-        #   to mimic the underlying behavior.  While processing this first call to columns,
-        #   we do the caching column check and dynamically add the class and instance methods
+        # ActiveRecord::Base.columns makes a database connection and caches the
+        #   calculated columns hash for the record as @columns.  Since we don't
+        #   want to add caching methods until we confirm the presence of a
+        #   caching column, and we don't want to force opening a database
+        #   connection when the class is loaded, here we intercept and cache
+        #   the call to :columns as @acts_as_taggable_on_cache_columns
+        #   to mimic the underlying behavior.  While processing this first
+        #   call to columns, we do the caching column check and dynamically add
+        #   the class and instance methods
         def columns
-          @acts_as_taggable_on_columns ||= begin
+          @acts_as_taggable_on_cache_columns ||= begin
             db_columns = super
             if _has_tags_cache_columns?(db_columns)
               _add_tags_caching_methods
