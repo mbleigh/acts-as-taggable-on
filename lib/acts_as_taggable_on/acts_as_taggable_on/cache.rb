@@ -49,6 +49,10 @@ module ActsAsTaggableOn::Taggable
             def self.caching_#{tag_type.singularize}_list?
               caching_tag_list_on?("#{tag_type}")
             end
+
+            def reset_cached_#{tag_type.singularize}_list
+              reset_cached_tag_list_on("#{tag_type}")
+            end
           RUBY
         end
       end
@@ -64,17 +68,25 @@ module ActsAsTaggableOn::Taggable
     end
 
     module InstanceMethods
+      def reset_cached_tag_list_on(tag_type)
+        reset_tag_list_on(tag_type)
+        save_cached_tag_list_on(tag_type)
+      end
+
       def save_cached_tag_list
         tag_types.map(&:to_s).each do |tag_type|
-          if self.class.send("caching_#{tag_type.singularize}_list?")
-            if tag_list_cache_set_on(tag_type)
-              list = tag_list_cache_on(tag_type).to_a.flatten.compact.join(', ')
-              self["cached_#{tag_type.singularize}_list"] = list
-            end
+          save_cached_tag_list_on(tag_type)
+        end
+        true
+      end
+
+      def save_cached_tag_list_on(tag_type)
+        if self.class.send("caching_#{tag_type.singularize}_list?")
+          if tag_list_cache_set_on(tag_type)
+            list = tag_list_cache_on(tag_type).to_a.flatten.compact.join(', ')
+            self["cached_#{tag_type.singularize}_list"] = list
           end
         end
-
-        true
       end
     end
 

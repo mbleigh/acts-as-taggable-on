@@ -50,6 +50,10 @@ module ActsAsTaggableOn::Taggable
             def all_#{tags_type}_list
               all_tags_list_on('#{tags_type}')
             end
+
+            def reset_#{tag_type}_list
+              reset_tag_list_on("#{tags_type}")
+            end
           RUBY
         end
       end
@@ -246,6 +250,11 @@ module ActsAsTaggableOn::Taggable
 
     def cached_tag_list_on(context)
       self["cached_#{context.to_s.singularize}_list"]
+    end
+
+    def reset_tag_list_on(context)
+      variable_name = "@#{context.to_s.singularize}_list"
+      instance_variable_set variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name))
     end
 
     def tag_list_cache_set_on(context)

@@ -72,6 +72,13 @@ describe "Acts As Taggable On" do
       @taggable.save!
       @taggable.tag_list.sort.should == %w(awesome epic).sort
     end
+
+    it 'should update cache when tag list is reset' do
+      @taggable.update_attributes(:tag_list => 'awesome')
+      @taggable.tags.first.update_attributes(:name => 'epic')
+      @taggable.reset_cached_tag_list
+      @taggable.cached_tag_list.should == 'epic'
+    end
   end
 
 end
