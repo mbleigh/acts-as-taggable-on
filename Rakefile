@@ -8,6 +8,13 @@ end
 desc 'Default: run specs'
 task :default => :spec
 
+desc 'Copy sample spec database.yml over if not exists'
+task :copy_db_config do
+  cp 'spec/database.yml.sample', 'spec/database.yml'
+end
+
+task :spec => [:copy_db_config]
+
 begin
   require 'appraisal'
   desc 'Run tests across gemfiles specified in Appraisals'
