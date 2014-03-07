@@ -430,6 +430,14 @@ describe "Taggable" do
     TaggableModel.tagged_with("fitter, happier", :match_all => true).to_a.should == [steve]
   end
 
+  it "should be able to find tagged with only the matching tags for a context" do
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "lazy, happier", :skill_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "fitter, happier, inefficient", :skill_list => "css")
+    steve = TaggableModel.create(:name => 'Steve', :tag_list => "fitter, happier", :skill_list => "ruby, rails, css")
+
+    TaggableModel.tagged_with("css", :on => :skills, :match_all => true).to_a.should == [frank]
+  end
+
   it "should be able to find tagged with some excluded tags" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "happier, lazy")
     frank = TaggableModel.create(:name => "Frank", :tag_list => "happier")

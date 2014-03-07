@@ -193,6 +193,8 @@ module ActsAsTaggableOn::Taggable
                    "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
                    " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}"
 
+          joins << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
+
           group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
           group = group_columns
           having = "COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
