@@ -39,7 +39,7 @@ describe "Tagger" do
     @user.tag(@taggable2, :with => 'java', :on => :tags)
     @user2.tag(@taggable3, :with => 'ruby', :on => :tags)
 
-    tags = TaggableModel.tagged_with(%w(ruby java), :owned_by => @user, :any => true)
+    tags = TaggableModel.tagged_with(%w(ruby java), :owned_by => @user, :any => true, :start_at => 1.day.ago)
     tags.should match_array [@taggable, @taggable2]
   end
 

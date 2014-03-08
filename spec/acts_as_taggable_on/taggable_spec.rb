@@ -224,6 +224,13 @@ describe "Taggable" do
     expect(TaggableModel.tagged_with("ruby").group(:created_at).count.count).to eq(1)
   end
 
+  it "should be able to get find a tag using dates" do
+    @taggable.skill_list = "ruby"
+    @taggable.save
+
+    expect(TaggableModel.tagged_with("ruby", :start_at => Date.today, :end_at => Date.tomorrow).count).to eq(1)
+  end
+
   it "should be able to find by tag with context" do
     @taggable.skill_list = "ruby, rails, css"
     @taggable.tag_list = "bob, charlie"
