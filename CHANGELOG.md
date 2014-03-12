@@ -9,6 +9,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 * Breaking Changes
 * Features
 * Fixes
+  * [@mikehale #487 Match_all respects context](https://github.com/mbleigh/acts-as-taggable-on/pull/487)
 * Misc
 
 ### [3.1.0.rc1 / 2014-02-26](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0.rc1)
