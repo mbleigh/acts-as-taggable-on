@@ -4,7 +4,7 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...master)
+### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.2...master)
 
 * Breaking Changes
 * Features
@@ -18,6 +18,10 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   * [@seuros #452 Remove I18n deprecation warning in specs](https://github.com/mbleigh/acts-as-taggable-on/pull/452)
   * [@seuros #453 Test against Ruby 2.1 on Travis CI](https://github.com/mbleigh/acts-as-taggable-on/pull/453)
   * [@takashi #454 Clarify example in docs](https://github.com/mbleigh/acts-as-taggable-on/pull/454)
+
+### [3.0.2 / 2014-03-12](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.0.2)
+
+* [@mikehale #486 Match_all respects context. Backport of #487](https://github.com/mbleigh/acts-as-taggable-on/pull/486)
 
 ### [3.0.1 / 2014-01-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.0...v3.0.1)
 
