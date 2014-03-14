@@ -5,15 +5,15 @@ rescue LoadError
   STDERR.puts "Bundler not loaded"
 end
 
+desc 'Default: run specs'
+task :default => :spec
+
 desc 'Copy sample spec database.yml over if not exists'
 task :copy_db_config do
   cp 'spec/database.yml.sample', 'spec/database.yml'
 end
 
 task :spec => [:copy_db_config]
-
-desc 'Default: run specs'
-task :default => :spec
 
 begin
   require 'appraisal'
