@@ -2,8 +2,12 @@ require 'spec_helper'
 
 describe "Single Table Inheritance" do
 
-  before(:each) do
-    clean_database!
+  before :each do
+    DatabaseCleaner.start
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   let(:taggable)            { TaggableModel.new(:name => "taggable model") }

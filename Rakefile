@@ -5,9 +5,10 @@ rescue LoadError
   STDERR.puts "Bundler not loaded"
 end
 
+#TODO we should probably remove this
 desc 'Copy sample spec database.yml over if not exists'
 task :copy_db_config do
-  cp 'spec/database.yml.sample', 'spec/database.yml'
+  cp 'spec/database.yml.sample', 'spec/internal/config/database.yml'
 end
 
 task :spec => [:copy_db_config]

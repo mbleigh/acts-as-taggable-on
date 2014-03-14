@@ -1,0 +1,2 @@
+class InheritingTaggableModel < TaggableModel
+end

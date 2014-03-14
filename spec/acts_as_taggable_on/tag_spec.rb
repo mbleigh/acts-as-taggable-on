@@ -2,10 +2,14 @@
 require 'spec_helper'
 
 describe ActsAsTaggableOn::Tag do
-  before(:each) do
-    clean_database!
+  before :each do
+    DatabaseCleaner.start
     @tag = ActsAsTaggableOn::Tag.new
     @user = TaggableModel.create(:name => "Pablo")
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   describe "named like any" do
@@ -166,7 +170,7 @@ describe ActsAsTaggableOn::Tag do
   describe "when using strict_case_match" do
     before do
       ActsAsTaggableOn.strict_case_match = true
-      @tag.name = "awesome"
+      @tag.name uniqueness = "awesome"
       @tag.save!
     end
 
@@ -203,7 +207,7 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
-  describe "name uniqeness validation" do
+  describe "name uniqueness validation" do
     let(:duplicate_tag) { ActsAsTaggableOn::Tag.new(:name => 'ror') }
 
     before { ActsAsTaggableOn::Tag.create(:name => 'ror') }

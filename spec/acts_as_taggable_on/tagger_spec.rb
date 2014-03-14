@@ -1,10 +1,14 @@
 require 'spec_helper'
 
 describe "Tagger" do
-  before(:each) do
-    clean_database!
+  before :each do
+    DatabaseCleaner.start
     @user = User.create
     @taggable = TaggableModel.create(:name => "Bob Jones")
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   it "should have taggings" do

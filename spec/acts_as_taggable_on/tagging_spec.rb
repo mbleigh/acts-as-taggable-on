@@ -1,9 +1,13 @@
 require 'spec_helper'
 
 describe ActsAsTaggableOn::Tagging do
-  before(:each) do
-    clean_database!
+  before :each do
+    DatabaseCleaner.start
     @tagging = ActsAsTaggableOn::Tagging.new
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   it "should not be valid with a invalid tag" do

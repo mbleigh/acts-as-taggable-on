@@ -1,9 +1,13 @@
 require 'spec_helper'
 
 describe "Taggable To Preserve Order" do
-  before(:each) do
-    clean_database!
+  before :each do
+    DatabaseCleaner.start
     @taggable = OrderedTaggableModel.new(:name => "Bob Jones")
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   it "should have tag types" do
@@ -111,9 +115,13 @@ end
 
 describe "Taggable" do
   before(:each) do
-    clean_database!
+    DatabaseCleaner.start
     @taggable = TaggableModel.new(:name => "Bob Jones")
     @taggables = [@taggable, TaggableModel.new(:name => "John Doe")]
+  end
+
+  after :each do
+    DatabaseCleaner.clean
   end
 
   it "should have tag types" do
@@ -490,9 +498,13 @@ describe "Taggable" do
 
   describe "NonStandardIdTaggable" do
     before(:each) do
-      clean_database!
+      DatabaseCleaner.start
       @taggable = NonStandardIdTaggableModel.new(:name => "Bob Jones")
       @taggables = [@taggable, NonStandardIdTaggableModel.new(:name => "John Doe")]
+    end
+
+    after :each do
+      DatabaseCleaner.clean
     end
 
     it "should have tag types" do
