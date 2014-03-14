@@ -1,4 +1,10 @@
 # coding: utf-8
+
+begin
+  require 'protected_attributes'
+rescue LoadError
+end
+
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     extend ActsAsTaggableOn::Utils

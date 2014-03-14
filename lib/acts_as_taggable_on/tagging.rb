@@ -1,3 +1,8 @@
+begin
+  require 'protected_attributes'
+rescue LoadError
+end
+
 module ActsAsTaggableOn
   class Tagging < ::ActiveRecord::Base #:nodoc:
     attr_accessible :tag,
