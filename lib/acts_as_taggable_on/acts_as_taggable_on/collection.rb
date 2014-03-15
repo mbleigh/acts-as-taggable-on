@@ -58,29 +58,13 @@ module ActsAsTaggableOn::Taggable
         ## Generate conditions:
         options[:conditions] = sanitize_sql(options[:conditions]) if options[:conditions]
 
-        start_at_conditions = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
-        end_at_conditions   = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
-
-        taggable_conditions  = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
-
-        tagging_conditions = [
-          taggable_conditions,
-          start_at_conditions,
-          end_at_conditions
-        ].compact.reverse
-
-        tag_conditions = [
-          options[:conditions]
-        ].compact.reverse
-
         ## Generate scope:
         tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id")
         tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*").order(options[:order]).limit(options[:limit])
 
         # Joins and conditions
-        tagging_conditions.each { |condition| tagging_scope = tagging_scope.where(condition) }
-        tag_conditions.each     { |condition| tag_scope     = tag_scope.where(condition)     }
+        tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
+        tag_scope     = tag_scope.where(options[:conditions])
 
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
 
@@ -88,9 +72,9 @@ module ActsAsTaggableOn::Taggable
         scoped_select = "#{table_name}.#{primary_key}"
         tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(scoped_select))})").group(group_columns)
 
-        tag_scope = tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
-        tag_scope.extending(CalculationMethods)
+        tag_scope_joins(tag_scope, tagging_scope)
       end
+
 
       ##
       # Calculate the tag counts for all tags.
@@ -107,56 +91,28 @@ module ActsAsTaggableOn::Taggable
       def all_tag_counts(options = {})
         options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :on, :id
 
-        scope = {}
-
         ## Generate conditions:
         options[:conditions] = sanitize_sql(options[:conditions]) if options[:conditions]
-
-        start_at_conditions = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
-        end_at_conditions   = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
-
-        taggable_conditions  = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]])  if options[:id]
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
-
-        tagging_conditions = [
-          taggable_conditions,
-          scope[:conditions],
-          start_at_conditions,
-          end_at_conditions
-        ].compact.reverse
-
-        tag_conditions = [
-          options[:conditions]
-        ].compact.reverse
 
         ## Generate joins:
         taggable_join = "INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
         taggable_join << " AND #{table_name}.#{inheritance_column} = '#{name}'" unless descends_from_active_record? # Current model is STI descendant, so add type checking to the join condition
 
-        tagging_joins = [
-          taggable_join,
-          scope[:joins]
-        ].compact
-
-        tag_joins = [
-        ].compact
 
         ## Generate scope:
         tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id, COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) AS tags_count")
         tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*, #{ActsAsTaggableOn::Tagging.table_name}.tags_count AS count").order(options[:order]).limit(options[:limit])
 
         # Joins and conditions
-        tagging_joins.each      { |join|      tagging_scope = tagging_scope.joins(join)      }
-        tagging_conditions.each { |condition| tagging_scope = tagging_scope.where(condition) }
-
-        tag_joins.each          { |join|      tag_scope     = tag_scope.joins(join)          }
-        tag_conditions.each     { |condition| tag_scope     = tag_scope.where(condition)     }
+        tagging_scope = tagging_scope.joins(taggable_join)
+        tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
+        tag_scope     = tag_scope.where(options[:conditions])
 
         # GROUP BY and HAVING clauses:
-        at_least  = sanitize_sql(["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) >= ?", options.delete(:at_least)]) if options[:at_least]
-        at_most   = sanitize_sql(["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) <= ?", options.delete(:at_most)]) if options[:at_most]
-        having    = ["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) > 0", at_least, at_most].compact.join(' AND ')
+        having = ["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) > 0"]
+        having.push sanitize_sql(["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) >= ?", options.delete(:at_least)]) if options[:at_least]
+        having.push sanitize_sql(["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) <= ?", options.delete(:at_most)]) if options[:at_most]
+        having = having.compact.join(' AND ')
 
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
 
@@ -168,12 +124,32 @@ module ActsAsTaggableOn::Taggable
 
         tagging_scope = tagging_scope.group(group_columns).having(having)
 
-        tag_scope = tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
-        tag_scope.extending(CalculationMethods)
+        tag_scope_joins(tag_scope, tagging_scope)
       end
 
       def safe_to_sql(relation)
         connection.respond_to?(:unprepared_statement) ? connection.unprepared_statement{relation.to_sql} : relation.to_sql
+      end
+
+      private
+
+      def tagging_conditions(options)
+        tagging_conditions = []
+        tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
+        tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
+
+        taggable_conditions  = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
+        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
+        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]])  if options[:id]
+
+        tagging_conditions.push     taggable_conditions
+
+        tagging_conditions
+      end
+
+      def tag_scope_joins(tag_scope, tagging_scope)
+        tag_scope = tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
+        tag_scope.extending(CalculationMethods)
       end
     end
 
