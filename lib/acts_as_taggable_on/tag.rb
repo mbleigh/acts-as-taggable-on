@@ -108,7 +108,7 @@ module ActsAsTaggableOn
       end
 
       def binary
-        /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
+        using_mysql? ? "BINARY " : nil
       end
 
       def as_8bit_ascii(string, downcase=false)
