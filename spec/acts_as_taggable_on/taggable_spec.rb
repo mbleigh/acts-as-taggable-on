@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'spec_helper'
 
 describe "Taggable To Preserve Order" do
@@ -240,6 +241,18 @@ describe "Taggable" do
 
     ActsAsTaggableOn::Tag.all.size.should == 1
     TaggableModel.tagged_with("ruby").to_a.should == TaggableModel.tagged_with("Ruby").to_a
+  end
+
+  unless ActsAsTaggableOn::Tag.using_sqlite?
+    it "should not care about case for unicode names" do
+      ActsAsTaggableOn.strict_case_match = false
+      anya = TaggableModel.create(:name => "Anya", :tag_list => "ПРИВЕТ")
+      igor = TaggableModel.create(:name => "Igor", :tag_list => "привет")
+      katia = TaggableModel.create(:name => "Katia", :tag_list => "ПРИВЕТ")
+
+      ActsAsTaggableOn::Tag.all.size.should == 1
+      TaggableModel.tagged_with("привет").to_a.should == TaggableModel.tagged_with("ПРИВЕТ").to_a
+    end
   end
 
   it "should be able to get tag counts on model as a whole" do
