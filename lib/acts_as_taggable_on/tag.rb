@@ -38,7 +38,7 @@ module ActsAsTaggableOn
         where(clause)
       else
         clause = list.map { |tag|
-          lowercase_ascii_tag = as_8bit_ascii(tag).downcase
+          lowercase_ascii_tag = as_8bit_ascii(tag, true)
           sanitize_sql(["lower(name) = ?", lowercase_ascii_tag])
         }.join(" OR ")
         where(clause)
@@ -103,7 +103,7 @@ module ActsAsTaggableOn
         if ActsAsTaggableOn.strict_case_match
           as_8bit_ascii(str)
         else
-          as_8bit_ascii(str).downcase
+          as_8bit_ascii(str, true)
         end
       end
 
@@ -111,11 +111,13 @@ module ActsAsTaggableOn
         /mysql/ === ActiveRecord::Base.connection_config[:adapter] ? "BINARY " : nil
       end
 
-      def as_8bit_ascii(string)
+      def as_8bit_ascii(string, downcase=false)
+        string = string.to_s.dup.mb_chars
+        string.downcase! if downcase
         if defined?(Encoding)
-          string.to_s.dup.force_encoding('BINARY')
+          string.to_s.force_encoding('BINARY')
         else
-          string.to_s.mb_chars
+          string.to_s
         end
       end
     end

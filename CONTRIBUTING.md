@@ -11,7 +11,7 @@
 2. Install the gem dependencies: `bundle install`
 3. Make the changes you want and back them up with tests.
   * [Run the tests](https://github.com/mbleigh/acts-as-taggable-on#testing) (`bundle exec rake spec`)
-4. Update the CHAGELOG.md file with your changes and give yourself credit
+4. Update the CHANGELOG.md file with your changes and give yourself credit
 5. Commit and create a pull request with details as to what has been changed and why
   * Use well-described, small (atomic) commits.
   * Include links to any relevant github issues.
