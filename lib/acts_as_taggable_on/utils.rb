@@ -1,12 +1,23 @@
 module ActsAsTaggableOn
   module Utils
+
+    def connection
+      ::ActiveRecord::Base.connection
+    end
+
     def using_postgresql?
-      ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+      connection && connection.adapter_name == 'PostgreSQL'
     end
 
     def using_sqlite?
-      ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name == 'SQLite'
+      connection && connection.adapter_name == 'SQLite'
     end
+
+    def using_mysql?
+      #We should probably use regex for mysql to support prehistoric adapters
+      connection && connection.adapter_name == 'Mysql2'
+    end
+
 
     def sha_prefix(string)
       Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
@@ -20,7 +31,7 @@ module ActsAsTaggableOn
 
     # escape _ and % characters in strings, since these are wildcards in SQL.
     def escape_like(str)
-      str.gsub(/[!%_]/){ |x| '!' + x }
+      str.gsub(/[!%_]/) { |x| '!' + x }
     end
   end
 end
