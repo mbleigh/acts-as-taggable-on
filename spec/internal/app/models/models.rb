@@ -75,3 +75,8 @@ class OrderedTaggableModel < ActiveRecord::Base
   acts_as_ordered_taggable
   acts_as_ordered_taggable_on :colours
 end
+
+class TaggableModelWithJson < ActiveRecord::Base
+  acts_as_taggable
+  acts_as_taggable_on :skills
+end
