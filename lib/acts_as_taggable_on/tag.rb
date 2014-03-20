@@ -24,9 +24,9 @@ module ActsAsTaggableOn
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
-        where(["name = #{binary}?", name])
+        where(["name = #{binary}?", as_8bit_ascii(name)])
       else
-        where(["lower(name) = ?", name.downcase])
+        where(["LOWER(name) = LOWER(?)", as_8bit_ascii(unicode_downcase(name))])
       end
     end
 
@@ -38,8 +38,7 @@ module ActsAsTaggableOn
         where(clause)
       else
         clause = list.map { |tag|
-          lowercase_ascii_tag = as_8bit_ascii(tag, true)
-          sanitize_sql(["lower(name) = ?", lowercase_ascii_tag])
+          sanitize_sql(["LOWER(name) = LOWER(?)", as_8bit_ascii(unicode_downcase(tag))])
         }.join(" OR ")
         where(clause)
       end
@@ -101,9 +100,9 @@ module ActsAsTaggableOn
 
       def comparable_name(str)
         if ActsAsTaggableOn.strict_case_match
-          as_8bit_ascii(str)
+          str
         else
-          as_8bit_ascii(str, true)
+          unicode_downcase(str.to_s)
         end
       end
 
@@ -111,13 +110,19 @@ module ActsAsTaggableOn
         using_mysql? ? "BINARY " : nil
       end
 
-      def as_8bit_ascii(string, downcase=false)
-        string = string.to_s.dup.mb_chars
-        string.downcase! if downcase
-        if defined?(Encoding)
-          string.to_s.force_encoding('BINARY')
+      def unicode_downcase(string)
+        if ActiveSupport::Multibyte::Unicode.respond_to?(:downcase)
+          ActiveSupport::Multibyte::Unicode.downcase(string)
         else
-          string.to_s
+          ActiveSupport::Multibyte::Chars.new(string).downcase.to_s  
+        end
+      end
+
+      def as_8bit_ascii(string)
+        if defined?(Encoding)
+          string.to_s.dup.force_encoding('BINARY')
+        else
+          string.to_s.mb_chars
         end
       end
     end
