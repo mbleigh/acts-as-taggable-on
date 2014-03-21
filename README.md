@@ -340,6 +340,8 @@ If you want to change the default delimiter (it defaults to ','). You can also p
 ActsAsTaggableOn.delimiter = ','
 ```
 
+*NOTE: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
+
 ## Contributors
 
 We have a long list of valued contributors. [Check them all](https://github.com/mbleigh/acts-as-taggable-on/contributors)

@@ -246,6 +246,7 @@ describe "Taggable" do
   unless ActsAsTaggableOn::Tag.using_sqlite?
     it "should not care about case for unicode names" do
       ActsAsTaggableOn.strict_case_match = false
+  
       anya = TaggableModel.create(:name => "Anya", :tag_list => "ПРИВЕТ")
       igor = TaggableModel.create(:name => "Igor", :tag_list => "привет")
       katia = TaggableModel.create(:name => "Katia", :tag_list => "ПРИВЕТ")
@@ -254,6 +255,21 @@ describe "Taggable" do
       TaggableModel.tagged_with("привет").to_a.should == TaggableModel.tagged_with("ПРИВЕТ").to_a
     end
   end
+
+  it "should be able to create and find tags in languages without capitalization" do
+    ActsAsTaggableOn.strict_case_match = false
+    chihiro = TaggableModel.create(:name => "Chihiro", :tag_list => "日本の")
+    salim = TaggableModel.create(:name => "Salim", :tag_list => "עברית")
+    ieie = TaggableModel.create(:name => "Ieie", :tag_list => "中国的")
+    yasser = TaggableModel.create(:name => "Yasser", :tag_list => "العربية")
+    emo = TaggableModel.create(:name => "Emo", :tag_list => "✏")
+
+    TaggableModel.tagged_with("日本の").to_a.size.should == 1
+    TaggableModel.tagged_with("עברית").to_a.size.should == 1
+    TaggableModel.tagged_with("中国的").to_a.size.should == 1
+    TaggableModel.tagged_with("العربية").to_a.size.should == 1
+    TaggableModel.tagged_with("✏").to_a.size.should == 1
+  end 
 
   it "should be able to get tag counts on model as a whole" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
