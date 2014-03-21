@@ -18,6 +18,9 @@ module ActsAsTaggableOn
       connection && connection.adapter_name == 'Mysql2'
     end
 
+    def using_case_insensitive_collation?
+      using_mysql? && ::ActiveRecord::Base.connection.collation =~ /_ci\Z/
+    end
 
     def sha_prefix(string)
       Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
