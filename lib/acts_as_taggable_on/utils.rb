@@ -22,6 +22,14 @@ module ActsAsTaggableOn
       using_mysql? && ::ActiveRecord::Base.connection.collation =~ /_ci\Z/
     end
 
+    def aborts_on_duplicate?
+      using_postgresql?
+    end
+
+    def supports_concurrency?
+      !using_sqlite?
+    end
+
     def sha_prefix(string)
       Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
     end

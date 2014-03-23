@@ -6,6 +6,9 @@ require "action_view"
 require "digest/sha1"
 
 module ActsAsTaggableOn
+  class DuplicateTagError < StandardError
+  end
+
   def self.setup
     @configuration ||= Configuration.new
     yield @configuration if block_given?

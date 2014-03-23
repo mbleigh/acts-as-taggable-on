@@ -246,7 +246,7 @@ describe "Taggable" do
   unless ActsAsTaggableOn::Tag.using_sqlite?
     it "should not care about case for unicode names" do
       ActsAsTaggableOn.strict_case_match = false
-  
+
       anya = TaggableModel.create(:name => "Anya", :tag_list => "ПРИВЕТ")
       igor = TaggableModel.create(:name => "Igor", :tag_list => "привет")
       katia = TaggableModel.create(:name => "Katia", :tag_list => "ПРИВЕТ")
@@ -269,7 +269,7 @@ describe "Taggable" do
     TaggableModel.tagged_with("中国的").to_a.size.should == 1
     TaggableModel.tagged_with("العربية").to_a.size.should == 1
     TaggableModel.tagged_with("✏").to_a.size.should == 1
-  end 
+  end
 
   it "should be able to get tag counts on model as a whole" do
     bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
@@ -482,13 +482,43 @@ describe "Taggable" do
     TaggableModel.tagged_with([]).should == []
   end
 
-  it "should not create duplicate taggings" do
-    bob = TaggableModel.create(:name => "Bob")
-    lambda {
-      bob.tag_list << "happier"
-      bob.tag_list << "happier"
-      bob.save
-    }.should change(ActsAsTaggableOn::Tagging, :count).by(1)
+  describe "Duplicates" do
+    it "should not create duplicate taggings" do
+      bob = TaggableModel.create(:name => "Bob")
+      lambda {
+        bob.tag_list << "happier"
+        bob.tag_list << "happier"
+        bob.save
+      }.should change(ActsAsTaggableOn::Tagging, :count).by(1)
+    end
+
+    if ActsAsTaggableOn::Tag.supports_concurrency?
+      it "should not duplicate tags added on different threads" do
+        thread_count = 4
+        barrier = Barrier.new thread_count
+
+        results = []
+        expect {
+          thread_count.times.map do |idx|
+            Thread.start do
+              connor = TaggableModel.first_or_create(:name => "Connor")
+              connor.tag_list = "There, can, be, only, one"
+              barrier.wait
+              connor.save
+              results[idx] = connor.errors.full_messages
+            end
+          end.map(&:join)
+        }.to change(ActsAsTaggableOn::Tag, :count).by(5)
+
+        errors = results.flatten
+        if ActsAsTaggableOn::Tag.aborts_on_duplicate?
+          # only one thread succeeds because the transaction is aborted in this case
+          errors.should eq Array.new(thread_count - 1, "Error saving tags: 'There' has already been taken")
+        else
+          errors.should be_empty
+        end
+      end
+    end
   end
 
   describe "Associations" do
