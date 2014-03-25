@@ -482,7 +482,7 @@ describe "Taggable" do
     TaggableModel.tagged_with([]).should == []
   end
 
-  describe "Duplicates" do
+  context "Duplicates" do
     it "should not create duplicate taggings" do
       bob = TaggableModel.create(:name => "Bob")
       lambda {
@@ -492,28 +492,30 @@ describe "Taggable" do
       }.should change(ActsAsTaggableOn::Tagging, :count).by(1)
     end
 
-    if ActsAsTaggableOn::Tag.supports_concurrency?
+    if ActsAsTaggableOn::Utils.supports_concurrency?
       it "should not duplicate tags added on different threads" do
         thread_count = 4
         barrier = Barrier.new thread_count
 
-        results = []
+        errors = []
         expect {
           thread_count.times.map do |idx|
             Thread.start do
               connor = TaggableModel.first_or_create(:name => "Connor")
               connor.tag_list = "There, can, be, only, one"
               barrier.wait
-              connor.save
-              results[idx] = connor.errors.full_messages
+              begin
+                connor.save
+              rescue StandardError => e
+                errors << e
+              end
             end
           end.map(&:join)
         }.to change(ActsAsTaggableOn::Tag, :count).by(5)
 
-        errors = results.flatten
         if ActsAsTaggableOn::Tag.aborts_on_duplicate?
           # only one thread succeeds because the transaction is aborted in this case
-          errors.should eq Array.new(thread_count - 1, "Error saving tags: 'There' has already been taken")
+          errors.map(&:to_s).should eq Array.new(thread_count - 1, "'There' has already been taken")
         else
           errors.should be_empty
         end

@@ -399,10 +399,6 @@ module ActsAsTaggableOn::Taggable
       end
 
       true
-
-    rescue StandardError => e
-      self.errors.add(:base, "Error saving tags: #{e.message}")
-      false
     end
   end
 end

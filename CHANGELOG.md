@@ -10,6 +10,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 * Features
 * Fixes
   * [@mikehale #487 Match_all respects context](https://github.com/mbleigh/acts-as-taggable-on/pull/487)
+  * [@jonseaberg #499 fix for race condition when multiple processes try to add the same tag](https://github.com/mbleigh/acts-as-taggable-on/pull/499)
 * Performance
   * [dgilperez #390 Add taggings counter cache](https://github.com/mbleigh/acts-as-taggable-on/pull/390)
 * Misc

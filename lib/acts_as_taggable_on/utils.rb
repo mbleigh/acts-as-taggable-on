@@ -1,5 +1,6 @@
 module ActsAsTaggableOn
   module Utils
+    extend self
 
     def connection
       ::ActiveRecord::Base.connection
