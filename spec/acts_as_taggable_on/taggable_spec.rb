@@ -517,7 +517,7 @@ describe "Taggable" do
           # only one thread succeeds because the transaction is aborted in this case
           errors.map(&:to_s).should eq Array.new(thread_count - 1, "'There' has already been taken")
         else
-          errors.should be_empty
+          errors.should eq []
         end
       end
     end
