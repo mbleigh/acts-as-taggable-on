@@ -497,7 +497,6 @@ describe "Taggable" do
         thread_count = 4
         barrier = Barrier.new thread_count
 
-        errors = []
         expect {
           thread_count.times.map do |idx|
             Thread.start do
@@ -506,19 +505,13 @@ describe "Taggable" do
               barrier.wait
               begin
                 connor.save
-              rescue StandardError => e
-                errors << e
+              rescue ActsAsTaggableOn::DuplicateTagError => e
+                # second save should succeed
+                connor.save
               end
             end
           end.map(&:join)
         }.to change(ActsAsTaggableOn::Tag, :count).by(5)
-
-        if ActsAsTaggableOn::Tag.aborts_on_duplicate?
-          # only one thread succeeds because the transaction is aborted in this case
-          errors.map(&:to_s).should eq Array.new(thread_count - 1, "'There' has already been taken")
-        else
-          errors.should eq []
-        end
       end
     end
   end
