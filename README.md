@@ -176,7 +176,7 @@ User.tagged_with(["awesome", "cool"], :any => true)
 User.tagged_with(["awesome", "cool"], :exclude => true)
 
 # Find a user with any of tags based on context:
-User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
+User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
 You can also use `:wild => true` option along with `:any` or `:exclude` option. It will looking for `%awesome%` and `%cool%` in sql.
