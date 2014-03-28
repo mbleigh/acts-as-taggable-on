@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}) { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+  gem.required_ruby_version     = '>= 1.9.3'
 
   if File.exists?('UPGRADING.md')
     gem.post_install_message = File.read('UPGRADING.md')
