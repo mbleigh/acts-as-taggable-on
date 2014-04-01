@@ -4,15 +4,24 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...master)
+### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.1.0...master)
 
 * Breaking Changes
 * Features
 * Fixes
+* Performance
+* Misc
+
+### [3.1.0 / 2014-03-31](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0)
+
+* Fixes
   * [@mikehale #487 Match_all respects context](https://github.com/mbleigh/acts-as-taggable-on/pull/487)
 * Performance
-  * [dgilperez #390 Add taggings counter cache](https://github.com/mbleigh/acts-as-taggable-on/pull/390)
+  * [@dgilperez #390 Add taggings counter cache](https://github.com/mbleigh/acts-as-taggable-on/pull/390)
 * Misc
+ * [@jonseaberg Add missing indexes to schema used in specs #474](https://github.com/mbleigh/acts-as-taggable-on/pull/474)
+ * [@seuros Specify Ruby >= 1.9.3 required in gemspec](https://github.com/mbleigh/acts-as-taggable-on/pull/502)
+ * [@kiasaki Add missing quotes to code example](https://github.com/mbleigh/acts-as-taggable-on/pull/501)
 
 ### [3.1.0.rc1 / 2014-02-26](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0.rc1)
 
