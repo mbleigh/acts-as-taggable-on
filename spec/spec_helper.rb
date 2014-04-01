@@ -5,6 +5,7 @@ require 'logger'
 require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
 I18n.enforce_available_locales = true
 require 'ammeter/init'
+require 'barrier'
 
 unless [].respond_to?(:freq)
   class Array

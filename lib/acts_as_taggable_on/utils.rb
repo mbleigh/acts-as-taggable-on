@@ -1,5 +1,6 @@
 module ActsAsTaggableOn
   module Utils
+    extend self
 
     def connection
       ::ActiveRecord::Base.connection
@@ -20,6 +21,10 @@ module ActsAsTaggableOn
 
     def using_case_insensitive_collation?
       using_mysql? && ::ActiveRecord::Base.connection.collation =~ /_ci\Z/
+    end
+
+    def supports_concurrency?
+      !using_sqlite?
     end
 
     def sha_prefix(string)

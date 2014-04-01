@@ -80,6 +80,14 @@ describe ActsAsTaggableOn::Tag do
       it "should find by name case insensitive" do
         ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("ПРИВЕТ").should == @tag
       end
+
+      if ActsAsTaggableOn::Tag.using_case_insensitive_collation?
+        it "should find by name accent insensitive" do
+          @tag.name = "inupiat"
+          @tag.save
+          ActsAsTaggableOn::Tag.find_or_create_with_like_by_name("Iñupiat").should == @tag
+        end
+      end
     end
   end
 
