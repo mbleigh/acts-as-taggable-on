@@ -9,7 +9,7 @@ module ActsAsTaggableOn
                     :tagger,
                     :tagger_type,
                     :tagger_id if defined?(ActiveModel::MassAssignmentSecurity)
-    belongs_to :tag, :class_name => 'ActsAsTaggableOn::Tag' , :counter_cache => true
+    belongs_to :tag, :class_name => 'ActsAsTaggableOn::Tag', :counter_cache => true
     belongs_to :taggable, :polymorphic => true
     belongs_to :tagger,   :polymorphic => true
 
@@ -24,10 +24,7 @@ module ActsAsTaggableOn
 
     def remove_unused_tags
       if ActsAsTaggableOn.remove_unused_tags
-        # TODO: use taggings_count in release 4.0.0
-        if tag.taggings.count.zero?
-          tag.destroy
-        end
+        tag.destroy if tag.taggings_count.zero?
       end
     end
   end
