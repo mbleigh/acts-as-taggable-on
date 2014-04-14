@@ -710,4 +710,43 @@ describe 'Taggable' do
       expect(TaggableModel.create(tag_list: 'woo').tag_list_submethod_called).to eq(true)
     end
   end
+
+  # See https://github.com/mbleigh/acts-as-taggable-on/pull/457 for details
+  context 'tag_counts and aggreating scopes, compatability with MySQL ' do
+    before(:each) do
+      clean_database!
+      TaggableModel.new(:name => "Barb Jones").tap{|t| t.tag_list = ['awesome', 'fun'] }.save
+      TaggableModel.new(:name => "John Doe").tap{|t| t.tag_list = ['cool', 'fun', 'hella'] }.save
+      TaggableModel.new(:name => "Jo Doe").tap{|t| t.tag_list = ['curious', 'young', 'naive', 'sharp'] }.save
+
+      TaggableModel.all.each{|t| t.save }
+    end
+
+    context 'Model.limit(x).tag_counts.sum(:tags_count)' do
+      it 'should not break on Mysql' do
+        expect( TaggableModel.limit(2).tag_counts.sum('tags_count') ).to eq 5
+      end
+    end
+
+    context 'regression prevention, just making sure these esoteric queries still work' do
+      context 'Model.tag_counts.limit(x)' do
+        it 'should limit the tag objects (not very useful, of course)' do
+          array_of_tag_counts = TaggableModel.tag_counts.limit(2)
+          expect(array_of_tag_counts.count).to eq 2
+        end
+      end
+
+      context 'Model.tag_counts.sum(:tags_count)' do
+        it 'should limit the total tags used' do
+          expect( TaggableModel.tag_counts.sum(:tags_count) ).to eq 9
+        end
+      end
+
+      context 'Model.tag_counts.limit(2).sum(:tags_count)' do
+        it 'limit should have no effect; this is just a sanity check' do
+          expect( TaggableModel.tag_counts.limit(2).sum(:tags_count) ).to eq 9
+        end
+      end
+    end
+  end
 end
