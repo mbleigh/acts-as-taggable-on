@@ -64,7 +64,7 @@ module ActsAsTaggableOn::Taggable
 
         # Joins and conditions
         tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
-        tag_scope     = tag_scope.where(options[:conditions])
+        tag_scope = tag_scope.where(options[:conditions])
 
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
 
@@ -106,7 +106,7 @@ module ActsAsTaggableOn::Taggable
         # Joins and conditions
         tagging_scope = tagging_scope.joins(taggable_join)
         tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
-        tag_scope     = tag_scope.where(options[:conditions])
+        tag_scope = tag_scope.where(options[:conditions])
 
         # GROUP BY and HAVING clauses:
         having = ["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) > 0"]
@@ -128,21 +128,21 @@ module ActsAsTaggableOn::Taggable
       end
 
       def safe_to_sql(relation)
-        connection.respond_to?(:unprepared_statement) ? connection.unprepared_statement{relation.to_sql} : relation.to_sql
+        connection.respond_to?(:unprepared_statement) ? connection.unprepared_statement { relation.to_sql } : relation.to_sql
       end
 
       private
 
       def tagging_conditions(options)
         tagging_conditions = []
-        tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
+        tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)]) if options[:end_at]
         tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
 
-        taggable_conditions  = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
+        taggable_conditions = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
         taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]])  if options[:id]
+        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]]) if options[:id]
 
-        tagging_conditions.push     taggable_conditions
+        tagging_conditions.push taggable_conditions
 
         tagging_conditions
       end
@@ -159,6 +159,7 @@ module ActsAsTaggableOn::Taggable
 
     module CalculationMethods
       def count
+        return super if ActsAsTaggableOn::Utils.active_record42?
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
         super(:all)
       end
