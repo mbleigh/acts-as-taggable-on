@@ -24,10 +24,7 @@ module ActsAsTaggableOn
 
     def remove_unused_tags
       if ActsAsTaggableOn.remove_unused_tags
-        # TODO: use taggings_count in release 4.0.0
-        if tag.taggings.count.zero?
-          tag.destroy
-        end
+        tag.destroy if tag.taggings_count.zero?
       end
     end
   end
