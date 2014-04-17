@@ -4,4 +4,11 @@ source "https://rubygems.org"
 
 gem "rails", "~> 4.0"
 
-gemspec :path=>"../"
+group :local_development do
+  gem "guard"
+  gem "guard-rspec"
+  gem "appraisal"
+  gem "rake"
+end
+
+gemspec :path => "../"

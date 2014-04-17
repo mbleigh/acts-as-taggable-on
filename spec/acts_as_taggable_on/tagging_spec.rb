@@ -6,23 +6,23 @@ describe ActsAsTaggableOn::Tagging do
     @tagging = ActsAsTaggableOn::Tagging.new
   end
 
-  it "should not be valid with a invalid tag" do
-    @tagging.taggable = TaggableModel.create(:name => "Bob Jones")
-    @tagging.tag = ActsAsTaggableOn::Tag.new(:name => "")
-    @tagging.context = "tags"
+  it 'should not be valid with a invalid tag' do
+    @tagging.taggable = TaggableModel.create(name: 'Bob Jones')
+    @tagging.tag = ActsAsTaggableOn::Tag.new(name: '')
+    @tagging.context = 'tags'
 
-    @tagging.should_not be_valid
-    
-    @tagging.errors[:tag_id].should == ["can't be blank"]
+    expect(@tagging).to_not be_valid
+
+    expect(@tagging.errors[:tag_id]).to eq(['can\'t be blank'])
   end
 
-  it "should not create duplicate taggings" do
-    @taggable = TaggableModel.create(:name => "Bob Jones")
-    @tag = ActsAsTaggableOn::Tag.create(:name => "awesome")
+  it 'should not create duplicate taggings' do
+    @taggable = TaggableModel.create(name: 'Bob Jones')
+    @tag = ActsAsTaggableOn::Tag.create(name: 'awesome')
 
-    lambda {
-      2.times { ActsAsTaggableOn::Tagging.create(:taggable => @taggable, :tag => @tag, :context => 'tags') }
-    }.should change(ActsAsTaggableOn::Tagging, :count).by(1)
+    expect(-> {
+      2.times { ActsAsTaggableOn::Tagging.create(taggable: @taggable, tag: @tag, context: 'tags') }
+    }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
   
 end

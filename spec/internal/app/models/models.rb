@@ -6,7 +6,7 @@ class TaggableModel < ActiveRecord::Base
   has_many :untaggable_models
 
   attr_reader :tag_list_submethod_called
-  def tag_list=v
+  def tag_list=(v)
     @tag_list_submethod_called = true
     super
   end
@@ -44,7 +44,7 @@ class UntaggableModel < ActiveRecord::Base
 end
 
 class NonStandardIdTaggableModel < ActiveRecord::Base
-  primary_key = "an_id"
+  self.primary_key = :an_id
   acts_as_taggable
   acts_as_taggable_on :languages
   acts_as_taggable_on :skills

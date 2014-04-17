@@ -2,6 +2,13 @@
 
 source "https://rubygems.org"
 
-gem "rails", :github=>"rails/rails"
+gem "rails", :github => "rails/rails"
 
-gemspec :path=>"../"
+group :local_development do
+  gem "guard"
+  gem "guard-rspec"
+  gem "appraisal"
+  gem "rake"
+end
+
+gemspec :path => "../"
