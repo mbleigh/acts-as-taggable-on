@@ -3,6 +3,7 @@ rvm:
   - 2.0.0
   - 2.1.0
   - 2.1.1
+  - rbx
 env:
   - DB=sqlite3
   - DB=mysql
@@ -14,8 +15,10 @@ gemfile:
   - gemfiles/rails_edge.gemfile
 cache: bundler
 script: bundle exec rake
-before_install:
-  - gem install bundler
+before_install: gem install bundler
 bundler_args: '--without local_development'
 matrix:
   fast_finish: true
+  allow_failures:
+      - gemfile: gemfiles/rails_edge.gemfile
+      - rvm: rbx
