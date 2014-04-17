@@ -44,7 +44,7 @@ describe 'acts_as_tagger' do
 
       it 'should by default not throw an exception ' do
         expect(@taggable.tag_list_on(:foo)).to be_empty
-        expect(lambda {
+        expect(-> {
           @tagger.tag(@taggable, with: 'this, and, that', on: :foo)
         }).to_not raise_error
       end
@@ -72,7 +72,7 @@ describe 'acts_as_tagger' do
 
       it 'should throw an exception when the default is over-ridden' do
         expect(@taggable.tag_list_on(:foo_boo)).to be_empty
-        expect(lambda {
+        expect(-> {
           @tagger.tag(@taggable, with: 'this, and, that', on: :foo_boo, force: false)
         }).to raise_error
       end

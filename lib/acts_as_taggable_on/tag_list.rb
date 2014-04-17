@@ -23,7 +23,7 @@ module ActsAsTaggableOn
         # Parse the quoted tags
         d = ActsAsTaggableOn.delimiter
         # Separate multiple delimiters by bitwise operator
-        d = d.join("|") if d.kind_of?(Array)
+        d = d.join('|') if d.kind_of?(Array)
         double_quote_pattern = %r{
           (             # Tag start delimiter ($1)
             \A       |  # Either string start or
@@ -39,7 +39,7 @@ module ActsAsTaggableOn
         }x
         string.gsub!(double_quote_pattern) {
           # Append the matched tag to the tag list
-          tag_list << $2
+          tag_list << Regexp.last_match[2]
           # Return the matched delimiter ($3) to replace the matched items
           ''
         }
@@ -58,7 +58,7 @@ module ActsAsTaggableOn
         }x
         string.gsub!(single_quote_pattern) {
           # Append the matched tag ($2) to the tag list
-          tag_list << $2
+          tag_list << Regexp.last_match[2]
           # Return an empty string to replace the matched items
           ''
         }
@@ -109,7 +109,7 @@ module ActsAsTaggableOn
 
       tags.map do |name|
         d = ActsAsTaggableOn.delimiter
-        d = Regexp.new d.join("|") if d.kind_of? Array
+        d = Regexp.new d.join('|') if d.kind_of? Array
         name.index(d) ? "\"#{name}\"" : name
       end.join(ActsAsTaggableOn.glue)
     end

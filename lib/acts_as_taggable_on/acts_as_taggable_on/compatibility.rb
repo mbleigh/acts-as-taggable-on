@@ -12,13 +12,13 @@ module ActsAsTaggableOn::Compatibility
     scope_opts, opts = parse_options(opts)
 
     unless scope_opts.empty?
-      scope = lambda do
+      scope = -> {
         scope_opts.inject(self) { |result, hash| result.send(*hash) }
-      end
+      }
       return [scope, opts]
     end
 
-    [nil,opts]
+    [nil, opts]
   end
 
   def parse_options(opts)

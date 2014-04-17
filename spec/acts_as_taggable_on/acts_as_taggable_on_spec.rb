@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'spec_helper'
 
-describe "Acts As Taggable On" do
+describe 'Acts As Taggable On' do
   before(:each) do
     clean_database!
   end
@@ -10,13 +10,13 @@ describe "Acts As Taggable On" do
     expect(UntaggableModel).to_not be_taggable
   end
 
-  describe "Taggable Method Generation To Preserve Order" do
+  describe 'Taggable Method Generation To Preserve Order' do
     before(:each) do
       clean_database!
       TaggableModel.tag_types = []
       TaggableModel.preserve_tag_order = false
       TaggableModel.acts_as_ordered_taggable_on(:ordered_tags)
-      @taggable = TaggableModel.new(name: "Bob Jones")
+      @taggable = TaggableModel.new(name: 'Bob Jones')
     end
 
     it "should respond 'true' to preserve_tag_order?" do
@@ -49,7 +49,7 @@ describe "Acts As Taggable On" do
     end
 
     it 'should create a class attribute for preserve tag order' do
-      expect( @taggable.class).to respond_to(:preserve_tag_order?)
+      expect(@taggable.class).to respond_to(:preserve_tag_order?)
     end
 
     it 'should create an instance attribute for preserve tag order' do
@@ -80,7 +80,7 @@ describe "Acts As Taggable On" do
 
   describe 'Reloading' do
     it 'should save a model instantiated by Model.find' do
-      taggable = TaggableModel.create!(name: "Taggable")
+      taggable = TaggableModel.create!(name: 'Taggable')
       found_taggable = TaggableModel.find(taggable.id)
       found_taggable.save
     end
@@ -88,17 +88,17 @@ describe "Acts As Taggable On" do
 
   describe 'Matching Contexts' do
     it 'should find objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(name: "Taggable 1")
-      taggable2 = TaggableModel.create!(name: "Taggable 2")
-      taggable3 = TaggableModel.create!(name: "Taggable 3")
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+      taggable2 = TaggableModel.create!(name: 'Taggable 2')
+      taggable3 = TaggableModel.create!(name: 'Taggable 3')
 
-      taggable1.offering_list = "one, two"
+      taggable1.offering_list = 'one, two'
       taggable1.save!
 
-      taggable2.need_list = "one, two"
+      taggable2.need_list = 'one, two'
       taggable2.save!
 
-      taggable3.offering_list = "one, two"
+      taggable3.offering_list = 'one, two'
       taggable3.save!
 
       expect(taggable1.find_matching_contexts(:offerings, :needs)).to include(taggable2)
@@ -106,17 +106,17 @@ describe "Acts As Taggable On" do
     end
 
     it 'should find other related objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(name: "Taggable 1")
-      taggable2 = OtherTaggableModel.create!(name: "Taggable 2")
-      taggable3 = OtherTaggableModel.create!(name: "Taggable 3")
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+      taggable2 = OtherTaggableModel.create!(name: 'Taggable 2')
+      taggable3 = OtherTaggableModel.create!(name: 'Taggable 3')
 
-      taggable1.offering_list = "one, two"
+      taggable1.offering_list = 'one, two'
       taggable1.save
 
-      taggable2.need_list = "one, two"
+      taggable2.need_list = 'one, two'
       taggable2.save
 
-      taggable3.offering_list = "one, two"
+      taggable3.offering_list = 'one, two'
       taggable3.save
 
       expect(taggable1.find_matching_contexts_for(OtherTaggableModel, :offerings, :needs)).to include(taggable2)
@@ -124,14 +124,14 @@ describe "Acts As Taggable On" do
     end
 
     it 'should not include the object itself in the list of related objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(name: "Taggable 1")
-      taggable2 = TaggableModel.create!(name: "Taggable 2")
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+      taggable2 = TaggableModel.create!(name: 'Taggable 2')
 
-      taggable1.offering_list = "one, two"
-      taggable1.need_list = "one, two"
+      taggable1.offering_list = 'one, two'
+      taggable1.need_list = 'one, two'
       taggable1.save
 
-      taggable2.need_list = "one, two"
+      taggable2.need_list = 'one, two'
       taggable2.save
 
       expect(taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to include(taggable2)
@@ -157,68 +157,68 @@ describe "Acts As Taggable On" do
     end
 
     it 'should not raise an error when passed nil' do
-      expect(lambda {
-        TaggableModel.acts_as_taggable_on()
+      expect(-> {
+        TaggableModel.acts_as_taggable_on
       }).to_not raise_error
     end
 
     it 'should not raise an error when passed [nil]' do
-      expect(lambda {
+      expect(-> {
         TaggableModel.acts_as_taggable_on([nil])
       }).to_not raise_error
     end
   end
 
   context 'when tagging context ends in an "s" when singular (ex. "status", "glass", etc.)' do
-   describe 'caching' do
-     before  { @taggable = OtherCachedModel.new(name: 'John Smith') }
-     subject { @taggable }
+    describe 'caching' do
+      before  { @taggable = OtherCachedModel.new(name: 'John Smith') }
+      subject { @taggable }
 
-     it { should respond_to(:save_cached_tag_list) }
-     its(:cached_language_list) { should be_blank }
-     its(:cached_status_list)   { should be_blank }
-     its(:cached_glass_list)    { should be_blank }
+      it { should respond_to(:save_cached_tag_list) }
+      its(:cached_language_list) { should be_blank }
+      its(:cached_status_list)   { should be_blank }
+      its(:cached_glass_list)    { should be_blank }
 
-     context 'language taggings cache after update' do
-       before  { @taggable.update_attributes(language_list: 'ruby, .net') }
-       subject { @taggable }
+      context 'language taggings cache after update' do
+        before  { @taggable.update_attributes(language_list: 'ruby, .net') }
+        subject { @taggable }
 
-       its(:language_list)        { should == ['ruby', '.net']}
-       its(:cached_language_list) { should == 'ruby, .net' }           # passes
-       its(:instance_variables)   { should     include((RUBY_VERSION < '1.9' ? '@language_list' : :@language_list)) }
-     end
+        its(:language_list)        { should == ['ruby', '.net']}
+        its(:cached_language_list) { should == 'ruby, .net' }           # passes
+        its(:instance_variables)   { should     include((RUBY_VERSION < '1.9' ? '@language_list' : :@language_list)) }
+      end
 
-     context 'status taggings cache after update' do
-       before  { @taggable.update_attributes(status_list: 'happy, married') }
-       subject { @taggable }
+      context 'status taggings cache after update' do
+        before  { @taggable.update_attributes(status_list: 'happy, married') }
+        subject { @taggable }
 
-       its(:status_list)        { should     == ['happy', 'married'] }
-       its(:cached_status_list) { should     == 'happy, married'     } # fails
-       its(:cached_status_list) { should_not == ''                   } # fails, is blank
-       its(:instance_variables) { should     include((RUBY_VERSION < '1.9' ? '@status_list' : :@status_list)) }
-       its(:instance_variables) { should_not include((RUBY_VERSION < '1.9' ? '@statu_list' : :@statu_list))  } # fails, note: one "s"
+        its(:status_list)        { should     == ['happy', 'married'] }
+        its(:cached_status_list) { should     == 'happy, married'     } # fails
+        its(:cached_status_list) { should_not == ''                   } # fails, is blank
+        its(:instance_variables) { should     include((RUBY_VERSION < '1.9' ? '@status_list' : :@status_list)) }
+        its(:instance_variables) { should_not include((RUBY_VERSION < '1.9' ? '@statu_list' : :@statu_list))  } # fails, note: one "s"
 
-     end
+      end
 
-     context 'glass taggings cache after update' do
-       before do
-         @taggable.update_attributes(glass_list: 'rectangle, aviator')
-       end
+      context 'glass taggings cache after update' do
+        before do
+          @taggable.update_attributes(glass_list: 'rectangle, aviator')
+        end
 
-       subject { @taggable }
-       its(:glass_list)         { should     == ['rectangle', 'aviator'] }
-       its(:cached_glass_list)  { should     == 'rectangle, aviator'     } # fails
-       its(:cached_glass_list)  { should_not == ''                       } # fails, is blank
-       if RUBY_VERSION < '1.9'
-         its(:instance_variables) { should     include('@glass_list')      }
-         its(:instance_variables) { should_not include('@glas_list')       } # fails, note: one "s"
-       else
-         its(:instance_variables) { should     include(:@glass_list)      }
-         its(:instance_variables) { should_not include(:@glas_list)       } # fails, note: one "s"
-       end
+        subject { @taggable }
+        its(:glass_list)         { should     == ['rectangle', 'aviator'] }
+        its(:cached_glass_list)  { should     == 'rectangle, aviator'     } # fails
+        its(:cached_glass_list)  { should_not == ''                       } # fails, is blank
+        if RUBY_VERSION < '1.9'
+          its(:instance_variables) { should     include('@glass_list')      }
+          its(:instance_variables) { should_not include('@glas_list')       } # fails, note: one "s"
+        else
+          its(:instance_variables) { should     include(:@glass_list)      }
+          its(:instance_variables) { should_not include(:@glas_list)       } # fails, note: one "s"
+        end
 
-     end
-   end
+      end
+    end
   end
 
   describe 'taggings' do

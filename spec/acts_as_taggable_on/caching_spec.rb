@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Acts As Taggable On" do
+describe 'Acts As Taggable On' do
 
   before(:each) do
     clean_database!
@@ -8,22 +8,22 @@ describe "Acts As Taggable On" do
 
   describe 'Caching' do
     before(:each) do
-      @taggable = CachedModel.new(name: "Bob Jones")
-      @another_taggable = OtherCachedModel.new(name: "John Smith")
+      @taggable = CachedModel.new(name: 'Bob Jones')
+      @another_taggable = OtherCachedModel.new(name: 'John Smith')
     end
 
-    it "should add saving of tag lists and cached tag lists to the instance" do
+    it 'should add saving of tag lists and cached tag lists to the instance' do
       expect(@taggable).to respond_to(:save_cached_tag_list)
       expect(@another_taggable).to respond_to(:save_cached_tag_list)
 
       expect(@taggable).to respond_to(:save_tags)
     end
 
-    it "should add cached tag lists to the instance if cached column is not present" do
-      expect(TaggableModel.new(name: "Art Kram")).to_not respond_to(:save_cached_tag_list)
+    it 'should add cached tag lists to the instance if cached column is not present' do
+      expect(TaggableModel.new(name: 'Art Kram')).to_not respond_to(:save_cached_tag_list)
     end
 
-    it "should generate a cached column checker for each tag type" do
+    it 'should generate a cached column checker for each tag type' do
       expect(CachedModel).to respond_to(:caching_tag_list?)
       expect(OtherCachedModel).to respond_to(:caching_language_list?)
     end
@@ -43,7 +43,7 @@ describe "Acts As Taggable On" do
 
     it 'should keep the cache' do
       @taggable.update_attributes(tag_list: 'awesome, epic')
-      @taggable = CachedModel.find(@taggable)
+      @taggable = CachedModel.find(@taggable.id)
       @taggable.save!
       expect(@taggable.cached_tag_list).to eq('awesome, epic')
     end

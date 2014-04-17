@@ -49,7 +49,7 @@ module ActsAsTaggableOn::Taggable
     private
 
     def exclude_self(klass, id)
-        "#{klass.table_name}.#{klass.primary_key} != #{id} AND" if [self.class.base_class, self.class].include? klass
+      "#{klass.table_name}.#{klass.primary_key} != #{id} AND" if [self.class.base_class, self.class].include? klass
     end
 
     def group_columns(klass)
@@ -64,7 +64,7 @@ module ActsAsTaggableOn::Taggable
       klass.select("#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count").
           from("#{klass.table_name}, #{ActsAsTaggableOn::Tag.table_name}, #{ActsAsTaggableOn::Tagging.table_name}").
           group(group_columns(klass)).
-          order("count DESC").
+          order('count DESC').
           where(conditions)
     end
   end
