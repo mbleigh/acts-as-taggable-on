@@ -465,7 +465,8 @@ describe 'Taggable' do
     frank = TaggableModel.create(name: 'Frank', tag_list: 'happier')
     steve = TaggableModel.create(name: 'Steve', tag_list: 'happier')
 
-    expect(TaggableModel.tagged_with('lazy', exclude: true).to_a).to eq([frank, steve])
+    expect(TaggableModel.tagged_with('lazy', exclude: true)).to include(frank, steve)
+    expect(TaggableModel.tagged_with('lazy', exclude: true).size).to eq(2)
   end
 
   it 'should return an empty scope for empty tags' do
