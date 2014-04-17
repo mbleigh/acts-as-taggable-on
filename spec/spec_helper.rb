@@ -71,7 +71,7 @@ if File.exist?(database_yml)
   begin
     logger_off
     load(File.dirname(__FILE__) + '/internal/db/schema.rb')
-    Dir[File.dirname(__FILE__) + '/internal/app/models/*.rb'].each { |file| load file }
+    load(File.dirname(__FILE__) + '/internal/app/models/models.rb')
   ensure
     logger_on
   end

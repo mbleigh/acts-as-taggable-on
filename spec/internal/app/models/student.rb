@@ -1,1 +1,2 @@
-#FIXME, see user.rb
+class Student < User
+end
