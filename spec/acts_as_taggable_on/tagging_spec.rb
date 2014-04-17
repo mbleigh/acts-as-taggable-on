@@ -20,7 +20,7 @@ describe ActsAsTaggableOn::Tagging do
     @taggable = TaggableModel.create(name: 'Bob Jones')
     @tag = ActsAsTaggableOn::Tag.create(name: 'awesome')
 
-    expect(lambda {
+    expect(-> {
       2.times { ActsAsTaggableOn::Tagging.create(taggable: @taggable, tag: @tag, context: 'tags') }
     }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
   end

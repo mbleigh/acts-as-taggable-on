@@ -26,7 +26,7 @@ module ActsAsTaggableOn
       if ActsAsTaggableOn.strict_case_match
         where(["name = #{binary}?", as_8bit_ascii(name)])
       else
-        where(["LOWER(name) = LOWER(?)", as_8bit_ascii(unicode_downcase(name))])
+        where(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(name))])
       end
     end
 
@@ -34,12 +34,12 @@ module ActsAsTaggableOn
       if ActsAsTaggableOn.strict_case_match
         clause = list.map { |tag|
           sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
-        }.join(" OR ")
+        }.join(' OR ')
         where(clause)
       else
         clause = list.map { |tag|
-          sanitize_sql(["LOWER(name) = LOWER(?)", as_8bit_ascii(unicode_downcase(tag))])
-        }.join(" OR ")
+          sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
+        }.join(' OR ')
         where(clause)
       end
     end
@@ -52,14 +52,14 @@ module ActsAsTaggableOn
     def self.named_like_any(list)
       clause = list.map { |tag|
         sanitize_sql(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(tag.to_s)}%"])
-      }.join(" OR ")
+      }.join(' OR ')
       where(clause)
     end
 
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
-      if (ActsAsTaggableOn.strict_case_match)
+      if ActsAsTaggableOn.strict_case_match
         self.find_or_create_all_with_like_by_name([name]).first
       else
         named_like(name).first || create(name: name)
@@ -113,7 +113,7 @@ module ActsAsTaggableOn
       end
 
       def binary
-        using_mysql? ? "BINARY " : nil
+        using_mysql? ? 'BINARY ' : nil
       end
 
       def unicode_downcase(string)

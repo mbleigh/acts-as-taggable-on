@@ -67,8 +67,8 @@ describe ActsAsTaggableOn::TagList do
 
     it 'should be able to call to_s on a frozen tag list' do
       tag_list.freeze
-      expect(lambda { tag_list.add('cool', 'rad,bodacious') }).to raise_error
-      expect(lambda { tag_list.to_s }).to_not raise_error
+      expect(-> { tag_list.add('cool', 'rad,bodacious') }).to raise_error
+      expect(-> { tag_list.to_s }).to_not raise_error
     end
   end
 

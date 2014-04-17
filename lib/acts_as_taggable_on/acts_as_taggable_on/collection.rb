@@ -156,11 +156,9 @@ module ActsAsTaggableOn::Taggable
     end
 
     module CalculationMethods
-      def count(column_name = nil)
-        #TODO, THIS should be fixed somehow
-        return super(column_name) if ActsAsTaggableOn::Utils.active_record42?
+      def count(column_name=:all)
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
-        super(:all)
+        super
       end
     end
   end

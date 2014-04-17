@@ -35,7 +35,7 @@ describe 'Taggable To Preserve Order' do
     @taggable.tag_list = 'rails, ruby, css'
     expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
-    expect(lambda {
+    expect(-> {
       @taggable.save
     }).to change(ActsAsTaggableOn::Tag, :count).by(3)
 
@@ -69,7 +69,7 @@ describe 'Taggable To Preserve Order' do
     @taggable.tag_list = 'pow, ruby, rails'
     expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
-    expect(lambda {
+    expect(-> {
       @taggable.save
     }).to change(ActsAsTaggableOn::Tag, :count).by(3)
 
@@ -147,7 +147,7 @@ describe 'Taggable' do
     @taggable.skill_list = 'ruby, rails, css'
     expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
-    expect(lambda {
+    expect(-> {
       @taggable.save
     }).to change(ActsAsTaggableOn::Tag, :count).by(3)
 
@@ -477,7 +477,7 @@ describe 'Taggable' do
   context 'Duplicates' do
     it 'should not create duplicate taggings' do
       bob = TaggableModel.create(name: 'Bob')
-      expect(lambda {
+      expect(-> {
         bob.tag_list << 'happier' << 'happier'
         bob.save
       }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
@@ -575,7 +575,7 @@ describe 'Taggable' do
       @taggable.skill_list = 'ruby, rails, css'
       expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
-      expect(lambda {
+      expect(-> {
         @taggable.save
       }).to change(ActsAsTaggableOn::Tag, :count).by(3)
 

@@ -77,7 +77,7 @@ if File.exist?(database_yml)
   end
 
 else
-  raise "Please create #{database_yml} first to configure your database. Take a look at: #{database_yml}.sample"
+  fail "Please create #{database_yml} first to configure your database. Take a look at: #{database_yml}.sample"
 end
 
 def clean_database!

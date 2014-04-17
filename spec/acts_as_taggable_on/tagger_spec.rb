@@ -40,7 +40,7 @@ describe 'Tagger' do
     @user2.tag(@taggable3, with: 'ruby', on: :tags)
 
     tags = TaggableModel.tagged_with(%w(ruby java), owned_by: @user, any: true)
-    expect(tags).to include(@taggable,@taggable2)
+    expect(tags).to include(@taggable, @taggable2)
     expect(tags.size).to eq(2)
 
   end
@@ -60,7 +60,7 @@ describe 'Tagger' do
 
   it 'should not overlap tags from different taggers' do
     @user2 = User.new
-    expect(lambda {
+    expect(-> {
       @user.tag(@taggable, with: 'ruby, scheme', on: :tags)
       @user2.tag(@taggable, with: 'java, python, lisp, ruby', on: :tags)
     }).to change(ActsAsTaggableOn::Tagging, :count).by(6)
@@ -82,7 +82,7 @@ describe 'Tagger' do
     @user2.tag(@taggable, with: 'java, python, lisp, ruby', on: :tags)
     @user.tag(@taggable, with: 'ruby, scheme', on: :tags)
 
-    expect(lambda {
+    expect(-> {
       @user2.tag(@taggable, with: 'java, python, lisp', on: :tags)
     }).to change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
@@ -101,7 +101,7 @@ describe 'Tagger' do
     @user.tag(@taggable, with: 'awesome', on: :tags)
     @user2.tag(@taggable, with: 'awesome, epic', on: :tags)
 
-    expect(lambda {
+    expect(-> {
       @user2.tag(@taggable, with: 'epic', on: :tags)
     }).to change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
@@ -115,10 +115,10 @@ describe 'Tagger' do
     @user.tag(@taggable, with: 'ruby, scheme', on: :tags)
 
     [@taggable, @user].each(&:reload)
-    expect(@taggable.tag_list).to eq(%w(ruby) )
+    expect(@taggable.tag_list).to eq(%w(ruby))
     expect(@taggable.all_tags_list.sort).to eq(%w(ruby scheme).sort)
 
-    expect(lambda {
+    expect(-> {
       @taggable.update_attributes(tag_list: '')
     }).to change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
@@ -131,7 +131,7 @@ describe 'Tagger' do
   end
 
   it 'should skip save if skip_save is passed as option' do
-    expect(lambda {
+    expect(-> {
       @user.tag(@taggable, with: 'epic', on: :tags, skip_save: true)
     }).to_not change(ActsAsTaggableOn::Tagging, :count)
   end

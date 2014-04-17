@@ -19,13 +19,13 @@ module ActsAsTaggableOn
             opts.merge(
               as: :tagger,
               dependent: :destroy,
-              class_name: "ActsAsTaggableOn::Tagging"
+              class_name: 'ActsAsTaggableOn::Tagging'
             )
 
           has_many_with_compatibility :owned_tags,
                                       through: :owned_taggings,
                                       source: :tag,
-                                      class_name: "ActsAsTaggableOn::Tag",
+                                      class_name: 'ActsAsTaggableOn::Tag',
                                       uniq: true
         end
 
@@ -54,9 +54,9 @@ module ActsAsTaggableOn
         skip_save = opts.delete(:skip_save)
         return false unless taggable.respond_to?(:is_taggable?) && taggable.is_taggable?
 
-        raise "You need to specify a tag context using :on"                unless opts.key?(:on)
-        raise "You need to specify some tags using :with"                  unless opts.key?(:with)
-        raise "No context :#{opts[:on]} defined in #{taggable.class}" unless (opts[:force] || taggable.tag_types.include?(opts[:on]))
+        fail 'You need to specify a tag context using :on'                unless opts.key?(:on)
+        fail 'You need to specify some tags using :with'                  unless opts.key?(:with)
+        fail "No context :#{opts[:on]} defined in #{taggable.class}" unless opts[:force] || taggable.tag_types.include?(opts[:on])
 
         taggable.set_owner_tag_list_on(self, opts[:on].to_s, opts[:with])
         taggable.save unless skip_save
