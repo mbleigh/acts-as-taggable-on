@@ -1,6 +1,6 @@
 module ActsAsTaggableOn
   module TagsHelper
-    # See the README for an example using tag_cloud.
+    # See the wiki for an example using tag_cloud.
     def tag_cloud(tags, classes)
       return [] if tags.empty?
 
