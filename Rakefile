@@ -6,7 +6,7 @@ task :default => :spec
 
 desc 'Copy sample spec database.yml over if not exists'
 task :copy_db_config do
-  cp 'spec/database.yml.sample', 'spec/database.yml'
+  cp 'spec/internal/config/database.yml.sample', 'spec/internal/config/database.yml'
 end
 
 task :spec => [:copy_db_config]
