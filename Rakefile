@@ -2,14 +2,14 @@ require 'rubygems'
 require 'bundler/setup'
 
 desc 'Default: run specs'
-task :default => :spec
+task default: :spec
 
 desc 'Copy sample spec database.yml over if not exists'
 task :copy_db_config do
   cp 'spec/internal/config/database.yml.sample', 'spec/internal/config/database.yml'
 end
 
-task :spec => [:copy_db_config]
+task spec: [:copy_db_config]
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new do |t|

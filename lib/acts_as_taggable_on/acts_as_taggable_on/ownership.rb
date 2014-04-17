@@ -108,13 +108,13 @@ module ActsAsTaggableOn::Taggable
 
           # Find all taggings that belong to the taggable (self), are owned by the owner,
           # have the correct context, and are removed from the list.
-          ActsAsTaggableOn::Tagging.destroy_all(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
-                                                            :tagger_type => owner.class.base_class.to_s, :tagger_id => owner.id,
-                                                            :tag_id => old_tags, :context => context) if old_tags.present?
+          ActsAsTaggableOn::Tagging.destroy_all(taggable_id: id, taggable_type: self.class.base_class.to_s,
+                                                            tagger_type: owner.class.base_class.to_s, tagger_id: owner.id,
+                                                            tag_id: old_tags, context: context) if old_tags.present?
 
           # Create new taggings:
           new_tags.each do |tag|
-            taggings.create!(:tag_id => tag.id, :context => context.to_s, :tagger => owner, :taggable => self)
+            taggings.create!(tag_id: tag.id, context: context.to_s, tagger: owner, taggable: self)
           end
         end
       end

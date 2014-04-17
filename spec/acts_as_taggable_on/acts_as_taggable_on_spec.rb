@@ -16,7 +16,7 @@ describe "Acts As Taggable On" do
       TaggableModel.tag_types = []
       TaggableModel.preserve_tag_order = false
       TaggableModel.acts_as_ordered_taggable_on(:ordered_tags)
-      @taggable = TaggableModel.new(:name => "Bob Jones")
+      @taggable = TaggableModel.new(name: "Bob Jones")
     end
 
     it "should respond 'true' to preserve_tag_order?" do
@@ -29,7 +29,7 @@ describe "Acts As Taggable On" do
       clean_database!
       TaggableModel.tag_types = []
       TaggableModel.acts_as_taggable_on(:tags, :languages, :skills, :needs, :offerings)
-      @taggable = TaggableModel.new(:name => 'Bob Jones')
+      @taggable = TaggableModel.new(name: 'Bob Jones')
     end
 
     it "should respond 'true' to taggable?" do
@@ -80,7 +80,7 @@ describe "Acts As Taggable On" do
 
   describe 'Reloading' do
     it 'should save a model instantiated by Model.find' do
-      taggable = TaggableModel.create!(:name => "Taggable")
+      taggable = TaggableModel.create!(name: "Taggable")
       found_taggable = TaggableModel.find(taggable.id)
       found_taggable.save
     end
@@ -88,9 +88,9 @@ describe "Acts As Taggable On" do
 
   describe 'Matching Contexts' do
     it 'should find objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(:name => "Taggable 1")
-      taggable2 = TaggableModel.create!(:name => "Taggable 2")
-      taggable3 = TaggableModel.create!(:name => "Taggable 3")
+      taggable1 = TaggableModel.create!(name: "Taggable 1")
+      taggable2 = TaggableModel.create!(name: "Taggable 2")
+      taggable3 = TaggableModel.create!(name: "Taggable 3")
 
       taggable1.offering_list = "one, two"
       taggable1.save!
@@ -106,9 +106,9 @@ describe "Acts As Taggable On" do
     end
 
     it 'should find other related objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(:name => "Taggable 1")
-      taggable2 = OtherTaggableModel.create!(:name => "Taggable 2")
-      taggable3 = OtherTaggableModel.create!(:name => "Taggable 3")
+      taggable1 = TaggableModel.create!(name: "Taggable 1")
+      taggable2 = OtherTaggableModel.create!(name: "Taggable 2")
+      taggable3 = OtherTaggableModel.create!(name: "Taggable 3")
 
       taggable1.offering_list = "one, two"
       taggable1.save
@@ -124,8 +124,8 @@ describe "Acts As Taggable On" do
     end
 
     it 'should not include the object itself in the list of related objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(:name => "Taggable 1")
-      taggable2 = TaggableModel.create!(:name => "Taggable 2")
+      taggable1 = TaggableModel.create!(name: "Taggable 1")
+      taggable2 = TaggableModel.create!(name: "Taggable 2")
 
       taggable1.offering_list = "one, two"
       taggable1.need_list = "one, two"
@@ -171,7 +171,7 @@ describe "Acts As Taggable On" do
 
   context 'when tagging context ends in an "s" when singular (ex. "status", "glass", etc.)' do
    describe 'caching' do
-     before  { @taggable = OtherCachedModel.new(:name => 'John Smith') }
+     before  { @taggable = OtherCachedModel.new(name: 'John Smith') }
      subject { @taggable }
 
      it { should respond_to(:save_cached_tag_list) }
@@ -180,7 +180,7 @@ describe "Acts As Taggable On" do
      its(:cached_glass_list)    { should be_blank }
 
      context 'language taggings cache after update' do
-       before  { @taggable.update_attributes(:language_list => 'ruby, .net') }
+       before  { @taggable.update_attributes(language_list: 'ruby, .net') }
        subject { @taggable }
 
        its(:language_list)        { should == ['ruby', '.net']}
@@ -189,7 +189,7 @@ describe "Acts As Taggable On" do
      end
 
      context 'status taggings cache after update' do
-       before  { @taggable.update_attributes(:status_list => 'happy, married') }
+       before  { @taggable.update_attributes(status_list: 'happy, married') }
        subject { @taggable }
 
        its(:status_list)        { should     == ['happy', 'married'] }
@@ -202,7 +202,7 @@ describe "Acts As Taggable On" do
 
      context 'glass taggings cache after update' do
        before do
-         @taggable.update_attributes(:glass_list => 'rectangle, aviator')
+         @taggable.update_attributes(glass_list: 'rectangle, aviator')
        end
 
        subject { @taggable }
@@ -223,7 +223,7 @@ describe "Acts As Taggable On" do
 
   describe 'taggings' do
     before(:each) do
-      @taggable = TaggableModel.new(:name => 'Art Kram')
+      @taggable = TaggableModel.new(name: 'Art Kram')
     end
 
     it 'should return no taggings' do
@@ -233,10 +233,10 @@ describe "Acts As Taggable On" do
 
   describe '@@remove_unused_tags' do
     before do
-      @taggable = TaggableModel.create(:name => 'Bob Jones')
-      @tag = ActsAsTaggableOn::Tag.create(:name => 'awesome')
+      @taggable = TaggableModel.create(name: 'Bob Jones')
+      @tag = ActsAsTaggableOn::Tag.create(name: 'awesome')
 
-      @tagging = ActsAsTaggableOn::Tagging.create(:taggable => @taggable, :tag => @tag, :context => 'tags')
+      @tagging = ActsAsTaggableOn::Tagging.create(taggable: @taggable, tag: @tag, context: 'tags')
     end
 
     context 'if set to true' do

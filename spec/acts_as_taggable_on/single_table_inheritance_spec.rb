@@ -6,16 +6,16 @@ describe 'Single Table Inheritance' do
     clean_database!
   end
 
-  let(:taggable)            { TaggableModel.new(:name => 'taggable model') }
+  let(:taggable) { TaggableModel.new(name: 'taggable model') }
 
-  let(:inheriting_model)    { InheritingTaggableModel.new(:name => 'Inheriting Taggable Model') }
-  let(:altered_inheriting)  { AlteredInheritingTaggableModel.new(:name => 'Altered Inheriting Model') }
+  let(:inheriting_model) { InheritingTaggableModel.new(name: 'Inheriting Taggable Model') }
+  let(:altered_inheriting) { AlteredInheritingTaggableModel.new(name: 'Altered Inheriting Model') }
 
   1.upto(4) do |n|
-    let(:"inheriting_#{n}") { InheritingTaggableModel.new(:name => "Inheriting Model #{n}") }
+    let(:"inheriting_#{n}") { InheritingTaggableModel.new(name: "Inheriting Model #{n}") }
   end
 
-  let(:student)             { Student.create! }
+  let(:student) { Student.create! }
 
   describe 'tag contexts' do
     it 'should pass on to STI-inherited models' do
@@ -49,15 +49,15 @@ describe 'Single Table Inheritance' do
     end
 
     it 'should find objects with tags of matching contexts' do
-      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to      include(inheriting_2)
-      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to_not  include(inheriting_3)
-      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to_not  include(inheriting_4)
-      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to_not  include(taggable)
+      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to include(inheriting_2)
+      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to_not include(inheriting_3)
+      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to_not include(inheriting_4)
+      expect(inheriting_1.find_matching_contexts(:offerings, :needs)).to_not include(taggable)
 
-      expect(inheriting_1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to     include(inheriting_2)
+      expect(inheriting_1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to include(inheriting_2)
       expect(inheriting_1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to_not include(inheriting_3)
       expect(inheriting_1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to_not include(inheriting_4)
-      expect(inheriting_1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to     include(taggable)
+      expect(inheriting_1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to include(taggable)
     end
 
     it 'should not include the object itself in the list of related objects with tags of matching contexts' do
@@ -101,11 +101,11 @@ describe 'Single Table Inheritance' do
 
   describe 'tag list' do
     before do
-      @inherited_same = InheritingTaggableModel.new(:name => 'inherited same')
-      @inherited_different = AlteredInheritingTaggableModel.new(:name => 'inherited different')
+      @inherited_same = InheritingTaggableModel.new(name: 'inherited same')
+      @inherited_different = AlteredInheritingTaggableModel.new(name: 'inherited different')
     end
 
-    #TODO => shared example
+    #TODO, shared example
     it 'should be able to save tags for inherited models' do
       inheriting_model.tag_list = 'bob, kelso'
       inheriting_model.save
@@ -121,8 +121,8 @@ describe 'Single Table Inheritance' do
     it 'should be able to add on contexts only to some subclasses' do
       altered_inheriting.part_list = 'fork, spoon'
       altered_inheriting.save
-      expect(InheritingTaggableModel.tagged_with('fork', :on => :parts)).to be_empty
-      expect(AlteredInheritingTaggableModel.tagged_with('fork', :on => :parts).first).to eq(altered_inheriting)
+      expect(InheritingTaggableModel.tagged_with('fork', on: :parts)).to be_empty
+      expect(AlteredInheritingTaggableModel.tagged_with('fork', on: :parts).first).to eq(altered_inheriting)
     end
 
     it 'should have different tag_counts_on for inherited models' do
@@ -131,9 +131,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tag_counts_on(:tags, :order => 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should have different tags_on for inherited models' do
@@ -142,9 +142,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tags_on(:tags, :order => 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should store same tag without validation conflict' do
@@ -154,34 +154,34 @@ describe 'Single Table Inheritance' do
       inheriting_model.tag_list = 'one'
       inheriting_model.save!
 
-      inheriting_model.update_attributes! :name => 'foo'
+      inheriting_model.update_attributes! name: 'foo'
     end
   end
 
   describe 'ownership' do
     it 'should have taggings' do
-      student.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
+      student.tag(taggable, with: 'ruby,scheme', on: :tags)
       expect(student.owned_taggings.count).to eq(2)
     end
 
     it 'should have tags' do
-      student.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
+      student.tag(taggable, with: 'ruby,scheme', on: :tags)
       expect(student.owned_tags.count).to eq(2)
     end
 
     it 'should return tags for the inheriting tagger' do
-      student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
+      student.tag(taggable, with: 'ruby, scheme', on: :tags)
       expect(taggable.tags_from(student)).to eq(%w(ruby scheme))
     end
 
     it 'returns owner tags on the tagger' do
-      student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
+      student.tag(taggable, with: 'ruby, scheme', on: :tags)
       expect(taggable.owner_tags_on(student, :tags).count).to eq(2)
     end
 
     it 'should scope objects returned by tagged_with by owners' do
-      student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
-      expect(TaggableModel.tagged_with(%w(ruby scheme), :owned_by => student).count).to eq(1)
+      student.tag(taggable, with: 'ruby, scheme', on: :tags)
+      expect(TaggableModel.tagged_with(%w(ruby scheme), owned_by: student).count).to eq(1)
     end
   end
 

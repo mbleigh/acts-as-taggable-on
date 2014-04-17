@@ -11,15 +11,15 @@ describe ActsAsTaggableOn::Tag do
   before(:each) do
     clean_database!
     @tag = ActsAsTaggableOn::Tag.new
-    @user = TaggableModel.create(:name => 'Pablo')
+    @user = TaggableModel.create(name: 'Pablo')
   end
 
   describe 'named like any' do
     context 'case insensitive collation and unique index on tag name' do
       if described_class.using_case_insensitive_collation?
         before(:each) do
-          ActsAsTaggableOn::Tag.create(:name => 'Awesome')
-          ActsAsTaggableOn::Tag.create(:name => 'epic')
+          ActsAsTaggableOn::Tag.create(name: 'Awesome')
+          ActsAsTaggableOn::Tag.create(name: 'epic')
         end
 
         it 'should find both tags' do
@@ -34,9 +34,9 @@ describe ActsAsTaggableOn::Tag do
       end
 
       before(:each) do
-        ActsAsTaggableOn::Tag.create(:name => 'Awesome')
-        ActsAsTaggableOn::Tag.create(:name => 'awesome')
-        ActsAsTaggableOn::Tag.create(:name => 'epic')
+        ActsAsTaggableOn::Tag.create(name: 'Awesome')
+        ActsAsTaggableOn::Tag.create(name: 'awesome')
+        ActsAsTaggableOn::Tag.create(name: 'epic')
       end
 
       it 'should find both tags' do
@@ -150,7 +150,7 @@ describe ActsAsTaggableOn::Tag do
 
   it 'should require a name' do
     @tag.valid?
-    #TODO we should find another way to check this
+    #TODO, we should find another way to check this
     expect(@tag.errors[:name]).to eq(["can't be blank"])
 
     @tag.name = 'something'
@@ -162,7 +162,7 @@ describe ActsAsTaggableOn::Tag do
   it 'should limit the name length to 255 or less characters' do
     @tag.name = 'fgkgnkkgjymkypbuozmwwghblmzpqfsgjasflblywhgkwndnkzeifalfcpeaeqychjuuowlacmuidnnrkprgpcpybarbkrmziqihcrxirlokhnzfvmtzixgvhlxzncyywficpraxfnjptxxhkqmvicbcdcynkjvziefqzyndxkjmsjlvyvbwraklbalykyxoliqdlreeykuphdtmzfdwpphmrqvwvqffojkqhlzvinqajsxbszyvrqqyzusxranr'
     @tag.valid?
-    #TODO we should find another way to check this
+    #TODO, we should find another way to check this
     expect(@tag.errors[:name]).to eq(['is too long (maximum is 255 characters)'])
 
     @tag.name = 'fgkgnkkgjymkypbuozmwwghblmzpqfsgjasflblywhgkwndnkzeifalfcpeaeqychjuuowlacmuidnnrkprgpcpybarbkrmziqihcrxirlokhnzfvmtzixgvhlxzncyywficpraxfnjptxxhkqmvicbcdcynkjvziefqzyndxkjmsjlvyvbwraklbalykyxoliqdlreeykuphdtmzfdwpphmrqvwvqffojkqhlzvinqajsxbszyvrqqyzusxran'
@@ -172,7 +172,7 @@ describe ActsAsTaggableOn::Tag do
 
   it 'should equal a tag with the same name' do
     @tag.name = 'awesome'
-    new_tag = ActsAsTaggableOn::Tag.new(:name => 'awesome')
+    new_tag = ActsAsTaggableOn::Tag.new(name: 'awesome')
     expect(new_tag).to eq(@tag)
   end
 
@@ -190,7 +190,7 @@ describe ActsAsTaggableOn::Tag do
   it 'have named_scope named_like(something)' do
     @tag.name = 'cool'
     @tag.save!
-    @another_tag = ActsAsTaggableOn::Tag.create!(:name => 'coolip')
+    @another_tag = ActsAsTaggableOn::Tag.create!(name: 'coolip')
     expect(ActsAsTaggableOn::Tag.named_like('cool')).to include(@tag, @another_tag)
   end
 
@@ -198,8 +198,8 @@ describe ActsAsTaggableOn::Tag do
     before(:each) do
       @tag.name = 'cool'
       @tag.save
-      @another_tag = ActsAsTaggableOn::Tag.create!(:name => 'coo%')
-      @another_tag2 = ActsAsTaggableOn::Tag.create!(:name => 'coolish')
+      @another_tag = ActsAsTaggableOn::Tag.create!(name: 'coo%')
+      @another_tag2 = ActsAsTaggableOn::Tag.create!(name: 'coolish')
     end
 
     it "return escaped result when '%' char present in tag" do
@@ -244,7 +244,7 @@ describe ActsAsTaggableOn::Tag do
       end
 
       it 'should have a named_scope named(something) that matches exactly' do
-        uppercase_tag = ActsAsTaggableOn::Tag.create(:name => 'Cool')
+        uppercase_tag = ActsAsTaggableOn::Tag.create(name: 'Cool')
         @tag.name = 'cool'
         @tag.save!
 
@@ -263,9 +263,9 @@ describe ActsAsTaggableOn::Tag do
   end
 
   describe 'name uniqeness validation' do
-    let(:duplicate_tag) { ActsAsTaggableOn::Tag.new(:name => 'ror') }
+    let(:duplicate_tag) { ActsAsTaggableOn::Tag.new(name: 'ror') }
 
-    before { ActsAsTaggableOn::Tag.create(:name => 'ror') }
+    before { ActsAsTaggableOn::Tag.create(name: 'ror') }
 
     context "when don't need unique names" do
       include_context 'without unique index'

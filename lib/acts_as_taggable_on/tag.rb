@@ -7,13 +7,13 @@ module ActsAsTaggableOn
 
     ### ASSOCIATIONS:
 
-    has_many :taggings, :dependent => :destroy, :class_name => 'ActsAsTaggableOn::Tagging'
+    has_many :taggings, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging'
 
     ### VALIDATIONS:
 
     validates_presence_of :name
-    validates_uniqueness_of :name, :if => :validates_name_uniqueness?
-    validates_length_of :name, :maximum => 255
+    validates_uniqueness_of :name, if: :validates_name_uniqueness?
+    validates_length_of :name, maximum: 255
 
     # monkey patch this method if don't need name uniqueness validation
     def validates_name_uniqueness?
@@ -62,7 +62,7 @@ module ActsAsTaggableOn
       if (ActsAsTaggableOn.strict_case_match)
         self.find_or_create_all_with_like_by_name([name]).first
       else
-        named_like(name).first || create(:name => name)
+        named_like(name).first || create(name: name)
       end
     end
 
@@ -75,9 +75,9 @@ module ActsAsTaggableOn
 
       list.map do |tag_name|
         comparable_tag_name = comparable_name(tag_name)
-        existing_tag = existing_tags.detect { |tag| comparable_name(tag.name) == comparable_tag_name }
+        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
         begin
-          existing_tag || Tag.create(:name => tag_name)
+          existing_tag || Tag.create(name: tag_name)
         rescue ActiveRecord::RecordNotUnique
           # Postgres aborts the current transaction with
           # PG::InFailedSqlTransaction: ERROR:  current transaction is aborted, commands ignored until end of transaction block

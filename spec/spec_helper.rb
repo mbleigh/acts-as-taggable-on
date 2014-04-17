@@ -32,13 +32,12 @@ def logger_off
   ActiveRecord::Base.logger.level = ::Logger::UNKNOWN
 end
 
-
 # set adapter to use, default is sqlite3
 # to use an alternative adapter run => rake spec DB='postgresql'
 db_name = ENV['DB'] || 'sqlite3'
 database_yml = File.expand_path('../internal/config/database.yml', __FILE__)
 
-if File.exists?(database_yml)
+if File.exist?(database_yml)
   active_record_configuration = YAML.load_file(database_yml)
 
   ActiveRecord::Base.configurations = active_record_configuration
@@ -46,7 +45,7 @@ if File.exists?(database_yml)
 
   begin
     #activerecord 4 uses symbol
-    #todo remove when activerecord 3 support is dropped
+    #TODO, remove when activerecord 3 support is dropped
     if ActsAsTaggableOn::Utils.active_record4?
       ActiveRecord::Base.establish_connection(db_name.to_sym)
     else
@@ -57,7 +56,7 @@ if File.exists?(database_yml)
     case db_name
       when /mysql/
         ActiveRecord::Base.establish_connection(config.merge('database' => nil))
-        ActiveRecord::Base.connection.create_database(config['database'], {:charset => 'utf8', :collation => 'utf8_unicode_ci'})
+        ActiveRecord::Base.connection.create_database(config['database'], {charset: 'utf8', collation: 'utf8_unicode_ci'})
       when 'postgresql'
         ActiveRecord::Base.establish_connection(config.merge('database' => 'postgres', 'schema_search_path' => 'public'))
         ActiveRecord::Base.connection.create_database(config['database'], config.merge('encoding' => 'utf8'))

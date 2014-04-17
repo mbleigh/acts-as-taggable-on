@@ -120,7 +120,7 @@ module ActsAsTaggableOn
     def clean!
       reject!(&:blank?)
       map!(&:strip)
-      map!{ |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
+      map! { |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
       uniq!
@@ -130,9 +130,9 @@ module ActsAsTaggableOn
       options = args.last.is_a?(Hash) ? args.pop : {}
       options.assert_valid_keys :parse
 
-      if options[:parse]
-        args.map! { |a| self.class.from(a) }
-      end
+
+      args.map! { |a| self.class.from(a) } if options[:parse]
+
 
       args.flatten!
     end

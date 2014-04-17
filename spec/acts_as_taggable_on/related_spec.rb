@@ -7,11 +7,11 @@ describe 'Acts As Taggable On' do
 
   describe 'Related Objects' do
 
-    #TODO shared example
+    #TODO, shared example
     it 'should find related objects based on tag names on context' do
-      taggable1 = TaggableModel.create!(:name => 'Taggable 1')
-      taggable2 = TaggableModel.create!(:name => 'Taggable 2')
-      taggable3 = TaggableModel.create!(:name => 'Taggable 3')
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+      taggable2 = TaggableModel.create!(name: 'Taggable 2')
+      taggable3 = TaggableModel.create!(name: 'Taggable 3')
 
       taggable1.tag_list = 'one, two'
       taggable1.save
@@ -27,9 +27,9 @@ describe 'Acts As Taggable On' do
     end
 
     it 'finds related tags for ordered taggable on' do
-      taggable1 = OrderedTaggableModel.create!(:name => 'Taggable 1')
-      taggable2 = OrderedTaggableModel.create!(:name => 'Taggable 2')
-      taggable3 = OrderedTaggableModel.create!(:name => 'Taggable 3')
+      taggable1 = OrderedTaggableModel.create!(name: 'Taggable 1')
+      taggable2 = OrderedTaggableModel.create!(name: 'Taggable 2')
+      taggable3 = OrderedTaggableModel.create!(name: 'Taggable 3')
 
       taggable1.colour_list = 'one, two'
       taggable1.save
@@ -45,9 +45,9 @@ describe 'Acts As Taggable On' do
     end
 
     it 'should find related objects based on tag names on context - non standard id' do
-      taggable1 = NonStandardIdTaggableModel.create!(:name => 'Taggable 1')
-      taggable2 = NonStandardIdTaggableModel.create!(:name => 'Taggable 2')
-      taggable3 = NonStandardIdTaggableModel.create!(:name => 'Taggable 3')
+      taggable1 = NonStandardIdTaggableModel.create!(name: 'Taggable 1')
+      taggable2 = NonStandardIdTaggableModel.create!(name: 'Taggable 2')
+      taggable3 = NonStandardIdTaggableModel.create!(name: 'Taggable 3')
 
       taggable1.tag_list = 'one, two'
       taggable1.save
@@ -63,9 +63,9 @@ describe 'Acts As Taggable On' do
     end
 
     it 'should find other related objects based on tag names on context' do
-      taggable1 = TaggableModel.create!(:name => 'Taggable 1')
-      taggable2 = OtherTaggableModel.create!(:name => 'Taggable 2')
-      taggable3 = OtherTaggableModel.create!(:name => 'Taggable 3')
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+      taggable2 = OtherTaggableModel.create!(name: 'Taggable 2')
+      taggable3 = OtherTaggableModel.create!(name: 'Taggable 3')
 
       taggable1.tag_list = 'one, two'
       taggable1.save
@@ -81,8 +81,8 @@ describe 'Acts As Taggable On' do
     end
 
     it 'should not include the object itself in the list of related objects' do
-      taggable1 = TaggableModel.create!(:name => 'Taggable 1')
-      taggable2 = TaggableModel.create!(:name => 'Taggable 2')
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+      taggable2 = TaggableModel.create!(name: 'Taggable 2')
 
       taggable1.tag_list = 'one'
       taggable1.save
@@ -95,8 +95,8 @@ describe 'Acts As Taggable On' do
     end
 
     it 'should not include the object itself in the list of related objects - non standard id' do
-      taggable1 = NonStandardIdTaggableModel.create!(:name => 'Taggable 1')
-      taggable2 = NonStandardIdTaggableModel.create!(:name => 'Taggable 2')
+      taggable1 = NonStandardIdTaggableModel.create!(name: 'Taggable 1')
+      taggable2 = NonStandardIdTaggableModel.create!(name: 'Taggable 2')
 
       taggable1.tag_list = 'one'
       taggable1.save
@@ -109,9 +109,9 @@ describe 'Acts As Taggable On' do
     end
 
 		context 'Ignored Tags' do
-			let(:taggable1) { TaggableModel.create!(:name => 'Taggable 1') }
-			let(:taggable2) { TaggableModel.create!(:name => 'Taggable 2') }
-			let(:taggable3) { TaggableModel.create!(:name => 'Taggable 3') }
+			let(:taggable1) { TaggableModel.create!(name: 'Taggable 1') }
+			let(:taggable2) { TaggableModel.create!(name: 'Taggable 2') }
+			let(:taggable3) { TaggableModel.create!(name: 'Taggable 3') }
 			before(:each) do
 				taggable1.tag_list = 'one, two, four'
 				taggable1.save
@@ -123,21 +123,21 @@ describe 'Acts As Taggable On' do
 				taggable3.save
 			end
 			it 'should not include ignored tags in related search' do
-        expect(taggable1.find_related_tags(:ignore => 'two')).to_not include(taggable2)
-        expect(taggable1.find_related_tags(:ignore => 'two')).to include(taggable3)
+        expect(taggable1.find_related_tags(ignore: 'two')).to_not include(taggable2)
+        expect(taggable1.find_related_tags(ignore: 'two')).to include(taggable3)
 			end
 
 			it 'should accept array of ignored tags' do
-				taggable4 = TaggableModel.create!(:name => 'Taggable 4')
+				taggable4 = TaggableModel.create!(name: 'Taggable 4')
 				taggable4.tag_list = 'four'
 				taggable4.save
 
-        expect(taggable1.find_related_tags(:ignore => ['two', 'four'])).to_not include(taggable2)
-        expect(taggable1.find_related_tags(:ignore => ['two', 'four'])).to_not include(taggable4)
+        expect(taggable1.find_related_tags(ignore: ['two', 'four'])).to_not include(taggable2)
+        expect(taggable1.find_related_tags(ignore: ['two', 'four'])).to_not include(taggable4)
 			end
 
 			it 'should accept symbols as ignored tags' do
-        expect(taggable1.find_related_tags(:ignore => :two)).to_not include(taggable2)
+        expect(taggable1.find_related_tags(ignore: :two)).to_not include(taggable2)
 			end
 		end
 

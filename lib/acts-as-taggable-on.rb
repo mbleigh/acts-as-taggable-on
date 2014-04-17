@@ -26,7 +26,7 @@ module ActsAsTaggableOn
   def self.glue
     setting = @configuration.delimiter
     delimiter = setting.kind_of?(Array) ? setting[0] : setting
-    delimiter.ends_with?(" ") ? delimiter : "#{delimiter} "
+    delimiter.ends_with?(' ') ? delimiter : "#{delimiter} "
   end
 
   class Configuration
@@ -44,7 +44,6 @@ module ActsAsTaggableOn
 
   setup
 end
-
 
 require 'acts_as_taggable_on/utils'
 

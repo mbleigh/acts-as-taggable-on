@@ -7,8 +7,8 @@ describe ActsAsTaggableOn::Tagging do
   end
 
   it 'should not be valid with a invalid tag' do
-    @tagging.taggable = TaggableModel.create(:name => 'Bob Jones')
-    @tagging.tag = ActsAsTaggableOn::Tag.new(:name => '')
+    @tagging.taggable = TaggableModel.create(name: 'Bob Jones')
+    @tagging.tag = ActsAsTaggableOn::Tag.new(name: '')
     @tagging.context = 'tags'
 
     expect(@tagging).to_not be_valid
@@ -17,11 +17,11 @@ describe ActsAsTaggableOn::Tagging do
   end
 
   it 'should not create duplicate taggings' do
-    @taggable = TaggableModel.create(:name => 'Bob Jones')
-    @tag = ActsAsTaggableOn::Tag.create(:name => 'awesome')
+    @taggable = TaggableModel.create(name: 'Bob Jones')
+    @tag = ActsAsTaggableOn::Tag.create(name: 'awesome')
 
     expect(lambda {
-      2.times { ActsAsTaggableOn::Tagging.create(:taggable => @taggable, :tag => @tag, :context => 'tags') }
+      2.times { ActsAsTaggableOn::Tagging.create(taggable: @taggable, tag: @tag, context: 'tags') }
     }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
   
