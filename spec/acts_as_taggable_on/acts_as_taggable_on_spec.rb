@@ -20,7 +20,7 @@ describe "Acts As Taggable On" do
     end
 
     it "should respond 'true' to preserve_tag_order?" do
-      expect(@taggable.class.preserve_tag_order?).to be_true
+      expect(@taggable.class.preserve_tag_order?).to eq(true)
     end
   end
 
@@ -57,7 +57,7 @@ describe "Acts As Taggable On" do
     end
 
     it "should respond 'false' to preserve_tag_order?" do
-      expect(@taggable.class.preserve_tag_order?).to be_false
+      expect(@taggable.class.preserve_tag_order?).to eq(false)
     end
 
     it 'should generate an association for each tag type' do
