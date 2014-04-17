@@ -31,9 +31,13 @@ module ActsAsTaggableOn
       Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
     end
 
+    def active_record4?
+      ::ActiveRecord::VERSION::MAJOR  == 4
+    end
+
 
     def active_record42?
-      ::ActiveRecord::VERSION::MAJOR  == 4  && ::ActiveRecord::VERSION::MINOR >= 2
+      active_record4?  && ::ActiveRecord::VERSION::MINOR >= 2
     end
 
 
