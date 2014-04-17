@@ -35,11 +35,9 @@ module ActsAsTaggableOn
       ::ActiveRecord::VERSION::MAJOR  == 4
     end
 
-
     def active_record42?
       active_record4?  && ::ActiveRecord::VERSION::MINOR >= 2
     end
-
 
     private
 

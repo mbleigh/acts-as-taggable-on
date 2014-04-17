@@ -1,6 +1,6 @@
 module ActsAsTaggableOn::Compatibility
   def has_many_with_compatibility(name, options = {}, &extention)
-    if ActiveRecord::VERSION::MAJOR >= 4
+    if ActsAsTaggableOn::Utils.active_record4?
       scope, opts = build_scope_and_options(options)
       has_many(name, scope, opts, &extention)
     else
@@ -13,11 +13,12 @@ module ActsAsTaggableOn::Compatibility
 
     unless scope_opts.empty?
       scope = lambda do
-        scope_opts.inject(self) { |result, hash| result.send *hash }
+        scope_opts.inject(self) { |result, hash| result.send(*hash) }
       end
+      return [scope, opts]
     end
 
-    [defined?(scope) ? scope : nil, opts]
+    [nil,opts]
   end
 
   def parse_options(opts)

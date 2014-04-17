@@ -18,11 +18,11 @@ module ActsAsTaggableOn::Taggable
             end
 
             def top_#{tag_type}(limit = 10)
-              tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+              tag_counts_on('#{tag_type}', order: 'count desc', limit: limit.to_i)
             end
 
             def self.top_#{tag_type}(limit = 10)
-              tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+              tag_counts_on('#{tag_type}', order: 'count desc', limit: limit.to_i)
             end
           RUBY
         end
@@ -34,11 +34,11 @@ module ActsAsTaggableOn::Taggable
       end
 
       def tag_counts_on(context, options = {})
-        all_tag_counts(options.merge({:on => context.to_s}))
+        all_tag_counts(options.merge({on: context.to_s}))
       end
 
       def tags_on(context, options = {})
-        all_tags(options.merge({:on => context.to_s}))
+        all_tags(options.merge({on: context.to_s}))
       end
 
       ##
@@ -75,7 +75,6 @@ module ActsAsTaggableOn::Taggable
         tag_scope_joins(tag_scope, tagging_scope)
       end
 
-
       ##
       # Calculate the tag counts for all tags.
       #
@@ -97,7 +96,6 @@ module ActsAsTaggableOn::Taggable
         ## Generate joins:
         taggable_join = "INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
         taggable_join << " AND #{table_name}.#{inheritance_column} = '#{name}'" unless descends_from_active_record? # Current model is STI descendant, so add type checking to the join condition
-
 
         ## Generate scope:
         tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id, COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) AS tags_count")
@@ -154,12 +152,12 @@ module ActsAsTaggableOn::Taggable
     end
 
     def tag_counts_on(context, options={})
-      self.class.tag_counts_on(context, options.merge(:id => id))
+      self.class.tag_counts_on(context, options.merge(id: id))
     end
 
     module CalculationMethods
       def count(column_name = nil)
-        return super(column_name) if ActsAsTaggableOn::Utils.active_record42?
+        return super(column_name) if ActsAsTaggableOn::Utils.active_record4?
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
         super(:all)
       end

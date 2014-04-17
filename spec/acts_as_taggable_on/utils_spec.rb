@@ -5,7 +5,7 @@ describe ActsAsTaggableOn::Utils do
     before(:each) do
       clean_database!
       TaggableModel.acts_as_taggable_on(:tags, :languages, :skills, :needs, :offerings)
-      @taggable = TaggableModel.new(:name => 'Bob Jones')
+      @taggable = TaggableModel.new(name: 'Bob Jones')
     end
 
     it 'should return \'ILIKE\' when the adapter is PostgreSQL' do

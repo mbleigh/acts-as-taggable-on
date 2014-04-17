@@ -4,13 +4,14 @@ describe ActsAsTaggableOn::TagsHelper do
   before(:each) do
     clean_database!
 
-    @bob = TaggableModel.create(:name => 'Bob Jones', :language_list => 'ruby, php')
-    @tom = TaggableModel.create(:name => 'Tom Marley', :language_list => 'ruby, java')
-    @eve = TaggableModel.create(:name => 'Eve Nodd', :language_list => 'ruby, c++')
+    @bob = TaggableModel.create(name: 'Bob Jones', language_list: 'ruby, php')
+    @tom = TaggableModel.create(name: 'Tom Marley', language_list: 'ruby, java')
+    @eve = TaggableModel.create(name: 'Eve Nodd', language_list: 'ruby, c++')
 
-    @helper = class Helper
-      include ActsAsTaggableOn::TagsHelper
-    end.new
+    @helper =
+        class Helper
+          include ActsAsTaggableOn::TagsHelper
+        end.new
   end
 
   it 'should yield the proper css classes' do
@@ -27,9 +28,9 @@ describe ActsAsTaggableOn::TagsHelper do
   end
 
   it 'should handle tags with zero counts (build for empty)' do
-    ActsAsTaggableOn::Tag.create(:name => 'php')
-    ActsAsTaggableOn::Tag.create(:name => 'java')
-    ActsAsTaggableOn::Tag.create(:name => 'c++')
+    ActsAsTaggableOn::Tag.create(name: 'php')
+    ActsAsTaggableOn::Tag.create(name: 'java')
+    ActsAsTaggableOn::Tag.create(name: 'c++')
 
     tags = {}
 
