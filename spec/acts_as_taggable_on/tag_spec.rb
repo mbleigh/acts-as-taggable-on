@@ -23,7 +23,7 @@ describe ActsAsTaggableOn::Tag do
         end
 
         it 'should find both tags' do
-          expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic))).to have(2).items
+          expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic)).count).to eq(2)
         end
       end
     end
@@ -40,7 +40,7 @@ describe ActsAsTaggableOn::Tag do
       end
 
       it 'should find both tags' do
-        expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic))).to have(3).items
+        expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic)).count).to eq(3)
       end
     end
   end
@@ -270,7 +270,7 @@ describe ActsAsTaggableOn::Tag do
     context "when don't need unique names" do
       include_context 'without unique index'
       it 'should not run uniqueness validation' do
-        duplicate_tag.stub(:validates_name_uniqueness?).and_return(false)
+        allow(duplicate_tag).to receive(:validates_name_uniqueness?) { false }
         duplicate_tag.save
         expect(duplicate_tag).to be_persisted
       end
@@ -284,7 +284,7 @@ describe ActsAsTaggableOn::Tag do
       it 'add error to name' do
         duplicate_tag.save
 
-        expect(duplicate_tag).to have(1).errors
+        expect(duplicate_tag.errors.size).to eq(1)
         expect(duplicate_tag.errors.messages[:name]).to include('has already been taken')
       end
     end

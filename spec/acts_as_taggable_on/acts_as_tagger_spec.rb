@@ -15,11 +15,11 @@ describe 'acts_as_tagger' do
     end
 
     it 'should return true from the class-side #is_tagger?' do
-      expect(User.is_tagger?).to be_true
+      expect(User.is_tagger?).to eq(true)
     end
 
     it 'should return false from the base #is_tagger?' do
-      expect(ActiveRecord::Base.is_tagger?).to be_false
+      expect(ActiveRecord::Base.is_tagger?).to eq(false)
     end
 
     it 'should add #is_tagger? query method to the singleton' do
@@ -102,7 +102,7 @@ describe 'acts_as_tagger' do
       end
 
       it 'should not delete other taggers tags' do
-        expect(@user_x.owned_tags).to have(2).items
+        expect(@user_x.owned_tags.count).to eq(2)
       end
 
       it 'should not delete original tags' do

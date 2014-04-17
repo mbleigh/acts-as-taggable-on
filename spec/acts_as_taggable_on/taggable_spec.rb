@@ -17,23 +17,23 @@ describe 'Taggable To Preserve Order' do
 
   it 'should have tag associations' do
     [:tags, :colours].each do |type|
-      expect(@taggable.respond_to?(type)).to be_true
-      expect(@taggable.respond_to?("#{type.to_s.singularize}_taggings")).to be_true
+      expect(@taggable.respond_to?(type)).to eq(true)
+      expect(@taggable.respond_to?("#{type.to_s.singularize}_taggings")).to eq(true)
     end
   end
 
   it 'should have tag methods' do
     [:tags, :colours].each do |type|
-      expect(@taggable.respond_to?("#{type.to_s.singularize}_list")).to be_true
-      expect(@taggable.respond_to?("#{type.to_s.singularize}_list=")).to be_true
-      expect(@taggable.respond_to?("all_#{type.to_s}_list")).to be_true
+      expect(@taggable.respond_to?("#{type.to_s.singularize}_list")).to eq(true)
+      expect(@taggable.respond_to?("#{type.to_s.singularize}_list=")).to eq(true)
+      expect(@taggable.respond_to?("all_#{type.to_s}_list")).to eq(true)
     end
   end
 
   it 'should return tag list in the order the tags were created' do
     # create
     @taggable.tag_list = 'rails, ruby, css'
-    expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to be_true
+    expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
     expect(lambda {
       @taggable.save
@@ -67,7 +67,7 @@ describe 'Taggable To Preserve Order' do
   it 'should return tag objects in the order the tags were created' do
     # create
     @taggable.tag_list = 'pow, ruby, rails'
-    expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to be_true
+    expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
     expect(lambda {
       @taggable.save
@@ -145,7 +145,7 @@ describe 'Taggable' do
 
   it 'should be able to create tags' do
     @taggable.skill_list = 'ruby, rails, css'
-    expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to be_true
+    expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
     expect(lambda {
       @taggable.save
@@ -180,11 +180,11 @@ describe 'Taggable' do
     @taggable.skill_list = 'ruby, rails, css'
     @taggable.save
     @taggable.reload
-    expect(@taggable).to have(3).skills
+    expect(@taggable.skills.count).to eq(3)
     @taggable.skill_list = 'ruby, rails'
     @taggable.save
     @taggable.reload
-    expect(@taggable).to have(2).skills
+    expect(@taggable.skills.count).to eq(2)
   end
 
   it 'should be able to select taggables by subset of tags using ActiveRelation methods' do
@@ -335,14 +335,14 @@ describe 'Taggable' do
     frank = TaggableModel.create(:name => 'Frank', :tag_list => 'ruby, rails')
     charlie = TaggableModel.create(:name => 'Charlie', :skill_list => 'ruby, java')
 
-    expect(TaggableModel.tagged_with('rails').all_tag_counts).to have(3).items
-    expect(TaggableModel.tagged_with('rails').all_tag_counts.any? { |tag| tag.name == 'java' }).to be_false
+    expect(TaggableModel.tagged_with('rails').all_tag_counts.size).to eq(3)
+    expect(TaggableModel.tagged_with('rails').all_tag_counts.any? { |tag| tag.name == 'java' }).to eq(false)
 
     # Test specific join syntaxes:
     frank.untaggable_models.create!
-    expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tag_counts).to have(2).items
-    expect(TaggableModel.tagged_with('rails').joins(:untaggable_models => :taggable_model).all_tag_counts).to have(2).items
-    expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tag_counts).to have(2).items
+    expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tag_counts.size).to eq(2)
+    expect(TaggableModel.tagged_with('rails').joins(:untaggable_models => :taggable_model).all_tag_counts.size).to eq(2)
+    expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tag_counts.size).to eq(2)
   end
 
   it 'should only return tags for the available scope' do
@@ -350,14 +350,14 @@ describe 'Taggable' do
     frank = TaggableModel.create(:name => 'Frank', :tag_list => 'ruby, rails')
     charlie = TaggableModel.create(:name => 'Charlie', :skill_list => 'ruby, java')
 
-    expect(TaggableModel.tagged_with('rails').all_tags).to have(3).items
-    expect(TaggableModel.tagged_with('rails').all_tags.any? { |tag| tag.name == 'java' }).to be_false
+    expect(TaggableModel.tagged_with('rails').all_tags.count).to eq(3)
+    expect(TaggableModel.tagged_with('rails').all_tags.any? { |tag| tag.name == 'java' }).to eq(false)
 
     # Test specific join syntaxes:
     frank.untaggable_models.create!
-    expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tags).to have(2).items
-    expect(TaggableModel.tagged_with('rails').joins({:untaggable_models => :taggable_model}).all_tags).to have(2).items
-    expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tags).to have(2).items
+    expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tags.size).to eq(2)
+    expect(TaggableModel.tagged_with('rails').joins({:untaggable_models => :taggable_model}).all_tags.size).to eq(2)
+    expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tags.size).to eq(2)
   end
 
   it 'should be able to set a custom tag context list' do
@@ -518,7 +518,7 @@ describe 'Taggable' do
     it 'should not remove tags when creating associated objects' do
       @taggable.untaggable_models.create!
       @taggable.reload
-      expect(@taggable.tag_list).to have(2).items
+      expect(@taggable.tag_list.size).to eq(2)
     end
   end
 
@@ -573,7 +573,7 @@ describe 'Taggable' do
 
     it 'should be able to create tags' do
       @taggable.skill_list = 'ruby, rails, css'
-      expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to be_true
+      expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to eq(true)
 
       expect(lambda {
         @taggable.save
@@ -613,7 +613,7 @@ describe 'Taggable' do
         end
 
         it 'flags tag_list as changed' do
-          expect(@taggable.tag_list_changed?).to be_true
+          expect(@taggable.tag_list_changed?).to eq(true)
         end
 
         it 'preserves original value' do
@@ -631,7 +631,7 @@ describe 'Taggable' do
         end
 
         it 'is not flagged as changed' do
-          expect(@taggable.tag_list_changed?).to be_false
+          expect(@taggable.tag_list_changed?).to eq(false)
         end
 
         it 'does not show any changes to the taggable item' do
@@ -672,7 +672,7 @@ describe 'Taggable' do
         end
 
         it 'flags language_list as changed' do
-          expect(@taggable.language_list_changed?).to be_true
+          expect(@taggable.language_list_changed?).to eq(true)
         end
 
         it 'preserves original value' do
@@ -694,7 +694,7 @@ describe 'Taggable' do
         end
 
         it 'is not flagged as changed' do
-          expect(@taggable.language_list_changed?).to be_false
+          expect(@taggable.language_list_changed?).to eq(false)
         end
 
         it 'does not show any changes to the taggable item' do
@@ -706,7 +706,7 @@ describe 'Taggable' do
 
   describe 'Autogenerated methods' do
     it 'should be overridable' do
-      expect(TaggableModel.create(:tag_list => 'woo').tag_list_submethod_called).to be_true
+      expect(TaggableModel.create(:tag_list => 'woo').tag_list_submethod_called).to eq(true)
     end
   end
 end

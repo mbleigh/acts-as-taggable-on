@@ -161,12 +161,12 @@ describe 'Single Table Inheritance' do
   describe 'ownership' do
     it 'should have taggings' do
       student.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
-      expect(student.owned_taggings).to have(2).tags
+      expect(student.owned_taggings.count).to eq(2)
     end
 
     it 'should have tags' do
       student.tag(taggable, :with=>'ruby,scheme', :on=>:tags)
-      expect(student.owned_tags).to have(2).tags
+      expect(student.owned_tags.count).to eq(2)
     end
 
     it 'should return tags for the inheriting tagger' do
@@ -176,12 +176,12 @@ describe 'Single Table Inheritance' do
 
     it 'returns owner tags on the tagger' do
       student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
-      expect(taggable.owner_tags_on(student, :tags)).to have(2).tags
+      expect(taggable.owner_tags_on(student, :tags).count).to eq(2)
     end
 
     it 'should scope objects returned by tagged_with by owners' do
       student.tag(taggable, :with => 'ruby, scheme', :on => :tags)
-      expect(TaggableModel.tagged_with(%w(ruby scheme), :owned_by => student)).to have(1).tag
+      expect(TaggableModel.tagged_with(%w(ruby scheme), :owned_by => student).count).to eq(1)
     end
   end
 
