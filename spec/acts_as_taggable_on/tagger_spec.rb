@@ -40,7 +40,9 @@ describe 'Tagger' do
     @user2.tag(@taggable3, :with => 'ruby', :on => :tags)
 
     tags = TaggableModel.tagged_with(%w(ruby java), :owned_by => @user, :any => true)
-    expect(tags).to eq([@taggable, @taggable2])
+    expect(tags).to include(@taggable,@taggable2)
+    expect(tags.count).to eq(2)
+
   end
 
   it 'only returns objects tagged by owned_by when exclude is true' do
