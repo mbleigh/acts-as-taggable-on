@@ -1,9 +1,9 @@
-require "active_record"
-require "active_record/version"
-require "active_support/core_ext/module"
-require "action_view"
+require 'active_record'
+require 'active_record/version'
+require 'active_support/core_ext/module'
+require 'action_view'
 
-require "digest/sha1"
+require 'digest/sha1'
 
 module ActsAsTaggableOn
   class DuplicateTagError < StandardError
@@ -46,22 +46,22 @@ module ActsAsTaggableOn
 end
 
 
-require "acts_as_taggable_on/utils"
+require 'acts_as_taggable_on/utils'
 
-require "acts_as_taggable_on/taggable"
-require "acts_as_taggable_on/acts_as_taggable_on/compatibility"
-require "acts_as_taggable_on/acts_as_taggable_on/core"
-require "acts_as_taggable_on/acts_as_taggable_on/collection"
-require "acts_as_taggable_on/acts_as_taggable_on/cache"
-require "acts_as_taggable_on/acts_as_taggable_on/ownership"
-require "acts_as_taggable_on/acts_as_taggable_on/related"
-require "acts_as_taggable_on/acts_as_taggable_on/dirty"
+require 'acts_as_taggable_on/taggable'
+require 'acts_as_taggable_on/acts_as_taggable_on/compatibility'
+require 'acts_as_taggable_on/acts_as_taggable_on/core'
+require 'acts_as_taggable_on/acts_as_taggable_on/collection'
+require 'acts_as_taggable_on/acts_as_taggable_on/cache'
+require 'acts_as_taggable_on/acts_as_taggable_on/ownership'
+require 'acts_as_taggable_on/acts_as_taggable_on/related'
+require 'acts_as_taggable_on/acts_as_taggable_on/dirty'
 
-require "acts_as_taggable_on/tagger"
-require "acts_as_taggable_on/tag"
-require "acts_as_taggable_on/tag_list"
-require "acts_as_taggable_on/tags_helper"
-require "acts_as_taggable_on/tagging"
+require 'acts_as_taggable_on/tagger'
+require 'acts_as_taggable_on/tag'
+require 'acts_as_taggable_on/tag_list'
+require 'acts_as_taggable_on/tags_helper'
+require 'acts_as_taggable_on/tagging'
 require 'acts_as_taggable_on/engine'
 
 ActiveSupport.on_load(:active_record) do

@@ -25,7 +25,7 @@ def init_logger
 end
 
 def logger_on
-  ActiveRecord::Base.logger.level = ::Logger::DEBUG
+  ActiveRecord::Base.logger.level = ENV['TRAVIS']? ::Logger::ERROR : ::Logger::DEBUG
 end
 
 def logger_off
