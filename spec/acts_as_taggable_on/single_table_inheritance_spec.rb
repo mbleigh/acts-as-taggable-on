@@ -185,4 +185,31 @@ describe 'Single Table Inheritance' do
     end
   end
 
+  describe 'a subclass of Tag' do
+    let(:company) { Company.new(:name => 'Dewey, Cheatham & Howe') }
+    let(:user) { User.create! }
+
+    subject { Market.create! :name => 'finance' }
+
+    its(:type) { should eql 'Market' }
+
+    it 'sets STI type through string list' do
+      company.market_list = 'law, accounting'
+      company.save!
+      expect(Market.count).to eq(2)
+    end
+
+    it 'does not interfere with a normal Tag context on the same model' do
+      company.location_list = 'cambridge'
+      company.save!
+      ActsAsTaggableOn::Tag.where(name: 'cambridge', type: nil).should_not be_empty
+    end
+
+    it 'is returned with proper type through ownership' do
+      user.tag(company, :with => 'ripoffs, rackets', :on => :markets)
+      tags = company.owner_tags_on(user, :markets)
+      tags.all? { |tag| tag.is_a? Market }.should be_truthy
+    end
+  end
 end
+
