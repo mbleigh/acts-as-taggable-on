@@ -476,15 +476,90 @@ describe 'Taggable' do
   end
 
   context 'Duplicates' do
-    it 'should not create duplicate taggings' do
-      bob = TaggableModel.create(name: 'Bob')
-      expect(-> {
-        bob.tag_list << 'happier' << 'happier'
-        bob.save
-      }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
-    end
+    context 'should not create duplicate taggings' do
+      let(:bob) { TaggableModel.create(name: 'Bob') }
+      context 'case sensitive' do
+        it '#add' do
+          expect(lambda {
+            bob.tag_list.add 'happier'
+            bob.tag_list.add 'happier'
+            bob.tag_list.add 'happier', 'rich', 'funny'
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(3)
+        end
+        it '#<<' do
+          expect(lambda {
+            bob.tag_list << 'social'
+            bob.tag_list << 'social'
+            bob.tag_list << 'social' << 'wow'
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(2)
 
-    pending 'should not create duplicate taggings [force lowercase]'
+        end
+
+        it 'unicode' do
+
+          expect(lambda {
+            bob.tag_list.add 'ПРИВЕТ'
+            bob.tag_list.add 'ПРИВЕТ'
+            bob.tag_list.add 'ПРИВЕТ', 'ПРИВЕТ'
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+
+        end
+
+        it '#=' do
+          expect(lambda {
+            bob.tag_list = ['Happy', 'Happy']
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+        end
+      end
+      context 'case insensitive' do
+        before(:all) { ActsAsTaggableOn.force_lowercase = true }
+        after(:all) { ActsAsTaggableOn.force_lowercase = false }
+
+        it '#<<' do
+          expect(lambda {
+            bob.tag_list << 'Alone'
+            bob.tag_list << 'AloNe'
+            bob.tag_list << 'ALONE' << 'In The dark'
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(2)
+
+        end
+
+        it '#add' do
+          expect(lambda {
+            bob.tag_list.add 'forever'
+            bob.tag_list.add 'ForEver'
+            bob.tag_list.add 'FOREVER', 'ALONE'
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(2)
+        end
+
+        it 'unicode' do
+
+          expect(lambda {
+            bob.tag_list.add 'ПРИВЕТ'
+            bob.tag_list.add 'привет', 'Привет'
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+
+        end
+
+        it '#=' do
+          expect(lambda {
+            bob.tag_list = ['Happy', 'HAPPY']
+            bob.save
+          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+        end
+
+
+      end
+
+
+    end
 
     if ActsAsTaggableOn::Utils.supports_concurrency?
       xit 'should not duplicate tags added on different threads' do
@@ -528,7 +603,7 @@ describe 'Taggable' do
       # NOTE: type column supports an STI Tag subclass in the test suite, though
       # isn't included by default in the migration generator
       expect(@taggable.grouped_column_names_for(ActsAsTaggableOn::Tag)).
-        to eq('tags.id, tags.name, tags.taggings_count, tags.type')
+          to eq('tags.id, tags.name, tags.taggings_count, tags.type')
     end
 
     it 'should return all column names joined for TaggableModel GROUP clause' do

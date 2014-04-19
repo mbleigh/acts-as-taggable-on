@@ -202,7 +202,7 @@ describe 'Single Table Inheritance' do
     it 'does not interfere with a normal Tag context on the same model' do
       company.location_list = 'cambridge'
       company.save!
-      ActsAsTaggableOn::Tag.where(name: 'cambridge', type: nil).should_not be_empty
+      expect(ActsAsTaggableOn::Tag.where(name: 'cambridge', type: nil)).to_not be_empty
     end
 
     it 'is returned with proper type through ownership' do
