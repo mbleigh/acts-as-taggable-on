@@ -76,14 +76,14 @@ end
 Add and remove a single tag
 
 ```ruby
-@user.tag_list.add("awesomer")   # add a single tag. alias for <<
+@user.tag_list.add("awesome")   # add a single tag. alias for <<
 @user.tag_list.remove("awesome") # remove a single tag
 ```
 
 Add and remove multiple tags in an array
 
 ```ruby
-@user.tag_list.add("awesomer", "slicker")
+@user.tag_list.add("awesome", "slick")
 @user.tag_list.remove("awesome", "slick")
 ```
 
@@ -98,7 +98,7 @@ a change on delimiter setting, make sure the string will match. See
 [configuration](#configuration) for more about delimiter.
 
 ```ruby
-@user.tag_list.add("awesomer, slicker", parse: true)
+@user.tag_list.add("awesome, slick", parse: true)
 @user.tag_list.remove("awesome, slick", parse: true)
 ```
 
@@ -107,29 +107,39 @@ remove existing tags so use it with attention.
 
 ```ruby
 @user.tag_list = "awesome, slick, hefty"
+@user.save
+@user.reload
 @user.tags
-# => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "awesome", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "slick", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "hefty", taggings_count: 1>]
 ```
 
 With the defined context in model, you have multiple new methods at disposal
 to manage and view the tags in the context. For example, with `:skill` context
 these methods are added to the model: `skill_list`(and `skill_list.add`, `skill_list.remove`
-`skill_list=`), `skills`(plural), skill_counts
-
+`skill_list=`), `skills`(plural), `skill_counts`.
 
 ```ruby
 @user.skill_list = "joking, clowning, boxing"
-
+@user.save
+@user.reload
 @user.skills
-# => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
 
 @user.skill_list.add("coding")
 
 @user.skill_list
-# => ["joking","clowning","boxing", "coding"]
+# => ["joking", "clowning", "boxing", "coding"]
+
+@another_user = User.new(:name => "Alice")
+@another_story.skill_list.add("joking")
+@another_story.save
 
 User.skill_counts
-# => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 2>, #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 1>, ...]
 ```
 
 To preserve the order in which tags are created use `acts_as_ordered_taggable`:
@@ -166,7 +176,7 @@ end
 User.tagged_with("awesome").by_join_date
 User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
-# Find a user with matching all tags, not just one
+# Find a user with matching all tags, not just one:
 User.tagged_with(["awesome", "cool"], :match_all => true)
 
 # Find a user with any of the tags:
@@ -199,7 +209,7 @@ matched tags.
 @tom = User.find_by_name("Tom")
 @tom.skill_list # => ["hacking", "jogging", "diving"]
 
-@tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
+@tom.find_related_skills # => [<User name="Bobby">, <User name="Frankie">]
 @bobby.find_related_skills # => [<User name="Tom">]
 @frankie.find_related_skills # => [<User name="Tom">]
 ```
@@ -212,7 +222,7 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 ```ruby
 @user = User.new(:name => "Bobby")
 @user.set_tag_list_on(:customs, "same, as, tag, list")
-@user.tag_list_on(:customs) # => ["same","as","tag","list"]
+@user.tag_list_on(:customs) # => ["same", "as", "tag", "list"]
 @user.save
 @user.tags_on(:customs) # => [<Tag name='same'>,...]
 @user.tag_counts_on(:customs)
