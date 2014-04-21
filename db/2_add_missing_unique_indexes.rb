@@ -1,4 +1,4 @@
-class AddMissingUniqueIndices < ActiveRecord::Migration
+class AddMissingUniqueIndexes < ActiveRecord::Migration
   def self.up
     add_index :tags, :name, unique: true
 
