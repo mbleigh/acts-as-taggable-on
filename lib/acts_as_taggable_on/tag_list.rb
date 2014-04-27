@@ -83,6 +83,13 @@ module ActsAsTaggableOn
       self
     end
 
+    # Append---Add the tag to the tag_list. This
+    # expression returns the tag_list itself, so several appends
+    # may be chained together.
+    def <<(obj)
+      add(obj)
+    end
+
     ##
     # Remove specific tags from the tag_list.
     # Use the <tt>:parse</tt> option to add an unparsed tag string.
@@ -130,11 +137,10 @@ module ActsAsTaggableOn
       options = args.last.is_a?(Hash) ? args.pop : {}
       options.assert_valid_keys :parse
 
-
       args.map! { |a| self.class.from(a) } if options[:parse]
-
 
       args.flatten!
     end
   end
 end
+
