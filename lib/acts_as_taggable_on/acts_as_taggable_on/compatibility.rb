@@ -1,15 +1,15 @@
 module ActsAsTaggableOn::Compatibility
-  def has_many_with_compatibility(name, options = {}, &extention)
+  def has_many_with_taggable_compatibility(name, options = {}, &extention)
     if ActsAsTaggableOn::Utils.active_record4?
-      scope, opts = build_scope_and_options(options)
+      scope, opts = build_taggable_scope_and_options(options)
       has_many(name, scope, opts, &extention)
     else
       has_many(name, options, &extention)
     end
   end
 
-  def build_scope_and_options(opts)
-    scope_opts, opts = parse_options(opts)
+  def build_taggable_scope_and_options(opts)
+    scope_opts, opts = parse_taggable_options(opts)
 
     unless scope_opts.empty?
       scope = -> {
@@ -21,7 +21,7 @@ module ActsAsTaggableOn::Compatibility
     [nil, opts]
   end
 
-  def parse_options(opts)
+  def parse_taggable_options(opts)
     scope_opts = {}
     [:order, :having, :select, :group, :limit, :offset, :readonly].each do |o|
       scope_opts[o] = opts.delete o if opts[o]
