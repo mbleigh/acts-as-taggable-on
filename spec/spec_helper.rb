@@ -95,5 +95,3 @@ def clean_database!
 end
 
 clean_database!
-
-
