@@ -218,10 +218,10 @@ describe 'Taggable' do
   end
 
   it "shouldn't generate a query with DISTINCT by default" do
-    @taggable.skill_list = "ruby, rails, css"
+    @taggable.skill_list = 'ruby, rails, css'
     @taggable.save
 
-    TaggableModel.tagged_with('ruby').to_sql.should_not match /DISTINCT/
+    expect(TaggableModel.tagged_with('ruby').to_sql).to_not match /DISTINCT/
   end
 
   it 'should be able to find by tag with context' do
@@ -243,25 +243,25 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('ruby').to_a).to eq(TaggableModel.tagged_with('Ruby').to_a)
   end
 
-  it "should be able to find by tags with other joins in the query" do
-    @taggable.skill_list = "ruby, rails, css"
-    @taggable.tag_list = "bob, charlie"
+  it 'should be able to find by tags with other joins in the query' do
+    @taggable.skill_list = 'ruby, rails, css'
+    @taggable.tag_list = 'bob, charlie'
     @taggable.save
 
-    TaggableModel.group(:created_at).tagged_with(['bob','css'], :any => true).first.should == @taggable
+    expect(TaggableModel.group(:created_at).tagged_with(['bob', 'css'], :any => true).first).to eq(@taggable)
 
-    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
-    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
-    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby, java")
+    bob = TaggableModel.create(:name => 'Bob', :tag_list => 'ruby, rails, css')
+    frank = TaggableModel.create(:name => 'Frank', :tag_list => 'ruby, rails')
+    charlie = TaggableModel.create(:name => 'Charlie', :skill_list => 'ruby, java')
 
     # Test for explicit distinct in select
     bob.untaggable_models.create!
     frank.untaggable_models.create!
     charlie.untaggable_models.create!
 
-    TaggableModel.select("distinct(taggable_models.id), taggable_models.*").joins(:untaggable_models).tagged_with(['css','java'], :any => true).to_a.sort.should == [bob,charlie].sort
+    expect(TaggableModel.select('distinct(taggable_models.id), taggable_models.*').joins(:untaggable_models).tagged_with(['css', 'java'], :any => true).to_a.sort).to eq([bob, charlie].sort)
 
-    TaggableModel.select("distinct(taggable_models.id), taggable_models.*").joins(:untaggable_models).tagged_with(['rails','ruby'], :any => false).to_a.sort.should == [bob,frank].sort
+    expect(TaggableModel.select('distinct(taggable_models.id), taggable_models.*').joins(:untaggable_models).tagged_with(['rails', 'ruby'], :any => false).to_a.sort).to eq([bob, frank].sort)
   end
 
   unless ActsAsTaggableOn::Tag.using_sqlite?
@@ -556,7 +556,7 @@ describe 'Taggable' do
       # NOTE: type column supports an STI Tag subclass in the test suite, though
       # isn't included by default in the migration generator
       expect(@taggable.grouped_column_names_for(ActsAsTaggableOn::Tag)).
-        to eq('tags.id, tags.name, tags.taggings_count, tags.type')
+          to eq('tags.id, tags.name, tags.taggings_count, tags.type')
     end
 
     it 'should return all column names joined for TaggableModel GROUP clause' do
@@ -785,32 +785,32 @@ end
 
 
 if ActsAsTaggableOn::Tag.using_postgresql?
-  describe "Taggable model with json columns" do
+  describe 'Taggable model with json columns' do
     before(:each) do
       clean_database!
-      @taggable = TaggableModelWithJson.new(:name => "Bob Jones")
-      @taggables = [@taggable, TaggableModelWithJson.new(:name => "John Doe")]
+      @taggable = TaggableModelWithJson.new(:name => 'Bob Jones')
+      @taggables = [@taggable, TaggableModelWithJson.new(:name => 'John Doe')]
     end
 
-    it "should be able to find by tag with context" do
-      @taggable.skill_list = "ruby, rails, css"
-      @taggable.tag_list = "bob, charlie"
+    it 'should be able to find by tag with context' do
+      @taggable.skill_list = 'ruby, rails, css'
+      @taggable.tag_list = 'bob, charlie'
       @taggable.save
 
-      TaggableModelWithJson.tagged_with("ruby").first.should == @taggable
-      TaggableModelWithJson.tagged_with("ruby, css").first.should == @taggable
-      TaggableModelWithJson.tagged_with("bob", :on => :skills).first.should_not == @taggable
-      TaggableModelWithJson.tagged_with("bob", :on => :tags).first.should == @taggable
+      expect(TaggableModelWithJson.tagged_with('ruby').first).to eq(@taggable)
+      expect(TaggableModelWithJson.tagged_with('ruby, css').first).to eq(@taggable)
+      expect(TaggableModelWithJson.tagged_with('bob', :on => :skills).first).to_not eq(@taggable)
+      expect(TaggableModelWithJson.tagged_with('bob', :on => :tags).first).to eq(@taggable)
     end
 
-    it "should be able to find tagged with any tag" do
-      bob = TaggableModelWithJson.create(:name => "Bob", :tag_list => "fitter, happier, more productive", :skill_list => "ruby, rails, css")
-      frank = TaggableModelWithJson.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
+    it 'should be able to find tagged with any tag' do
+      bob = TaggableModelWithJson.create(:name => 'Bob', :tag_list => 'fitter, happier, more productive', :skill_list => 'ruby, rails, css')
+      frank = TaggableModelWithJson.create(:name => 'Frank', :tag_list => 'weaker, depressed, inefficient', :skill_list => 'ruby, rails, css')
       steve = TaggableModelWithJson.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
 
-      TaggableModelWithJson.tagged_with(["ruby", "java"], :order => 'taggable_model_with_jsons.name', :any => true).to_a.should == [bob, frank, steve]
-      TaggableModelWithJson.tagged_with(["c++", "fitter"], :order => 'taggable_model_with_jsons.name', :any => true).to_a.should == [bob, steve]
-      TaggableModelWithJson.tagged_with(["depressed", "css"], :order => 'taggable_model_with_jsons.name', :any => true).to_a.should == [bob, frank]
+      expect(TaggableModelWithJson.tagged_with(%w(ruby java), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, frank, steve])
+      expect(TaggableModelWithJson.tagged_with(%w(c++ fitter), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, steve])
+      expect(TaggableModelWithJson.tagged_with(%w(depressed css), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, frank])
     end
   end
 end
