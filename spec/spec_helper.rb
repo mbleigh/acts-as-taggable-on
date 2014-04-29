@@ -83,7 +83,7 @@ end
 def clean_database!
   models = [ActsAsTaggableOn::Tag, ActsAsTaggableOn::Tagging, TaggableModel, OtherTaggableModel,
             InheritingTaggableModel, AlteredInheritingTaggableModel, User, UntaggableModel,
-            OrderedTaggableModel]
+            OrderedTaggableModel, TaggableModelWithJson]
   models.each do |model|
     #Sqlite don't support truncate
     if ActsAsTaggableOn::Utils.using_sqlite?

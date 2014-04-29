@@ -152,6 +152,7 @@ module ActsAsTaggableOn::Taggable
           end
 
           joins << tagging_join
+          group = "#{table_name}.#{primary_key}"
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
 
@@ -179,7 +180,7 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
-        group = [] # Rails interprets this as a no-op in the group() call below
+        group ||= [] # Rails interprets this as a no-op in the group() call below
         if options.delete(:order_by_matching_tag_count)
           select_clause = "#{table_name}.*, COUNT(#{taggings_alias}.tag_id) AS #{taggings_alias}_count"
           group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
@@ -208,8 +209,6 @@ module ActsAsTaggableOn::Taggable
             having(having).
             order(order_by.join(', ')).
             readonly(false)
-
-        ((context and tag_types.one?) && options.delete(:any)) ? request : request.uniq
       end
 
       def is_taggable?
