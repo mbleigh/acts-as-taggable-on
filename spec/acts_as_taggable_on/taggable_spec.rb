@@ -217,6 +217,13 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('ruby').group(:created_at).count.count).to eq(1)
   end
 
+  it "shouldn't generate a query with DISTINCT by default" do
+    @taggable.skill_list = "ruby, rails, css"
+    @taggable.save
+
+    TaggableModel.tagged_with('ruby').to_sql.should_not match /DISTINCT/
+  end
+
   it 'should be able to find by tag with context' do
     @taggable.skill_list = 'ruby, rails, css'
     @taggable.tag_list = 'bob, charlie'
@@ -234,6 +241,27 @@ describe 'Taggable' do
 
     expect(ActsAsTaggableOn::Tag.all.size).to eq(1)
     expect(TaggableModel.tagged_with('ruby').to_a).to eq(TaggableModel.tagged_with('Ruby').to_a)
+  end
+
+  it "should be able to find by tags with other joins in the query" do
+    @taggable.skill_list = "ruby, rails, css"
+    @taggable.tag_list = "bob, charlie"
+    @taggable.save
+
+    TaggableModel.group(:created_at).tagged_with(['bob','css'], :any => true).first.should == @taggable
+
+    bob = TaggableModel.create(:name => "Bob", :tag_list => "ruby, rails, css")
+    frank = TaggableModel.create(:name => "Frank", :tag_list => "ruby, rails")
+    charlie = TaggableModel.create(:name => "Charlie", :skill_list => "ruby, java")
+
+    # Test for explicit distinct in select
+    bob.untaggable_models.create!
+    frank.untaggable_models.create!
+    charlie.untaggable_models.create!
+
+    TaggableModel.select("distinct(taggable_models.id), taggable_models.*").joins(:untaggable_models).tagged_with(['css','java'], :any => true).to_a.sort.should == [bob,charlie].sort
+
+    TaggableModel.select("distinct(taggable_models.id), taggable_models.*").joins(:untaggable_models).tagged_with(['rails','ruby'], :any => false).to_a.sort.should == [bob,frank].sort
   end
 
   unless ActsAsTaggableOn::Tag.using_sqlite?
@@ -826,6 +854,38 @@ describe 'Taggable' do
           expect(TaggableModel.tag_counts.limit(2).sum(:tags_count).to_i).to eq(9)
         end
       end
+    end
+  end
+end
+
+
+if ActsAsTaggableOn::Tag.using_postgresql?
+  describe "Taggable model with json columns" do
+    before(:each) do
+      clean_database!
+      @taggable = TaggableModelWithJson.new(:name => "Bob Jones")
+      @taggables = [@taggable, TaggableModelWithJson.new(:name => "John Doe")]
+    end
+
+    it "should be able to find by tag with context" do
+      @taggable.skill_list = "ruby, rails, css"
+      @taggable.tag_list = "bob, charlie"
+      @taggable.save
+
+      TaggableModelWithJson.tagged_with("ruby").first.should == @taggable
+      TaggableModelWithJson.tagged_with("ruby, css").first.should == @taggable
+      TaggableModelWithJson.tagged_with("bob", :on => :skills).first.should_not == @taggable
+      TaggableModelWithJson.tagged_with("bob", :on => :tags).first.should == @taggable
+    end
+
+    it "should be able to find tagged with any tag" do
+      bob = TaggableModelWithJson.create(:name => "Bob", :tag_list => "fitter, happier, more productive", :skill_list => "ruby, rails, css")
+      frank = TaggableModelWithJson.create(:name => "Frank", :tag_list => "weaker, depressed, inefficient", :skill_list => "ruby, rails, css")
+      steve = TaggableModelWithJson.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
+
+      TaggableModelWithJson.tagged_with(["ruby", "java"], :order => 'taggable_model_with_jsons.name', :any => true).to_a.should == [bob, frank, steve]
+      TaggableModelWithJson.tagged_with(["c++", "fitter"], :order => 'taggable_model_with_jsons.name', :any => true).to_a.should == [bob, steve]
+      TaggableModelWithJson.tagged_with(["depressed", "css"], :order => 'taggable_model_with_jsons.name', :any => true).to_a.should == [bob, frank]
     end
   end
 end

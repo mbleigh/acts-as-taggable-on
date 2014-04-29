@@ -10,6 +10,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 * Features
 * Fixes
   * [@jonseaberg #499 fix for race condition when multiple processes try to add the same tag](https://github.com/mbleigh/acts-as-taggable-on/pull/499)
+  * [@leklund #496 Fix for distinct and postgresql json columns errors](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
 * Performance
 * Misc
 
