@@ -8,11 +8,17 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 
 * Breaking Changes
 * Features
+  * [@chess #413 Hook to support STI subclasses of Tag in save_tags](https://github.com/mbleigh/acts-as-taggable-on/pull/413)
 * Fixes
+  * [@jdelStrother #515 Rename Compatibility methods to reduce chance of conflicts ](https://github.com/mbleigh/acts-as-taggable-on/pull/515)
+  * [@seuros #512 fix for << method](https://github.com/mbleigh/acts-as-taggable-on/pull/512)
+  * [@sonots #510 fix IN subquery error for mysql](https://github.com/mbleigh/acts-as-taggable-on/pull/510)
   * [@jonseaberg #499 fix for race condition when multiple processes try to add the same tag](https://github.com/mbleigh/acts-as-taggable-on/pull/499)
   * [@leklund #496 Fix for distinct and postgresql json columns errors](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
+  * [@thatbettina & @plexus #394 Multiple quoted tags](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
 * Performance
 * Misc
+  * [@seuros #511 Rspec 3](https://github.com/mbleigh/acts-as-taggable-on/pull/511)
 
 ### [3.1.0 / 2014-03-31](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0)
 

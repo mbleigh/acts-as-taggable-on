@@ -208,7 +208,7 @@ describe 'Single Table Inheritance' do
     it 'is returned with proper type through ownership' do
       user.tag(company, :with => 'ripoffs, rackets', :on => :markets)
       tags = company.owner_tags_on(user, :markets)
-      tags.all? { |tag| tag.is_a? Market }.should be_truthy
+      expect(tags.all? { |tag| tag.is_a? Market }).to be_truthy
     end
   end
 end

@@ -3,6 +3,7 @@ require 'spec_helper'
 
 describe ActsAsTaggableOn::TagList do
   let(:tag_list) { ActsAsTaggableOn::TagList.new('awesome', 'radical') }
+  let(:another_tag_list) { ActsAsTaggableOn::TagList.new('awesome','crazy', 'alien') }
 
   it { should be_kind_of Array }
 
@@ -13,7 +14,7 @@ describe ActsAsTaggableOn::TagList do
   describe '#add' do
     it 'should be able to be add a new tag word' do
       tag_list.add('cool')
-      expect(tag_list.include?('cool')).to eq(true)
+      expect(tag_list.include?('cool')).to be_truthy
     end
 
     it 'should be able to add delimited lists of words' do
@@ -57,6 +58,31 @@ describe ActsAsTaggableOn::TagList do
     it 'should be able to remove an array of words' do
       tag_list.remove(%w(awesome radical), parse: true)
       expect(tag_list).to be_empty
+    end
+  end
+
+  describe '#+' do
+    it 'should not have duplicate tags' do
+      new_tag_list = tag_list + another_tag_list
+      expect(tag_list).to eq(%w[awesome radical])
+      expect(another_tag_list).to eq(%w[awesome crazy alien])
+      expect(new_tag_list).to eq(%w[awesome radical crazy alien])
+    end
+
+    it 'should have class : ActsAsTaggableOn::TagList' do
+      new_tag_list = tag_list + another_tag_list
+      expect(new_tag_list.class).to eq(ActsAsTaggableOn::TagList)
+    end
+  end
+
+  describe '#concat' do
+    it 'should not have duplicate tags' do
+      expect(tag_list.concat(another_tag_list)).to eq(%w[awesome radical crazy alien])
+    end
+
+    it 'should have class : ActsAsTaggableOn::TagList' do
+      new_tag_list = tag_list.concat(another_tag_list)
+      expect(new_tag_list.class).to eq(ActsAsTaggableOn::TagList)
     end
   end
 

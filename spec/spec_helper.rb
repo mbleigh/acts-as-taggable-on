@@ -80,6 +80,10 @@ else
   fail "Please create #{database_yml} first to configure your database. Take a look at: #{database_yml}.sample"
 end
 
+RSpec.configure do |config|
+  config.raise_errors_for_deprecations!
+end
+
 def clean_database!
   models = [ActsAsTaggableOn::Tag, ActsAsTaggableOn::Tagging, TaggableModel, OtherTaggableModel,
             InheritingTaggableModel, AlteredInheritingTaggableModel, User, UntaggableModel,

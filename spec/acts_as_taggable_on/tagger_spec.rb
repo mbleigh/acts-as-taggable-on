@@ -127,7 +127,7 @@ describe 'Tagger' do
   end
 
   it 'is tagger' do
-    expect(@user.is_tagger?).to eq(true)
+    expect(@user.is_tagger?).to be_truthy
   end
 
   it 'should skip save if skip_save is passed as option' do
