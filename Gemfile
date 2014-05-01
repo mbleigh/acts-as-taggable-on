@@ -8,4 +8,3 @@ group :local_development do
   gem 'appraisal'
   gem 'rake'
 end
-
