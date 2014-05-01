@@ -3,6 +3,7 @@ require 'spec_helper'
 
 describe ActsAsTaggableOn::TagList do
   let(:tag_list) { ActsAsTaggableOn::TagList.new('awesome', 'radical') }
+  let(:another_tag_list) { ActsAsTaggableOn::TagList.new('awesome','crazy', 'alien') }
 
   it { should be_kind_of Array }
 
@@ -57,6 +58,22 @@ describe ActsAsTaggableOn::TagList do
     it 'should be able to remove an array of words' do
       tag_list.remove(%w(awesome radical), parse: true)
       expect(tag_list).to be_empty
+    end
+  end
+
+  describe '#+' do
+    it 'should not have duplicate tags' do
+      new_tag_list = tag_list + another_tag_list
+      expect(tag_list).to eq(%w[awesome radical])
+      expect(another_tag_list).to eq(%w[awesome crazy alien])
+      expect(new_tag_list).to eq(%w[awesome radical crazy alien])
+    end
+  end
+
+  describe '#concat' do
+    it 'should not have duplicate tags' do
+      tag_list.concat(another_tag_list)
+      expect(tag_list).to eq(%w[awesome radical crazy alien])
     end
   end
 

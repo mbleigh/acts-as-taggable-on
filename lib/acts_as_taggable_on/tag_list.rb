@@ -90,6 +90,17 @@ module ActsAsTaggableOn
       add(obj)
     end
 
+    # Concatenation --- Returns a new tag list built by concatenating the
+    # two tag lists together to produce a third tag list.
+    def +(other_tag_list)
+      super(other_tag_list).uniq!
+    end
+
+    # Appends the elements of +other_tag_list+ to +self+.
+    def concat(other_tag_list)
+      super(other_tag_list).uniq!
+    end
+
     ##
     # Remove specific tags from the tag_list.
     # Use the <tt>:parse</tt> option to add an unparsed tag string.
@@ -132,6 +143,7 @@ module ActsAsTaggableOn
 
       uniq!
     end
+
 
     def extract_and_apply_options!(args)
       options = args.last.is_a?(Hash) ? args.pop : {}
