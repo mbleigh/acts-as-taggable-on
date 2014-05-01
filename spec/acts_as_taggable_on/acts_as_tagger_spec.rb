@@ -15,11 +15,11 @@ describe 'acts_as_tagger' do
     end
 
     it 'should return true from the class-side #is_tagger?' do
-      expect(User.is_tagger?).to eq(true)
+      expect(User.is_tagger?).to be_truthy
     end
 
     it 'should return false from the base #is_tagger?' do
-      expect(ActiveRecord::Base.is_tagger?).to eq(false)
+      expect(ActiveRecord::Base.is_tagger?).to be_falsy
     end
 
     it 'should add #is_tagger? query method to the singleton' do

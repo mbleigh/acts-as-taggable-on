@@ -14,7 +14,7 @@ describe ActsAsTaggableOn::TagList do
   describe '#add' do
     it 'should be able to be add a new tag word' do
       tag_list.add('cool')
-      expect(tag_list.include?('cool')).to eq(true)
+      expect(tag_list.include?('cool')).to be_truthy
     end
 
     it 'should be able to add delimited lists of words' do
