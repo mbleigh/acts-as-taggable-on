@@ -93,7 +93,7 @@ module ActsAsTaggableOn
     # Concatenation --- Returns a new tag list built by concatenating the
     # two tag lists together to produce a third tag list.
     def +(other_tag_list)
-      super(other_tag_list).uniq!
+      TagList.new.add(self).add(other_tag_list)
     end
 
     # Appends the elements of +other_tag_list+ to +self+.

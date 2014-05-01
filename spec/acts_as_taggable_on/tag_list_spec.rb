@@ -68,12 +68,21 @@ describe ActsAsTaggableOn::TagList do
       expect(another_tag_list).to eq(%w[awesome crazy alien])
       expect(new_tag_list).to eq(%w[awesome radical crazy alien])
     end
+
+    it 'should have class : ActsAsTaggableOn::TagList' do
+      new_tag_list = tag_list + another_tag_list
+      expect(new_tag_list.class).to eq(ActsAsTaggableOn::TagList)
+    end
   end
 
   describe '#concat' do
     it 'should not have duplicate tags' do
-      tag_list.concat(another_tag_list)
-      expect(tag_list).to eq(%w[awesome radical crazy alien])
+      expect(tag_list.concat(another_tag_list)).to eq(%w[awesome radical crazy alien])
+    end
+
+    it 'should have class : ActsAsTaggableOn::TagList' do
+      new_tag_list = tag_list.concat(another_tag_list)
+      expect(new_tag_list.class).to eq(ActsAsTaggableOn::TagList)
     end
   end
 
