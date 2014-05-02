@@ -3,17 +3,9 @@ require 'spec_helper'
 
 describe 'Taggable To Preserve Order' do
   before(:each) do
-    clean_database!
     @taggable = OrderedTaggableModel.new(name: 'Bob Jones')
   end
 
-  it 'should have tag types' do
-    [:tags, :colours].each do |type|
-      expect(OrderedTaggableModel.tag_types).to include type
-    end
-
-    expect(@taggable.tag_types).to eq(OrderedTaggableModel.tag_types)
-  end
 
   it 'should have tag associations' do
     [:tags, :colours].each do |type|
@@ -105,7 +97,6 @@ end
 
 describe 'Taggable' do
   before(:each) do
-    clean_database!
     @taggable = TaggableModel.new(name: 'Bob Jones')
     @taggables = [@taggable, TaggableModel.new(name: 'John Doe')]
   end
@@ -645,7 +636,6 @@ describe 'Taggable' do
 
   describe 'NonStandardIdTaggable' do
     before(:each) do
-      clean_database!
       @taggable = NonStandardIdTaggableModel.new(name: 'Bob Jones')
       @taggables = [@taggable, NonStandardIdTaggableModel.new(name: 'John Doe')]
     end
@@ -820,7 +810,6 @@ describe 'Taggable' do
   # See https://github.com/mbleigh/acts-as-taggable-on/pull/457 for details
   context 'tag_counts and aggreating scopes, compatability with MySQL ' do
     before(:each) do
-      clean_database!
       TaggableModel.new(:name => 'Barb Jones').tap { |t| t.tag_list = %w(awesome fun) }.save
       TaggableModel.new(:name => 'John Doe').tap { |t| t.tag_list = %w(cool fun hella) }.save
       TaggableModel.new(:name => 'Jo Doe').tap { |t| t.tag_list = %w(curious young naive sharp) }.save
@@ -862,7 +851,6 @@ end
 if ActsAsTaggableOn::Tag.using_postgresql?
   describe 'Taggable model with json columns' do
     before(:each) do
-      clean_database!
       @taggable = TaggableModelWithJson.new(:name => 'Bob Jones')
       @taggables = [@taggable, TaggableModelWithJson.new(:name => 'John Doe')]
     end

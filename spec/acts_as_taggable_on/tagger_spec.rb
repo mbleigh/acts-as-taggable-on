@@ -2,10 +2,11 @@ require 'spec_helper'
 
 describe 'Tagger' do
   before(:each) do
-    clean_database!
     @user = User.create
     @taggable = TaggableModel.create(name: 'Bob Jones')
   end
+
+
 
   it 'should have taggings' do
     @user.tag(@taggable, with: 'ruby,scheme', on: :tags)

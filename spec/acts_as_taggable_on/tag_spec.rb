@@ -9,10 +9,11 @@ end
 
 describe ActsAsTaggableOn::Tag do
   before(:each) do
-    clean_database!
     @tag = ActsAsTaggableOn::Tag.new
     @user = TaggableModel.create(name: 'Pablo')
   end
+
+
 
   describe 'named like any' do
     context 'case insensitive collation and unique index on tag name' do

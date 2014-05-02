@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe 'acts_as_tagger' do
-  before(:each) do
-    clean_database!
-  end
 
   describe 'Tagger Method Generation' do
     before(:each) do
