@@ -8,67 +8,82 @@ module ActsAsTaggableOn
       add(*args)
     end
 
-    ##
-    # Returns a new TagList using the given tag string.
-    #
-    # Example:
-    #   tag_list = TagList.from("One , Two,  Three")
-    #   tag_list # ["One", "Two", "Three"]
-    def self.from(string)
-      string = string.join(ActsAsTaggableOn.glue) if string.respond_to?(:join)
+    class << self
+      ##
+      # Returns a new TagList using the given tag string.
+      #
+      # Example:
+      #   tag_list = ActsAsTaggableOn::TagList.from("One , Two,  Three")
+      #   tag_list # ["One", "Two", "Three"]
+      def from(string)
+        string = string.join(ActsAsTaggableOn.glue) if string.respond_to?(:join)
 
-      new.tap do |tag_list|
-        string = string.to_s.dup
+        new.tap do |tag_list|
+          string = string.to_s.dup
 
+
+          string.gsub!(double_quote_pattern) {
+            # Append the matched tag to the tag list
+            tag_list << Regexp.last_match[2]
+            # Return the matched delimiter ($3) to replace the matched items
+            ''
+          }
+
+          string.gsub!(single_quote_pattern) {
+            # Append the matched tag ($2) to the tag list
+            tag_list << Regexp.last_match[2]
+            # Return an empty string to replace the matched items
+            ''
+          }
+
+          # split the string by the delimiter
+          # and add to the tag_list
+          tag_list.add(string.split(Regexp.new delimiter))
+        end
+      end
+
+      def delimiter
         # Parse the quoted tags
         d = ActsAsTaggableOn.delimiter
         # Separate multiple delimiters by bitwise operator
         d = d.join('|') if d.kind_of?(Array)
-        double_quote_pattern = %r{
+
+        d
+      end
+
+      def single_quote_pattern
+        %r{
           (             # Tag start delimiter ($1)
             \A       |  # Either string start or
-            #{d}        # a delimiter
-          )
-          \s*"          # quote (") optionally preceded by whitespace
-          (.*?)         # Tag ($2)
-          "\s*          # quote (") optionally followed by whitespace
-          (?=           # Tag end delimiter (not consumed; is zero-length lookahead)
-            #{d}\s*  |  # Either a delimiter optionally followed by whitespace or
-            \z          # string end
-          )
-        }x
-        string.gsub!(double_quote_pattern) {
-          # Append the matched tag to the tag list
-          tag_list << Regexp.last_match[2]
-          # Return the matched delimiter ($3) to replace the matched items
-          ''
-        }
-        single_quote_pattern = %r{
-          (             # Tag start delimiter ($1)
-            \A       |  # Either string start or
-            #{d}        # a delimiter
+            #{delimiter}        # a delimiter
           )
           \s*'          # quote (') optionally preceded by whitespace
           (.*?)         # Tag ($2)
           '\s*          # quote (') optionally followed by whitespace
           (?=           # Tag end delimiter (not consumed; is zero-length lookahead)
-            #{d}\s*  |  # Either a delimiter optionally followed by whitespace or
+            #{delimiter}\s*  |  # Either a delimiter optionally followed by whitespace or
             \z          # string end
           )
-        }x
-        string.gsub!(single_quote_pattern) {
-          # Append the matched tag ($2) to the tag list
-          tag_list << Regexp.last_match[2]
-          # Return an empty string to replace the matched items
-          ''
-        }
-
-        # split the string by the delimiter
-        # and add to the tag_list
-        tag_list.add(string.split(Regexp.new d))
+      }x
       end
-    end
 
+      def double_quote_pattern
+        %r{
+          (             # Tag start delimiter ($1)
+            \A       |  # Either string start or
+            #{delimiter}        # a delimiter
+          )
+          \s*"          # quote (") optionally preceded by whitespace
+          (.*?)         # Tag ($2)
+          "\s*          # quote (") optionally followed by whitespace
+          (?=           # Tag end delimiter (not consumed; is zero-length lookahead)
+            #{delimiter}\s*  |  # Either a delimiter optionally followed by whitespace or
+            \z          # string end
+          )
+      }x
+      end
+
+    end
     ##
     # Add tags to the tag_list. Duplicate or blank tags will be ignored.
     # Use the <tt>:parse</tt> option to add an unparsed tag string.
@@ -98,7 +113,7 @@ module ActsAsTaggableOn
 
     # Appends the elements of +other_tag_list+ to +self+.
     def concat(other_tag_list)
-      super(other_tag_list).uniq!
+      super(other_tag_list).send(:clean!)
     end
 
     ##
@@ -153,6 +168,8 @@ module ActsAsTaggableOn
 
       args.flatten!
     end
+
+
   end
 end
 
