@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe 'Single Table Inheritance' do
-
-  before(:each) do
-    clean_database!
-  end
-
   let(:taggable) { TaggableModel.new(name: 'taggable model') }
 
   let(:inheriting_model) { InheritingTaggableModel.new(name: 'Inheriting Taggable Model') }

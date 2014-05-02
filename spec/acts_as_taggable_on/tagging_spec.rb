@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe ActsAsTaggableOn::Tagging do
   before(:each) do
-    clean_database!
     @tagging = ActsAsTaggableOn::Tagging.new
   end
 
