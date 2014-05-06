@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe 'Acts As Taggable On' do
 
-  before(:each) do
-    clean_database!
-  end
-
   describe 'Caching' do
     before(:each) do
       @taggable = CachedModel.new(name: 'Bob Jones')
@@ -74,4 +70,7 @@ describe 'Acts As Taggable On' do
     end
   end
 
+  describe 'CachingWithArray' do
+    pending '#TODO'
+  end
 end

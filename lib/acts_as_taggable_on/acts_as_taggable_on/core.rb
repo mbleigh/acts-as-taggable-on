@@ -24,16 +24,16 @@ module ActsAsTaggableOn::Taggable
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
             has_many_with_taggable_compatibility context_taggings, as: :taggable,
-                                        dependent: :destroy,
-                                        class_name: 'ActsAsTaggableOn::Tagging',
-                                        order: taggings_order,
-                                        conditions: ["#{ActsAsTaggableOn::Tagging.table_name}.context = (?)", tags_type],
-                                        include: :tag
+                                                                   dependent: :destroy,
+                                                                   class_name: 'ActsAsTaggableOn::Tagging',
+                                                                   order: taggings_order,
+                                                                   conditions: ["#{ActsAsTaggableOn::Tagging.table_name}.context = (?)", tags_type],
+                                                                   include: :tag
 
             has_many_with_taggable_compatibility context_tags, through: context_taggings,
-                                        source: :tag,
-                                        class_name: 'ActsAsTaggableOn::Tag',
-                                        order: taggings_order
+                                                               source: :tag,
+                                                               class_name: 'ActsAsTaggableOn::Tag',
+                                                               order: taggings_order
 
           end
 
@@ -96,13 +96,13 @@ module ActsAsTaggableOn::Taggable
         context = options.delete(:on)
         owned_by = options.delete(:owned_by)
         alias_base_name = undecorated_table_name.gsub('.', '_')
-        quote = ActsAsTaggableOn::Tag.using_postgresql? ? '"' : ''
+        quote = ActsAsTaggableOn::Utils.using_postgresql? ? '"' : ''
 
         if options.delete(:exclude)
           if options.delete(:wild)
-            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ? ESCAPE '!'", "%#{escape_like(t)}%"]) }.join(' OR ')
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(t)}%"]) }.join(' OR ')
           else
-            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{like_operator} ?", t]) }.join(' OR ')
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{ActsAsTaggableOn::Utils.like_operator} ?", t]) }.join(' OR ')
           end
 
           conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name, nil)})"
@@ -183,7 +183,7 @@ module ActsAsTaggableOn::Taggable
         group ||= [] # Rails interprets this as a no-op in the group() call below
         if options.delete(:order_by_matching_tag_count)
           select_clause = "#{table_name}.*, COUNT(#{taggings_alias}.tag_id) AS #{taggings_alias}_count"
-          group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
+          group_columns = ActsAsTaggableOn::Utils.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
           group = group_columns
           order_by << "#{taggings_alias}_count DESC"
 
@@ -195,7 +195,7 @@ module ActsAsTaggableOn::Taggable
 
           joins << ' AND ' + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
-          group_columns = ActsAsTaggableOn::Tag.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
+          group_columns = ActsAsTaggableOn::Utils.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
           group = group_columns
           having = "COUNT(#{taggings_alias}.taggable_id) = #{tags.size}"
         end
@@ -284,7 +284,7 @@ module ActsAsTaggableOn::Taggable
       opts = ["#{tagging_table_name}.context = ?", context.to_s]
       scope = base_tags.where(opts)
 
-      if ActsAsTaggableOn::Tag.using_postgresql?
+      if ActsAsTaggableOn::Utils.using_postgresql?
         group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
         scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
       else
@@ -415,9 +415,8 @@ module ActsAsTaggableOn::Taggable
     #
     # @param [Array<String>] tag_list Tags to find or create
     # @param [Symbol] context The tag context for the tag_list
-    def find_or_create_tags_from_list_with_context(tag_list, context)
+    def find_or_create_tags_from_list_with_context(tag_list, _context)
       load_tags(tag_list)
     end
   end
 end
-

@@ -6,6 +6,7 @@ class TaggableModel < ActiveRecord::Base
   has_many :untaggable_models
 
   attr_reader :tag_list_submethod_called
+
   def tag_list=(v)
     @tag_list_submethod_called = true
     super
@@ -76,7 +77,14 @@ class OrderedTaggableModel < ActiveRecord::Base
   acts_as_ordered_taggable_on :colours
 end
 
-class TaggableModelWithJson < ActiveRecord::Base
-  acts_as_taggable
-  acts_as_taggable_on :skills
+if ActsAsTaggableOn::Utils.using_postgresql?
+  class CachedModelWithArray < ActiveRecord::Base
+    acts_as_taggable
+  end
+  if ActsAsTaggableOn::Utils.postgresql_support_json?
+    class TaggableModelWithJson < ActiveRecord::Base
+      acts_as_taggable
+      acts_as_taggable_on :skills
+    end
+  end
 end

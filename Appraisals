@@ -1,15 +1,20 @@
-appraise "rails-3.2" do
-  gem "rails", "~> 3.2"
+appraise "activerecord-3.2" do
+  gem "activerecord", "~> 3.2"
+  gem "actionpack", "~> 3.2"
 end
 
-appraise "rails-4.0" do
-  gem "rails", "~> 4.0"
+appraise "activerecord-4.0" do
+  gem "activerecord", "~> 4.0"
+  gem "actionpack", "~> 4.0"
 end
 
-appraise "rails-4.1" do
-  gem "rails", "~> 4.1.0"
+appraise "activerecord-4.1" do
+  gem "activerecord", "~> 4.1"
+  gem "actionpack", "~> 4.1"
 end
 
-appraise "rails-edge" do
-  gem "rails", github: "rails/rails"
+appraise "activerecord-edge" do
+  gem "activerecord", github: "rails/rails"
+  gem "actionpack", github: "rails/rails"
+  gem 'arel', github: 'rails/arel'
 end

@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe 'Acts As Taggable On' do
-  before(:each) do
-    clean_database!
-  end
 
   describe 'Related Objects' do
 

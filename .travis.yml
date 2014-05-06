@@ -8,10 +8,10 @@ env:
   - DB=mysql
   - DB=postgresql
 gemfile:
-  - gemfiles/rails_3.2.gemfile
-  - gemfiles/rails_4.0.gemfile
-  - gemfiles/rails_4.1.gemfile
-  - gemfiles/rails_edge.gemfile
+  - gemfiles/activerecord_3.2.gemfile
+  - gemfiles/activerecord_4.0.gemfile
+  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_edge.gemfile
 cache: bundler
 script: bundle exec rake
 before_install: gem install bundler
@@ -19,5 +19,5 @@ bundler_args: '--without local_development'
 matrix:
   fast_finish: true
   allow_failures:
-      - gemfile: gemfiles/rails_edge.gemfile
+      - gemfile: gemfiles/activerecord_edge.gemfile
       - rvm: rbx-2

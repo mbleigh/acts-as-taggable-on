@@ -2,8 +2,6 @@ require 'spec_helper'
 
 describe ActsAsTaggableOn::TagsHelper do
   before(:each) do
-    clean_database!
-
     @bob = TaggableModel.create(name: 'Bob Jones', language_list: 'ruby, php')
     @tom = TaggableModel.create(name: 'Tom Marley', language_list: 'ruby, java')
     @eve = TaggableModel.create(name: 'Eve Nodd', language_list: 'ruby, c++')
@@ -13,6 +11,7 @@ describe ActsAsTaggableOn::TagsHelper do
           include ActsAsTaggableOn::TagsHelper
         end.new
   end
+
 
   it 'should yield the proper css classes' do
     tags = {}
