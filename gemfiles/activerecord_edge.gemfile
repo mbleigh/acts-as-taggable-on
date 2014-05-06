@@ -2,7 +2,9 @@
 
 source "https://rubygems.org"
 
-gem "rails", "~> 3.2"
+gem "activerecord", :github => "rails/rails"
+gem "actionpack", :github => "rails/rails"
+gem "arel", :github => "rails/arel"
 
 group :local_development do
   gem "guard"

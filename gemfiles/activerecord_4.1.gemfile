@@ -2,7 +2,8 @@
 
 source "https://rubygems.org"
 
-gem "rails", "~> 4.1.0"
+gem "activerecord", "~> 4.1"
+gem "actionpack", "~> 4.1"
 
 group :local_development do
   gem "guard"
