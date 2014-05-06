@@ -53,7 +53,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def group_columns(klass)
-      if ActsAsTaggableOn::Tag.using_postgresql?
+      if ActsAsTaggableOn::Utils.using_postgresql?
         grouped_column_names_for(klass)
       else
         "#{klass.table_name}.#{klass.primary_key}"

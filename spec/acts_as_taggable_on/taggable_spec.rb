@@ -255,7 +255,7 @@ describe 'Taggable' do
     expect(TaggableModel.select('distinct(taggable_models.id), taggable_models.*').joins(:untaggable_models).tagged_with(['rails', 'ruby'], :any => false).to_a.sort).to eq([bob, frank].sort)
   end
 
-  unless ActsAsTaggableOn::Tag.using_sqlite?
+  unless ActsAsTaggableOn::Utils.using_sqlite?
     it 'should not care about case for unicode names' do
       ActsAsTaggableOn.strict_case_match = false
       TaggableModel.create(name: 'Anya', tag_list: 'ПРИВЕТ')
@@ -848,7 +848,7 @@ describe 'Taggable' do
 end
 
 
-if ActsAsTaggableOn::Tag.using_postgresql?
+if ActsAsTaggableOn::Utils.using_postgresql?
   describe 'Taggable model with json columns' do
     before(:each) do
       @taggable = TaggableModelWithJson.new(:name => 'Bob Jones')

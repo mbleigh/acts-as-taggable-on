@@ -1,7 +1,6 @@
 # coding: utf-8
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
-    extend ActsAsTaggableOn::Utils
 
     attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
 
@@ -45,13 +44,13 @@ module ActsAsTaggableOn
     end
 
     def self.named_like(name)
-      clause = ["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(name)}%"]
+      clause = ["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(name)}%"]
       where(clause)
     end
 
     def self.named_like_any(list)
       clause = list.map { |tag|
-        sanitize_sql(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(tag.to_s)}%"])
+        sanitize_sql(["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(tag.to_s)}%"])
       }.join(' OR ')
       where(clause)
     end
@@ -113,7 +112,7 @@ module ActsAsTaggableOn
       end
 
       def binary
-        using_mysql? ? 'BINARY ' : nil
+        ActsAsTaggableOn::Utils.using_mysql? ? 'BINARY ' : nil
       end
 
       def unicode_downcase(string)

@@ -17,7 +17,7 @@ describe ActsAsTaggableOn::Tag do
 
   describe 'named like any' do
     context 'case insensitive collation and unique index on tag name' do
-      if described_class.using_case_insensitive_collation?
+      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
         before(:each) do
           ActsAsTaggableOn::Tag.create(name: 'Awesome')
           ActsAsTaggableOn::Tag.create(name: 'epic')
@@ -30,7 +30,7 @@ describe ActsAsTaggableOn::Tag do
     end
 
     context 'case insensitive collation without indexes or case sensitive collation with indexes' do
-      if described_class.using_case_insensitive_collation?
+      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
         include_context 'without unique index'
       end
 
@@ -67,7 +67,7 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
-  unless ActsAsTaggableOn::Tag.using_sqlite?
+  unless ActsAsTaggableOn::Utils.using_sqlite?
     describe 'find or create by unicode name' do
       before(:each) do
         @tag.name = 'привет'
@@ -82,7 +82,7 @@ describe ActsAsTaggableOn::Tag do
         expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('ПРИВЕТ')).to eq(@tag)
       end
 
-      if ActsAsTaggableOn::Tag.using_case_insensitive_collation?
+      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
         it 'should find by name accent insensitive' do
           @tag.name = 'inupiat'
           @tag.save
@@ -107,7 +107,7 @@ describe ActsAsTaggableOn::Tag do
     end
 
     context 'case sensitive' do
-      if described_class.using_case_insensitive_collation?
+      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
         include_context 'without unique index'
       end
 
@@ -126,7 +126,7 @@ describe ActsAsTaggableOn::Tag do
     end
 
     context 'case sensitive' do
-      if described_class.using_case_insensitive_collation?
+      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
         include_context 'without unique index'
       end
 
@@ -226,7 +226,7 @@ describe ActsAsTaggableOn::Tag do
     end
 
     context 'case sensitive' do
-      if described_class.using_case_insensitive_collation?
+      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
         include_context 'without unique index'
       end
 
@@ -240,7 +240,7 @@ describe ActsAsTaggableOn::Tag do
     end
 
     context 'case sensitive' do
-      if described_class.using_case_insensitive_collation?
+      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
         include_context 'without unique index'
       end
 

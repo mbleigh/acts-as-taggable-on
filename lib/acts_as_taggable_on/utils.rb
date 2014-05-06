@@ -2,12 +2,23 @@ module ActsAsTaggableOn
   module Utils
     extend self
 
+    # Use ActsAsTaggableOn::Tag connection
     def connection
-      ::ActiveRecord::Base.connection
+      ActsAsTaggableOn::Tag.connection
     end
 
     def using_postgresql?
       connection && connection.adapter_name == 'PostgreSQL'
+    end
+
+    def postgresql_version
+      if using_postgresql?
+        connection.execute("SHOW SERVER_VERSION").first["server_version"].to_f
+      end
+    end
+
+    def postgresql_support_json?
+      postgresql_version >= 9.2
     end
 
     def using_sqlite?
@@ -20,7 +31,7 @@ module ActsAsTaggableOn
     end
 
     def using_case_insensitive_collation?
-      using_mysql? && ::ActiveRecord::Base.connection.collation =~ /_ci\Z/
+      using_mysql? && connection.collation =~ /_ci\Z/
     end
 
     def supports_concurrency?
@@ -32,14 +43,12 @@ module ActsAsTaggableOn
     end
 
     def active_record4?
-      ::ActiveRecord::VERSION::MAJOR  == 4
+      ::ActiveRecord::VERSION::MAJOR == 4
     end
 
     def active_record42?
-      active_record4?  && ::ActiveRecord::VERSION::MINOR >= 2
+      active_record4? && ::ActiveRecord::VERSION::MINOR >= 2
     end
-
-    private
 
     def like_operator
       using_postgresql? ? 'ILIKE' : 'LIKE'

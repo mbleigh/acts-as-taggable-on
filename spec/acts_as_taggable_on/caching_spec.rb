@@ -70,4 +70,7 @@ describe 'Acts As Taggable On' do
     end
   end
 
+  describe 'CachingWithArray' do
+    pending '#TODO'
+  end
 end
