@@ -622,7 +622,7 @@ describe 'Taggable' do
       # NOTE: type column supports an STI Tag subclass in the test suite, though
       # isn't included by default in the migration generator
       expect(@taggable.grouped_column_names_for(ActsAsTaggableOn::Tag))
-          .to eq('tags.id, tags.name, tags.taggings_count, tags.type')
+      .to eq('tags.id, tags.name, tags.taggings_count, tags.type')
     end
 
     it 'should return all column names joined for TaggableModel GROUP clause' do
@@ -847,33 +847,34 @@ describe 'Taggable' do
   end
 end
 
-
 if ActsAsTaggableOn::Utils.using_postgresql?
-  describe 'Taggable model with json columns' do
-    before(:each) do
-      @taggable = TaggableModelWithJson.new(:name => 'Bob Jones')
-      @taggables = [@taggable, TaggableModelWithJson.new(:name => 'John Doe')]
-    end
+  if ActsAsTaggableOn::Utils.postgresql_support_json?
+    describe 'Taggable model with json columns' do
+      before(:each) do
+        @taggable = TaggableModelWithJson.new(:name => 'Bob Jones')
+        @taggables = [@taggable, TaggableModelWithJson.new(:name => 'John Doe')]
+      end
 
-    it 'should be able to find by tag with context' do
-      @taggable.skill_list = 'ruby, rails, css'
-      @taggable.tag_list = 'bob, charlie'
-      @taggable.save
+      it 'should be able to find by tag with context' do
+        @taggable.skill_list = 'ruby, rails, css'
+        @taggable.tag_list = 'bob, charlie'
+        @taggable.save
 
-      expect(TaggableModelWithJson.tagged_with('ruby').first).to eq(@taggable)
-      expect(TaggableModelWithJson.tagged_with('ruby, css').first).to eq(@taggable)
-      expect(TaggableModelWithJson.tagged_with('bob', :on => :skills).first).to_not eq(@taggable)
-      expect(TaggableModelWithJson.tagged_with('bob', :on => :tags).first).to eq(@taggable)
-    end
+        expect(TaggableModelWithJson.tagged_with('ruby').first).to eq(@taggable)
+        expect(TaggableModelWithJson.tagged_with('ruby, css').first).to eq(@taggable)
+        expect(TaggableModelWithJson.tagged_with('bob', :on => :skills).first).to_not eq(@taggable)
+        expect(TaggableModelWithJson.tagged_with('bob', :on => :tags).first).to eq(@taggable)
+      end
 
-    it 'should be able to find tagged with any tag' do
-      bob = TaggableModelWithJson.create(:name => 'Bob', :tag_list => 'fitter, happier, more productive', :skill_list => 'ruby, rails, css')
-      frank = TaggableModelWithJson.create(:name => 'Frank', :tag_list => 'weaker, depressed, inefficient', :skill_list => 'ruby, rails, css')
-      steve = TaggableModelWithJson.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
+      it 'should be able to find tagged with any tag' do
+        bob = TaggableModelWithJson.create(:name => 'Bob', :tag_list => 'fitter, happier, more productive', :skill_list => 'ruby, rails, css')
+        frank = TaggableModelWithJson.create(:name => 'Frank', :tag_list => 'weaker, depressed, inefficient', :skill_list => 'ruby, rails, css')
+        steve = TaggableModelWithJson.create(:name => 'Steve', :tag_list => 'fitter, happier, more productive', :skill_list => 'c++, java, ruby')
 
-      expect(TaggableModelWithJson.tagged_with(%w(ruby java), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, frank, steve])
-      expect(TaggableModelWithJson.tagged_with(%w(c++ fitter), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, steve])
-      expect(TaggableModelWithJson.tagged_with(%w(depressed css), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, frank])
+        expect(TaggableModelWithJson.tagged_with(%w(ruby java), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, frank, steve])
+        expect(TaggableModelWithJson.tagged_with(%w(c++ fitter), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, steve])
+        expect(TaggableModelWithJson.tagged_with(%w(depressed css), :order => 'taggable_model_with_jsons.name', :any => true).to_a).to eq([bob, frank])
+      end
     end
   end
 end

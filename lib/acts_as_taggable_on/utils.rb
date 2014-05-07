@@ -13,7 +13,7 @@ module ActsAsTaggableOn
 
     def postgresql_version
       if using_postgresql?
-        connection.execute("SHOW SERVER_VERSION").first["server_version"].to_f
+        connection.execute('SHOW SERVER_VERSION').first['server_version'].to_f
       end
     end
 
