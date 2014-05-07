@@ -3,8 +3,11 @@ require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
 
 shared_examples_for 'without unique index' do
-  before { AddMissingUniqueIndices.down }
-  after { ActsAsTaggableOn::Tag.delete_all; AddMissingUniqueIndices.up }
+  prepend_before(:all) { AddMissingUniqueIndices.down }
+  append_after(:all) do
+    ActsAsTaggableOn::Tag.delete_all
+    AddMissingUniqueIndices.up
+  end
 end
 
 describe ActsAsTaggableOn::Tag do
@@ -14,10 +17,9 @@ describe ActsAsTaggableOn::Tag do
   end
 
 
-
   describe 'named like any' do
-    context 'case insensitive collation and unique index on tag name' do
-      if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
+    if ActsAsTaggableOn::Utils.using_case_insensitive_collation?
+      context 'case insensitive collation and unique index on tag name' do
         before(:each) do
           ActsAsTaggableOn::Tag.create(name: 'Awesome')
           ActsAsTaggableOn::Tag.create(name: 'epic')

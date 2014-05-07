@@ -86,7 +86,7 @@ ActiveRecord::Schema.define version: 0 do
       t.column :cached_glass_list, :string, array: true
     end
 
-    if self.
+    if ActsAsTaggableOn::Utils.postgresql_support_json?
       create_table :taggable_model_with_jsons, :force => true do |t|
         t.column :name, :string
         t.column :type, :string
