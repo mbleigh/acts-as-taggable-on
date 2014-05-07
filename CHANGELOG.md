@@ -4,21 +4,33 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.1.0...master)
+### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.0...master)
 
-* Breaking Changes
-* Features
-  * [@chess #413 Hook to support STI subclasses of Tag in save_tags](https://github.com/mbleigh/acts-as-taggable-on/pull/413)
-* Fixes
-  * [@jdelStrother #515 Rename Compatibility methods to reduce chance of conflicts ](https://github.com/mbleigh/acts-as-taggable-on/pull/515)
-  * [@seuros #512 fix for << method](https://github.com/mbleigh/acts-as-taggable-on/pull/512)
-  * [@sonots #510 fix IN subquery error for mysql](https://github.com/mbleigh/acts-as-taggable-on/pull/510)
-  * [@jonseaberg #499 fix for race condition when multiple processes try to add the same tag](https://github.com/mbleigh/acts-as-taggable-on/pull/499)
-  * [@leklund #496 Fix for distinct and postgresql json columns errors](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
-  * [@thatbettina & @plexus #394 Multiple quoted tags](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
-* Performance
-* Misc
-  * [@seuros #511 Rspec 3](https://github.com/mbleigh/acts-as-taggable-on/pull/511)
+  * Breaking Changes
+    * Taggable models are not extend with ActsAsTaggableOn::Utils anymore
+  * Features
+  * Fixes
+  * Performance
+  * Misc
+    * Deleted outdated benchmark script
+
+
+### [3.2.0 / 2014-05-1](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.1.1...v3.2.0)
+
+ * Breaking Changes
+   * ActsAsTaggableOn::Tag is not extend with ActsAsTaggableOn::Utils anymore
+ * Features
+   * [@chess #413 Hook to support STI subclasses of Tag in save_tags](https://github.com/mbleigh/acts-as-taggable-on/pull/413)
+ * Fixes
+   * [@jdelStrother #515 Rename Compatibility methods to reduce chance of conflicts ](https://github.com/mbleigh/acts-as-taggable-on/pull/515)
+   * [@seuros #512 fix for << method](https://github.com/mbleigh/acts-as-taggable-on/pull/512)
+   * [@sonots #510 fix IN subquery error for mysql](https://github.com/mbleigh/acts-as-taggable-on/pull/510)
+   * [@jonseaberg #499 fix for race condition when multiple processes try to add the same tag](https://github.com/mbleigh/acts-as-taggable-on/pull/499)
+   * [@leklund #496 Fix for distinct and postgresql json columns errors](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
+   * [@thatbettina & @plexus #394 Multiple quoted tags](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
+ * Performance
+ * Misc
+   * [@seuros #511 Rspec 3](https://github.com/mbleigh/acts-as-taggable-on/pull/511)
 
 ### [3.1.0 / 2014-03-31](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0)
 

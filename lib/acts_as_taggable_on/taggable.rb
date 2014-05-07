@@ -85,8 +85,6 @@ module ActsAsTaggableOn
           def self.taggable?
             true
           end
-
-          extend ActsAsTaggableOn::Utils
         end
       end
 

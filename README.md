@@ -360,6 +360,11 @@ We have a long list of valued contributors. [Check them all](https://github.com/
 
 * [Joost Baaij](https://github.com/tilsammans)
 
+## TODO
+
+- Write benchmark script
+- Resolve concurrency issues
+
 ## Testing
 
 Acts As Taggable On uses RSpec for its test coverage. Inside the gem
