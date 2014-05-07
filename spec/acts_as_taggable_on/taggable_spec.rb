@@ -621,8 +621,8 @@ describe 'Taggable' do
     it 'should return all column names joined for Tag GROUP clause' do
       # NOTE: type column supports an STI Tag subclass in the test suite, though
       # isn't included by default in the migration generator
-      expect(@taggable.grouped_column_names_for(ActsAsTaggableOn::Tag)).
-          to eq('tags.id, tags.name, tags.taggings_count, tags.type')
+      expect(@taggable.grouped_column_names_for(ActsAsTaggableOn::Tag))
+          .to eq('tags.id, tags.name, tags.taggings_count, tags.type')
     end
 
     it 'should return all column names joined for TaggableModel GROUP clause' do

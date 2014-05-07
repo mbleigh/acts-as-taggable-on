@@ -24,16 +24,16 @@ module ActsAsTaggableOn::Taggable
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
             has_many_with_taggable_compatibility context_taggings, as: :taggable,
-                                                                   dependent: :destroy,
-                                                                   class_name: 'ActsAsTaggableOn::Tagging',
-                                                                   order: taggings_order,
-                                                                   conditions: ["#{ActsAsTaggableOn::Tagging.table_name}.context = (?)", tags_type],
-                                                                   include: :tag
+                                                 dependent: :destroy,
+                                                 class_name: 'ActsAsTaggableOn::Tagging',
+                                                 order: taggings_order,
+                                                 conditions: ["#{ActsAsTaggableOn::Tagging.table_name}.context = (?)", tags_type],
+                                                 include: :tag
 
             has_many_with_taggable_compatibility context_tags, through: context_taggings,
-                                                               source: :tag,
-                                                               class_name: 'ActsAsTaggableOn::Tag',
-                                                               order: taggings_order
+                                                 source: :tag,
+                                                 class_name: 'ActsAsTaggableOn::Tag',
+                                                 order: taggings_order
 
           end
 
@@ -145,9 +145,9 @@ module ActsAsTaggableOn::Taggable
           if owned_by
             tagging_join << ' AND ' +
                 sanitize_sql([
-                  "#{taggings_alias}.tagger_id = ? AND #{taggings_alias}.tagger_type = ?",
-                  owned_by.id,
-                  owned_by.class.base_class.to_s
+                                 "#{taggings_alias}.tagger_id = ? AND #{taggings_alias}.tagger_type = ?",
+                                 owned_by.id,
+                                 owned_by.class.base_class.to_s
                              ])
           end
 
@@ -170,9 +170,9 @@ module ActsAsTaggableOn::Taggable
             if owned_by
               tagging_join << ' AND ' +
                   sanitize_sql([
-                    "#{taggings_alias}.tagger_id = ? AND #{taggings_alias}.tagger_type = ?",
-                    owned_by.id,
-                    owned_by.class.base_class.to_s
+                                   "#{taggings_alias}.tagger_id = ? AND #{taggings_alias}.tagger_type = ?",
+                                   owned_by.id,
+                                   owned_by.class.base_class.to_s
                                ])
             end
 
@@ -202,13 +202,13 @@ module ActsAsTaggableOn::Taggable
 
         order_by << options[:order] if options[:order].present?
 
-        request = select(select_clause).
-            joins(joins.join(' ')).
-            where(conditions.join(' AND ')).
-            group(group).
-            having(having).
-            order(order_by.join(', ')).
-            readonly(false)
+        select(select_clause)
+        .joins(joins.join(' '))
+        .where(conditions.join(' AND '))
+        .group(group)
+        .having(having)
+        .order(order_by.join(', '))
+        .readonly(false)
       end
 
       def is_taggable?

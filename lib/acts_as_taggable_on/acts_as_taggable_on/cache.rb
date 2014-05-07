@@ -31,6 +31,7 @@ module ActsAsTaggableOn::Taggable
         #   to mimic the underlying behavior.  While processing this first
         #   call to columns, we do the caching column check and dynamically add
         #   the class and instance methods
+        #   FIXME: this method cannot compile in rubinius
         def columns
           @acts_as_taggable_on_cache_columns ||= begin
             db_columns = super
