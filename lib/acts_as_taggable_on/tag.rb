@@ -21,7 +21,7 @@ module ActsAsTaggableOn
 
     ### SCOPES:
 
-    def self.named(name)
+    scope :named, ->(name) do
       if ActsAsTaggableOn.strict_case_match
         where(["name = #{binary}?", as_8bit_ascii(name)])
       else
@@ -29,7 +29,7 @@ module ActsAsTaggableOn
       end
     end
 
-    def self.named_any(list)
+    scope :named_any, ->(list) do
       if ActsAsTaggableOn.strict_case_match
         clause = list.map { |tag|
           sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
@@ -43,47 +43,16 @@ module ActsAsTaggableOn
       end
     end
 
-    def self.named_like(name)
+    scope :named_like, ->(name) do
       clause = ["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(name)}%"]
       where(clause)
     end
 
-    def self.named_like_any(list)
+    scope :named_like_any, ->(list) do
       clause = list.map { |tag|
         sanitize_sql(["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(tag.to_s)}%"])
       }.join(' OR ')
       where(clause)
-    end
-
-    ### CLASS METHODS:
-
-    def self.find_or_create_with_like_by_name(name)
-      if ActsAsTaggableOn.strict_case_match
-        self.find_or_create_all_with_like_by_name([name]).first
-      else
-        named_like(name).first || create(name: name)
-      end
-    end
-
-    def self.find_or_create_all_with_like_by_name(*list)
-      list = Array(list).flatten
-
-      return [] if list.empty?
-
-      existing_tags = named_any(list)
-
-      list.map do |tag_name|
-        comparable_tag_name = comparable_name(tag_name)
-        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
-        begin
-          existing_tag || create(name: tag_name)
-        rescue ActiveRecord::RecordNotUnique
-          # Postgres aborts the current transaction with
-          # PG::InFailedSqlTransaction: ERROR:  current transaction is aborted, commands ignored until end of transaction block
-          # so we have to rollback this transaction
-          raise DuplicateTagError.new("'#{tag_name}' has already been taken")
-        end
-      end
     end
 
     ### INSTANCE METHODS:
@@ -100,7 +69,38 @@ module ActsAsTaggableOn
       read_attribute(:count).to_i
     end
 
+    ### CLASS METHODS:
     class << self
+
+      def find_or_create_with_like_by_name(name)
+        if ActsAsTaggableOn.strict_case_match
+          self.find_or_create_all_with_like_by_name([name]).first
+        else
+          named_like(name).first || create(name: name)
+        end
+      end
+
+      def find_or_create_all_with_like_by_name(*list)
+        list = Array(list).flatten
+
+        return [] if list.empty?
+
+        existing_tags = named_any(list)
+
+        list.map do |tag_name|
+          comparable_tag_name = comparable_name(tag_name)
+          existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
+          begin
+            existing_tag || create(name: tag_name)
+          rescue ActiveRecord::RecordNotUnique
+            # Postgres aborts the current transaction with
+            # PG::InFailedSqlTransaction: ERROR:  current transaction is aborted, commands ignored until end of transaction block
+            # so we have to rollback this transaction
+            raise DuplicateTagError.new("'#{tag_name}' has already been taken")
+          end
+        end
+      end
+
       private
 
       def comparable_name(str)
