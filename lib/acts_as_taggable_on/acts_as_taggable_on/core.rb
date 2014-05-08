@@ -1,17 +1,19 @@
 module ActsAsTaggableOn::Taggable
   module Core
+    extend ActiveSupport::Concern
+
+    included do
+      attr_writer :custom_contexts
+      after_save :save_tags
+    end
+
     def self.included(base)
-      base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
-
-      base.class_eval do
-        attr_writer :custom_contexts
-        after_save :save_tags
-      end
-
+      # HACK
       base.initialize_acts_as_taggable_on_core
     end
 
     module ClassMethods
+      #OPTIMIZE
       def initialize_acts_as_taggable_on_core
         include taggable_mixin
         tag_types.map(&:to_s).each do |tags_type|
