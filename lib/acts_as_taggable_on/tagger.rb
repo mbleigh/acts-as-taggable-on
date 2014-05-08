@@ -1,8 +1,7 @@
 module ActsAsTaggableOn
   module Tagger
-    def self.included(base)
-      base.extend ClassMethods
-    end
+    extend ActiveSupport::Concern
+
 
     module ClassMethods
       ##
@@ -29,7 +28,6 @@ module ActsAsTaggableOn
                                                uniq: true
         end
 
-        include ActsAsTaggableOn::Tagger::InstanceMethods
         extend ActsAsTaggableOn::Tagger::SingletonMethods
       end
 
@@ -42,7 +40,7 @@ module ActsAsTaggableOn
       end
     end
 
-    module InstanceMethods
+    included do
       ##
       # Tag a taggable model with tags that are owned by the tagger.
       #

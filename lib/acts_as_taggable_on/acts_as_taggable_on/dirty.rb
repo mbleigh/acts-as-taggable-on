@@ -1,8 +1,9 @@
 module ActsAsTaggableOn::Taggable
   module Dirty
-    def self.included(base)
-      base.extend ActsAsTaggableOn::Taggable::Dirty::ClassMethods
+    extend ActiveSupport::Concern
 
+    def self.included(base)
+      # HACK
       base.initialize_acts_as_taggable_on_dirty
     end
 

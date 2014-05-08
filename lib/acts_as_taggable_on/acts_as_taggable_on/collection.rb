@@ -1,7 +1,8 @@
 module ActsAsTaggableOn::Taggable
   module Collection
+    extend ActiveSupport::Concern
     def self.included(base)
-      base.extend ActsAsTaggableOn::Taggable::Collection::ClassMethods
+      # HACK
       base.initialize_acts_as_taggable_on_collection
     end
 
@@ -29,6 +30,7 @@ module ActsAsTaggableOn::Taggable
       end
 
       def acts_as_taggable_on(*args)
+        #HACK
         super(*args)
         initialize_acts_as_taggable_on_collection
       end

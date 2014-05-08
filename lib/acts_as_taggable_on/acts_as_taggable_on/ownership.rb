@@ -1,17 +1,19 @@
 module ActsAsTaggableOn::Taggable
   module Ownership
+    extend ActiveSupport::Concern
+
+    included do
+      after_save :save_owned_tags
+    end
+
     def self.included(base)
-      base.extend ActsAsTaggableOn::Taggable::Ownership::ClassMethods
-
-      base.class_eval do
-        after_save :save_owned_tags
-      end
-
+      # HACK
       base.initialize_acts_as_taggable_on_ownership
     end
 
     module ClassMethods
       def acts_as_taggable_on(*args)
+        # HACK
         initialize_acts_as_taggable_on_ownership
         super(*args)
       end
