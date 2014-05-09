@@ -135,11 +135,13 @@ these methods are added to the model: `skill_list`(and `skill_list.add`, `skill_
 # => ["joking", "clowning", "boxing", "coding"]
 
 @another_user = User.new(:name => "Alice")
-@another_story.skill_list.add("joking")
-@another_story.save
+@another_user.skill_list.add("clowning")
+@another_user.save
 
 User.skill_counts
-=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 2>, #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 1>, ...]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 2>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
 ```
 
 To preserve the order in which tags are created use `acts_as_ordered_taggable`:
@@ -176,22 +178,22 @@ end
 User.tagged_with("awesome").by_join_date
 User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
-# Find a user with matching all tags, not just one:
+# Find users that matches all given tags:
 User.tagged_with(["awesome", "cool"], :match_all => true)
 
-# Find a user with any of the tags:
+# Find users with any of the specified tags:
 User.tagged_with(["awesome", "cool"], :any => true)
 
-# Find a user that not tags with awesome or cool:
+# Find users that has not been tagged with awesome or cool:
 User.tagged_with(["awesome", "cool"], :exclude => true)
 
-# Find a user with any of tags based on context:
+# Find users with any of the tags based on context:
 User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
-You can also use `:wild => true` option along with `:any` or `:exclude` option. It will looking for `%awesome%` and `%cool%` in sql.
+You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
 
-__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, but not all records.
+__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
 
 ### Relationships
 
@@ -273,7 +275,7 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 To construct tag clouds, the frequency of each tag needs to be calculated.
 Because we specified `acts_as_taggable_on` on the `User` class, we can
 get a calculation of all the tag counts by using `User.tag_counts_on(:customs)`. But what if we wanted a tag count for
-an single user's posts? To achieve this we call tag_counts on the association:
+a single user's posts? To achieve this we call tag_counts on the association:
 
 ```ruby
 User.find(:first).posts.tag_counts_on(:tags)
