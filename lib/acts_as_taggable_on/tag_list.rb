@@ -149,9 +149,10 @@ module ActsAsTaggableOn
 
     private
 
-    # Remove whitespace, duplicates, and blanks.
+    # Convert everything to string, remove whitespace, duplicates, and blanks.
     def clean!
       reject!(&:blank?)
+      map!(&:to_s)
       map!(&:strip)
       map! { |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
