@@ -83,6 +83,7 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with("awesome", "cool", :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagList.from(tags)
+        options = options.dup
         empty_result = where('1 = 0')
 
         return empty_result if tag_list.empty?
