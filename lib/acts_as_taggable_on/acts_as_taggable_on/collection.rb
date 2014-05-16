@@ -53,6 +53,7 @@ module ActsAsTaggableOn::Taggable
       #                       * :order      - A piece of SQL to order by. Eg 'tags.count desc' or 'taggings.created_at desc'
       #                       * :on         - Scope the find to only include a certain context
       def all_tags(options = {})
+        options = options.dup
         options.assert_valid_keys :start_at, :end_at, :conditions, :order, :limit, :on
 
         ## Generate conditions:
@@ -87,6 +88,7 @@ module ActsAsTaggableOn::Taggable
       #                       * :at_most    - Exclude tags with a frequency greater than the given value
       #                       * :on         - Scope the find to only include a certain context
       def all_tag_counts(options = {})
+        options = options.dup
         options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :on, :id
 
         ## Generate conditions:

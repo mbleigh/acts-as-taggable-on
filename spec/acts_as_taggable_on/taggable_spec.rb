@@ -494,6 +494,12 @@ describe 'Taggable' do
     end
   end
 
+  it 'should options key not be deleted' do
+    options = {:exclude => true}
+    TaggableModel.tagged_with("foo", options)
+    expect(options).to eq({:exclude => true})
+  end
+
   context 'Duplicates' do
     context 'should not create duplicate taggings' do
       let(:bob) { TaggableModel.create(name: 'Bob') }
