@@ -23,5 +23,29 @@ describe ActsAsTaggableOn::Tagging do
       2.times { ActsAsTaggableOn::Tagging.create(taggable: @taggable, tag: @tag, context: 'tags') }
     }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
-  
+
+  it 'should not delete tags of other records' do
+    6.times { TaggableModel.create(name: 'Bob Jones', tag_list: 'very, serious, bug') }
+    expect(ActsAsTaggableOn::Tag.count).to eq(3)
+    taggable = TaggableModel.first
+    taggable.tag_list = 'bug'
+    taggable.save
+
+    expect(taggable.tag_list).to eq(['bug'])
+
+    another_taggable = TaggableModel.where('id != ?', taggable.id).sample
+    expect(another_taggable.tag_list).to eq(%w(very serious bug))
+  end
+
+  pending 'context scopes' do
+    describe '.by_context'
+
+    describe '.by_contexts'
+
+    describe '.owned_by'
+
+    describe '.not_owned'
+
+  end
+
 end

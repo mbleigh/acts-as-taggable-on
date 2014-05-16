@@ -382,7 +382,7 @@ module ActsAsTaggableOn::Taggable
 
         # Destroy old taggings:
         if old_tags.present?
-          ActsAsTaggableOn::Tagging.destroy_all(tagger_type: nil, tagger_id: nil, context: context.to_s, tag_id: old_tags)
+          self.taggings.not_owned.by_context(context).destroy_all(tag_id: old_tags)
         end
 
         # Create new taggings:
