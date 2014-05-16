@@ -34,7 +34,7 @@ describe ActsAsTaggableOn::Tagging do
     expect(taggable.tag_list).to eq(['bug'])
 
     another_taggable = TaggableModel.where('id != ?', taggable.id).sample
-    expect(another_taggable.tag_list).to eq(%w(very serious bug))
+    expect(another_taggable.tag_list.sort).to eq(%w(very serious bug).sort)
   end
 
   pending 'context scopes' do
