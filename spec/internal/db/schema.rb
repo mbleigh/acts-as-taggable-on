@@ -76,7 +76,7 @@ ActiveRecord::Schema.define version: 0 do
 
 
   # Special cases for postgresql
-  if ActsAsTaggableOn::Utils.using_postgresql?
+  if using_postgresql?
 
     create_table :other_cached_with_array_models, force: true do |t|
       t.column :name, :string
@@ -86,7 +86,7 @@ ActiveRecord::Schema.define version: 0 do
       t.column :cached_glass_list, :string, array: true
     end
 
-    if ActsAsTaggableOn::Utils.postgresql_support_json?
+    if postgresql_support_json?
       create_table :taggable_model_with_jsons, :force => true do |t|
         t.column :name, :string
         t.column :type, :string

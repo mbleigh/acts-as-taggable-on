@@ -77,11 +77,11 @@ class OrderedTaggableModel < ActiveRecord::Base
   acts_as_ordered_taggable_on :colours
 end
 
-if ActsAsTaggableOn::Utils.using_postgresql?
+if using_postgresql?
   class CachedModelWithArray < ActiveRecord::Base
     acts_as_taggable
   end
-  if ActsAsTaggableOn::Utils.postgresql_support_json?
+  if postgresql_support_json?
     class TaggableModelWithJson < ActiveRecord::Base
       acts_as_taggable
       acts_as_taggable_on :skills
