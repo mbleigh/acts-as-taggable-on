@@ -9,14 +9,23 @@ module ActsAsTaggableOn
   extend ActiveSupport::Autoload
 
   autoload :Engine
-  autoload :Utils
-  autoload :Taggable
   autoload :Tag
-  autoload :Tagger
   autoload :TagList
+  autoload :Taggable
+  autoload :Tagger
   autoload :Tagging
   autoload :TagsHelper
 
+  autoload_under 'taggable' do
+    autoload :Cache
+    autoload :Collection
+    autoload :Core
+    autoload :Dirty
+    autoload :Ownership
+    autoload :Related
+  end
+
+  autoload :Utils
   autoload :Compatibility
 
 
@@ -30,7 +39,7 @@ module ActsAsTaggableOn
 
   def self.method_missing(method_name, *args, &block)
     @configuration.respond_to?(method_name) ?
-      @configuration.send(method_name, *args, &block) : super
+        @configuration.send(method_name, *args, &block) : super
   end
 
   def self.respond_to?(method_name, include_private=false)
@@ -45,7 +54,7 @@ module ActsAsTaggableOn
 
   class Configuration
     attr_accessor :delimiter, :force_lowercase, :force_parameterize,
-      :strict_case_match, :remove_unused_tags
+                  :strict_case_match, :remove_unused_tags
 
     def initialize
       @delimiter = ','

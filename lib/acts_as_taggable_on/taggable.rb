@@ -1,13 +1,5 @@
 module ActsAsTaggableOn
   module Taggable
-    extend ActiveSupport::Autoload
-
-    autoload :Core
-    autoload :Collection
-    autoload :Cache
-    autoload :Ownership
-    autoload :Related
-    autoload :Dirty
 
     def taggable?
       false
