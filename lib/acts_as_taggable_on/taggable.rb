@@ -1,5 +1,6 @@
 module ActsAsTaggableOn
   module Taggable
+
     def taggable?
       false
     end
@@ -90,12 +91,12 @@ module ActsAsTaggableOn
 
       # each of these add context-specific methods and must be
       # called on each call of taggable_on
-      include ActsAsTaggableOn::Taggable::Core
-      include ActsAsTaggableOn::Taggable::Collection
-      include ActsAsTaggableOn::Taggable::Cache
-      include ActsAsTaggableOn::Taggable::Ownership
-      include ActsAsTaggableOn::Taggable::Related
-      include ActsAsTaggableOn::Taggable::Dirty
+      include Core
+      include Collection
+      include Cache
+      include Ownership
+      include Related
+      include Dirty
     end
   end
 end
