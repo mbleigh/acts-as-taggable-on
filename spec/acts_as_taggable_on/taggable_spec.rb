@@ -208,6 +208,14 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('ruby').group(:created_at).count.count).to eq(1)
   end
 
+  it 'can be used as scope' do
+    @taggable.skill_list = 'ruby'
+    @taggable.save
+    untaggable_model = @taggable.untaggable_models.create!(name:'foobar')
+    scope_tag = TaggableModel.tagged_with('ruby', :any => true, order: 'taggable_models.name asc')
+    expect(UntaggableModel.joins(:taggable_model).merge(scope_tag).except(:select)).to eq([untaggable_model])
+  end
+
   it "shouldn't generate a query with DISTINCT by default" do
     @taggable.skill_list = 'ruby, rails, css'
     @taggable.save

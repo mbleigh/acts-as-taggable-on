@@ -1,3 +1,4 @@
+
 module ActsAsTaggableOn::Taggable
   module Core
     def self.included(base)
@@ -82,7 +83,7 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
       #   User.tagged_with("awesome", "cool", :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
       def tagged_with(tags, options = {})
-        tag_list = ActsAsTaggableOn::TagList.from(tags)
+        tag_list = ActsAsTaggableOn::TagListParser.parse(tags)
         options = options.dup
         empty_result = where('1 = 0')
 
@@ -141,7 +142,7 @@ module ActsAsTaggableOn::Taggable
 
           # don't need to sanitize sql, map all ids and join with OR logic
           conditions << tags.map { |t| "#{taggings_alias}.tag_id = #{quote_value(t.id, nil)}" }.join(' OR ')
-          select_clause = " #{table_name}.*" unless context and tag_types.one?
+          select_clause << " #{table_name}.*" unless context and tag_types.one?
 
           if owned_by
             tagging_join << ' AND ' +
@@ -154,6 +155,7 @@ module ActsAsTaggableOn::Taggable
 
           joins << tagging_join
           group = "#{table_name}.#{primary_key}"
+          select_clause << group
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
 
@@ -183,7 +185,7 @@ module ActsAsTaggableOn::Taggable
 
         group ||= [] # Rails interprets this as a no-op in the group() call below
         if options.delete(:order_by_matching_tag_count)
-          select_clause = "#{table_name}.*, COUNT(#{taggings_alias}.tag_id) AS #{taggings_alias}_count"
+          select_clause << "#{table_name}.*, COUNT(#{taggings_alias}.tag_id) AS #{taggings_alias}_count"
           group_columns = ActsAsTaggableOn::Utils.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
           group = group_columns
           order_by << "#{taggings_alias}_count DESC"
@@ -203,8 +205,10 @@ module ActsAsTaggableOn::Taggable
 
         order_by << options[:order] if options[:order].present?
 
-        select(select_clause)
-        .joins(joins.join(' '))
+
+        query = self
+        query = self.select(select_clause.join(',')) unless select_clause.empty?
+        query.joins(joins.join(' '))
         .where(conditions.join(' AND '))
         .group(group)
         .having(having)
@@ -259,7 +263,7 @@ module ActsAsTaggableOn::Taggable
       if instance_variable_get(variable_name)
         instance_variable_get(variable_name)
       elsif cached_tag_list_on(context) && self.class.caching_tag_list_on?(context)
-        instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(cached_tag_list_on(context)))
+        instance_variable_set(variable_name, ActsAsTaggableOn::TagListParser.parse(cached_tag_list_on(context)))
       else
         instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
       end
@@ -309,7 +313,7 @@ module ActsAsTaggableOn::Taggable
       variable_name = "@#{context.to_s.singularize}_list"
       process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
 
-      instance_variable_set(variable_name, ActsAsTaggableOn::TagList.from(new_list))
+      instance_variable_set(variable_name, ActsAsTaggableOn::TagListParser.parse(new_list))
     end
 
     def tagging_contexts
