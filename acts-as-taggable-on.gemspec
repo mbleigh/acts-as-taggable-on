@@ -32,7 +32,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec-rails'  , '~> 3.0.0.beta'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'ammeter'
   gem.add_development_dependency 'barrier'
   gem.add_development_dependency 'database_cleaner'
 end
