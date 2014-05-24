@@ -1,4 +1,3 @@
-
 module ActsAsTaggableOn::Taggable
   module Core
     def self.included(base)
@@ -117,7 +116,7 @@ module ActsAsTaggableOn::Taggable
                 " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = #{quote_value(owned_by.class.base_class.to_s, nil)}"
           end
 
-        elsif options.delete(:any)
+        elsif any = options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
           tags = if options.delete(:wild)
                    ActsAsTaggableOn::Tag.named_like_any(tag_list)
@@ -154,8 +153,10 @@ module ActsAsTaggableOn::Taggable
           end
 
           joins << tagging_join
-          group = "#{table_name}.#{primary_key}"
-          select_clause << group
+          unless any == 'distinct'    # Fix issue #544
+            group = "#{table_name}.#{primary_key}"
+            select_clause << group
+          end
         else
           tags = ActsAsTaggableOn::Tag.named_any(tag_list)
 
@@ -204,7 +205,6 @@ module ActsAsTaggableOn::Taggable
         end
 
         order_by << options[:order] if options[:order].present?
-
 
         query = self
         query = self.select(select_clause.join(',')) unless select_clause.empty?
