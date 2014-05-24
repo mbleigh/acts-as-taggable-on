@@ -11,6 +11,7 @@ module ActsAsTaggableOn
   autoload :Engine
   autoload :Tag
   autoload :TagList
+  autoload :TagListParser
   autoload :Taggable
   autoload :Tagger
   autoload :Tagging

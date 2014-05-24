@@ -6,7 +6,6 @@ require File.expand_path('../../lib/acts-as-taggable-on', __FILE__)
 I18n.enforce_available_locales = true
 require 'rails'
 require 'rspec/its'
-require 'ammeter/init'  # <= You are next
 require 'barrier'
 require 'database_cleaner'
 

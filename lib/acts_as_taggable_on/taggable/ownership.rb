@@ -63,7 +63,7 @@ module ActsAsTaggableOn::Taggable
 
       cache = cached_owned_tag_list_on(context)
 
-      cache[owner] = ActsAsTaggableOn::TagList.from(new_list)
+      cache[owner] = ActsAsTaggableOn::TagListParser.parse(new_list)
     end
 
     def reload(*args)
