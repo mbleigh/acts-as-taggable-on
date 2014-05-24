@@ -1,3 +1,4 @@
+
 require 'active_support/core_ext/module/delegation'
 
 module ActsAsTaggableOn
@@ -8,82 +9,6 @@ module ActsAsTaggableOn
       add(*args)
     end
 
-    class << self
-      ##
-      # Returns a new TagList using the given tag string.
-      #
-      # Example:
-      #   tag_list = ActsAsTaggableOn::TagList.from("One , Two,  Three")
-      #   tag_list # ["One", "Two", "Three"]
-      def from(string)
-        string = string.join(ActsAsTaggableOn.glue) if string.respond_to?(:join)
-
-        new.tap do |tag_list|
-          string = string.to_s.dup
-
-
-          string.gsub!(double_quote_pattern) {
-            # Append the matched tag to the tag list
-            tag_list << Regexp.last_match[2]
-            # Return the matched delimiter ($3) to replace the matched items
-            ''
-          }
-
-          string.gsub!(single_quote_pattern) {
-            # Append the matched tag ($2) to the tag list
-            tag_list << Regexp.last_match[2]
-            # Return an empty string to replace the matched items
-            ''
-          }
-
-          # split the string by the delimiter
-          # and add to the tag_list
-          tag_list.add(string.split(Regexp.new delimiter))
-        end
-      end
-
-      def delimiter
-        # Parse the quoted tags
-        d = ActsAsTaggableOn.delimiter
-        # Separate multiple delimiters by bitwise operator
-        d = d.join('|') if d.kind_of?(Array)
-
-        d
-      end
-
-      def single_quote_pattern
-        %r{
-          (             # Tag start delimiter ($1)
-            \A       |  # Either string start or
-            #{delimiter}        # a delimiter
-          )
-          \s*'          # quote (') optionally preceded by whitespace
-          (.*?)         # Tag ($2)
-          '\s*          # quote (') optionally followed by whitespace
-          (?=           # Tag end delimiter (not consumed; is zero-length lookahead)
-            #{delimiter}\s*  |  # Either a delimiter optionally followed by whitespace or
-            \z          # string end
-          )
-      }x
-      end
-
-      def double_quote_pattern
-        %r{
-          (             # Tag start delimiter ($1)
-            \A       |  # Either string start or
-            #{delimiter}        # a delimiter
-          )
-          \s*"          # quote (") optionally preceded by whitespace
-          (.*?)         # Tag ($2)
-          "\s*          # quote (") optionally followed by whitespace
-          (?=           # Tag end delimiter (not consumed; is zero-length lookahead)
-            #{delimiter}\s*  |  # Either a delimiter optionally followed by whitespace or
-            \z          # string end
-          )
-      }x
-      end
-
-    end
     ##
     # Add tags to the tag_list. Duplicate or blank tags will be ignored.
     # Use the <tt>:parse</tt> option to add an unparsed tag string.
@@ -165,9 +90,20 @@ module ActsAsTaggableOn
       options = args.last.is_a?(Hash) ? args.pop : {}
       options.assert_valid_keys :parse
 
-      args.map! { |a| self.class.from(a) } if options[:parse]
+      args.map! { |a| TagListParser.parse(a) } if options[:parse]
 
       args.flatten!
+    end
+
+
+    ## DEPRECATED
+    def self.from(string)
+      ActiveRecord::Base.logger.warn <<WARNING
+ActsAsTaggableOn::TagList.from is deprecated \
+and will be removed from v4.0+, use  \
+ActsAsTaggableOn::TagListParser.parse instead
+WARNING
+      TagListParser.parse(string)
     end
 
 
