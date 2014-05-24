@@ -212,7 +212,7 @@ describe 'Taggable' do
     @taggable.skill_list = 'ruby'
     @taggable.save
     untaggable_model = @taggable.untaggable_models.create!(name:'foobar')
-    scope_tag = TaggableModel.tagged_with('ruby', :any => true, order: 'taggable_models.name asc')
+    scope_tag = TaggableModel.tagged_with('ruby', :any => 'distinct', order: 'taggable_models.name asc')
     expect(UntaggableModel.joins(:taggable_model).merge(scope_tag).except(:select)).to eq([untaggable_model])
   end
 

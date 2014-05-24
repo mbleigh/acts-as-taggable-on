@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- encoding : utf-8 -*-
 require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
 
