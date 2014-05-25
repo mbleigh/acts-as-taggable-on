@@ -3,12 +3,13 @@ require 'active_record/version'
 require 'active_support/core_ext/module'
 require 'action_view'
 
+require_relative 'acts_as_taggable_on/engine'
+
 require 'digest/sha1'
 
 module ActsAsTaggableOn
   extend ActiveSupport::Autoload
 
-  autoload :Engine
   autoload :Tag
   autoload :TagList
   autoload :TagListParser
@@ -16,6 +17,7 @@ module ActsAsTaggableOn
   autoload :Tagger
   autoload :Tagging
   autoload :TagsHelper
+  autoload :VERSION
 
   autoload_under 'taggable' do
     autoload :Cache
