@@ -506,6 +506,13 @@ describe 'Taggable' do
     expect(options).to eq({:exclude => true})
   end
 
+  it 'should not delete tags if not updated' do
+    model = TaggableModel.create(name: 'foo', tag_list: 'ruby, rails, programming')
+    model.update_attributes(name: 'bar')
+    model.reload
+    expect(model.tag_list.sort).to eq(%w(ruby rails programming).sort)
+  end
+
   context 'Duplicates' do
     context 'should not create duplicate taggings' do
       let(:bob) { TaggableModel.create(name: 'Bob') }

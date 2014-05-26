@@ -3,7 +3,7 @@ require 'active_record/version'
 require 'active_support/core_ext/module'
 require 'action_view'
 
-require_relative 'acts_as_taggable_on/engine'
+require_relative 'acts_as_taggable_on/engine'  if defined?(Rails)
 
 require 'digest/sha1'
 
