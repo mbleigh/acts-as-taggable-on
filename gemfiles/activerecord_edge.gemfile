@@ -3,7 +3,6 @@
 source "https://rubygems.org"
 
 gem "activerecord", :github => "rails/rails"
-gem "actionpack", :github => "rails/rails"
 gem "arel", :github => "rails/arel"
 
 group :local_development do

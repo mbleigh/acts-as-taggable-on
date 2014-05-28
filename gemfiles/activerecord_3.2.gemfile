@@ -3,7 +3,6 @@
 source "https://rubygems.org"
 
 gem "activerecord", "~> 3.2"
-gem "actionpack", "~> 3.2"
 
 group :local_development do
   gem "guard"
