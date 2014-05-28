@@ -153,7 +153,7 @@ module ActsAsTaggableOn::Taggable
           end
 
           joins << tagging_join
-          unless any == 'distinct'    # Fix issue #544
+          unless any == 'distinct' # Fix issue #544
             group = "#{table_name}.#{primary_key}"
             select_clause << group
           end
@@ -329,8 +329,12 @@ module ActsAsTaggableOn::Taggable
         old = changed_attributes[attrib]
         changed_attributes.delete(attrib) if old.to_s == value.to_s
       else
-        old = tag_list_on(context).to_s
-        changed_attributes[attrib] = old if old.to_s != value.to_s
+        old = tag_list_on(context)
+        if self.class.preserve_tag_order
+          changed_attributes[attrib] = old if old.to_s != value.to_s
+        else
+          changed_attributes[attrib] = old.to_s if old.sort != ActsAsTaggableOn::TagListParser.parse(value).sort
+        end
       end
     end
 
