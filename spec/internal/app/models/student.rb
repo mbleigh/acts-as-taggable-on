@@ -1,0 +1,2 @@
+class Student < User
+end

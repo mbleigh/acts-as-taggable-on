@@ -18,11 +18,11 @@ module ActsAsTaggableOn::Taggable
             end
 
             def top_#{tag_type}(limit = 10)
-              tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+              tag_counts_on('#{tag_type}', order: 'count desc', limit: limit.to_i)
             end
 
             def self.top_#{tag_type}(limit = 10)
-              tag_counts_on('#{tag_type}', :order => 'count desc', :limit => limit.to_i)
+              tag_counts_on('#{tag_type}', order: 'count desc', limit: limit.to_i)
             end
           RUBY
         end
@@ -34,11 +34,11 @@ module ActsAsTaggableOn::Taggable
       end
 
       def tag_counts_on(context, options = {})
-        all_tag_counts(options.merge({:on => context.to_s}))
+        all_tag_counts(options.merge({on: context.to_s}))
       end
 
       def tags_on(context, options = {})
-        all_tags(options.merge({:on => context.to_s}))
+        all_tags(options.merge({on: context.to_s}))
       end
 
       ##
@@ -53,6 +53,7 @@ module ActsAsTaggableOn::Taggable
       #                       * :order      - A piece of SQL to order by. Eg 'tags.count desc' or 'taggings.created_at desc'
       #                       * :on         - Scope the find to only include a certain context
       def all_tags(options = {})
+        options = options.dup
         options.assert_valid_keys :start_at, :end_at, :conditions, :order, :limit, :on
 
         ## Generate conditions:
@@ -64,17 +65,15 @@ module ActsAsTaggableOn::Taggable
 
         # Joins and conditions
         tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
-        tag_scope     = tag_scope.where(options[:conditions])
+        tag_scope = tag_scope.where(options[:conditions])
 
         group_columns = "#{ActsAsTaggableOn::Tagging.table_name}.tag_id"
 
         # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
-        scoped_select = "#{table_name}.#{primary_key}"
-        tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(scoped_select))})").group(group_columns)
+        tagging_scope = generate_tagging_scope_in_clause(tagging_scope, table_name, primary_key).group(group_columns)
 
         tag_scope_joins(tag_scope, tagging_scope)
       end
-
 
       ##
       # Calculate the tag counts for all tags.
@@ -89,6 +88,7 @@ module ActsAsTaggableOn::Taggable
       #                       * :at_most    - Exclude tags with a frequency greater than the given value
       #                       * :on         - Scope the find to only include a certain context
       def all_tag_counts(options = {})
+        options = options.dup
         options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :on, :id
 
         ## Generate conditions:
@@ -98,7 +98,6 @@ module ActsAsTaggableOn::Taggable
         taggable_join = "INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
         taggable_join << " AND #{table_name}.#{inheritance_column} = '#{name}'" unless descends_from_active_record? # Current model is STI descendant, so add type checking to the join condition
 
-
         ## Generate scope:
         tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id, COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) AS tags_count")
         tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*, #{ActsAsTaggableOn::Tagging.table_name}.tags_count AS count").order(options[:order]).limit(options[:limit])
@@ -106,7 +105,7 @@ module ActsAsTaggableOn::Taggable
         # Joins and conditions
         tagging_scope = tagging_scope.joins(taggable_join)
         tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
-        tag_scope     = tag_scope.where(options[:conditions])
+        tag_scope = tag_scope.where(options[:conditions])
 
         # GROUP BY and HAVING clauses:
         having = ["COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) > 0"]
@@ -118,8 +117,7 @@ module ActsAsTaggableOn::Taggable
 
         unless options[:id]
           # Append the current scope to the scope, because we can't use scope(:find) in RoR 3.0 anymore:
-          scoped_select = "#{table_name}.#{primary_key}"
-          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(scoped_select))})")
+          tagging_scope = generate_tagging_scope_in_clause(tagging_scope, table_name, primary_key)
         end
 
         tagging_scope = tagging_scope.group(group_columns).having(having)
@@ -128,21 +126,34 @@ module ActsAsTaggableOn::Taggable
       end
 
       def safe_to_sql(relation)
-        connection.respond_to?(:unprepared_statement) ? connection.unprepared_statement{relation.to_sql} : relation.to_sql
+        connection.respond_to?(:unprepared_statement) ? connection.unprepared_statement { relation.to_sql } : relation.to_sql
       end
 
       private
 
+      def generate_tagging_scope_in_clause(tagging_scope, table_name, primary_key)
+        table_name_pkey = "#{table_name}.#{primary_key}"
+        if ActsAsTaggableOn::Utils.using_mysql?
+          # See https://github.com/mbleigh/acts-as-taggable-on/pull/457 for details
+          scoped_ids = select(table_name_pkey).map(&:id)
+          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN (?)", scoped_ids)
+        else
+          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(table_name_pkey))})")
+        end
+
+        tagging_scope
+      end
+
       def tagging_conditions(options)
         tagging_conditions = []
-        tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
+        tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)]) if options[:end_at]
         tagging_conditions.push sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
 
-        taggable_conditions  = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
+        taggable_conditions = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
         taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]])  if options[:id]
+        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]]) if options[:id]
 
-        tagging_conditions.push     taggable_conditions
+        tagging_conditions.push taggable_conditions
 
         tagging_conditions
       end
@@ -154,13 +165,13 @@ module ActsAsTaggableOn::Taggable
     end
 
     def tag_counts_on(context, options={})
-      self.class.tag_counts_on(context, options.merge(:id => id))
+      self.class.tag_counts_on(context, options.merge(id: id))
     end
 
     module CalculationMethods
-      def count
+      def count(column_name=:all)
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
-        super(:all)
+        super
       end
     end
   end

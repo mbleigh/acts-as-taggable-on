@@ -76,14 +76,14 @@ end
 Add and remove a single tag
 
 ```ruby
-@user.tag_list.add("awesomer")   # add a single tag. alias for <<
+@user.tag_list.add("awesome")   # add a single tag. alias for <<
 @user.tag_list.remove("awesome") # remove a single tag
 ```
 
 Add and remove multiple tags in an array
 
 ```ruby
-@user.tag_list.add("awesomer", "slicker")
+@user.tag_list.add("awesome", "slick")
 @user.tag_list.remove("awesome", "slick")
 ```
 
@@ -98,7 +98,7 @@ a change on delimiter setting, make sure the string will match. See
 [configuration](#configuration) for more about delimiter.
 
 ```ruby
-@user.tag_list.add("awesomer, slicker", parse: true)
+@user.tag_list.add("awesome, slick", parse: true)
 @user.tag_list.remove("awesome, slick", parse: true)
 ```
 
@@ -107,29 +107,41 @@ remove existing tags so use it with attention.
 
 ```ruby
 @user.tag_list = "awesome, slick, hefty"
+@user.save
+@user.reload
 @user.tags
-# => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "awesome", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "slick", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "hefty", taggings_count: 1>]
 ```
 
 With the defined context in model, you have multiple new methods at disposal
 to manage and view the tags in the context. For example, with `:skill` context
 these methods are added to the model: `skill_list`(and `skill_list.add`, `skill_list.remove`
-`skill_list=`), `skills`(plural), skill_counts
-
+`skill_list=`), `skills`(plural), `skill_counts`.
 
 ```ruby
 @user.skill_list = "joking, clowning, boxing"
-
+@user.save
+@user.reload
 @user.skills
-# => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
 
 @user.skill_list.add("coding")
 
 @user.skill_list
-# => ["joking","clowning","boxing", "coding"]
+# => ["joking", "clowning", "boxing", "coding"]
+
+@another_user = User.new(:name => "Alice")
+@another_user.skill_list.add("clowning")
+@another_user.save
 
 User.skill_counts
-# => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 2>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
 ```
 
 To preserve the order in which tags are created use `acts_as_ordered_taggable`:
@@ -166,22 +178,22 @@ end
 User.tagged_with("awesome").by_join_date
 User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
-# Find a user with matching all tags, not just one
+# Find users that matches all given tags:
 User.tagged_with(["awesome", "cool"], :match_all => true)
 
-# Find a user with any of the tags:
+# Find users with any of the specified tags:
 User.tagged_with(["awesome", "cool"], :any => true)
 
-# Find a user that not tags with awesome or cool:
+# Find users that has not been tagged with awesome or cool:
 User.tagged_with(["awesome", "cool"], :exclude => true)
 
-# Find a user with any of tags based on context:
-User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
+# Find users with any of the tags based on context:
+User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
-You can also use `:wild => true` option along with `:any` or `:exclude` option. It will looking for `%awesome%` and `%cool%` in sql.
+You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
 
-__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, but not all records.
+__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
 
 ### Relationships
 
@@ -199,7 +211,7 @@ matched tags.
 @tom = User.find_by_name("Tom")
 @tom.skill_list # => ["hacking", "jogging", "diving"]
 
-@tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
+@tom.find_related_skills # => [<User name="Bobby">, <User name="Frankie">]
 @bobby.find_related_skills # => [<User name="Tom">]
 @frankie.find_related_skills # => [<User name="Tom">]
 ```
@@ -212,7 +224,7 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 ```ruby
 @user = User.new(:name => "Bobby")
 @user.set_tag_list_on(:customs, "same, as, tag, list")
-@user.tag_list_on(:customs) # => ["same","as","tag","list"]
+@user.tag_list_on(:customs) # => ["same", "as", "tag", "list"]
 @user.save
 @user.tags_on(:customs) # => [<Tag name='same'>,...]
 @user.tag_counts_on(:customs)
@@ -263,7 +275,7 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 To construct tag clouds, the frequency of each tag needs to be calculated.
 Because we specified `acts_as_taggable_on` on the `User` class, we can
 get a calculation of all the tag counts by using `User.tag_counts_on(:customs)`. But what if we wanted a tag count for
-an single user's posts? To achieve this we call tag_counts on the association:
+a single user's posts? To achieve this we call tag_counts on the association:
 
 ```ruby
 User.find(:first).posts.tag_counts_on(:tags)
@@ -340,6 +352,8 @@ If you want to change the default delimiter (it defaults to ','). You can also p
 ActsAsTaggableOn.delimiter = ','
 ```
 
+*NOTE: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
+
 ## Contributors
 
 We have a long list of valued contributors. [Check them all](https://github.com/mbleigh/acts-as-taggable-on/contributors)
@@ -347,6 +361,11 @@ We have a long list of valued contributors. [Check them all](https://github.com/
 ## Maintainer
 
 * [Joost Baaij](https://github.com/tilsammans)
+
+## TODO
+
+- Write benchmark script
+- Resolve concurrency issues
 
 ## Testing
 

@@ -1,19 +1,18 @@
-# coding: utf-8
+# encoding: utf-8
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
-    extend ActsAsTaggableOn::Utils
 
     attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
 
     ### ASSOCIATIONS:
 
-    has_many :taggings, :dependent => :destroy, :class_name => 'ActsAsTaggableOn::Tagging'
+    has_many :taggings, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging'
 
     ### VALIDATIONS:
 
     validates_presence_of :name
-    validates_uniqueness_of :name, :if => :validates_name_uniqueness?
-    validates_length_of :name, :maximum => 255
+    validates_uniqueness_of :name, if: :validates_name_uniqueness?
+    validates_length_of :name, maximum: 255
 
     # monkey patch this method if don't need name uniqueness validation
     def validates_name_uniqueness?
@@ -24,9 +23,9 @@ module ActsAsTaggableOn
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
-        where(["name = #{binary}?", name])
+        where(["name = #{binary}?", as_8bit_ascii(name)])
       else
-        where(["lower(name) = ?", name.downcase])
+        where(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(name))])
       end
     end
 
@@ -34,36 +33,35 @@ module ActsAsTaggableOn
       if ActsAsTaggableOn.strict_case_match
         clause = list.map { |tag|
           sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
-        }.join(" OR ")
+        }.join(' OR ')
         where(clause)
       else
         clause = list.map { |tag|
-          lowercase_ascii_tag = as_8bit_ascii(tag, true)
-          sanitize_sql(["lower(name) = ?", lowercase_ascii_tag])
-        }.join(" OR ")
+          sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
+        }.join(' OR ')
         where(clause)
       end
     end
 
     def self.named_like(name)
-      clause = ["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(name)}%"]
+      clause = ["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(name)}%"]
       where(clause)
     end
 
     def self.named_like_any(list)
       clause = list.map { |tag|
-        sanitize_sql(["name #{like_operator} ? ESCAPE '!'", "%#{escape_like(tag.to_s)}%"])
-      }.join(" OR ")
+        sanitize_sql(["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(tag.to_s)}%"])
+      }.join(' OR ')
       where(clause)
     end
 
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
-      if (ActsAsTaggableOn.strict_case_match)
+      if ActsAsTaggableOn.strict_case_match
         self.find_or_create_all_with_like_by_name([name]).first
       else
-        named_like(name).first || create(:name => name)
+        named_like(name).first || create(name: name)
       end
     end
 
@@ -72,13 +70,19 @@ module ActsAsTaggableOn
 
       return [] if list.empty?
 
-      existing_tags = Tag.named_any(list)
+      existing_tags = named_any(list)
 
       list.map do |tag_name|
         comparable_tag_name = comparable_name(tag_name)
-        existing_tag = existing_tags.detect { |tag| comparable_name(tag.name) == comparable_tag_name }
-
-        existing_tag || Tag.create(:name => tag_name)
+        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
+        begin
+          existing_tag || create(name: tag_name)
+        rescue ActiveRecord::RecordNotUnique
+          # Postgres aborts the current transaction with
+          # PG::InFailedSqlTransaction: ERROR:  current transaction is aborted, commands ignored until end of transaction block
+          # so we have to rollback this transaction
+          raise DuplicateTagError.new("'#{tag_name}' has already been taken")
+        end
       end
     end
 
@@ -101,23 +105,29 @@ module ActsAsTaggableOn
 
       def comparable_name(str)
         if ActsAsTaggableOn.strict_case_match
-          as_8bit_ascii(str)
+          str
         else
-          as_8bit_ascii(str, true)
+          unicode_downcase(str.to_s)
         end
       end
 
       def binary
-        using_mysql? ? "BINARY " : nil
+        ActsAsTaggableOn::Utils.using_mysql? ? 'BINARY ' : nil
       end
 
-      def as_8bit_ascii(string, downcase=false)
-        string = string.to_s.dup.mb_chars
-        string.downcase! if downcase
-        if defined?(Encoding)
-          string.to_s.force_encoding('BINARY')
+      def unicode_downcase(string)
+        if ActiveSupport::Multibyte::Unicode.respond_to?(:downcase)
+          ActiveSupport::Multibyte::Unicode.downcase(string)
         else
-          string.to_s
+          ActiveSupport::Multibyte::Chars.new(string).downcase.to_s
+        end
+      end
+
+      def as_8bit_ascii(string)
+        if defined?(Encoding)
+          string.to_s.dup.force_encoding('BINARY')
+        else
+          string.to_s.mb_chars
         end
       end
     end

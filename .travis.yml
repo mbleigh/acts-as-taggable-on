@@ -1,21 +1,43 @@
 rvm:
   - 1.9.3
   - 2.0.0
-  - 2.1.0
   - 2.1.1
+  - rbx-2
+  - ruby-head
+
 env:
   - DB=sqlite3
   - DB=mysql
   - DB=postgresql
+
 gemfile:
-  - gemfiles/rails_3.2.gemfile
-  - gemfiles/rails_4.0.gemfile
-  - gemfiles/rails_4.1.gemfile
-  - gemfiles/rails_edge.gemfile
+  - gemfiles/activerecord_3.2.gemfile
+  - gemfiles/activerecord_4.0.gemfile
+  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_edge.gemfile
+
 cache: bundler
 script: bundle exec rake
-before_install:
-  - gem install bundler
+before_install: gem install bundler
 bundler_args: '--without local_development'
 matrix:
   fast_finish: true
+  allow_failures:
+      - gemfile: gemfiles/activerecord_edge.gemfile
+      - rvm: rbx-2
+      - rvm: ruby-head
+  exclude:
+      - rvm: 1.9.3
+        gemfile: gemfiles/activerecord_4.0.gemfile
+      - rvm: 1.9.3
+        gemfile: gemfiles/activerecord_4.1.gemfile
+      - rvm: 1.9.3
+        gemfile: gemfiles/activerecord_edge.gemfile
+      - rvm: rbx-2
+        gemfile: gemfiles/activerecord_3.2.gemfile
+      - rvm: ruby-head
+        gemfile: gemfiles/activerecord_3.2.gemfile
+      - rvm: ruby-head
+        gemfile: gemfiles/activerecord_4.0.gemfile
+      - rvm: ruby-head
+        gemfile: gemfiles/activerecord_4.1.gemfile

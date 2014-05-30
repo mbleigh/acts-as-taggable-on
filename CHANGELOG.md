@@ -4,15 +4,44 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...master)
+### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.0...master)
 
-* Breaking Changes
-* Features
+  * Breaking Changes
+    * Taggable models are not extend with ActsAsTaggableOn::Utils anymore
+  * Features
+  * Fixes
+  * Performance
+  * Misc
+    * Deleted outdated benchmark script
+
+
+### [3.2.0 / 2014-05-1](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.1.1...v3.2.0)
+
+ * Breaking Changes
+   * ActsAsTaggableOn::Tag is not extend with ActsAsTaggableOn::Utils anymore
+ * Features
+   * [@chess #413 Hook to support STI subclasses of Tag in save_tags](https://github.com/mbleigh/acts-as-taggable-on/pull/413)
+ * Fixes
+   * [@jdelStrother #515 Rename Compatibility methods to reduce chance of conflicts ](https://github.com/mbleigh/acts-as-taggable-on/pull/515)
+   * [@seuros #512 fix for << method](https://github.com/mbleigh/acts-as-taggable-on/pull/512)
+   * [@sonots #510 fix IN subquery error for mysql](https://github.com/mbleigh/acts-as-taggable-on/pull/510)
+   * [@jonseaberg #499 fix for race condition when multiple processes try to add the same tag](https://github.com/mbleigh/acts-as-taggable-on/pull/499)
+   * [@leklund #496 Fix for distinct and postgresql json columns errors](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
+   * [@thatbettina & @plexus #394 Multiple quoted tags](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
+ * Performance
+ * Misc
+   * [@seuros #511 Rspec 3](https://github.com/mbleigh/acts-as-taggable-on/pull/511)
+
+### [3.1.0 / 2014-03-31](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0)
+
 * Fixes
   * [@mikehale #487 Match_all respects context](https://github.com/mbleigh/acts-as-taggable-on/pull/487)
 * Performance
-  * [dgilperez #390 Add taggings counter cache](https://github.com/mbleigh/acts-as-taggable-on/pull/390)
+  * [@dgilperez #390 Add taggings counter cache](https://github.com/mbleigh/acts-as-taggable-on/pull/390)
 * Misc
+ * [@jonseaberg Add missing indexes to schema used in specs #474](https://github.com/mbleigh/acts-as-taggable-on/pull/474)
+ * [@seuros Specify Ruby >= 1.9.3 required in gemspec](https://github.com/mbleigh/acts-as-taggable-on/pull/502)
+ * [@kiasaki Add missing quotes to code example](https://github.com/mbleigh/acts-as-taggable-on/pull/501)
 
 ### [3.1.0.rc1 / 2014-02-26](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0.rc1)
 
@@ -25,7 +54,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   * [@rgould #417 Let '.count' work when tagged_with is accompanied by a group clause](https://github.com/mbleigh/acts-as-taggable-on/pull/417)
   * [@developer88 #461 Move 'Distinct' out of select string and use .uniq instead](https://github.com/mbleigh/acts-as-taggable-on/pull/461)
   * [@gerard-leijdekkers #473 Fixed down migration index name](https://github.com/mbleigh/acts-as-taggable-on/pull/473)
-  * [@leo-souza #492 Fix downcasing of unicode tag names](https://github.com/mbleigh/acts-as-taggable-on/pull/492)
+  * [@leo-souza #498 Use database's lower function for case-insensitive match](https://github.com/mbleigh/acts-as-taggable-on/pull/498)
 * Misc
   * [@billychan #463 Thread safe support](https://github.com/mbleigh/acts-as-taggable-on/pull/463)
   * [@billychan #386 Add parse:true instructions to README](https://github.com/mbleigh/acts-as-taggable-on/pull/386)

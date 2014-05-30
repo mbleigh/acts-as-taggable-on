@@ -31,12 +31,11 @@ module ActsAsTaggableOn::Taggable
         #   to mimic the underlying behavior.  While processing this first
         #   call to columns, we do the caching column check and dynamically add
         #   the class and instance methods
+        #   FIXME: this method cannot compile in rubinius
         def columns
           @acts_as_taggable_on_cache_columns ||= begin
             db_columns = super
-            if _has_tags_cache_columns?(db_columns)
-              _add_tags_caching_methods
-            end
+            _add_tags_caching_methods if _has_tags_cache_columns?(db_columns)
             db_columns
           end
         end
@@ -79,6 +78,5 @@ module ActsAsTaggableOn::Taggable
         true
       end
     end
-
   end
 end

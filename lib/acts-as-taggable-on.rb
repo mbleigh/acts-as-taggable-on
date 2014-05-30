@@ -1,11 +1,40 @@
-require "active_record"
-require "active_record/version"
-require "active_support/core_ext/module"
-require "action_view"
+require 'active_record'
+require 'active_record/version'
+require 'active_support/core_ext/module'
+require 'action_view'
 
-require "digest/sha1"
+require_relative 'acts_as_taggable_on/engine'  if defined?(Rails)
+
+require 'digest/sha1'
 
 module ActsAsTaggableOn
+  extend ActiveSupport::Autoload
+
+  autoload :Tag
+  autoload :TagList
+  autoload :TagListParser
+  autoload :Taggable
+  autoload :Tagger
+  autoload :Tagging
+  autoload :TagsHelper
+  autoload :VERSION
+
+  autoload_under 'taggable' do
+    autoload :Cache
+    autoload :Collection
+    autoload :Core
+    autoload :Dirty
+    autoload :Ownership
+    autoload :Related
+  end
+
+  autoload :Utils
+  autoload :Compatibility
+
+
+  class DuplicateTagError < StandardError
+  end
+
   def self.setup
     @configuration ||= Configuration.new
     yield @configuration if block_given?
@@ -13,7 +42,7 @@ module ActsAsTaggableOn
 
   def self.method_missing(method_name, *args, &block)
     @configuration.respond_to?(method_name) ?
-      @configuration.send(method_name, *args, &block) : super
+        @configuration.send(method_name, *args, &block) : super
   end
 
   def self.respond_to?(method_name, include_private=false)
@@ -23,12 +52,12 @@ module ActsAsTaggableOn
   def self.glue
     setting = @configuration.delimiter
     delimiter = setting.kind_of?(Array) ? setting[0] : setting
-    delimiter.ends_with?(" ") ? delimiter : "#{delimiter} "
+    delimiter.ends_with?(' ') ? delimiter : "#{delimiter} "
   end
 
   class Configuration
     attr_accessor :delimiter, :force_lowercase, :force_parameterize,
-      :strict_case_match, :remove_unused_tags
+                  :strict_case_match, :remove_unused_tags
 
     def initialize
       @delimiter = ','
@@ -41,25 +70,6 @@ module ActsAsTaggableOn
 
   setup
 end
-
-
-require "acts_as_taggable_on/utils"
-
-require "acts_as_taggable_on/taggable"
-require "acts_as_taggable_on/acts_as_taggable_on/compatibility"
-require "acts_as_taggable_on/acts_as_taggable_on/core"
-require "acts_as_taggable_on/acts_as_taggable_on/collection"
-require "acts_as_taggable_on/acts_as_taggable_on/cache"
-require "acts_as_taggable_on/acts_as_taggable_on/ownership"
-require "acts_as_taggable_on/acts_as_taggable_on/related"
-require "acts_as_taggable_on/acts_as_taggable_on/dirty"
-
-require "acts_as_taggable_on/tagger"
-require "acts_as_taggable_on/tag"
-require "acts_as_taggable_on/tag_list"
-require "acts_as_taggable_on/tags_helper"
-require "acts_as_taggable_on/tagging"
-require 'acts_as_taggable_on/engine'
 
 ActiveSupport.on_load(:active_record) do
   extend ActsAsTaggableOn::Compatibility
