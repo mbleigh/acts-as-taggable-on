@@ -1,7 +1,16 @@
-appraise "rails-3" do
-  gem "rails", "3.2.13"
+appraise "activerecord-3.2" do
+  gem "activerecord", "~> 3.2"
 end
 
-appraise "rails-4" do
-  gem "rails", "4.0.0.beta1"
+appraise "activerecord-4.0" do
+  gem "activerecord", "~> 4.0"
+end
+
+appraise "activerecord-4.1" do
+  gem "activerecord", "~> 4.1"
+end
+
+appraise "activerecord-edge" do
+  gem "activerecord", github: "rails/rails"
+  gem 'arel', github: 'rails/arel'
 end

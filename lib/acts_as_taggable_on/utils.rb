@@ -1,34 +1,38 @@
+# This module is deprecated and will be removed in the incoming versions
+
 module ActsAsTaggableOn
   module Utils
-    def self.included(base)
-
-      base.send :include, ActsAsTaggableOn::Utils::OverallMethods
-      base.extend ActsAsTaggableOn::Utils::OverallMethods
-    end
-
-    module OverallMethods
-      def using_postgresql?
-        ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+    class << self
+      # Use ActsAsTaggableOn::Tag connection
+      def connection
+        ActsAsTaggableOn::Tag.connection
       end
 
-      def using_sqlite?
-        ::ActiveRecord::Base.connection && ::ActiveRecord::Base.connection.adapter_name == 'SQLite'
+      def using_postgresql?
+        connection && connection.adapter_name == 'PostgreSQL'
+      end
+
+      def using_mysql?
+        #We should probably use regex for mysql to support prehistoric adapters
+        connection && connection.adapter_name == 'Mysql2'
       end
 
       def sha_prefix(string)
         Digest::SHA1.hexdigest("#{string}#{rand}")[0..6]
       end
-      
-      private
+
+      def active_record4?
+        ::ActiveRecord::VERSION::MAJOR == 4
+      end
+
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'
       end
 
       # escape _ and % characters in strings, since these are wildcards in SQL.
-       def escape_like(str)
-         str.gsub(/[!%_]/){ |x| '!' + x }
-       end
+      def escape_like(str)
+        str.gsub(/[!%_]/) { |x| '!' + x }
+      end
     end
-
   end
 end
