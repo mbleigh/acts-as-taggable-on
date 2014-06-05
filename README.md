@@ -1,7 +1,7 @@
 # ActsAsTaggableOn
 [![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.png)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
 [![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.png)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
-[![Inline docs](http://inch-pages.github.io/github/mbleigh/acts-as-taggable-on.png)](http://inch-pages.github.io/github/mbleigh/acts-as-taggable-on)
+[![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.png)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
 
 This plugin was originally based on Acts as Taggable on Steroids by Jonathan Viney.
 It has evolved substantially since that point, but all credit goes to him for the
