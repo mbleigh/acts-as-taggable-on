@@ -1,6 +1,7 @@
 # ActsAsTaggableOn
 [![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.png)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
 [![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.png)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
+[![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.png)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
 
 This plugin was originally based on Acts as Taggable on Steroids by Jonathan Viney.
 It has evolved substantially since that point, but all credit goes to him for the
@@ -21,7 +22,7 @@ Versions 2.x are compatible with Ruby 1.8.7+ and Rails 3.
 
 Versions 2.4.1 and up are compatible with Rails 4 too (thanks to arabonradar and cwoodcox).
 
-Versions 3.x (currently unreleased) are compatible with Ruby 1.9.3+ and Rails 3 and 4.
+Versions >= 3.x are compatible with Ruby 1.9.3+ and Rails 3 and 4.
 
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/issues/milestones
 
@@ -35,52 +36,112 @@ gem 'acts-as-taggable-on'
 
 and bundle:
 
-```ruby
+```shell
 bundle
 ```
 
 #### Post Installation
 
+Install migrations
+
 ```shell
+# For the latest versions :
+rake acts_as_taggable_on_engine:install:migrations
+# For versions 2.4.1 and earlier :
 rails generate acts_as_taggable_on:migration
+```
+
+Review the generated migrations then migrate :
+```shell
 rake db:migrate
 ```
 
-## Testing
+#### Upgrading
 
-Acts As Taggable On uses RSpec for its test coverage. Inside the gem
-directory, you can run the specs with:
-
-```shell
-bundle
-rake spec
-```
-
-If you want, add a `.ruby-version` file in the project root (and use rbenv or RVM) to work on a specific version of Ruby.
+see [UPGRADING](UPGRADING.md)
 
 ## Usage
 
+Setup
+
 ```ruby
 class User < ActiveRecord::Base
-  # Alias for acts_as_taggable_on :tags
-  acts_as_taggable
+  acts_as_taggable # Alias for acts_as_taggable_on :tags
   acts_as_taggable_on :skills, :interests
 end
 
 @user = User.new(:name => "Bobby")
-@user.tag_list = "awesome, slick, hefty"      # this should be familiar
-@user.skill_list = "joking, clowning, boxing" # but you can do it for any context!
+```
 
-@user.tags                                    # => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
-@user.skills                                  # => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
-@user.skill_list                              # => ["joking","clowning","boxing"] as TagList
+Add and remove a single tag
 
-@user.tag_list.remove("awesome")              # remove a single tag
-@user.tag_list.remove("awesome, slick")       # works with arrays too
-@user.tag_list.add("awesomer")                # add a single tag. alias for <<
-@user.tag_list.add("awesomer, slicker")       # also works with arrays
+```ruby
+@user.tag_list.add("awesome")   # add a single tag. alias for <<
+@user.tag_list.remove("awesome") # remove a single tag
+```
 
-User.skill_counts                             # => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
+Add and remove multiple tags in an array
+
+```ruby
+@user.tag_list.add("awesome", "slick")
+@user.tag_list.remove("awesome", "slick")
+```
+
+You can also add and remove tags in format of String. This would
+be convenient in some cases such as handling tag input param in a String.
+
+Pay attention you need to add `parse: true` as option in this case.
+
+You may also want to take a look at delimiter in the string. The default
+is comma `,` so you don't need to do anything here. However, if you made
+a change on delimiter setting, make sure the string will match. See
+[configuration](#configuration) for more about delimiter.
+
+```ruby
+@user.tag_list.add("awesome, slick", parse: true)
+@user.tag_list.remove("awesome, slick", parse: true)
+```
+
+You can also add and remove tags by direct assignment. Note this will
+remove existing tags so use it with attention.
+
+```ruby
+@user.tag_list = "awesome, slick, hefty"
+@user.save
+@user.reload
+@user.tags
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "awesome", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "slick", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "hefty", taggings_count: 1>]
+```
+
+With the defined context in model, you have multiple new methods at disposal
+to manage and view the tags in the context. For example, with `:skill` context
+these methods are added to the model: `skill_list`(and `skill_list.add`, `skill_list.remove`
+`skill_list=`), `skills`(plural), `skill_counts`.
+
+```ruby
+@user.skill_list = "joking, clowning, boxing"
+@user.save
+@user.reload
+@user.skills
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
+
+@user.skill_list.add("coding")
+
+@user.skill_list
+# => ["joking", "clowning", "boxing", "coding"]
+
+@another_user = User.new(:name => "Alice")
+@another_user.skill_list.add("clowning")
+@another_user.save
+
+User.skill_counts
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 2>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
 ```
 
 To preserve the order in which tags are created use `acts_as_ordered_taggable`:
@@ -117,22 +178,22 @@ end
 User.tagged_with("awesome").by_join_date
 User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
-# Find a user with matching all tags, not just one
+# Find users that matches all given tags:
 User.tagged_with(["awesome", "cool"], :match_all => true)
 
-# Find a user with any of the tags:
+# Find users with any of the specified tags:
 User.tagged_with(["awesome", "cool"], :any => true)
 
-# Find a user that not tags with awesome or cool:
+# Find users that has not been tagged with awesome or cool:
 User.tagged_with(["awesome", "cool"], :exclude => true)
 
-# Find a user with any of tags based on context:
-User.tagged_with(['awesome, cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
+# Find users with any of the tags based on context:
+User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
-You can also use `:wild => true` option along with `:any` or `:exclude` option. It will looking for `%awesome%` and `%cool%` in sql.
+You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
 
-__Tip:__ `User.tagged_with([])` or '' will return `[]`, but not all records.
+__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
 
 ### Relationships
 
@@ -150,7 +211,7 @@ matched tags.
 @tom = User.find_by_name("Tom")
 @tom.skill_list # => ["hacking", "jogging", "diving"]
 
-@tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
+@tom.find_related_skills # => [<User name="Bobby">, <User name="Frankie">]
 @bobby.find_related_skills # => [<User name="Tom">]
 @frankie.find_related_skills # => [<User name="Tom">]
 ```
@@ -163,7 +224,7 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 ```ruby
 @user = User.new(:name => "Bobby")
 @user.set_tag_list_on(:customs, "same, as, tag, list")
-@user.tag_list_on(:customs) # => ["same","as","tag","list"]
+@user.tag_list_on(:customs) # => ["same", "as", "tag", "list"]
 @user.save
 @user.tags_on(:customs) # => [<Tag name='same'>,...]
 @user.tag_counts_on(:customs)
@@ -214,7 +275,7 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 To construct tag clouds, the frequency of each tag needs to be calculated.
 Because we specified `acts_as_taggable_on` on the `User` class, we can
 get a calculation of all the tag counts by using `User.tag_counts_on(:customs)`. But what if we wanted a tag count for
-an single user's posts? To achieve this we call tag_counts on the association:
+a single user's posts? To achieve this we call tag_counts on the association:
 
 ```ruby
 User.find(:first).posts.tag_counts_on(:tags)
@@ -291,6 +352,8 @@ If you want to change the default delimiter (it defaults to ','). You can also p
 ActsAsTaggableOn.delimiter = ','
 ```
 
+*NOTE: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
+
 ## Contributors
 
 We have a long list of valued contributors. [Check them all](https://github.com/mbleigh/acts-as-taggable-on/contributors)
@@ -298,6 +361,24 @@ We have a long list of valued contributors. [Check them all](https://github.com/
 ## Maintainer
 
 * [Joost Baaij](https://github.com/tilsammans)
+
+## TODO
+
+- Write benchmark script
+- Resolve concurrency issues
+
+## Testing
+
+Acts As Taggable On uses RSpec for its test coverage. Inside the gem
+directory, you can run the specs with:
+
+```shell
+bundle
+rake spec
+```
+
+You can run all the tests across all the Rails versions by running `rake appraise`.  If you'd also like to [run the tests across all rubies and databases as configured for Travis CI, install and run `wwtd`](https://github.com/grosser/wwtd).
+
 
 ## License
 

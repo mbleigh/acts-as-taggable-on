@@ -1,9 +1,43 @@
-script: "cp spec/database.yml.sample spec/database.yml && bundle install && bundle exec rake"
 rvm:
-  - 1.8.7
-  - 1.9.2
   - 1.9.3
+  - 2.0.0
+  - 2.1.1
+  - rbx-2
+  - ruby-head
+
 env:
   - DB=sqlite3
   - DB=mysql
   - DB=postgresql
+
+gemfile:
+  - gemfiles/activerecord_3.2.gemfile
+  - gemfiles/activerecord_4.0.gemfile
+  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_edge.gemfile
+
+cache: bundler
+script: bundle exec rake
+before_install: gem install bundler
+bundler_args: '--without local_development'
+matrix:
+  fast_finish: true
+  allow_failures:
+      - gemfile: gemfiles/activerecord_edge.gemfile
+      - rvm: rbx-2
+      - rvm: ruby-head
+  exclude:
+      - rvm: 1.9.3
+        gemfile: gemfiles/activerecord_4.0.gemfile
+      - rvm: 1.9.3
+        gemfile: gemfiles/activerecord_4.1.gemfile
+      - rvm: 1.9.3
+        gemfile: gemfiles/activerecord_edge.gemfile
+      - rvm: rbx-2
+        gemfile: gemfiles/activerecord_3.2.gemfile
+      - rvm: ruby-head
+        gemfile: gemfiles/activerecord_3.2.gemfile
+      - rvm: ruby-head
+        gemfile: gemfiles/activerecord_4.0.gemfile
+      - rvm: ruby-head
+        gemfile: gemfiles/activerecord_4.1.gemfile
