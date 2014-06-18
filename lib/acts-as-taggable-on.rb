@@ -1,7 +1,7 @@
 require 'active_record'
 require 'active_record/version'
 require 'active_support/core_ext/module'
-require 'action_view'
+require 'action_view' if defined?(Rails)
 
 require_relative 'acts_as_taggable_on/engine'  if defined?(Rails)
 
