@@ -32,7 +32,7 @@ module ActsAsTaggableOn
 
     def remove_unused_tags
       if ActsAsTaggableOn.remove_unused_tags
-        tag.destroy if tag.taggings_count.zero?
+        tag.destroy if tag.reload.taggings_count.zero?
       end
     end
   end
