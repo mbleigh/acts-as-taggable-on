@@ -77,13 +77,13 @@ module ActsAsTaggableOn::Taggable
       #                       * <tt>:end_at</tt> - Restrict the tags to those created before a certain time
       #
       # Example:
-      #   User.tagged_with("awesome", "cool")                     # Users that are tagged with awesome and cool
-      #   User.tagged_with("awesome", "cool", :exclude => true)   # Users that are not tagged with awesome or cool
-      #   User.tagged_with("awesome", "cool", :any => true)       # Users that are tagged with awesome or cool
-      #   User.tagged_with("awesome", "cool", :any => true, :order_by_matching_tag_count => true)  # Sort by users who match the most tags, descending
-      #   User.tagged_with("awesome", "cool", :match_all => true) # Users that are tagged with just awesome and cool
-      #   User.tagged_with("awesome", "cool", :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
-      #   User.tagged_with("awesome", "cool", :owned_by => foo, :start_at => Date.today ) # Users that are tagged with just awesome, cool by 'foo' and starting today
+      #   User.tagged_with(["awesome", "cool"])                     # Users that are tagged with awesome and cool
+      #   User.tagged_with(["awesome", "cool"], :exclude => true)   # Users that are not tagged with awesome or cool
+      #   User.tagged_with(["awesome", "cool"], :any => true)       # Users that are tagged with awesome or cool
+      #   User.tagged_with(["awesome", "cool"], :any => true, :order_by_matching_tag_count => true)  # Sort by users who match the most tags, descending
+      #   User.tagged_with(["awesome", "cool"], :match_all => true) # Users that are tagged with just awesome and cool
+      #   User.tagged_with(["awesome", "cool"], :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
+      #   User.tagged_with(["awesome", "cool"], :owned_by => foo, :start_at => Date.today ) # Users that are tagged with just awesome, cool by 'foo' and starting today
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn::TagListParser.parse(tags)
         options = options.dup
