@@ -38,6 +38,17 @@ describe ActsAsTaggableOn::Tagging do
     expect(another_taggable.tag_list.sort).to eq(%w(very serious bug).sort)
   end
 
+  it 'should destroy unused tags after tagging destroyed' do
+    previous_setting = ActsAsTaggableOn.remove_unused_tags
+    ActsAsTaggableOn.remove_unused_tags = true
+    ActsAsTaggableOn::Tag.destroy_all
+    @taggable = TaggableModel.create(name: 'Bob Jones')
+    @taggable.update_attribute :tag_list, 'aaa,bbb,ccc'
+    @taggable.update_attribute :tag_list, ''
+    expect(ActsAsTaggableOn::Tag.count).to eql(0)
+    ActsAsTaggableOn.remove_unused_tags = previous_setting
+  end
+
   pending 'context scopes' do
     describe '.by_context'
 

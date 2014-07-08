@@ -223,6 +223,20 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('ruby').to_sql).to_not match /DISTINCT/
   end
 
+  it "should be able to find a tag using dates" do
+    @taggable.skill_list = "ruby"
+    @taggable.save
+
+    expect(TaggableModel.tagged_with("ruby", :start_at => Date.today, :end_at => Date.tomorrow).count).to eq(1)
+  end
+
+    it "shouldn't be able to find a tag outside date range" do
+    @taggable.skill_list = "ruby"
+    @taggable.save
+
+    expect(TaggableModel.tagged_with("ruby", :start_at => Date.today - 2.days, :end_at => Date.today - 1.day).count).to eq(0)
+  end
+
   it 'should be able to find by tag with context' do
     @taggable.skill_list = 'ruby, rails, css'
     @taggable.tag_list = 'bob, charlie'

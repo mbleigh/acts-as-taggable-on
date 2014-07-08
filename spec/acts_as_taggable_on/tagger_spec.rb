@@ -44,7 +44,6 @@ describe 'Tagger' do
     tags = TaggableModel.tagged_with(%w(ruby java), owned_by: @user, any: true)
     expect(tags).to include(@taggable, @taggable2)
     expect(tags.size).to eq(2)
-
   end
 
   it 'only returns objects tagged by owned_by when exclude is true' do
