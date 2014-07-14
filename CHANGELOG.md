@@ -4,18 +4,86 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.0...master)
+### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.3.0...master)
 
   * Breaking Changes
-    * Taggable models are not extend with ActsAsTaggableOn::Utils anymore
   * Features
   * Fixes
   * Performance
   * Misc
-    * Deleted outdated benchmark script
 
 
-### [3.2.0 / 2014-05-1](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.1.1...v3.2.0)
+### [3.3.0 / 2014-07-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.6...v3.3.0)
+
+* Features
+  * [@felipeclopes #488 Support for `start_at` and `end_at` restrictions when selecting tags](https://github.com/mbleigh/acts-as-taggable-on/pull/488)
+
+* Fixes
+  * [@tonytonyjan #560 Fix for `ActsAsTaggableOn.remove_unused_tags` doesn't work](https://github.com/mbleigh/acts-as-taggable-on/pull/560)
+  * [@ThearkInn #555 Fix for `tag_cloud` helper to generate correct css tags](https://github.com/mbleigh/acts-as-taggable-on/pull/555)
+
+* Performance
+  * [@pcai #556 Add back taggables index in the taggins table](https://github.com/mbleigh/acts-as-taggable-on/pull/556)
+
+
+### [3.2.6 / 2014-05-28](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.5...v3.2.6)
+
+* Fixes
+  * [@seuros #548 Fix dirty marking when tags are not ordered](https://github.com/mbleigh/acts-as-taggable-on/issues/548)
+
+* Misc
+  * [@seuros Remove actionpack dependency](https://github.com/mbleigh/acts-as-taggable-on/commit/5d20e0486c892fbe21af42fdcd79d0b6ebe87ed4)
+  * [@seuros #547 Add tests for update_attributes](https://github.com/mbleigh/acts-as-taggable-on/issues/547)
+
+
+### [3.2.5 / 2014-05-25](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.4...v3.2.5)
+
+* Fixes
+  * [@seuros #546 Fix autoload bug. Now require engine file instead of autoloading it](https://github.com/mbleigh/acts-as-taggable-on/issues/546)
+
+
+### [3.2.4 / 2014-05-24](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.3...v3.2.4)
+
+* Fixes
+  * [@seuros #544 Fix incorrect query generation related to `GROUP BY` SQL statement](https://github.com/mbleigh/acts-as-taggable-on/issues/544)
+
+* Misc
+  * [@seuros #545 Remove `ammeter` development dependency](https://github.com/mbleigh/acts-as-taggable-on/pull/545)
+  * [@seuros #545 Deprecate `TagList.from` in favor of `TagListParser.parse`](https://github.com/mbleigh/acts-as-taggable-on/pull/545)
+  * [@seuros #543 Introduce lazy loading](https://github.com/mbleigh/acts-as-taggable-on/pull/543)
+  * [@seuros #541 Deprecate ActsAsTaggableOn::Utils](https://github.com/mbleigh/acts-as-taggable-on/pull/541)
+
+
+### [3.2.3 / 2014-05-16](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.2...v3.2.3)
+
+* Fixes
+  * [@seuros #540 Fix for tags removal (it was affecting all records with the same tag)](https://github.com/mbleigh/acts-as-taggable-on/pull/540)
+  * [@akcho8 #535 Fix for `options` Hash passed to methods from being deleted by those methods](https://github.com/mbleigh/acts-as-taggable-on/pull/535)
+
+
+### [3.2.2 / 2014-05-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.1...v3.2.2)
+
+* Breaking Changes
+  * [@seuros #526 Taggable models are not extended with ActsAsTaggableOn::Utils anymore](https://github.com/mbleigh/acts-as-taggable-on/pull/526)
+
+* Fixes
+  * [@seuros #536 Add explicit conversion of tags to strings (when assigning tags)](https://github.com/mbleigh/acts-as-taggable-on/pull/536)
+
+* Misc
+  * [@seuros #526 Delete outdated benchmark script](https://github.com/mbleigh/acts-as-taggable-on/pull/526)
+  * [@seuros #525 Fix tests so that they pass with MySQL](https://github.com/mbleigh/acts-as-taggable-on/pull/525)
+
+
+### [3.2.1 / 2014-05-06](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.0...v3.2.1)
+
+* Misc
+  * [@seuros #523 Run tests loading only ActiveRecord (without the full Rails stack)](https://github.com/mbleigh/acts-as-taggable-on/pull/523)
+  * [@seuros #523 Remove activesupport dependency](https://github.com/mbleigh/acts-as-taggable-on/pull/523)
+  * [@seuros #523 Introduce database_cleaner in specs](https://github.com/mbleigh/acts-as-taggable-on/pull/523)
+  * [@seuros #520 Tag_list cleanup](https://github.com/mbleigh/acts-as-taggable-on/pull/520)
+
+
+### [3.2.0 / 2014-05-01](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.1.1...v3.2.0)
 
  * Breaking Changes
    * ActsAsTaggableOn::Tag is not extend with ActsAsTaggableOn::Utils anymore
