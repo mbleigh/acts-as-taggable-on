@@ -126,6 +126,8 @@ module ActsAsTaggableOn::Taggable
           # get tags, drop out if nothing returned (we need at least one)
           tags = if options.delete(:wild)
                    ActsAsTaggableOn::Tag.named_like_any(tag_list)
+                 elsif options.delete(:prefix)
+                   ActsAsTaggableOn::Tag.named_with_prefix_any(tag_list)
                  else
                    ActsAsTaggableOn::Tag.named_any(tag_list)
                  end

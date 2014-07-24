@@ -55,6 +55,13 @@ module ActsAsTaggableOn
       where(clause)
     end
 
+    def self.named_with_prefix_any(list)
+      clause = list.map { |tag|
+        sanitize_sql(["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "#{ActsAsTaggableOn::Utils.escape_like(tag.to_s)}%"])
+      }.join(' OR ')
+      where(clause)
+    end
+
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
