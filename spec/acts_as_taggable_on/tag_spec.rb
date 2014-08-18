@@ -286,4 +286,24 @@ describe ActsAsTaggableOn::Tag do
       end
     end
   end
+
+  describe 'popular tags' do
+    before do
+      %w(sports rails linux tennis golden_syrup).each_with_index do |t, i|
+        tag = ActsAsTaggableOn::Tag.new(name: t)
+        tag.taggings_count = i
+        tag.save!
+      end
+    end
+    
+    it 'should find the most popular tags' do
+      expect(ActsAsTaggableOn::Tag.most_used(3).first.name).to eq("golden_syrup")
+      expect(ActsAsTaggableOn::Tag.most_used(3).length).to eq(3)
+    end
+
+    it 'should find the least popular tags' do
+      expect(ActsAsTaggableOn::Tag.least_used(3).first.name).to eq("sports")
+      expect(ActsAsTaggableOn::Tag.least_used(3).length).to eq(3)
+    end
+  end
 end

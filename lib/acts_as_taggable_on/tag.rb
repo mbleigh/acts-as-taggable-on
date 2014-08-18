@@ -20,6 +20,8 @@ module ActsAsTaggableOn
     end
 
     ### SCOPES:
+    scope :most_used, ->(limit = 20) { order('taggings_count desc').limit(limit) }
+    scope :least_used, ->(limit = 20) { order(:taggings_count).limit(limit) }
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
@@ -101,6 +103,9 @@ module ActsAsTaggableOn
     end
 
     class << self
+
+
+
       private
 
       def comparable_name(str)
