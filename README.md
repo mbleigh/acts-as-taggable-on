@@ -70,6 +70,12 @@ class User < ActiveRecord::Base
   acts_as_taggable_on :skills, :interests
 end
 
+class UsersController < ApplicationController
+  def user_params
+    params.require(:user).permit(:name, :tag_list) ## Rails 4 strong params usage
+  end
+end
+
 @user = User.new(:name => "Bobby")
 ```
 
