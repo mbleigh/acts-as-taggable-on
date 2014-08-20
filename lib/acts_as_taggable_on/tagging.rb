@@ -11,9 +11,9 @@ module ActsAsTaggableOn
                     :tagger_type,
                     :tagger_id if defined?(ActiveModel::MassAssignmentSecurity)
 
-    belongs_to :tag, class_name: 'ActsAsTaggableOn::Tag' , counter_cache: true
-    belongs_to :taggable, polymorphic: true
-    belongs_to :tagger,   polymorphic: true
+    belongs_to :tag, class_name: 'ActsAsTaggableOn::Tag' , counter_cache: true, touch: true
+    belongs_to :taggable, polymorphic: true, touch: true
+    belongs_to :tagger,   polymorphic: true, touch: true
 
     scope :owned_by, ->(owner) { where(tagger: owner) }
     scope :not_owned, -> { where(tagger_id: nil, tagger_type: nil) }
