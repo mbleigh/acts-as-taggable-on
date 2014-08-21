@@ -328,6 +328,8 @@ CSS:
 
 ## Configuration
 
+To configure `acts_as_taggable_on`, place any of these directives in `config/initializers/acts_as_taggable_on.rb`.
+
 If you would like to remove unused tag objects after removing taggings, add:
 
 ```ruby
