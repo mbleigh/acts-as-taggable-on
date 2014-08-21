@@ -360,6 +360,24 @@ If you want to change the default delimiter (it defaults to ','). You can also p
 ActsAsTaggableOn.delimiter = ','
 ```
 
+If you would like tags to be touched when they're added/removed:
+
+```ruby
+ActsAsTaggableOn.touch_tags = true
+```
+
+If you would like taggables to be touched when tags are added/removed:
+
+```ruby
+ActsAsTaggableOn.touch_taggables = true
+```
+
+If you would like taggers to be touched when tags are added/removed:
+
+```ruby
+ActsAsTaggableOn.touch_taggers = true
+```
+
 *NOTE: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
 
 ## Contributors
