@@ -26,9 +26,16 @@ module ActsAsTaggableOn
 
     validates_uniqueness_of :tag_id, scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
 
+    before_save :touch_associations
     after_destroy :remove_unused_tags
 
     private
+
+    def touch_associations
+      tag.touch if ActsAsTaggableOn.touch_tags
+      taggable.touch if ActsAsTaggableOn.touch_taggables
+      tagger.touch if ActsAsTaggableOn.touch_taggers
+    end
 
     def remove_unused_tags
       if ActsAsTaggableOn.remove_unused_tags
