@@ -33,8 +33,8 @@ module ActsAsTaggableOn
 
     def touch_associations
       tag.touch if ActsAsTaggableOn.touch_tags
-      taggable.touch if ActsAsTaggableOn.touch_taggable
-      tagger.touch if ActsAsTaggableOn.touch_tagger
+      taggable.touch if ActsAsTaggableOn.touch_taggables
+      tagger.touch if ActsAsTaggableOn.touch_taggers
     end
 
     def remove_unused_tags
