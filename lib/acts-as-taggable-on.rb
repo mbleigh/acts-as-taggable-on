@@ -57,7 +57,7 @@ module ActsAsTaggableOn
 
   class Configuration
     attr_accessor :delimiter, :force_lowercase, :force_parameterize,
-                  :strict_case_match, :remove_unused_tags
+                  :strict_case_match, :touch_tags, :touch_taggables, :touch_taggers
 
     def initialize
       @delimiter = ','
@@ -65,6 +65,9 @@ module ActsAsTaggableOn
       @force_parameterize = false
       @strict_case_match = false
       @remove_unused_tags = false
+      @touch_tags = false
+      @touch_taggables = false
+      @touch_taggers = false
     end
   end
 
