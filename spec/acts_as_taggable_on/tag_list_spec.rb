@@ -114,7 +114,36 @@ describe ActsAsTaggableOn::TagList do
 
       ActsAsTaggableOn.force_lowercase = false
     end
+  end
 
+  describe 'custom parser' do
+    let(:parser)       { double(parse: %w(cool wicked)) }
+    let(:parser_class) { stub_const('MyParser', Class) }
+
+    it 'should use a the default parser if none is set as parameter' do
+      allow(ActsAsTaggableOn.default_parser).to receive(:new).and_return(parser)
+      ActsAsTaggableOn::TagList.new('cool, wicked', parse: true)
+
+      expect(parser).to have_received(:parse)
+    end
+
+    it 'should use the custom parser passed as parameter' do
+      allow(parser_class).to receive(:new).and_return(parser)
+
+      ActsAsTaggableOn::TagList.new('cool, wicked', parser: parser_class)
+
+      expect(parser).to have_received(:parse)
+    end
+
+    it 'should use the parser setted as attribute' do
+      allow(parser_class).to receive(:new).with('new, tag').and_return(parser)
+
+      tag_list = ActsAsTaggableOn::TagList.new('example')
+      tag_list.parser = parser_class
+      tag_list.add('new, tag', parse: true)
+
+      expect(parser).to have_received(:parse)
+    end
   end
 
 

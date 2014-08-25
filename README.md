@@ -237,6 +237,43 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 User.tagged_with("same", :on => :customs) # => [@user]
 ```
 
+### Tag Parsers
+
+If you want to change how tags are parsed, you can define a your own implementation:
+
+```ruby
+class MyParser < ActsAsTaggableOn::GenericParser
+  def parse
+    TagList.new.tap do |tag_list|
+      tag_list.add @tag_list.split('|')
+    end
+  end
+end
+```
+
+Now you can use this parser, passing it as parameter:
+
+```ruby
+@user = User.new(:name => "Bobby")
+@user.tag_list = "east, south"
+@user.tag_list.add("north|west", parser: MyParser)
+@user.tag_list # => ["north", "east", "south", "west"]
+
+# Or also:
+@user.tag_list.parser = MyParser
+@user.tag_list.add("north|west")
+@user.tag_list # => ["north", "east", "south", "west"]
+```
+
+Or change it globally:
+
+```ruby
+ActsAsTaggable.default_parser = MyParser
+@user = User.new(:name => "Bobby")
+@user.tag_list = "east|south"
+@user.tag_list # => ["east", "south"]
+```
+
 ### Tag Ownership
 
 Tags can have owners:

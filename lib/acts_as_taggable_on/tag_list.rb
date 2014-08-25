@@ -4,8 +4,10 @@ require 'active_support/core_ext/module/delegation'
 module ActsAsTaggableOn
   class TagList < Array
     attr_accessor :owner
+    attr_accessor :parser
 
     def initialize(*args)
+      @parser = ActsAsTaggableOn.default_parser
       add(*args)
     end
 
@@ -88,9 +90,11 @@ module ActsAsTaggableOn
 
     def extract_and_apply_options!(args)
       options = args.last.is_a?(Hash) ? args.pop : {}
-      options.assert_valid_keys :parse
+      options.assert_valid_keys :parse, :parser
 
-      args.map! { |a| TagListParser.parse(a) } if options[:parse]
+      parser = options[:parser] ? options[:parser] : @parser
+
+      args.map! { |a| parser.new(a).parse } if options[:parse] || options[:parser]
 
       args.flatten!
     end
@@ -101,9 +105,9 @@ module ActsAsTaggableOn
       ActiveRecord::Base.logger.warn <<WARNING
 ActsAsTaggableOn::TagList.from is deprecated \
 and will be removed from v4.0+, use  \
-ActsAsTaggableOn::TagListParser.parse instead
+ActsAsTaggableOn::DefaultParser.new instead
 WARNING
-      TagListParser.parse(string)
+      @parser.new(string).parse
     end
 
 

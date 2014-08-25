@@ -12,6 +12,8 @@ module ActsAsTaggableOn
 
   autoload :Tag
   autoload :TagList
+  autoload :GenericParser
+  autoload :DefaultParser
   autoload :TagListParser
   autoload :Taggable
   autoload :Tagger
@@ -57,7 +59,7 @@ module ActsAsTaggableOn
 
   class Configuration
     attr_accessor :delimiter, :force_lowercase, :force_parameterize,
-                  :strict_case_match, :remove_unused_tags
+                  :strict_case_match, :remove_unused_tags, :default_parser
 
     def initialize
       @delimiter = ','
@@ -65,6 +67,16 @@ module ActsAsTaggableOn
       @force_parameterize = false
       @strict_case_match = false
       @remove_unused_tags = false
+      @default_parser = DefaultParser
+    end
+
+    def delimiter=(string)
+      ActiveRecord::Base.logger.warn <<WARNING
+ActsAsTaggableOn.delimiter is deprecated \
+and will be removed from v4.0+, use  \
+a ActsAsTaggableOn.default_parser instead
+WARNING
+      @delimiter = string
     end
   end
 

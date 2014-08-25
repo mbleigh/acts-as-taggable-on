@@ -8,6 +8,8 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 
   * Breaking Changes
   * Features
+    * [@ProGM Support for custom parsers for tags](https://github.com/mbleigh/acts-as-taggable-on/pull/579)
+
   * Fixes
   * Performance
   * Misc
