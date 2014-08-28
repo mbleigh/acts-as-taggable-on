@@ -85,7 +85,7 @@ module ActsAsTaggableOn::Taggable
       #   User.tagged_with(["awesome", "cool"], :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
       #   User.tagged_with(["awesome", "cool"], :owned_by => foo, :start_at => Date.today ) # Users that are tagged with just awesome, cool by 'foo' and starting today
       def tagged_with(tags, options = {})
-        tag_list = ActsAsTaggableOn::TagListParser.parse(tags)
+        tag_list = ActsAsTaggableOn.default_parser.new(tags).parse
         options = options.dup
         empty_result = where('1 = 0')
 
@@ -278,7 +278,7 @@ module ActsAsTaggableOn::Taggable
       if instance_variable_get(variable_name)
         instance_variable_get(variable_name)
       elsif cached_tag_list_on(context) && self.class.caching_tag_list_on?(context)
-        instance_variable_set(variable_name, ActsAsTaggableOn::TagListParser.parse(cached_tag_list_on(context)))
+        instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(cached_tag_list_on(context)).parse)
       else
         instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
       end
@@ -328,7 +328,7 @@ module ActsAsTaggableOn::Taggable
       variable_name = "@#{context.to_s.singularize}_list"
       process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
 
-      instance_variable_set(variable_name, ActsAsTaggableOn::TagListParser.parse(new_list))
+      instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(new_list).parse)
     end
 
     def tagging_contexts
@@ -348,7 +348,7 @@ module ActsAsTaggableOn::Taggable
         if self.class.preserve_tag_order
           changed_attributes[attrib] = old if old.to_s != value.to_s
         else
-          changed_attributes[attrib] = old.to_s if old.sort != ActsAsTaggableOn::TagListParser.parse(value).sort
+          changed_attributes[attrib] = old.to_s if old.sort != ActsAsTaggableOn.default_parser.new(value).parse.sort
         end
       end
     end
