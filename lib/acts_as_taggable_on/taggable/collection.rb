@@ -135,7 +135,7 @@ module ActsAsTaggableOn::Taggable
         table_name_pkey = "#{table_name}.#{primary_key}"
         if ActsAsTaggableOn::Utils.using_mysql?
           # See https://github.com/mbleigh/acts-as-taggable-on/pull/457 for details
-          scoped_ids = select(table_name_pkey).map(&:id)
+          scoped_ids = pluck(table_name_pkey)
           tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN (?)", scoped_ids)
         else
           tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(table_name_pkey))})")

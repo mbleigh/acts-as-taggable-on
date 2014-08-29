@@ -12,13 +12,15 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   * Performance
   * Misc
 
-### [3.4.0 / 2014-08-29](Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.3.0...v3.4.0)
+### [3.4.0 / 2014-08-29](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.3.0...v3.4.0)
 
   * Features
     * [@ProGM Support for custom parsers for tags](https://github.com/mbleigh/acts-as-taggable-on/pull/579)
     * [@damzcodes #577 Popular feature](https://github.com/mbleigh/acts-as-taggable-on/pull/577)
   * Fixes
-    * [@twalpole Update for rails edge (4.2)]
+    * [@twalpole Update for rails edge (4.2)](https://github.com/mbleigh/acts-as-taggable-on/pull/583)
+  * Performance
+    * [@dontfidget #587 Use pluck instead of select](https://github.com/mbleigh/acts-as-taggable-on/pull/587)
 
 ### [3.3.0 / 2014-07-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.6...v3.3.0)
 
