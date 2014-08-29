@@ -342,13 +342,13 @@ module ActsAsTaggableOn::Taggable
       if changed_attributes.include?(attrib)
         # The attribute already has an unsaved change.
         old = changed_attributes[attrib]
-        changed_attributes.delete(attrib) if old.to_s == value.to_s
+        @changed_attributes.delete(attrib) if old.to_s == value.to_s
       else
         old = tag_list_on(context)
         if self.class.preserve_tag_order
-          changed_attributes[attrib] = old if old.to_s != value.to_s
+          @changed_attributes[attrib] = old if old.to_s != value.to_s
         else
-          changed_attributes[attrib] = old.to_s if old.sort != ActsAsTaggableOn.default_parser.new(value).parse.sort
+          @changed_attributes[attrib] = old.to_s if old.sort != ActsAsTaggableOn.default_parser.new(value).parse.sort
         end
       end
     end
@@ -420,6 +420,21 @@ module ActsAsTaggableOn::Taggable
 
     private
 
+    # Filters the tag lists from the attribute names.
+    def attributes_for_update(attribute_names)
+      filter_tag_lists(super)
+    end
+
+    # Filters the tag lists from the attribute names.
+    def attributes_for_create(attribute_names)
+      filter_tag_lists(super)
+    end
+    
+    def filter_tag_lists(attributes)
+      tag_lists = tag_types.map {|tags_type| "#{tags_type.to_s.singularize}_list"}
+      attributes.delete_if {|attr| tag_lists.include? attr }
+    end
+    
     ##
     # Override this hook if you wish to subclass {ActsAsTaggableOn::Tag} --
     # context is provided so that you may conditionally use a Tag subclass
