@@ -11,6 +11,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
     * [@ProGM Support for custom parsers for tags](https://github.com/mbleigh/acts-as-taggable-on/pull/579)
 
   * Fixes
+    * [@twalpole Update for rails edge (4.2)]
   * Performance
   * Misc
 
