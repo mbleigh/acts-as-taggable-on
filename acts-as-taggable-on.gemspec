@@ -22,13 +22,13 @@ Gem::Specification.new do |gem|
     gem.post_install_message = File.read('UPGRADING.md')
   end
 
-  gem.add_runtime_dependency 'activerecord',  ['>= 3', '< 5']
+  gem.add_runtime_dependency 'activerecord',  ['>= 3.2', '< 5']
 
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'mysql2', '~> 0.3.7'
   gem.add_development_dependency 'pg'
 
-  gem.add_development_dependency 'rspec-rails'  , '~> 3.0.0.beta'
+  gem.add_development_dependency 'rspec-rails'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'barrier'

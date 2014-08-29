@@ -175,15 +175,15 @@ end
 You can find the most or least used tags by using:
 
 ```ruby
-User.most_used
-User.least_used
+ActsAsTaggableOn::Tag.most_used
+ActsAsTaggableOn::Tag.least_used
 ```
 
 You can also filter the results by passing the method a limit, however the default limit is 50.
 
 ```ruby
-User.most_used(10)
-User.least_most(10)
+ActsAsTaggableOn::Tag.most_used(10)
+ActsAsTaggableOn::Tag.least_used(10)
 ```
 
 ### Finding Tagged Objects
