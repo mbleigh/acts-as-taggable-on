@@ -170,6 +170,22 @@ end
 @user.tag_list # => ["north", "east", "south", "west"]
 ```
 
+### Finding most or least used tags
+
+You can find the most or least used tags by using:
+
+```ruby
+User.most_used
+User.least_used
+```
+
+You can also filter the results by passing the method a limit, however the default limit is 50.
+
+```ruby
+User.most_used(10)
+User.least_most(10)
+```
+
 ### Finding Tagged Objects
 
 Acts As Taggable On uses scopes to create an association for tags.
@@ -200,6 +216,7 @@ User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['
 You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
 
 __Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
+
 
 ### Relationships
 
