@@ -82,7 +82,7 @@ module ActsAsTaggableOn::Taggable
           tags = find_or_create_tags_from_list_with_context(tag_list.uniq, context)
 
           # Tag objects for owned tags
-          owned_tags = owner_tags_on(owner, context)
+          owned_tags = owner_tags_on(owner, context).to_a
 
           # Tag maintenance based on whether preserving the created order of tags
           if self.class.preserve_tag_order?
