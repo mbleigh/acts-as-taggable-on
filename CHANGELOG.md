@@ -12,6 +12,10 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   * Performance
   * Misc
 
+### [3.4.1 / 2014-09-01](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.0...v3.4.1)
+  * Fixes
+    * [@konukhov fix owned ordered taggable bug]((https://github.com/mbleigh/acts-as-taggable-on/pull/585)
+
 ### [3.4.0 / 2014-08-29](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.3.0...v3.4.0)
 
   * Features
