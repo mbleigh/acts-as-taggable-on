@@ -4,7 +4,7 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.0...master)
+### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.1...master)
 
   * Breaking Changes
   * Features
