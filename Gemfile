@@ -7,4 +7,5 @@ group :local_development do
   gem 'guard-rspec'
   gem 'appraisal'
   gem 'rake'
+  gem 'byebug' , platform: :mri_21
 end
