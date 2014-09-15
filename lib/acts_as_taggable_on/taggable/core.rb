@@ -27,7 +27,7 @@ module ActsAsTaggableOn::Taggable
                                                  dependent: :destroy,
                                                  class_name: 'ActsAsTaggableOn::Tagging',
                                                  order: taggings_order,
-                                                 conditions: ["#{ActsAsTaggableOn::Tagging.table_name}.context = (?)", tags_type],
+                                                 conditions: {context: tags_type},
                                                  include: :tag
 
             has_many_with_taggable_compatibility context_tags, through: context_taggings,
