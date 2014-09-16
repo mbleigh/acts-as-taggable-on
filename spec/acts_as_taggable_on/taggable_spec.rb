@@ -261,7 +261,7 @@ describe 'Taggable' do
     @taggable.tag_list = 'bob, charlie'
     @taggable.save
 
-    expect(TaggableModel.group(:created_at).tagged_with(['bob', 'css'], :any => true).first).to eq(@taggable)
+    expect(TaggableModel.tagged_with(['bob', 'css'], :any => true).to_a).to eq([@taggable])
 
     bob = TaggableModel.create(:name => 'Bob', :tag_list => 'ruby, rails, css')
     frank = TaggableModel.create(:name => 'Frank', :tag_list => 'ruby, rails')
