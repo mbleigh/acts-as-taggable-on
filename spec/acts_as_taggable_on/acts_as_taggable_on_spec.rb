@@ -133,6 +133,22 @@ describe 'Acts As Taggable On' do
       expect(taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to_not include(taggable1)
     end
 
+    it 'should ensure joins to multiple taggings maintain their contexts when aliasing' do
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+
+      taggable1.offering_list = 'one'
+      taggable1.need_list = 'two'
+
+      taggable1.save
+
+      column = TaggableModel.connection.quote_column_name("context")
+      offer_alias = TaggableModel.connection.quote_table_name("taggings")
+      need_alias = TaggableModel.connection.quote_table_name("need_taggings_taggable_models_join")
+
+      expect(TaggableModel.joins(:offerings, :needs).to_sql).to include "#{offer_alias}.#{column}"
+      expect(TaggableModel.joins(:offerings, :needs).to_sql).to include "#{need_alias}.#{column}"
+    end
+
   end
 
   describe 'Tagging Contexts' do
