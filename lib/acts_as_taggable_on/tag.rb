@@ -97,8 +97,6 @@ module ActsAsTaggableOn
 
     class << self
 
-
-
       private
 
       def comparable_name(str)
@@ -136,6 +134,7 @@ module ActsAsTaggableOn
           sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
         end
       end
+      
     end
   end
 end

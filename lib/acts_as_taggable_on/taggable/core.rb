@@ -18,21 +18,21 @@ module ActsAsTaggableOn::Taggable
           tag_type = tags_type.to_s.singularize
           context_taggings = "#{tag_type}_taggings".to_sym
           context_tags = tags_type.to_sym
-          taggings_order = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.id" : [])
+          taggings_order = (preserve_tag_order? ? "#{self.tag_namespaced(:tagging).table_name}.id" : [])
 
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
             has_many_with_taggable_compatibility context_taggings, as: :taggable,
                                                  dependent: :destroy,
-                                                 class_name: 'ActsAsTaggableOn::Tagging',
+                                                 class_name: self.tag_namespaced(:tagging).to_s,
                                                  order: taggings_order,
                                                  conditions: {context: tags_type},
                                                  include: :tag
 
             has_many_with_taggable_compatibility context_tags, through: context_taggings,
                                                  source: :tag,
-                                                 class_name: 'ActsAsTaggableOn::Tag',
+                                                 class_name: self.tag_namespaced(:tag).to_s,
                                                  order: taggings_order
 
           end
@@ -53,8 +53,8 @@ module ActsAsTaggableOn::Taggable
         end
       end
 
-      def taggable_on(preserve_tag_order, *tag_types)
-        super(preserve_tag_order, *tag_types)
+      def taggable_on(preserve_tag_order, *tag_types, **named_args)
+        super(preserve_tag_order, *tag_types, **named_args)
         initialize_acts_as_taggable_on_core
       end
 
@@ -105,30 +105,30 @@ module ActsAsTaggableOn::Taggable
 
         if options.delete(:exclude)
           if options.delete(:wild)
-            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(t)}%"]) }.join(' OR ')
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{self.tag_namespaced(:tag).table_name}.name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(t)}%"]) }.join(' OR ')
           else
-            tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{ActsAsTaggableOn::Utils.like_operator} ?", t]) }.join(' OR ')
+            tags_conditions = tag_list.map { |t| sanitize_sql(["#{self.tag_namespaced(:tag).table_name}.name #{ActsAsTaggableOn::Utils.like_operator} ?", t]) }.join(' OR ')
           end
 
-          conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name, nil)})"
+          conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{self.tag_namespaced(:tagging).table_name}.taggable_id FROM #{self.tag_namespaced(:tagging).table_name} JOIN #{self.tag_namespaced(:tag).table_name} ON #{self.tag_namespaced(:tagging).table_name}.tag_id = #{self.tag_namespaced(:tag).table_name}.#{self.tag_namespaced(:tag).primary_key} AND (#{tags_conditions}) WHERE #{self.tag_namespaced(:tagging).table_name}.taggable_type = #{quote_value(base_class.name, nil)})"
 
           if owned_by
-            joins <<  "JOIN #{ActsAsTaggableOn::Tagging.table_name}" +
-                      "  ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
-                      " AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name, nil)}" +
-                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = #{quote_value(owned_by.id, nil)}" +
-                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = #{quote_value(owned_by.class.base_class.to_s, nil)}"
+            joins <<  "JOIN #{self.tag_namespaced(:tagging).table_name}" +
+                      "  ON #{self.tag_namespaced(:tagging).table_name}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
+                      " AND #{self.tag_namespaced(:tagging).table_name}.taggable_type = #{quote_value(base_class.name, nil)}" +
+                      " AND #{self.tag_namespaced(:tagging).table_name}.tagger_id = #{quote_value(owned_by.id, nil)}" +
+                      " AND #{self.tag_namespaced(:tagging).table_name}.tagger_type = #{quote_value(owned_by.class.base_class.to_s, nil)}"
 
-            joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
-            joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
+            joins << " AND " + sanitize_sql(["#{self.tag_namespaced(:tagging).table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
+            joins << " AND " + sanitize_sql(["#{self.tag_namespaced(:tagging).table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
           end
 
         elsif any = options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
           tags = if options.delete(:wild)
-                   ActsAsTaggableOn::Tag.named_like_any(tag_list)
+                   self.tag_namespaced(:tag).named_like_any(tag_list)
                  else
-                   ActsAsTaggableOn::Tag.named_any(tag_list)
+                   self.tag_namespaced(:tag).named_any(tag_list)
                  end
 
           return empty_result if tags.length == 0
@@ -141,7 +141,7 @@ module ActsAsTaggableOn::Taggable
               "#{alias_base_name[0..4]}#{taggings_context[0..6]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tags.map(&:name).join('_'))}"
           )
 
-          tagging_cond = "#{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
+          tagging_cond = "#{self.tag_namespaced(:tagging).table_name} #{taggings_alias}" +
                           " WHERE #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
                           " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}"
 
@@ -169,13 +169,13 @@ module ActsAsTaggableOn::Taggable
             order_by << "(SELECT count(*) FROM #{tagging_cond}) desc"
           end
         else
-          tags = ActsAsTaggableOn::Tag.named_any(tag_list)
+          tags = self.tag_namespaced(:tag).named_any(tag_list)
 
           return empty_result unless tags.length == tag_list.length
 
           tags.each do |tag|
             taggings_alias = adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag.name)}")
-            tagging_join = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" \
+            tagging_join = "JOIN #{self.tag_namespaced(:tagging).table_name} #{taggings_alias}" \
                 "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
                 " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}" +
                 " AND #{taggings_alias}.tag_id = #{quote_value(tag.id, nil)}"
@@ -207,13 +207,13 @@ module ActsAsTaggableOn::Taggable
 
         elsif options.delete(:match_all)
           taggings_alias, _ = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
-          joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" \
+          joins << "LEFT OUTER JOIN #{self.tag_namespaced(:tagging).table_name} #{taggings_alias}" \
               "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" \
               " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}"
 
           joins << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
-          joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
-          joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
+          joins << " AND " + sanitize_sql(["#{self.tag_namespaced(:tagging).table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
+          joins << " AND " + sanitize_sql(["#{self.tag_namespaced(:tagging).table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
 
           group_columns = ActsAsTaggableOn::Utils.using_postgresql? ? grouped_column_names_for(self) : "#{table_name}.#{primary_key}"
           group = group_columns
@@ -300,26 +300,26 @@ module ActsAsTaggableOn::Taggable
     ##
     # Returns all tags of a given context
     def all_tags_on(context)
-      tagging_table_name = ActsAsTaggableOn::Tagging.table_name
+      tagging_table_name = self.tag_namespaced(:tagging).table_name
 
       opts = ["#{tagging_table_name}.context = ?", context.to_s]
       scope = base_tags.where(opts)
 
       if ActsAsTaggableOn::Utils.using_postgresql?
-        group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
+        group_columns = grouped_column_names_for(self.tag_namespaced(:tag))
         scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
       else
-        scope.group("#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
+        scope.group("#{self.tag_namespaced(:tag).table_name}.#{self.tag_namespaced(:tag).primary_key}")
       end.to_a
     end
 
     ##
     # Returns all tags that are not owned of a given context
     def tags_on(context)
-      scope = base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s])
+      scope = base_tags.where("#{self.tag_namespaced(:tagging).table_name}.context = ? AND #{self.tag_namespaced(:tagging).table_name}.tagger_id IS NULL", context.to_s)
       # when preserving tag order, return tags in created order
       # if we added the order to the association this would always apply
-      scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
+      scope = scope.order("#{self.tag_namespaced(:tagging).table_name}.id") if self.class.preserve_tag_order?
       scope
     end
 
@@ -366,7 +366,7 @@ module ActsAsTaggableOn::Taggable
     ##
     # Find existing tags or create non-existing tags
     def load_tags(tag_list)
-      ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
+      self.tag_namespaced(:tag).find_or_create_all_with_like_by_name(tag_list)
     end
 
     def save_tags
