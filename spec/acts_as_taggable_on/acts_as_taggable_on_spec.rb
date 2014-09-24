@@ -82,40 +82,45 @@ describe 'Acts As Taggable On' do
   end
 
   describe 'Matching Contexts' do
-    it 'should find objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(name: 'Taggable 1')
-      taggable2 = TaggableModel.create!(name: 'Taggable 2')
-      taggable3 = TaggableModel.create!(name: 'Taggable 3')
 
-      taggable1.offering_list = 'one, two'
-      taggable1.save!
+    it 'should find objects with tags of matching contexts in both top-level and in namespaced environments' do
+      [ TaggableModel, TaggableNamespacedModel ].each do |m|
+        taggable1 = m.create!(name: "#{m} Taggable 1")
+        taggable2 = m.create!(name: "#{m} Taggable 2")
+        taggable3 = m.create!(name: "#{m} Taggable 3")
 
-      taggable2.need_list = 'one, two'
-      taggable2.save!
+        taggable1.offering_list = "#{m} one, #{m} two"
+        taggable1.save!
 
-      taggable3.offering_list = 'one, two'
-      taggable3.save!
+        taggable2.need_list = "#{m} one, #{m} two"
+        taggable2.save!
 
-      expect(taggable1.find_matching_contexts(:offerings, :needs)).to include(taggable2)
-      expect(taggable1.find_matching_contexts(:offerings, :needs)).to_not include(taggable3)
+        taggable3.offering_list = "#{m} one, #{m} two"
+        taggable3.save!
+
+        expect(taggable1.find_matching_contexts(:offerings, :needs)).to include(taggable2)
+        expect(taggable1.find_matching_contexts(:offerings, :needs)).to_not include(taggable3)
+      end
     end
 
     it 'should find other related objects with tags of matching contexts' do
-      taggable1 = TaggableModel.create!(name: 'Taggable 1')
-      taggable2 = OtherTaggableModel.create!(name: 'Taggable 2')
-      taggable3 = OtherTaggableModel.create!(name: 'Taggable 3')
+      [ [TaggableModel, OtherTaggableModel], [TaggableNamespacedModel, OtherTaggableNamespacedModel] ].each do |m|
+        taggable1 = m[0].create!(name: 'Taggable 1')
+        taggable2 = m[1].create!(name: 'Taggable 2')
+        taggable3 = m[1].create!(name: 'Taggable 3')
 
-      taggable1.offering_list = 'one, two'
-      taggable1.save
+        taggable1.offering_list = 'one, two'
+        taggable1.save
 
-      taggable2.need_list = 'one, two'
-      taggable2.save
+        taggable2.need_list = 'one, two'
+        taggable2.save
 
-      taggable3.offering_list = 'one, two'
-      taggable3.save
+        taggable3.offering_list = 'one, two'
+        taggable3.save
 
-      expect(taggable1.find_matching_contexts_for(OtherTaggableModel, :offerings, :needs)).to include(taggable2)
-      expect(taggable1.find_matching_contexts_for(OtherTaggableModel, :offerings, :needs)).to_not include(taggable3)
+        expect(taggable1.find_matching_contexts_for(m[1], :offerings, :needs)).to include(taggable2)
+        expect(taggable1.find_matching_contexts_for(m[1], :offerings, :needs)).to_not include(taggable3)
+      end
     end
 
     it 'should not include the object itself in the list of related objects with tags of matching contexts' do

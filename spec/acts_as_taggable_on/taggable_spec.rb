@@ -1,6 +1,17 @@
 # encoding: utf-8
 require 'spec_helper'
 
+describe 'The test database' do
+
+  it 'should have namespaced and non-namespaced tables' do
+    expect(ActiveRecord::Base.connection.table_exists?(:tags)).to be true
+    expect(ActiveRecord::Base.connection.table_exists?(:taggings)).to be true
+    expect(ActiveRecord::Base.connection.table_exists?(:nspaced_tags)).to be true
+    expect(ActiveRecord::Base.connection.table_exists?(:nspaced_taggings)).to be true
+  end
+
+end
+
 describe 'Taggable To Preserve Order' do
   before(:each) do
     @taggable = OrderedTaggableModel.new(name: 'Bob Jones')
