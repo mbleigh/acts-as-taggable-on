@@ -14,19 +14,23 @@ module ActsAsTaggableOn
       #     acts_as_tagger
       #   end
       def acts_as_tagger(opts={})
+        namespace = opts.delete(:namespace)
+        ns = Proc.new { |obj| [*namespace, obj].join('_') }
+        ns_class = Proc.new { |obj| "ActsAsTaggableOn::#{ ns.call(obj).camelize }" }
+
         class_eval do
           has_many_with_taggable_compatibility :owned_taggings,
-                                               opts.merge(
-                                                   as: :tagger,
-                                                   dependent: :destroy,
-                                                   class_name: 'ActsAsTaggableOn::Tagging'
-                                               )
+                                              opts.merge(
+                                                  as: :tagger,
+                                                  dependent: :destroy,
+                                                  class_name: ns_class.call(:tagging)
+                                              )
 
           has_many_with_taggable_compatibility :owned_tags,
-                                               through: :owned_taggings,
-                                               source: :tag,
-                                               class_name: 'ActsAsTaggableOn::Tag',
-                                               uniq: true
+                                              through: :owned_taggings,
+                                              source: :tag,
+                                              class_name: ns_class.call(:tag),
+                                              uniq: true
         end
 
         include ActsAsTaggableOn::Tagger::InstanceMethods

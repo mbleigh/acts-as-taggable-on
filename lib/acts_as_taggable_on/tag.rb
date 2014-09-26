@@ -6,7 +6,7 @@ module ActsAsTaggableOn
 
     ### ASSOCIATIONS:
 
-    has_many :taggings, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging'
+    has_many :taggings, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging', inverse_of: :tag
 
     ### VALIDATIONS:
 
@@ -20,8 +20,8 @@ module ActsAsTaggableOn
     end
 
     ### SCOPES:
-    scope :most_used, ->(limit = 20) { order('taggings_count desc').limit(limit) }
-    scope :least_used, ->(limit = 20) { order('taggings_count asc').limit(limit) }
+    scope :most_used, ->(limit = 20) { order("#{self.namespaced(:taggings_count)} desc").limit(limit) }
+    scope :least_used, ->(limit = 20) { order("#{self.namespaced(:taggings_count)} asc").limit(limit) }
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
@@ -134,7 +134,7 @@ module ActsAsTaggableOn
           sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
         end
       end
-      
+
     end
   end
 end
