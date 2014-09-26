@@ -1,0 +1,2 @@
+class NamespacedStudent < NamespacedUser
+end

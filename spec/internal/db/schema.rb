@@ -89,27 +89,28 @@ ActiveRecord::Schema.define version: 0 do
   end
 
 
+  [nil, :namespaced_].each do |m|
+    create_table "cached_#{m}models", force: true do |t|
+      t.column :name, :string
+      t.column :type, :string
+      t.column :cached_tag_list, :string
+    end
 
-  create_table :cached_models, force: true do |t|
-    t.column :name, :string
-    t.column :type, :string
-    t.column :cached_tag_list, :string
-  end
+    create_table "other_cached_#{m}models", force: true do |t|
+      t.column :name, :string
+      t.column :type, :string
+      t.column :cached_language_list, :string
+      t.column :cached_status_list, :string
+      t.column :cached_glass_list, :string
+    end
 
-  create_table :other_cached_models, force: true do |t|
-    t.column :name, :string
-    t.column :type, :string
-    t.column :cached_language_list, :string
-    t.column :cached_status_list, :string
-    t.column :cached_glass_list, :string
-  end
+    create_table "#{m}users", force: true do |t|
+      t.column :name, :string
+    end
 
-  create_table :companies, force: true do |t|
-    t.column :name, :string
-  end
-
-  create_table :users, force: true do |t|
-    t.column :name, :string
+    create_table "#{m}companies", force: true do |t|
+      t.column :name, :string
+    end
   end
 
 

@@ -419,14 +419,21 @@ describe 'Taggable' do
     expect(bob.tags_on(:rotors)).to_not be_empty
   end
 
-  it 'should be able to find tagged' do
-    bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css')
-    frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css')
-    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby')
+  # ----------------
 
-    expect(TaggableModel.tagged_with('ruby', order: 'taggable_models.name').to_a).to eq([bob, frank, steve])
-    expect(TaggableModel.tagged_with('ruby, rails', order: 'taggable_models.name').to_a).to eq([bob, frank])
-    expect(TaggableModel.tagged_with(%w(ruby rails), order: 'taggable_models.name').to_a).to eq([bob, frank])
+  def make_bob_frank_steve!
+    @bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css')
+    @frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css')
+    @steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby')
+  end
+
+  # ----------------
+
+  it 'should be able to find tagged' do
+    make_bob_frank_steve!
+    expect(TaggableModel.tagged_with('ruby', order: 'taggable_models.name').to_a).to eq([@bob, @frank, @steve])
+    expect(TaggableModel.tagged_with('ruby, rails', order: 'taggable_models.name').to_a).to eq([@bob, @frank])
+    expect(TaggableModel.tagged_with(%w(ruby rails), order: 'taggable_models.name').to_a).to eq([@bob, @frank])
   end
 
   it 'should be able to find tagged with quotation marks' do
@@ -440,25 +447,19 @@ describe 'Taggable' do
   end
 
   it 'should be able to find tagged with any tag' do
-    bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css')
-    frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css')
-    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby')
-
-    expect(TaggableModel.tagged_with(%w(ruby java), order: 'taggable_models.name', any: true).to_a).to eq([bob, frank, steve])
-    expect(TaggableModel.tagged_with(%w(c++ fitter), order: 'taggable_models.name', any: true).to_a).to eq([bob, steve])
-    expect(TaggableModel.tagged_with(%w(depressed css), order: 'taggable_models.name', any: true).to_a).to eq([bob, frank])
+    make_bob_frank_steve!
+    expect(TaggableModel.tagged_with(%w(ruby java), order: 'taggable_models.name', any: true).to_a).to eq([@bob, @frank, @steve])
+    expect(TaggableModel.tagged_with(%w(c++ fitter), order: 'taggable_models.name', any: true).to_a).to eq([@bob, @steve])
+    expect(TaggableModel.tagged_with(%w(depressed css), order: 'taggable_models.name', any: true).to_a).to eq([@bob, @frank])
   end
 
   it 'should be able to order by number of matching tags when matching any' do
-    bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css')
-    frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css')
-    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby')
-
-    expect(TaggableModel.tagged_with(%w(ruby java), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([steve, bob, frank])
-    expect(TaggableModel.tagged_with(%w(c++ fitter), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([steve, bob])
-    expect(TaggableModel.tagged_with(%w(depressed css), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([frank, bob])
-    expect(TaggableModel.tagged_with(['fitter', 'happier', 'more productive', 'c++', 'java', 'ruby'], any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([steve, bob, frank])
-    expect(TaggableModel.tagged_with(%w(c++ java ruby fitter), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([steve, bob, frank])
+    make_bob_frank_steve!
+    expect(TaggableModel.tagged_with(%w(ruby java), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([@steve, @bob, @frank])
+    expect(TaggableModel.tagged_with(%w(c++ fitter), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([@steve, @bob])
+    expect(TaggableModel.tagged_with(%w(depressed css), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([@frank, @bob])
+    expect(TaggableModel.tagged_with(['fitter', 'happier', 'more productive', 'c++', 'java', 'ruby'], any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([@steve, @bob, @frank])
+    expect(TaggableModel.tagged_with(%w(c++ java ruby fitter), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([@steve, @bob, @frank])
   end
 
   context 'wild: true' do
@@ -484,15 +485,13 @@ describe 'Taggable' do
   end
 
   it 'should be able to use named scopes to chain tag finds' do
-    bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css')
-    frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css')
-    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, python')
+    make_bob_frank_steve!
 
     # Let's only find those productive Rails developers
-    expect(TaggableModel.tagged_with('rails', on: :skills, order: 'taggable_models.name').to_a).to eq([bob, frank])
-    expect(TaggableModel.tagged_with('happier', on: :tags, order: 'taggable_models.name').to_a).to eq([bob, steve])
-    expect(TaggableModel.tagged_with('rails', on: :skills).tagged_with('happier', on: :tags).to_a).to eq([bob])
-    expect(TaggableModel.tagged_with('rails').tagged_with('happier', on: :tags).to_a).to eq([bob])
+    expect(TaggableModel.tagged_with('rails', on: :skills, order: 'taggable_models.name').to_a).to eq([@bob, @frank])
+    expect(TaggableModel.tagged_with('happier', on: :tags, order: 'taggable_models.name').to_a).to eq([@bob, @steve])
+    expect(TaggableModel.tagged_with('rails', on: :skills).tagged_with('happier', on: :tags).to_a).to eq([@bob])
+    expect(TaggableModel.tagged_with('rails').tagged_with('happier', on: :tags).to_a).to eq([@bob])
   end
 
   it 'should be able to find tagged with only the matching tags' do
