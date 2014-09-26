@@ -31,7 +31,7 @@ For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/is
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on'
+gem 'acts-as-taggable-on', '~> 3.4'
 ```
 
 and bundle:
