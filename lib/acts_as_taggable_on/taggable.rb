@@ -80,7 +80,7 @@ module ActsAsTaggableOn
         self.preserve_tag_order = preserve_tag_order
         
         ns = named_args.delete(:namespace)
-        ActsAsTaggableOn.namespace_classes! ns
+        ActsAsTaggableOn.namespace_base_classes! ns
         ActsAsTaggableOn.tagify_class! self, ns
       end
 

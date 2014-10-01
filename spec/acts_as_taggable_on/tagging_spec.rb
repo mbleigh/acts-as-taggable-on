@@ -6,11 +6,10 @@ require 'spec_helper'
   [ActsAsTaggableOn::NspacedTagging, TaggableNamespacedModel, ActsAsTaggableOn::NspacedTag]
 ].each do |m|
 
-  def set_info(m)
-    @tagging = m[0].new
-  end
-
   describe m[0] do
+    def set_info(m)
+      @tagging = m[0].new
+    end
     before(:each) { set_info m }
 
     it 'should not be valid with a invalid tag' do
@@ -19,8 +18,7 @@ require 'spec_helper'
       @tagging.context = 'tags'
 
       expect(@tagging).to_not be_valid
-
-      expect(@tagging.errors[:tag_id]).to eq(['can\'t be blank'])
+      expect(@tagging.errors[m[0].namespaced(:tag_id)]).to eq(['can\'t be blank'])
     end
 
     it 'should not create duplicate taggings' do
@@ -28,7 +26,7 @@ require 'spec_helper'
       @tag = m[2].create(name: 'awesome')
 
       expect(-> {
-        2.times { m[0].create(taggable: @taggable, tag: @tag, context: 'tags') }
+        2.times { m[0].create(taggable: @taggable, m[0].namespaced(:tag) => @tag, context: 'tags') }
       }).to change(m[0], :count).by(1)
     end
 
@@ -51,11 +49,7 @@ require 'spec_helper'
       m[2].destroy_all
       @taggable = m[1].create(name: 'Bob Jones')
       @taggable.update_attribute :tag_list, 'aaa,bbb,ccc'
-      puts "Right before"
-      # look_at_database
       @taggable.update_attribute :tag_list, ''
-      puts "Right after"
-      # look_at_database
       expect(m[2].count).to eql(0)
       ActsAsTaggableOn.remove_unused_tags = previous_setting
     end

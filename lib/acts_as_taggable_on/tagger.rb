@@ -28,7 +28,7 @@ module ActsAsTaggableOn
 
           has_many_with_taggable_compatibility :owned_tags,
                                               through: :owned_taggings,
-                                              source: :tag,
+                                              source: ns.call(:tag),
                                               class_name: ns_class.call(:tag),
                                               uniq: true
         end

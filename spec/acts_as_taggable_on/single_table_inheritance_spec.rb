@@ -15,10 +15,6 @@ describe 'Single Table Inheritance' do
 
     @student = m[3].create!
   end
-
-  def namespaced_table(model, att)
-    [*(:nspaced if model.name.include?('Namespaced')), att].join('_').to_sym
-  end
   
   [
     [TaggableModel, InheritingTaggableModel, AlteredInheritingTaggableModel, Student, Company, User, Market, ActsAsTaggableOn::Tag],
@@ -143,9 +139,9 @@ describe 'Single Table Inheritance' do
         @altered_inheriting.tag_list = 'fork, spoon'
         @altered_inheriting.save!
 
-        expect(m[1].tag_counts_on(:tags, order: "#{namespaced_table m[1], :tags}.id").map(&:name)).to eq(%w(bob kelso))
-        expect(m[2].tag_counts_on(:tags, order: "#{namespaced_table m[2], :tags}.id").map(&:name)).to eq(%w(fork spoon))
-        expect(m[0].tag_counts_on(:tags, order: "#{namespaced_table m[0], :tags}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
+        expect(m[1].tag_counts_on(:tags, order: "#{m[1].namespaced :tags}.id").map(&:name)).to eq(%w(bob kelso))
+        expect(m[2].tag_counts_on(:tags, order: "#{m[2].namespaced :tags}.id").map(&:name)).to eq(%w(fork spoon))
+        expect(m[0].tag_counts_on(:tags, order: "#{m[0].namespaced :tags}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
       end
 
       it 'should have different tags_on for inherited models' do
@@ -154,9 +150,9 @@ describe 'Single Table Inheritance' do
         @altered_inheriting.tag_list = 'fork, spoon'
         @altered_inheriting.save!
 
-        expect(m[1].tags_on(:tags, order: "#{namespaced_table m[1], :tags}.id").map(&:name)).to eq(%w(bob kelso))
-        expect(m[2].tags_on(:tags, order: "#{namespaced_table m[2], :tags}.id").map(&:name)).to eq(%w(fork spoon))
-        expect(m[0].tags_on(:tags, order: "#{namespaced_table m[0], :tags}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
+        expect(m[1].tags_on(:tags, order: "#{m[1].namespaced :tags}.id").map(&:name)).to eq(%w(bob kelso))
+        expect(m[2].tags_on(:tags, order: "#{m[2].namespaced :tags}.id").map(&:name)).to eq(%w(fork spoon))
+        expect(m[0].tags_on(:tags, order: "#{m[0].namespaced :tags}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
       end
 
       it 'should store same tag without validation conflict' do
@@ -217,11 +213,11 @@ describe 'Single Table Inheritance' do
       it 'does not interfere with a normal Tag context on the same model' do
         @company.location_list = 'cambridge'
         @company.save!
-        expect(m[7].where(name: 'cambridge', type: (m[7].name.include?('Nspaced') ? m[7].name : nil))).to_not be_empty
+        expect(m[7].where(name: 'cambridge', type: m[7].to_s)).to_not be_empty
       end
 
       it 'is returned with proper type through ownership' do
-        @user.tag(@company, :with => 'ripoffs, rackets', :on => :markets)
+        @user.tag(@company, with: 'ripoffs, rackets', on: :markets)
         tags = @company.owner_tags_on(@user, :markets)
         expect(tags.all? { |tag| tag.is_a? m[6] }).to be_truthy
       end

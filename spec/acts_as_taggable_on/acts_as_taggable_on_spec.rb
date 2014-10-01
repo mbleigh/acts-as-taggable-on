@@ -100,17 +100,17 @@ describe 'Acts As Taggable On' do
 
     it 'should find objects with tags of matching contexts' do
       [ TaggableModel, TaggableNamespacedModel ].each do |m|
-        taggable1 = m.create!(name: "#{m} Taggable 1")
-        taggable2 = m.create!(name: "#{m} Taggable 2")
-        taggable3 = m.create!(name: "#{m} Taggable 3")
+        taggable1 = m.create!(name: "Taggable 1")
+        taggable2 = m.create!(name: "Taggable 2")
+        taggable3 = m.create!(name: "Taggable 3")
 
-        taggable1.offering_list = "#{m} one, #{m} two"
+        taggable1.offering_list = "one, two"
         taggable1.save!
 
-        taggable2.need_list = "#{m} one, #{m} two"
+        taggable2.need_list = "one, two"
         taggable2.save!
 
-        taggable3.offering_list = "#{m} one, #{m} two"
+        taggable3.offering_list = "one, two"
         taggable3.save!
 
         expect(taggable1.find_matching_contexts(:offerings, :needs)).to include(taggable2)
@@ -120,17 +120,17 @@ describe 'Acts As Taggable On' do
 
     it 'should find other related objects with tags of matching contexts' do
       [ [TaggableModel, OtherTaggableModel], [TaggableNamespacedModel, OtherTaggableNamespacedModel] ].each do |m|
-        taggable1 = m[0].create!(name: "#{m[0]} Taggable 1")
-        taggable2 = m[1].create!(name: "#{m[1]} Taggable 2")
-        taggable3 = m[1].create!(name: "#{m[1]} Taggable 3")
+        taggable1 = m[0].create!(name: "Taggable 1")
+        taggable2 = m[1].create!(name: "Taggable 2")
+        taggable3 = m[1].create!(name: "Taggable 3")
 
-        taggable1.offering_list = "#{m[0]} one, #{m[0]} two"
+        taggable1.offering_list = "one, two"
         taggable1.save!
 
-        taggable2.need_list = "#{m[1]} one, #{m[1]} two"
+        taggable2.need_list = "one, two"
         taggable2.save!
 
-        taggable3.offering_list = "#{m[1]} one, #{m[1]} two"
+        taggable3.offering_list = "one, two"
         taggable3.save!
 
         expect(taggable1.find_matching_contexts_for(m[1], :offerings, :needs)).to include(taggable2)
@@ -140,14 +140,14 @@ describe 'Acts As Taggable On' do
 
     it 'should not include the object itself in the list of related objects with tags of matching contexts' do
       [ TaggableModel, TaggableNamespacedModel ].each do |m|
-        taggable1 = m.create!(name: "#{m} Taggable 1")
-        taggable2 = m.create!(name: "#{m} Taggable 2")
+        taggable1 = m.create!(name: "Taggable 1")
+        taggable2 = m.create!(name: "Taggable 2")
 
-        taggable1.offering_list = "#{m} one, #{m} two"
-        taggable1.need_list = "#{m} one, #{m} two"
+        taggable1.offering_list = "one, two"
+        taggable1.need_list = "one, two"
         taggable1.save
 
-        taggable2.need_list = "#{m} one, #{m} two"
+        taggable2.need_list = "one, two"
         taggable2.save
 
         expect(taggable1.find_matching_contexts_for(m, :offerings, :needs)).to include(taggable2)
@@ -157,12 +157,12 @@ describe 'Acts As Taggable On' do
 
     it 'should ensure joins to multiple taggings maintain their contexts when aliasing' do
       [ TaggableModel, TaggableNamespacedModel ].each do |m|
-        taggable1 = m.create!(name: "#{m} Taggable 1")
+        taggable1 = m.create!(name: "Taggable 1")
 
-        taggable1.offering_list = "#{m} one"
-        taggable1.need_list = "#{m} two"
+        taggable1.offering_list = "one"
+        taggable1.need_list = "two"
 
-        taggable1.save
+        taggable1.save!
 
         column = m.connection.quote_column_name("context")
         offer_alias = m.connection.quote_table_name("#{ 'nspaced_' if m == TaggableNamespacedModel }taggings")
@@ -271,7 +271,7 @@ describe 'Acts As Taggable On' do
   describe 'taggings' do
     [ TaggableModel, TaggableNamespacedModel ].each do |m|
       before(:each) do
-        @taggable = m.new(name: "#{m} Art Kram")
+        @taggable = m.new(name: "Art Kram")
       end
 
       it 'should return no taggings' do
@@ -282,9 +282,9 @@ describe 'Acts As Taggable On' do
 
   describe '@@remove_unused_tags' do
     def set_tags(m)
-      @taggable = m[0].create!(name: "#{m[0]} Bob Jones")
-      @tag = m[1].create!(name: "#{m[1]} awesome")
-      @tagging = m[2].create!(taggable: @taggable, tag: @tag, context: 'tags')
+      @taggable = m[0].create!(name: "Bob Jones")
+      @tag = m[1].create!(name: "awesome")
+      @tagging = m[2].create!(taggable: @taggable, @taggable.namespaced(:tag) => @tag, context: 'tags')
     end
 
     [
@@ -299,8 +299,10 @@ describe 'Acts As Taggable On' do
         end
 
         it 'should remove unused tags after removing taggings' do
+          # look_at_database
           @tagging.destroy
-          expect(m[1].find_by_name("#{m[1]} awesome")).to be_nil
+          # look_at_database
+          expect(m[1].find_by_name("awesome")).to be_nil
         end
       end
 
@@ -312,10 +314,13 @@ describe 'Acts As Taggable On' do
 
         it 'should not remove unused tags after removing taggings' do
           @tagging.destroy
-          expect(m[1].find_by_name("#{m[1]} awesome")).to eq(@tag)
+          expect(m[1].find_by_name("awesome")).to eq(@tag)
         end
       end
     end
   end
+
+
+
 
 end

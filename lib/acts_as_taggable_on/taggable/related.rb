@@ -37,14 +37,14 @@ module ActsAsTaggableOn::Taggable
 
     def matching_contexts_for(search_context, result_context, klass, options = {})
       tags_to_find = klass.tags_on(search_context).map { |t| t.name }
-      related_where(klass, ["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{self.namespaced(:tagging).table_name}.taggable_id AND #{self.namespaced(:tagging).table_name}.taggable_type = '#{klass.base_class}' AND #{self.namespaced(:tagging).table_name}.tag_id = #{self.namespaced(:tag).table_name}.#{self.namespaced(:tag).primary_key} AND #{self.namespaced(:tag).table_name}.name IN (?) AND #{self.namespaced(:tagging).table_name}.context = ?", tags_to_find, result_context])
+      related_where(klass, ["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{namespaced_class(:Tagging).table_name}.taggable_id AND #{namespaced_class(:Tagging).table_name}.taggable_type = '#{klass.base_class}' AND #{namespaced_class(:Tagging).table_name}.#{namespaced(:tag_id)} = #{namespaced_class(:Tag).table_name}.#{namespaced_class(:Tag).primary_key} AND #{namespaced_class(:Tag).table_name}.name IN (?) AND #{namespaced_class(:Tagging).table_name}.context = ?", tags_to_find, result_context])
     end
 
     def related_tags_for(context, klass, options = {})
       tags_to_ignore = Array.wrap(options[:ignore]).map(&:to_s) || []
       # Cannot use klass.tags_on, else it fails in related_spec.rb
       tags_to_find = tags_on(context).map { |t| t.name }.reject { |t| tags_to_ignore.include? t }
-      related_where(klass, ["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{self.namespaced(:tagging).table_name}.taggable_id AND #{self.namespaced(:tagging).table_name}.taggable_type = '#{klass.base_class}' AND #{self.namespaced(:tagging).table_name}.tag_id = #{self.namespaced(:tag).table_name}.#{self.namespaced(:tag).primary_key} AND #{self.namespaced(:tag).table_name}.name IN (?)", tags_to_find])
+      related_where(klass, ["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{namespaced_class(:Tagging).table_name}.taggable_id AND #{namespaced_class(:Tagging).table_name}.taggable_type = '#{klass.base_class}' AND #{namespaced_class(:Tagging).table_name}.#{namespaced(:tag_id)} = #{namespaced_class(:Tag).table_name}.#{namespaced_class(:Tag).primary_key} AND #{namespaced_class(:Tag).table_name}.name IN (?)", tags_to_find])
     end
 
     private
@@ -62,8 +62,8 @@ module ActsAsTaggableOn::Taggable
     end
 
     def related_where(klass, conditions)
-      klass.select("#{klass.table_name}.*, COUNT(#{self.namespaced(:tag).table_name}.#{self.namespaced(:tag).primary_key}) AS count")
-      .from("#{klass.table_name}, #{self.namespaced(:tag).table_name}, #{self.namespaced(:tagging).table_name}")
+      klass.select("#{klass.table_name}.*, COUNT(#{namespaced_class(:Tag).table_name}.#{namespaced_class(:Tag).primary_key}) AS count")
+      .from("#{klass.table_name}, #{namespaced_class(:Tag).table_name}, #{namespaced_class(:Tagging).table_name}")
       .group(group_columns(klass))
       .order('count DESC')
       .where(conditions)

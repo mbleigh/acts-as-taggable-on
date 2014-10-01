@@ -29,5 +29,6 @@ d = File.dirname(__FILE__)
   :ordered_taggable_model,
   :ordered_taggable_namespaced_model,
   :cached_model_with_array,
-  :taggable_model_with_json
+  :taggable_model_with_json,
+  :taggable_namespaced_model_with_json
 ].each { |f| require File.join d, f.to_s }

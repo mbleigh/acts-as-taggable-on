@@ -6,15 +6,15 @@ require 'spec_helper'
   [TaggableModel, User, ActsAsTaggableOn::Tagging, OrderedTaggableModel],
   [TaggableNamespacedModel, NamespacedUser, ActsAsTaggableOn::NspacedTagging, OrderedTaggableNamespacedModel]
 ].each do |m|
-
-  def set_info(m)
-    @user = m[1].create
-    @taggable = m[0].create(name: 'Bob Jones')
-  end
   
   describe 'Tagger' do
 
-    before { set_info m }
+    def set_info(m)
+      @user = m[1].create!
+      @taggable = m[0].create!(name: 'Bob Jones')
+    end
+
+    before(:each) { set_info m }
 
     it 'should have taggings' do
       @user.tag(@taggable, with: 'ruby,scheme', on: :tags)

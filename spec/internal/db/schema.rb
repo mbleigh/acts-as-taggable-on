@@ -30,13 +30,13 @@ ActiveRecord::Schema.define version: 0 do
 
   create_table :nspaced_tags, force: true do |t|
     t.string :name
-    t.integer :taggings_count, default: 0
+    t.integer :nspaced_taggings_count, default: 0
     t.string :type
   end
   add_index 'nspaced_tags', ['name'], name: 'index_nspaced_tags_on_name', unique: true
 
   create_table :nspaced_taggings, force: true do |t|
-    t.references :tag
+    t.references :nspaced_tag
 
     # You should make sure that the column created is
     # long enough to store the required class names.
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define version: 0 do
     t.datetime :created_at
   end
   add_index 'nspaced_taggings',
-            ['tag_id', 'taggable_id', 'taggable_type', 'context', 'tagger_id', 'tagger_type'],
+            ['nspaced_tag_id', 'taggable_id', 'taggable_type', 'context', 'tagger_id', 'tagger_type'],
             unique: true, name: 'nspaced_taggings_idx'
 
 
@@ -73,7 +73,7 @@ ActiveRecord::Schema.define version: 0 do
     end
 
     create_table "un#{m}", force: true do |t|
-      t.column :taggable_model_id, :integer
+      t.column "#{m.to_s.singularize}_id", :integer
       t.column :name, :string
     end
 

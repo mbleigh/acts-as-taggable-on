@@ -56,72 +56,128 @@ module ActsAsTaggableOn
     delimiter.ends_with?(' ') ? delimiter : "#{delimiter} "
   end
 
+
+
+
+  # Returns namespaced class constant (i.e., ActsAsTaggableOn::namespaced(:Tag) > ActsAsTaggableOn::NamespacedTag)
+  def self.namespaced_class(ns, obj, as_constant: true)
+    m = "ActsAsTaggableOn::#{ ns.to_s.camelize }#{ obj.to_s.camelize }"
+    as_constant ? m.constantize : m
+  end
+
+  def self.namespaced_attribute(ns, att)
+    [*ns, att].join('_').to_sym
+  end
+
+  # Allow affected model/instance to namespace attributes and classes
+  # i.e., Tag > NspacedTag (namespaced),
+  #       tag > nspaced_tag (namespaced_class)
+  def self.add_namespace_class_helpers!(klass)
+    klass.class_eval do
+      def self.namespaced(att)
+        ActsAsTaggableOn.namespaced_attribute taggable_on_namespace, att
+      end
+
+      def self.namespaced_class(obj, **as_constant)
+        ActsAsTaggableOn.namespaced_class taggable_on_namespace, obj, as_constant: as_constant
+      end
+
+      def namespaced(att); self.class.namespaced att; end
+      def namespaced_class(obj, **as_constant); self.class.namespaced_class obj, as_constant: as_constant; end
+    end
+  end
+
   # Apply attributes/methods to app class (ex., class Student now responds_to `taggable?` and has_many :taggings)
   def self.tagify_class!(klass, namespace)
-    klass.class_attribute :taggable_namespace
-    klass.taggable_namespace = namespace
-    # Join the namespace and base object name (i.e., Tagging > namespace_tagging) 
-    ns = Proc.new { |obj| [*namespace, obj.to_s.underscore].join('_').to_sym }
-    ns_class = Proc.new { |obj| "ActsAsTaggableOn::#{ ns.call(obj).to_s.camelize }" }
+    klass.class_attribute :taggable_on_namespace
+    klass.taggable_on_namespace = namespace
 
+    # Shortcuts
+    ns = ->(obj) { ActsAsTaggableOn.namespaced_attribute namespace, obj }
+    ns_class = ->(obj) { ActsAsTaggableOn.namespaced_class namespace, obj }
+
+    ActsAsTaggableOn.add_namespace_class_helpers! klass
     klass.class_eval do
       # Namespace the relations
       # i.e., No namespace:             has_many :taggings, ..., class_name: 'ActsAsTaggableOn::Tagging'
       # With a namespace of 'nspaced':  has_many :nspaced_taggings, ..., class_name: 'ActsAsTaggableOn::NspacedTagging'
 
-      has_many ns.call(:taggings), as: :taggable, dependent: :destroy, class_name: ns_class.call(:Tagging)
-      has_many :base_tags, through: ns.call(:taggings), source: :tag, class_name: ns_class.call(:Tag)
+      has_many ns.call(:taggings), as: :taggable, dependent: :destroy, class_name: ns_class.call(:Tagging).to_s
+      has_many :base_tags, through: ns.call(:taggings), source: ns.call(:tag), class_name: ns_class.call(:Tag).to_s
       alias_method :taggings, ns.call(:taggings)
 
       def self.taggable?
         true
       end
-
-      # Returns namespaced class constant (i.e., ActsAsTaggableOn::namespaced(:Tag) > ActsAsTaggableOn::NamespacedTag)
-      def self.namespaced(obj)
-        "ActsAsTaggableOn::#{ taggable_namespace.to_s.camelize }#{ obj.to_s.camelize }".constantize
-      end
-      def namespaced(obj); self.class.namespaced obj; end
     end
   end
 
   # only: can optionally namespace one class at a time (ex., ActsAsTaggableOn.namespace_classes! :nspace, only: :Tag)
   # useful in test suite when creating NspacedTag and NspacedTagging models
-  def self.namespace_classes!(namespace, only: nil)
+  def self.namespace_base_classes!(namespace, only: nil)
     return if namespace.nil?
-    # Join the namespace and base object name (i.e., Tagging > namespace_tagging) 
-    ns = Proc.new { |obj| [*namespace, obj.to_s.underscore].join('_').to_sym }
-    # Camelize base class (i.e., :namespace_taging > NamespaceTagging)
-    ns_class = Proc.new { |obj| ns.call(obj).to_s.camelize }
-    # Fully scoped namespaced class (i.e., ActsAsTaggableOn::Tagging > ActsAsTaggableOn::NamespaceTagging)
-    ns_full_class = Proc.new { |obj| "ActsAsTaggableOn::#{ ns_class.call(obj) }" }
+
+    # Shortcuts
+    ns = ->(obj) { ActsAsTaggableOn.namespaced_attribute namespace, obj }
+    ns_class = ->(obj, as_constant=true) { ActsAsTaggableOn.namespaced_class namespace, obj, as_constant: as_constant }
+    # Namespaced class without the ActsAsTaggableOn module prefix and in string format
+    ns_base_class = ->(obj) { ActsAsTaggableOn.namespaced_class(namespace, obj, as_constant: false).demodulize }
 
     # Copy ActsAsTaggableOn::Tag to ActsAsTaggableOn::[Namespace]Tag (where [Namespace] is usually set by `taggable_on`)
     if only.nil? or only.to_s.downcase.to_sym == :tag
-      unless ActsAsTaggableOn.const_defined?(ns_class.call(:Tag))
-        ActsAsTaggableOn.const_set ns_class.call(:Tag), Class.new(ActsAsTaggableOn::Tag)
-        ns_full_class.call(:Tag).constantize.class_eval do
-          has_many ns.call(:taggings), dependent: :destroy, class_name: ns_full_class.call(:Tagging), foreign_key: :tag_id, inverse_of: ns.call(:tag)
+      unless ActsAsTaggableOn.const_defined?(ns_base_class.call(:Tag))
+        ActsAsTaggableOn.const_set ns_base_class.call(:Tag), Class.new(ActsAsTaggableOn::BasicTag)
+        klass = ns_class.call(:Tag)
+        klass.taggable_on_namespace = namespace
+        klass.class_eval do
           self.table_name = ns.call(:tags)
+          self.superclass.table_name = ns.call(:tags)
+
+          has_many ns.call(:taggings), dependent: :destroy, class_name: ns_class.call(:Tagging, false), foreign_key: ns.call(:tag_id), inverse_of: ns.call(:tag)
+
+          validates_presence_of :name
+          validates_uniqueness_of :name, if: :validates_name_uniqueness?
+          validates_length_of :name, maximum: 255
+
+          # Override normal attribute getters/setters
+          define_method(:taggings_count) do
+            send ns.call(:taggings_count)
+          end
         end
       end
     end
 
     # Copy ActsAsTaggableOn::Tagging to ActsAsTaggableOn::[Namespace]Tagging (where [Namespace] is usually set by `taggable_on`)
     if only.nil? or only.to_s.downcase.to_sym == :tagging
-      unless ActsAsTaggableOn.const_defined?(ns_class.call(:Tagging))
-        ActsAsTaggableOn.const_set ns_class.call(:Tagging), Class.new(ActsAsTaggableOn::Tagging)
-        ns_full_class.call(:Tagging).constantize.class_eval do
-          belongs_to ns.call(:Tag), class_name: ns_full_class.call(:Tag), counter_cache: ActsAsTaggableOn.tags_counter, inverse_of: ns.call(:taggings)
+      unless ActsAsTaggableOn.const_defined?(ns_base_class.call(:Tagging))
+        ActsAsTaggableOn.const_set ns_base_class.call(:Tagging), Class.new(ActsAsTaggableOn::BasicTagging)
+        klass = ns_class.call(:Tagging)
+        klass.taggable_on_namespace = namespace
+        klass.class_eval do
           self.table_name = ns.call(:taggings)
+          self.superclass.table_name = ns.call(:taggings)
+
+          belongs_to ns.call(:tag), class_name: ns_class.call(:Tag, false), counter_cache: ActsAsTaggableOn.tags_counter, inverse_of: ns.call(:taggings)
+          
           # For some reason validators aren't copied over...
-          validates_uniqueness_of :tag_id, scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
-          # The calls to base_class screw up the way this gem records tagger_type, so we need to modify the scope
-          scope :not_owned, -> { where(tagger_id: nil, tagger_type: ns_full_class.call(:Tagging)) }
+          validates_presence_of ns.call(:tag_id)
+          validates_uniqueness_of ns.call(:tag_id), scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
+          validates_presence_of :context
+
+          # Override normal attribute getters/setters
+          define_method(:tag) do
+            send ns.call(:tag)
+          end
+          define_method(:tag=) do |val|
+            send ns.call(:tag=), val
+          end
         end
       end
     end
   end
+
+
+
 
   class Configuration
     attr_accessor :delimiter, :force_lowercase, :force_parameterize,

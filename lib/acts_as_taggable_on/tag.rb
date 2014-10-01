@@ -1,27 +1,25 @@
 # encoding: utf-8
 module ActsAsTaggableOn
-  class Tag < ::ActiveRecord::Base
+  class BasicTag < ::ActiveRecord::Base
 
     attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
-
-    ### ASSOCIATIONS:
-
-    has_many :taggings, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging', inverse_of: :tag
-
-    ### VALIDATIONS:
-
-    validates_presence_of :name
-    validates_uniqueness_of :name, if: :validates_name_uniqueness?
-    validates_length_of :name, maximum: 255
+    class_attribute :taggable_on_namespace
 
     # monkey patch this method if don't need name uniqueness validation
     def validates_name_uniqueness?
       true
     end
 
+    ActsAsTaggableOn.add_namespace_class_helpers! self
+
     ### SCOPES:
-    scope :most_used, ->(limit = 20) { order("#{self.namespaced(:taggings_count)} desc").limit(limit) }
-    scope :least_used, ->(limit = 20) { order("#{self.namespaced(:taggings_count)} asc").limit(limit) }
+    def self.most_used(limit = 20)
+      order("#{namespaced(:taggings_count)} desc").limit(limit)
+    end
+    
+    def self.least_used(limit = 20)
+      order("#{namespaced(:taggings_count)} asc").limit(limit)
+    end
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
@@ -81,10 +79,11 @@ module ActsAsTaggableOn
       end
     end
 
+
     ### INSTANCE METHODS:
 
     def ==(object)
-      super || (object.is_a?(Tag) && name == object.name)
+      super || (object.is_a?(namespaced_class(:Tag)) && name == object.name)
     end
 
     def to_s
@@ -136,5 +135,17 @@ module ActsAsTaggableOn
       end
 
     end
+  end
+
+  class Tag < BasicTag
+    self.table_name = :tags
+    self.superclass.table_name = :tags
+    # self.inheritance_column = nil
+
+    has_many :taggings, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging', inverse_of: :tag
+
+    validates_presence_of :name
+    validates_uniqueness_of :name, if: :validates_name_uniqueness?
+    validates_length_of :name, maximum: 255
   end
 end
