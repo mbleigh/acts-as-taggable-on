@@ -284,6 +284,7 @@ describe 'Acts As Taggable On' do
     def set_tags(m)
       @taggable = m[0].create!(name: "Bob Jones")
       @tag = m[1].create!(name: "awesome")
+      puts "@taggable: #{@taggable.inspect}, namespace: #{@taggable.taggable_on_namespace}...@tagging: #{@tagging.inspect}"
       @tagging = m[2].create!(taggable: @taggable, @taggable.namespaced(:tag) => @tag, context: 'tags')
     end
 
