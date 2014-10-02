@@ -97,16 +97,16 @@ module ActsAsTaggableOn
 
     # Shortcuts
     ns = ->(obj) { ActsAsTaggableOn.namespaced_attribute namespace, obj }
-    ns_class = ->(obj) { ActsAsTaggableOn.namespaced_class namespace, obj }
+    ns_class = ->(obj, as_constant=true) { ActsAsTaggableOn.namespaced_class namespace, obj, as_constant: as_constant }
 
     ActsAsTaggableOn.add_namespace_class_helpers! klass
     klass.class_eval do
       # Namespace the relations
       # i.e., No namespace:             has_many :taggings, ..., class_name: 'ActsAsTaggableOn::Tagging'
       # With a namespace of 'nspaced':  has_many :nspaced_taggings, ..., class_name: 'ActsAsTaggableOn::NspacedTagging'
-
-      has_many ns.call(:taggings), as: :taggable, dependent: :destroy, class_name: ns_class.call(:Tagging).to_s
-      has_many :base_tags, through: ns.call(:taggings), source: ns.call(:tag), class_name: ns_class.call(:Tag).to_s
+      puts ns.call(:taggings)
+      has_many ns.call(:taggings), as: :taggable, dependent: :destroy, class_name: ns_class.call(:Tagging, false)
+      has_many :base_tags, through: ns.call(:taggings), source: ns.call(:tag), class_name: ns_class.call(:Tag, false)
       alias_method :taggings, ns.call(:taggings)
 
       def self.taggable?

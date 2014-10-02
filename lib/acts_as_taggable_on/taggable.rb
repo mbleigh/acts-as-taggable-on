@@ -37,7 +37,6 @@ module ActsAsTaggableOn
     #     acts_as_taggable_on :languages, :skills
     #   end
     def acts_as_taggable_on(*options)
-      # tag_types, options = ActsAsTaggableOn::Utils.get_tag_types_and_options(options)
       taggable_on false, options
     end
 
@@ -52,7 +51,6 @@ module ActsAsTaggableOn
     #     acts_as_ordered_taggable_on :languages, :skills
     #   end
     def acts_as_ordered_taggable_on(*options)
-      # tag_types, options = ActsAsTaggableOn::Utils.get_tag_types_and_options(options)
       taggable_on true, options
     end
 
