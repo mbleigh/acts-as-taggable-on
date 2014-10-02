@@ -420,8 +420,6 @@ module ActsAsTaggableOn::Taggable
           rescue => e
             puts "self: #{self}"
             puts "taggings: #{taggings.inspect}"
-            puts "tag_id: #{namespaced(:tag_id)}"
-            puts "tag: #{tag.inspect}"
             raise e
           end
         end

@@ -106,7 +106,15 @@ module ActsAsTaggableOn
       # With a namespace of 'nspaced':  has_many :nspaced_taggings, ..., class_name: 'ActsAsTaggableOn::NspacedTagging'
       has_many ns.call(:taggings), as: :taggable, dependent: :destroy, class_name: ns_class.call(:Tagging, false)
       has_many :base_tags, through: ns.call(:taggings), source: ns.call(:tag), class_name: ns_class.call(:Tag, false)
-      alias_method :taggings, ns.call(:taggings)
+
+      # Try namespaced version of methods
+      define_method :method_missing do |method, *args, &block|
+        if method == :taggings
+          send ns.call(:taggings)
+        else
+          super method, *args, &block
+        end
+      end
 
       def self.taggable?
         true
@@ -142,9 +150,13 @@ module ActsAsTaggableOn
           validates_uniqueness_of :name, if: :validates_name_uniqueness?
           validates_length_of :name, maximum: 255
 
-          # Override normal attribute getters/setters
-          define_method(:taggings_count) do
-            send ns.call(:taggings_count)
+          # Try namespaced version of methods
+          define_method :method_missing do |method, *args, &block|
+            if [:taggings, :taggings_count].include?(method)
+              send ns.call(method)
+            else
+              super method, *args, &block
+            end
           end
         end
       end
