@@ -81,12 +81,12 @@ module ActsAsTaggableOn
         ActsAsTaggableOn.namespaced_attribute taggable_on_namespace, att
       end
 
-      def self.namespaced_class(obj, **as_constant)
-        ActsAsTaggableOn.namespaced_class taggable_on_namespace, obj, as_constant: as_constant
+      def self.namespaced_class(obj, options = {as_constant: true})
+        ActsAsTaggableOn.namespaced_class taggable_on_namespace, obj, options
       end
 
       def namespaced(att); self.class.namespaced att; end
-      def namespaced_class(obj, **as_constant); self.class.namespaced_class obj, as_constant: as_constant; end
+      def namespaced_class(obj, options = {as_constant: true}); self.class.namespaced_class obj, options; end
     end
   end
 
@@ -117,8 +117,9 @@ module ActsAsTaggableOn
 
   # only: can optionally namespace one class at a time (ex., ActsAsTaggableOn.namespace_classes! :nspace, only: :Tag)
   # useful in test suite when creating NspacedTag and NspacedTagging models
-  def self.namespace_base_classes!(namespace, only: nil)
+  def self.namespace_base_classes!(namespace, options = {only: nil})
     return if namespace.nil?
+    only = options[:only]
 
     # Shortcuts
     ns = ->(obj) { ActsAsTaggableOn.namespaced_attribute namespace, obj }

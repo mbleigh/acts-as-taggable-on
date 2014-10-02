@@ -12,8 +12,8 @@ module ActsAsTaggableOn
     #   class Book < ActiveRecord::Base
     #     acts_as_taggable
     #   end
-    def acts_as_taggable(**named_args)
-      acts_as_taggable_on :tags, **named_args
+    def acts_as_taggable(options = {})
+      acts_as_taggable_on :tags, options
     end
 
     ##
@@ -23,8 +23,8 @@ module ActsAsTaggableOn
     #   class Book < ActiveRecord::Base
     #     acts_as_ordered_taggable
     #   end
-    def acts_as_ordered_taggable(**named_args)
-      acts_as_ordered_taggable_on :tags, **named_args
+    def acts_as_ordered_taggable(options = {})
+      acts_as_ordered_taggable_on :tags, options
     end
 
     ##
@@ -36,8 +36,9 @@ module ActsAsTaggableOn
     #   class User < ActiveRecord::Base
     #     acts_as_taggable_on :languages, :skills
     #   end
-    def acts_as_taggable_on(*tag_types, **named_args)
-      taggable_on false, *tag_types, **named_args
+    def acts_as_taggable_on(*options)
+      # tag_types, options = ActsAsTaggableOn::Utils.get_tag_types_and_options(options)
+      taggable_on false, options
     end
 
     ##
@@ -50,8 +51,9 @@ module ActsAsTaggableOn
     #   class User < ActiveRecord::Base
     #     acts_as_ordered_taggable_on :languages, :skills
     #   end
-    def acts_as_ordered_taggable_on(*tag_types, **named_args)
-      taggable_on true, *tag_types, **named_args
+    def acts_as_ordered_taggable_on(*options)
+      # tag_types, options = ActsAsTaggableOn::Utils.get_tag_types_and_options(options)
+      taggable_on true, options
     end
 
     private
@@ -67,8 +69,9 @@ module ActsAsTaggableOn
       # NB: method overridden in core module in order to create tag type
       #     associations and methods after this logic has executed
       #
-    def taggable_on(preserve_tag_order, *tag_types, **named_args)
-      tag_types = tag_types.to_a.flatten.compact.map(&:to_sym)
+    def taggable_on(preserve_tag_order, *options)
+      tag_types, opts = ActsAsTaggableOn::Utils.get_tag_types_and_options(options)
+      tag_types = tag_types.compact.map(&:to_sym)
 
       if taggable?
         self.tag_types = (self.tag_types + tag_types).uniq
@@ -79,7 +82,7 @@ module ActsAsTaggableOn
         class_attribute :preserve_tag_order
         self.preserve_tag_order = preserve_tag_order
         
-        ns = named_args.delete(:namespace)
+        ns = opts.delete(:namespace)
         ActsAsTaggableOn.namespace_base_classes! ns
         ActsAsTaggableOn.tagify_class! self, ns
       end

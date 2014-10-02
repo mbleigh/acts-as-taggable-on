@@ -53,8 +53,9 @@ module ActsAsTaggableOn::Taggable
         end
       end
 
-      def taggable_on(preserve_tag_order, *tag_types, **named_args)
-        super(preserve_tag_order, *tag_types, **named_args)
+      def taggable_on(preserve_tag_order, *options)
+        tag_types, options = ActsAsTaggableOn::Utils.get_tag_types_and_options(options)
+        super(preserve_tag_order, *tag_types, options)
         initialize_acts_as_taggable_on_core
       end
 

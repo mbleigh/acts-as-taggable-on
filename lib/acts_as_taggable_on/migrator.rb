@@ -4,8 +4,8 @@ module ActsAsTaggableOn
 
 
     # Generate instance methods
-    def initialize(namespace: nil)
-      initialize_namespacing! namespace
+    def initialize(options = {namespace: nil})
+      initialize_namespacing! options[:namespace]
       [:make_tables!, :make_unique_indexes!, :make_taggings_counter_cache!, :add_missing_taggable_index!].each do |meth|
         define_singleton_method meth, lambda {
           self.class.send meth, namespace: @namespace
@@ -30,8 +30,8 @@ module ActsAsTaggableOn
 
 
     # First migration
-    def self.make_tables!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.make_tables!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       create_table ns(:tags) do |t|
         t.string :name
       end
@@ -55,8 +55,8 @@ module ActsAsTaggableOn
       add_index ns(:taggings), [:taggable_id, :taggable_type, :context], name: ns(:taggings_itc)
     end
 
-    def self.destroy_tables!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.destroy_tables!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       drop_table ns(:taggings)
       drop_table ns(:tags)
     end

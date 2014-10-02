@@ -14,22 +14,22 @@ module ActsAsTaggableOn
       #     acts_as_tagger
       #   end
       def acts_as_tagger(opts={})
-        namespace = opts.delete(:namespace)
-        ns = Proc.new { |obj| [*namespace, obj].join('_') }
-        ns_class = Proc.new { |obj| "ActsAsTaggableOn::#{ ns.call(obj).camelize }" }
+        ns = opts.delete(:namespace)
+        # ns = Proc.new { |obj| [*namespace, obj].join('_') }
+        # ns_class = Proc.new { |obj| "ActsAsTaggableOn::#{ ns.call(obj).camelize }" }
 
         class_eval do
           has_many_with_taggable_compatibility :owned_taggings,
                                               opts.merge(
                                                   as: :tagger,
                                                   dependent: :destroy,
-                                                  class_name: ns_class.call(:tagging)
+                                                  class_name: ActsAsTaggableOn.namespaced_class(ns, :Tagging, as_constant: false)
                                               )
 
           has_many_with_taggable_compatibility :owned_tags,
                                               through: :owned_taggings,
-                                              source: ns.call(:tag),
-                                              class_name: ns_class.call(:tag),
+                                              source: ActsAsTaggableOn.namespaced_attribute(ns, :tag),
+                                              class_name: ActsAsTaggableOn.namespaced_class(ns, :Tag, as_constant: false),
                                               uniq: true
         end
 
