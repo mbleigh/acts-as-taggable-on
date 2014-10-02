@@ -2,17 +2,20 @@ require 'active_record'
 require 'active_record/version'
 require 'active_support/core_ext/module'
 
-require_relative 'acts_as_taggable_on/engine'  if defined?(Rails)
+require_relative 'acts_as_taggable_on/engine' if defined?(Rails)
 
 require 'digest/sha1'
 
 module ActsAsTaggableOn
   extend ActiveSupport::Autoload
 
+  autoload :BasicTag
+  autoload :BasicTagging
   autoload :Tag
   autoload :TagList
   autoload :GenericParser
   autoload :DefaultParser
+  autoload :Migrator
   autoload :TagListParser
   autoload :Taggable
   autoload :Tagger

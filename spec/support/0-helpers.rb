@@ -32,7 +32,7 @@ def using_case_insensitive_collation?
 end
 
 # Quickly retrieve table contents for debugging...feel free
-# to modify
+# to modify --- used for debugging tests
 def look_at_database(only: nil)
   puts "\n\n========== Database Tables =========="
   if only.nil? or only == :tags
