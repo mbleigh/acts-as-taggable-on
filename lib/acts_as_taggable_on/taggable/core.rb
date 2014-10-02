@@ -410,7 +410,6 @@ module ActsAsTaggableOn::Taggable
 
         # Destroy old taggings:
         if old_tags.present?
-          puts taggings.to_sql
           taggings.not_owned.by_context(context).destroy_all(namespaced(:tag_id) => old_tags)
         end
 

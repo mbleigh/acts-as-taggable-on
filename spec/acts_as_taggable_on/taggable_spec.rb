@@ -228,7 +228,7 @@ require 'spec_helper'
       @taggable.skill_list = 'ruby'
       @taggable.save
 
-      expect(m[2].tagged_with('ruby').group(:created_at).count.count).to eq(1)
+      expect(m[2].tagged_with('ruby').count).to eq(1)
     end
 
     it 'can be used as scope' do
@@ -372,7 +372,7 @@ require 'spec_helper'
       m[2].create(name: 'Frank', tag_list: 'ruby, rails')
       m[2].create(name: 'Charlie', skill_list: 'ruby')
 
-      expect(m[2].tagged_with('ruby').tag_counts(order: "#{m[0].namespaced(:tags)}.id").first.count).to eq(2) # ruby
+      expect(m[2].tagged_with('ruby').tag_counts(order: "#{m[2].namespaced(:tags)}.id").first.count).to eq(2) # ruby
       expect(m[2].tagged_with('ruby').skill_counts.first.count).to eq(1) # ruby
     end
 
@@ -381,7 +381,7 @@ require 'spec_helper'
       m[2].create(name: 'Frank', tag_list: 'ruby, rails')
       m[2].create(name: 'Charlie', skill_list: 'ruby')
 
-      expect(m[2].tagged_with('ruby').all_tag_counts(order: "#{m[0].namespaced(:tags)}.id").first.count).to eq(3) # ruby
+      expect(m[2].tagged_with('ruby').all_tag_counts(order: "#{m[2].namespaced(:tags)}.id").first.count).to eq(3) # ruby
     end
 
     it 'should be able to get all scoped tags' do
@@ -389,7 +389,7 @@ require 'spec_helper'
       m[2].create(name: 'Frank', tag_list: 'ruby, rails')
       m[2].create(name: 'Charlie', skill_list: 'ruby')
 
-      expect(m[2].tagged_with('ruby').all_tags(order: "#{m[0].namespaced(:tags)}.id").first.name).to eq('ruby')
+      expect(m[2].tagged_with('ruby').all_tags(order: "#{m[2].namespaced(:tags)}.id").first.name).to eq('ruby')
     end
 
     it 'should only return tag counts for the available scope' do
@@ -402,9 +402,9 @@ require 'spec_helper'
 
       # Test specific join syntaxes:
       frank.untaggable_models.create!
-      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[0], :models)}".to_sym).all_tag_counts.size).to eq(2)
-      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[0], :models)}".to_sym => "taggable_#{ns_generic_att(m[0], :model)}".to_sym).all_tag_counts.size).to eq(2)
-      expect(m[2].tagged_with('rails').joins(["untaggable_#{ns_generic_att(m[0], :models)}".to_sym]).all_tag_counts.size).to eq(2)
+      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[2], :models)}".to_sym).all_tag_counts.size).to eq(2)
+      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[2], :models)}".to_sym => "taggable_#{ns_generic_att(m[2], :model)}".to_sym).all_tag_counts.size).to eq(2)
+      expect(m[2].tagged_with('rails').joins(["untaggable_#{ns_generic_att(m[2], :models)}".to_sym]).all_tag_counts.size).to eq(2)
     end
 
     it 'should only return tags for the available scope' do
@@ -417,9 +417,9 @@ require 'spec_helper'
 
       # Test specific join syntaxes:
       frank.untaggable_models.create!
-      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[0], :models)}".to_sym).all_tags.size).to eq(2)
-      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[0], :models)}".to_sym => "taggable_#{ns_generic_att(m[0], :model)}".to_sym).all_tags.size).to eq(2)
-      expect(m[2].tagged_with('rails').joins(["untaggable_#{ns_generic_att(m[0], :models)}".to_sym]).all_tags.size).to eq(2)
+      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[2], :models)}".to_sym).all_tags.size).to eq(2)
+      expect(m[2].tagged_with('rails').joins("untaggable_#{ns_generic_att(m[2], :models)}".to_sym => "taggable_#{ns_generic_att(m[2], :model)}".to_sym).all_tags.size).to eq(2)
+      expect(m[2].tagged_with('rails').joins(["untaggable_#{ns_generic_att(m[2], :models)}".to_sym]).all_tags.size).to eq(2)
     end
 
     it 'should be able to set a custom tag context list' do
@@ -443,9 +443,9 @@ require 'spec_helper'
 
     it 'should be able to find tagged' do
       make_bob_frank_steve! m
-      expect(m[2].tagged_with('ruby', order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@bob, @frank, @steve])
-      expect(m[2].tagged_with('ruby, rails', order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@bob, @frank])
-      expect(m[2].tagged_with(%w(ruby rails), order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@bob, @frank])
+      expect(m[2].tagged_with('ruby', order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@bob, @frank, @steve])
+      expect(m[2].tagged_with('ruby, rails', order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@bob, @frank])
+      expect(m[2].tagged_with(%w(ruby rails), order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@bob, @frank])
     end
 
     it 'should be able to find tagged with quotation marks' do
@@ -460,18 +460,18 @@ require 'spec_helper'
 
     it 'should be able to find tagged with any tag' do
       make_bob_frank_steve! m
-      expect(m[2].tagged_with(%w(ruby java), order: "taggable_#{ns_generic_att(m[0], :models)}.name", any: true).to_a).to eq([@bob, @frank, @steve])
-      expect(m[2].tagged_with(%w(c++ fitter), order: "taggable_#{ns_generic_att(m[0], :models)}.name", any: true).to_a).to eq([@bob, @steve])
-      expect(m[2].tagged_with(%w(depressed css), order: "taggable_#{ns_generic_att(m[0], :models)}.name", any: true).to_a).to eq([@bob, @frank])
+      expect(m[2].tagged_with(%w(ruby java), order: "taggable_#{ns_generic_att(m[2], :models)}.name", any: true).to_a).to eq([@bob, @frank, @steve])
+      expect(m[2].tagged_with(%w(c++ fitter), order: "taggable_#{ns_generic_att(m[2], :models)}.name", any: true).to_a).to eq([@bob, @steve])
+      expect(m[2].tagged_with(%w(depressed css), order: "taggable_#{ns_generic_att(m[2], :models)}.name", any: true).to_a).to eq([@bob, @frank])
     end
 
     it 'should be able to order by number of matching tags when matching any' do
       make_bob_frank_steve! m
-      expect(m[2].tagged_with(%w(ruby java), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@steve, @bob, @frank])
-      expect(m[2].tagged_with(%w(c++ fitter), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@steve, @bob])
-      expect(m[2].tagged_with(%w(depressed css), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@frank, @bob])
-      expect(m[2].tagged_with(['fitter', 'happier', 'more productive', 'c++', 'java', 'ruby'], any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@steve, @bob, @frank])
-      expect(m[2].tagged_with(%w(c++ java ruby fitter), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@steve, @bob, @frank])
+      expect(m[2].tagged_with(%w(ruby java), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@steve, @bob, @frank])
+      expect(m[2].tagged_with(%w(c++ fitter), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@steve, @bob])
+      expect(m[2].tagged_with(%w(depressed css), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@frank, @bob])
+      expect(m[2].tagged_with(['fitter', 'happier', 'more productive', 'c++', 'java', 'ruby'], any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@steve, @bob, @frank])
+      expect(m[2].tagged_with(%w(c++ java ruby fitter), any: true, order_by_matching_tag_count: true, order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@steve, @bob, @frank])
     end
 
     context 'wild: true' do
@@ -500,8 +500,8 @@ require 'spec_helper'
       make_bob_frank_steve! m
 
       # Let's only find those productive Rails developers
-      expect(m[2].tagged_with('rails', on: :skills, order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@bob, @frank])
-      expect(m[2].tagged_with('happier', on: :tags, order: "taggable_#{ns_generic_att(m[0], :models)}.name").to_a).to eq([@bob, @steve])
+      expect(m[2].tagged_with('rails', on: :skills, order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@bob, @frank])
+      expect(m[2].tagged_with('happier', on: :tags, order: "taggable_#{ns_generic_att(m[2], :models)}.name").to_a).to eq([@bob, @steve])
       expect(m[2].tagged_with('rails', on: :skills).tagged_with('happier', on: :tags).to_a).to eq([@bob])
       expect(m[2].tagged_with('rails').tagged_with('happier', on: :tags).to_a).to eq([@bob])
     end

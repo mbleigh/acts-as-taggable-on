@@ -15,8 +15,6 @@ module ActsAsTaggableOn
       #   end
       def acts_as_tagger(opts={})
         ns = opts.delete(:namespace)
-        # ns = Proc.new { |obj| [*namespace, obj].join('_') }
-        # ns_class = Proc.new { |obj| "ActsAsTaggableOn::#{ ns.call(obj).camelize }" }
 
         class_eval do
           has_many_with_taggable_compatibility :owned_taggings,
