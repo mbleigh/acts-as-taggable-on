@@ -415,7 +415,7 @@ module ActsAsTaggableOn::Taggable
 
         # Create new taggings:
         new_tags.each do |tag|
-          taggings.create!(namespaced(:tag) => tag, context: context.to_s, taggable: self)
+          taggings.create!(namespaced(:tag_id) => tag.id, context: context.to_s, taggable: self)
         end
       end
 

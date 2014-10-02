@@ -140,6 +140,7 @@ module ActsAsTaggableOn
         ActsAsTaggableOn.const_set ns_base_class.call(:Tag), Class.new(ActsAsTaggableOn::BasicTag)
         klass = ns_class.call(:Tag)
         klass.taggable_on_namespace = namespace
+        
         klass.class_eval do
           self.table_name = ns.call(:tags)
           self.superclass.table_name = ns.call(:tags)
@@ -149,7 +150,9 @@ module ActsAsTaggableOn
           validates_presence_of :name
           validates_uniqueness_of :name, if: :validates_name_uniqueness?
           validates_length_of :name, maximum: 255
+        end
 
+        klass.instance_eval do
           # Try namespaced version of methods
           define_method :method_missing do |method, *args, &block|
             if [:taggings, :taggings_count].include?(method)
@@ -168,16 +171,21 @@ module ActsAsTaggableOn
         ActsAsTaggableOn.const_set ns_base_class.call(:Tagging), Class.new(ActsAsTaggableOn::BasicTagging)
         klass = ns_class.call(:Tagging)
         klass.taggable_on_namespace = namespace
+
         klass.class_eval do
           self.table_name = ns.call(:taggings)
           self.superclass.table_name = ns.call(:taggings)
 
+          attr_accessible ns.call(:tag), ns.call(:tag_id) if defined?(ActiveModel::MassAssignmentSecurity)
+
           belongs_to ns.call(:tag), class_name: ns_class.call(:Tag, false), counter_cache: ActsAsTaggableOn.tags_counter, inverse_of: ns.call(:taggings)
           
-          validates_presence_of ns.call(:tag)
+          validates_presence_of ns.call(:tag_id)
           validates_uniqueness_of ns.call(:tag_id), scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
           validates_presence_of :context
+        end
 
+        klass.instance_eval do
           # Override normal attribute getters/setters
           define_method(:tag) do
             send ns.call(:tag)

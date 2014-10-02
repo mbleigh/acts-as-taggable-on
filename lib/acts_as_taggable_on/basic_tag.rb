@@ -1,6 +1,7 @@
 # encoding: utf-8
 module ActsAsTaggableOn
-  class BasicTag < ::ActiveRecord::Base
+  class BasicTag < ActiveRecord::Base
+    self.abstract_class = true
 
     attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
     class_attribute :taggable_on_namespace

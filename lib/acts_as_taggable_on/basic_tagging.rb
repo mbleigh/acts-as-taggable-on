@@ -1,9 +1,9 @@
 module ActsAsTaggableOn
-  class BasicTagging < ::ActiveRecord::Base #:nodoc:
+  class BasicTagging < ActiveRecord::Base #:nodoc:
+    self.abstract_class = true
+    
     #TODO, remove from 4.0.0
-    attr_accessible :tag,
-                    :tag_id,
-                    :context,
+    attr_accessible :context,
                     :taggable,
                     :taggable_type,
                     :taggable_id,
@@ -17,11 +17,19 @@ module ActsAsTaggableOn
     belongs_to :taggable, polymorphic: true
     belongs_to :tagger,   polymorphic: true
 
-    scope :owned_by, ->(owner) { where(tagger: owner) }
-    scope :not_owned, -> { where(tagger_id: nil, tagger_type: nil) }
+    def self.owned_by(owner)
+        where(tagger: owner)
+    end
+    def self.not_owned
+        where(tagger_id: nil, tagger_type: nil)
+    end
 
-    scope :by_contexts, ->(contexts = ['tags']) { where(context: contexts) }
-    scope :by_context, ->(context= 'tags') { by_contexts(context.to_s) }
+    def self.by_contexts(contexts = ['tags'])
+        where(context: contexts)
+    end
+    def self.by_context(context = 'tags')
+        by_contexts(context.to_s)
+    end
 
     after_destroy :remove_unused_tags
     

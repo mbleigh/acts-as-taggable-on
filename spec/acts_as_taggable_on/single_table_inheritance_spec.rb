@@ -197,7 +197,7 @@ describe 'Single Table Inheritance' do
       end
     end
 
-    describe 'a subclass of Tag' do
+    describe "a subclass of #{m[7]}" do
       before do
         set_info m
         @company = m[4].new(name: 'Dewey, Cheatham & Howe')
@@ -210,10 +210,10 @@ describe 'Single Table Inheritance' do
         expect(m[6].count).to eq(2)
       end
 
-      it 'does not interfere with a normal Tag context on the same model' do
+      it "does not interfere with a normal #{m[7]} context on the same model" do
         @company.location_list = 'cambridge'
         @company.save!
-        expect(m[7].where(name: 'cambridge', type: m[7].to_s)).to_not be_empty
+        expect(m[7].where(name: 'cambridge', type: nil)).to_not be_empty
       end
 
       it 'is returned with proper type through ownership' do
