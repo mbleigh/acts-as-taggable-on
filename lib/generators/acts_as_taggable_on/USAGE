@@ -1,0 +1,12 @@
+Description:
+    Generates a migration file which creates AATO tables namespaced the way you want. This is required for namespacing in your models.
+
+Example:
+    rails generate acts_as_taggable_on:namespacing Manager
+
+    This will create:
+        db/migrate/[timestamp]_create_manager_acts_as_taggable_on_tables.rb
+
+    Which when migrated will create the tables:
+    	manager_tags
+    	manager_taggings
