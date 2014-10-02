@@ -415,8 +415,15 @@ module ActsAsTaggableOn::Taggable
 
         # Create new taggings:
         new_tags.each do |tag|
-          puts "#{self}...#{namespaced(:tag_id)}...#{tag.inspect}"
-          taggings.create!(namespaced(:tag_id) => tag.id, context: context.to_s, taggable: self)
+          begin
+            taggings.create!(namespaced(:tag_id) => tag.id, context: context.to_s, taggable: self)
+          rescue => e
+            puts "self: #{self}"
+            puts "taggings: #{taggings.inspect}"
+            puts "tag_id: #{namespaced(:tag_id)}"
+            puts "tag: #{tag.inspect}"
+            raise e
+          end
         end
       end
 
