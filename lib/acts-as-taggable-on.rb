@@ -104,7 +104,6 @@ module ActsAsTaggableOn
       # Namespace the relations
       # i.e., No namespace:             has_many :taggings, ..., class_name: 'ActsAsTaggableOn::Tagging'
       # With a namespace of 'nspaced':  has_many :nspaced_taggings, ..., class_name: 'ActsAsTaggableOn::NspacedTagging'
-      puts ns.call(:taggings)
       has_many ns.call(:taggings), as: :taggable, dependent: :destroy, class_name: ns_class.call(:Tagging, false)
       has_many :base_tags, through: ns.call(:taggings), source: ns.call(:tag), class_name: ns_class.call(:Tag, false)
       alias_method :taggings, ns.call(:taggings)

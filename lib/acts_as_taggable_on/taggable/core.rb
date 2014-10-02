@@ -309,7 +309,7 @@ module ActsAsTaggableOn::Taggable
       scope = base_tags.where(opts)
 
       if ActsAsTaggableOn::Utils.using_postgresql?
-        group_columns = grouped_column_names_for(namespaced(:tag))
+        group_columns = grouped_column_names_for(namespaced_class(:Tag))
         scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
       else
         scope.group("#{namespaced_class(:Tag).table_name}.#{namespaced_class(:Tag).primary_key}")
@@ -410,6 +410,7 @@ module ActsAsTaggableOn::Taggable
 
         # Destroy old taggings:
         if old_tags.present?
+          puts taggings.to_sql
           taggings.not_owned.by_context(context).destroy_all(namespaced(:tag_id) => old_tags)
         end
 
