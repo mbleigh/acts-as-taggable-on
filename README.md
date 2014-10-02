@@ -380,6 +380,26 @@ CSS:
 .css4 { font-size: 1.6em; }
 ```
 
+## Namespacing everything
+
+You have another level of separation between models - namespacing the acts_as_taggable_on tables in the database!
+
+This feature becomes quite useful when your app is an engine embedded in another app that uses acts_as_taggable_on. The engine models' tags/tag lists will not interfere with the main app and vice-versa.
+
+```ruby
+# In your Rails Engine
+module MyEngine
+  class Photo < ActiveRecord::Base
+    acts_as_taggable_on :locations, namespace: :my_engine # Saves to my_engine_tags and my_engine_taggings tables
+  end
+end
+
+# In your main application which mounts the engine
+class Photo < ActiveRecord::Base
+  acts_as_taggable_on :locations # Saves to tags and taggings tables (default)
+end
+```
+
 ## Configuration
 
 If you would like to remove unused tag objects after removing taggings, add:
