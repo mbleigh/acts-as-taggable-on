@@ -1,9 +1,9 @@
 class AddMissingUniqueIndices < ActiveRecord::Migration
-  def self.up(namespace: nil)
-    ActsAsTaggableOn::Migrator.make_unique_indexes! namespace: namespace
+  def self.up(options = {namespace: nil})
+    ActsAsTaggableOn::Migrator.make_unique_indexes! options
   end
 
-  def self.down(namespace: nil)
-    ActsAsTaggableOn::Migrator.destroy_unique_indexes! namespace: namespace
+  def self.down(options = {namespace: nil})
+    ActsAsTaggableOn::Migrator.destroy_unique_indexes! options
   end
 end

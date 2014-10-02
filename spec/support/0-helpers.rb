@@ -33,7 +33,8 @@ end
 
 # Quickly retrieve table contents for debugging...feel free
 # to modify --- used for debugging tests
-def look_at_database(only: nil)
+def look_at_database(options = {only: nil})
+  only = options[:only]
   puts "\n\n========== Database Tables =========="
   if only.nil? or only == :tags
     puts "\n---tags---"

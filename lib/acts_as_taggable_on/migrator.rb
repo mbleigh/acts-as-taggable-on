@@ -65,8 +65,8 @@ module ActsAsTaggableOn
 
 
     # Second migration
-    def self.make_unique_indexes!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.make_unique_indexes!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       add_index ns(:tags), :name, unique: true
 
       remove_index ns(:taggings), ns(:tag_id)
@@ -76,8 +76,8 @@ module ActsAsTaggableOn
                 unique: true, name: ns(:taggings_idx)
     end
 
-    def self.destroy_unique_indexes!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.destroy_unique_indexes!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       remove_index ns(:tags), :name
 
       remove_index ns(:taggings), name: ns(:taggings_idx)
@@ -89,8 +89,8 @@ module ActsAsTaggableOn
 
 
     # Third migration
-    def self.make_taggings_counter_cache!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.make_taggings_counter_cache!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       add_column ns(:tags), ns(:taggings_count), :integer, default: 0
       m = ns_class(:Tag)
 
@@ -100,21 +100,21 @@ module ActsAsTaggableOn
       end
     end
 
-    def self.destroy_taggings_counter_cache!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.destroy_taggings_counter_cache!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       remove_column :tags, :taggings_count
     end
 
 
 
     # Fourth migration - doesn't this conflict/duplicate a past migration?!?!
-    def self.add_missing_taggable_index!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.add_missing_taggable_index!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       add_index ns(:taggings), [:taggable_id, :taggable_type, :context], name: ns(:taggings_itc)
     end
 
-    def self.destroy_missing_taggable_index!(namespace: nil)
-      self.initialize_namespacing! namespace
+    def self.destroy_missing_taggable_index!(options = {namespace: nil})
+      self.initialize_namespacing! options[:namespace]
       remove_index ns(:taggings), [:taggable_id, :taggable_type, :context], name: ns(:taggings_itc)
     end
 
