@@ -400,6 +400,12 @@ class Photo < ActiveRecord::Base
 end
 ```
 
+If you wish to use namespacing in your models you'll need to run the generator to create the migration.
+
+```ruby
+rails g acts_as_taggable_on:namespacing MyEngine
+```
+
 ## Configuration
 
 If you would like to remove unused tag objects after removing taggings, add:
