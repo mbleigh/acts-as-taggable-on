@@ -172,6 +172,8 @@ module ActsAsTaggableOn
           self.table_name = ns.call(:taggings)
           self.superclass.table_name = ns.call(:taggings)
 
+          attr_accessible ns.call(:tag), ns.call(:tag_id) if defined?(ActiveModel::MassAssignmentSecurity)
+
           belongs_to ns.call(:tag), class_name: ns_class.call(:Tag, false), counter_cache: ActsAsTaggableOn.tags_counter, inverse_of: ns.call(:taggings)
           
           validates_presence_of ns.call(:tag)

@@ -1,9 +1,7 @@
 module ActsAsTaggableOn
   class BasicTagging < ::ActiveRecord::Base #:nodoc:
     #TODO, remove from 4.0.0
-    attr_accessible :tag,
-                    :tag_id,
-                    :context,
+    attr_accessible :context,
                     :taggable,
                     :taggable_type,
                     :taggable_id,
