@@ -420,6 +420,7 @@ module ActsAsTaggableOn::Taggable
           rescue => e
             puts "self: #{self}"
             puts "taggings: #{taggings.inspect}"
+            puts "respond_to? namespaced_taggings: #{respond_to?(:nspaced_taggings).inspect}"
             raise e
           end
         end
