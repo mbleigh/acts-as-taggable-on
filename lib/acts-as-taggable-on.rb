@@ -63,9 +63,9 @@ module ActsAsTaggableOn
 
 
   # Returns namespaced class constant (i.e., ActsAsTaggableOn::namespaced(:Tag) > ActsAsTaggableOn::NamespacedTag)
-  def self.namespaced_class(ns, obj, as_constant: true)
+  def self.namespaced_class(ns, obj, options = {as_constant: true})
     m = "ActsAsTaggableOn::#{ ns.to_s.camelize }#{ obj.to_s.camelize }"
-    as_constant ? m.constantize : m
+    options[:as_constant] ? m.constantize : m
   end
 
   def self.namespaced_attribute(ns, att)
