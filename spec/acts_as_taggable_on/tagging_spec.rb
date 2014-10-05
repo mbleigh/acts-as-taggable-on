@@ -18,7 +18,7 @@ require 'spec_helper'
       @tagging.context = 'tags'
 
       expect(@tagging).to_not be_valid
-      expect(@tagging.errors[m[0].namespaced(:tag_id)]).to eq(['can\'t be blank'])
+      expect(@tagging.errors[m[0].namespaced(:tag_id)]).to eq(["can't be blank"])
     end
 
     it 'should not create duplicate taggings' do

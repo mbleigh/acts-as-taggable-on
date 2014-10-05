@@ -62,7 +62,7 @@ module ActsAsTaggableOn::Taggable
         ## Generate scope:
         tagging_scope = namespaced_class(:Tagging).select("#{namespaced_class(:Tagging).table_name}.#{namespaced(:tag_id)}")
         tag_scope = namespaced_class(:Tag).select("#{namespaced_class(:Tag).table_name}.*").order(options[:order]).limit(options[:limit])
-
+        
         # Joins and conditions
         tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
         tag_scope = tag_scope.where(options[:conditions])
