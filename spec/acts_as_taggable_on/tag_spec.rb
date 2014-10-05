@@ -8,10 +8,10 @@ require 'db/migrate/2_add_missing_unique_indices.rb'
 ].each do |m|
 
   shared_examples_for "#{m[0]} - without unique index" do
-    prepend_before(:all) { AddMissingUniqueIndices.down namespace: m[0].taggable_on_namespace }
+    prepend_before(:all) { ActsAsTaggableOn::Migrator.destroy_unique_indexes! namespace: m[0].taggable_on_namespace }
     append_after(:all) do
       m[0].delete_all
-      AddMissingUniqueIndices.up namespace: m[0].taggable_on_namespace
+      ActsAsTaggableOn::Migrator.make_unique_indexes! namespace: m[0].taggable_on_namespace
     end
   end
 
