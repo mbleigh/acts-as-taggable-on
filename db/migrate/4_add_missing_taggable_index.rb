@@ -1,9 +1,9 @@
 class AddMissingTaggableIndex < ActiveRecord::Migration
   def self.up
-  	ActsAsTaggableOn::Migrator.add_missing_taggable_index!
+    add_index :taggings, [:taggable_id, :taggable_type, :context]
   end
 
   def self.down
-  	ActsAsTaggableOn::Migrator.destroy_missing_taggable_index!
+    remove_index :taggings, [:taggable_id, :taggable_type, :context]
   end
 end
