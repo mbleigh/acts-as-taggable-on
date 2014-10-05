@@ -180,7 +180,7 @@ module ActsAsTaggableOn
 
           belongs_to ns.call(:tag), class_name: ns_class.call(:Tag, false), counter_cache: ActsAsTaggableOn.tags_counter, inverse_of: ns.call(:taggings)
           
-          validates_presence_of ns.call(:tag)
+          validates_presence_of ns.call(:tag_id)
           validates_uniqueness_of ns.call(:tag_id), scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
           validates_presence_of :context
         end

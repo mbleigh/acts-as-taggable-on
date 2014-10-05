@@ -1,5 +1,5 @@
 module ActsAsTaggableOn
-  class BasicTagging < ::ActiveRecord::Base #:nodoc:
+  class BasicTagging < ActiveRecord::Base #:nodoc:
     self.abstract_class = true
     
     #TODO, remove from 4.0.0
