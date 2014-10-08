@@ -14,14 +14,10 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 
 ### [3.4.2 / 2014-09-26](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.1...v3.4.2)
 
-  * Breaking Changes
-  * Features
   * Fixes
    	* [@stiff    fixed tagged_with :any in postgresql](https://github.com/mbleigh/acts-as-taggable-on/pull/570)
    	* [@jerefrer fixed encoding in mysql](https://github.com/mbleigh/acts-as-taggable-on/pull/588)
    	* [@markedmondson 	Ensure taggings context aliases are maintained when joining multiple taggables](https://github.com/mbleigh/acts-as-taggable-on/pull/589)
-  * Performance
-  * Misc
 
 ### [3.4.1 / 2014-09-01](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.0...v3.4.1)
   * Fixes
