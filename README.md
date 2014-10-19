@@ -25,7 +25,7 @@ Versions 2.4.1 and up are compatible with Rails 4 too (thanks to arabonradar and
 
 Versions >= 3.x are compatible with Ruby 1.9.3+ and Rails 3 and 4.
 
-For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/issues/milestones
+For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
 
 ## Installation
 
