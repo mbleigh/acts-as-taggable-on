@@ -13,4 +13,11 @@ describe ActsAsTaggableOn::Utils do
       expect(ActsAsTaggableOn::Utils.like_operator).to eq('LIKE')
     end
   end
+
+  describe '#sha_prefix' do
+    it 'should return a consistent prefix for a given word' do
+      expect(ActsAsTaggableOn::Utils.sha_prefix('kittens')).to eq(ActsAsTaggableOn::Utils.sha_prefix('kittens'))
+      expect(ActsAsTaggableOn::Utils.sha_prefix('puppies')).not_to eq(ActsAsTaggableOn::Utils.sha_prefix('kittens'))
+    end
+  end
 end
