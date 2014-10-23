@@ -169,7 +169,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     module CalculationMethods
-      def count(column_name=:all)
+      def count(column_name=:all, options = {})
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
         super
       end
