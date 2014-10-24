@@ -278,7 +278,6 @@ describe 'Taggable' do
   end
 
   it 'should not care about case for unicode names', unless: using_sqlite? do
-    ActsAsTaggableOn.strict_case_match = false
     TaggableModel.create(name: 'Anya', tag_list: 'ПРИВЕТ')
     TaggableModel.create(name: 'Igor', tag_list: 'привет')
     TaggableModel.create(name: 'Katia', tag_list: 'ПРИВЕТ')
@@ -288,7 +287,6 @@ describe 'Taggable' do
   end
 
   context 'should be able to create and find tags in languages without capitalization :' do
-    ActsAsTaggableOn.strict_case_match = false
     {
         japanese: {name: 'Chihiro', tag_list: '日本の'},
         hebrew: {name: 'Salim', tag_list: 'עברית'},

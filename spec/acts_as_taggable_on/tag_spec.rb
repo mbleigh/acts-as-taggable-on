@@ -115,8 +115,7 @@ describe ActsAsTaggableOn::Tag do
         include_context 'without unique index'
       end
 
-      it 'should find by name case sensitive' do
-        ActsAsTaggableOn.strict_case_match = true
+      it 'should find by name case sensitive', strict_case_match: true do
         expect {
           ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('AWESOME')
         }.to change(ActsAsTaggableOn::Tag, :count).by(1)
@@ -134,8 +133,7 @@ describe ActsAsTaggableOn::Tag do
         include_context 'without unique index'
       end
 
-      it 'should find or create by name case sensitive' do
-        ActsAsTaggableOn.strict_case_match = true
+      it 'should find or create by name case sensitive', strict_case_match: true do
         expect {
           expect(ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('AWESOME', 'awesome').map(&:name)).to eq(%w(AWESOME awesome))
         }.to change(ActsAsTaggableOn::Tag, :count).by(1)
@@ -150,6 +148,19 @@ describe ActsAsTaggableOn::Tag do
 
     it 'should return an empty array if no tags are specified' do
       expect(ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name([])).to be_empty
+    end
+
+    context 'accented characters', unless: using_sqlite? do
+      before(:each) do
+        @tag.name = 'spécifique'
+        @tag.save
+      end
+
+      it 'should find or create by name' do
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('specifique')
+        }.not_to change(ActsAsTaggableOn::Tag, :count)
+      end
     end
   end
 
@@ -214,15 +225,10 @@ describe ActsAsTaggableOn::Tag do
 
   end
 
-  describe 'when using strict_case_match' do
+  describe 'when using strict_case_match', strict_case_match: true do
     before do
-      ActsAsTaggableOn.strict_case_match = true
       @tag.name = 'awesome'
       @tag.save!
-    end
-
-    after do
-      ActsAsTaggableOn.strict_case_match = false
     end
 
     it 'should find by name' do
