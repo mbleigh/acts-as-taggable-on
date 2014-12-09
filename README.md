@@ -180,7 +180,7 @@ ActsAsTaggableOn::Tag.most_used
 ActsAsTaggableOn::Tag.least_used
 ```
 
-You can also filter the results by passing the method a limit, however the default limit is 50.
+You can also filter the results by passing the method a limit, however the default limit is 20.
 
 ```ruby
 ActsAsTaggableOn::Tag.most_used(10)
