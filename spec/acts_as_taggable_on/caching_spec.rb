@@ -69,6 +69,12 @@ describe 'Acts As Taggable On' do
       @taggable.save!
       expect(@taggable.tag_list.sort).to eq(%w(awesome epic).sort)
     end
+
+    it 'should clear the cache on reset_column_information' do
+      CachedModel.column_names
+      CachedModel.reset_column_information
+      expect(CachedModel.instance_variable_get(:@acts_as_taggable_on_cache_columns)).to eql(nil)
+    end
   end
 
   describe 'CachingWithArray' do
