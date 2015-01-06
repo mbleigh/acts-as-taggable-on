@@ -40,6 +40,10 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
+        def reset_column_information
+          super
+          @acts_as_taggable_on_cache_columns = nil
+        end
       end
     end
 
