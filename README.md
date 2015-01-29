@@ -262,7 +262,7 @@ If you want to change how tags are parsed, you can define a your own implementat
 ```ruby
 class MyParser < ActsAsTaggableOn::GenericParser
   def parse
-    TagList.new.tap do |tag_list|
+    ActsAsTaggableOn::TagList.new.tap do |tag_list|
       tag_list.add @tag_list.split('|')
     end
   end
