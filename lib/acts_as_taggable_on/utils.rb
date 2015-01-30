@@ -33,6 +33,24 @@ module ActsAsTaggableOn
       def escape_like(str)
         str.gsub(/[!%_]/) { |x| '!' + x }
       end
+
+      def get_tag_types_and_options(*options)
+        opts = options.to_a.flatten.compact
+        if opts.any?
+
+          last = opts.pop
+          if last.is_a?(Hash)
+            return opts, last
+          else
+            # opts is actually tag_list
+            opts << last
+            return opts.compact, Hash.new
+          end
+
+        else
+          return Array.new, Hash.new
+        end
+      end
     end
   end
 end

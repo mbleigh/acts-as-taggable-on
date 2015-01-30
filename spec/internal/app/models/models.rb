@@ -1,90 +1,34 @@
-class TaggableModel < ActiveRecord::Base
-  acts_as_taggable
-  acts_as_taggable_on :languages
-  acts_as_taggable_on :skills
-  acts_as_taggable_on :needs, :offerings
-  has_many :untaggable_models
-
-  attr_reader :tag_list_submethod_called
-
-  def tag_list=(v)
-    @tag_list_submethod_called = true
-    super
-  end
-end
-
-class CachedModel < ActiveRecord::Base
-  acts_as_taggable
-end
-
-class OtherCachedModel < ActiveRecord::Base
-  acts_as_taggable_on :languages, :statuses, :glasses
-end
-
-class OtherTaggableModel < ActiveRecord::Base
-  acts_as_taggable_on :tags, :languages
-  acts_as_taggable_on :needs, :offerings
-end
-
-class InheritingTaggableModel < TaggableModel
-end
-
-class AlteredInheritingTaggableModel < TaggableModel
-  acts_as_taggable_on :parts
-end
-
-class Market < ActsAsTaggableOn::Tag
-end
-
-class Company < ActiveRecord::Base
-  acts_as_taggable_on :locations, :markets
-
-  has_many :markets, :through => :market_taggings, :source => :tag
-
-  private
-
-  def find_or_create_tags_from_list_with_context(tag_list, context)
-    if context.to_sym == :markets
-      Market.find_or_create_all_with_like_by_name(tag_list)
-    else
-      super
-    end
-  end
-end
-
-class User < ActiveRecord::Base
-  acts_as_tagger
-end
-
-class Student < User
-end
-
-class UntaggableModel < ActiveRecord::Base
-  belongs_to :taggable_model
-end
-
-class NonStandardIdTaggableModel < ActiveRecord::Base
-  self.primary_key = :an_id
-  acts_as_taggable
-  acts_as_taggable_on :languages
-  acts_as_taggable_on :skills
-  acts_as_taggable_on :needs, :offerings
-  has_many :untaggable_models
-end
-
-class OrderedTaggableModel < ActiveRecord::Base
-  acts_as_ordered_taggable
-  acts_as_ordered_taggable_on :colours
-end
-
-if using_postgresql?
-  class CachedModelWithArray < ActiveRecord::Base
-    acts_as_taggable
-  end
-  if postgresql_support_json?
-    class TaggableModelWithJson < ActiveRecord::Base
-      acts_as_taggable
-      acts_as_taggable_on :skills
-    end
-  end
-end
+d = File.dirname(__FILE__)
+[
+  :taggable_model,
+  :taggable_namespaced_model,
+  :cached_model,
+  :other_cached_model,
+  :other_taggable_model,
+  :cached_namespaced_model,
+  :other_cached_namespaced_model,
+  :other_taggable_namespaced_model,
+  :inheriting_taggable_model,
+  :inheriting_taggable_namespaced_model,
+  :altered_inheriting_taggable_model,
+  :altered_inheriting_taggable_namespaced_model,
+  :market,
+  :namespaced_market,
+  :company,
+  :namespaced_company,
+  :user,
+  :namespaced_user,
+  :student,
+  :namespaced_student,
+  :nspaced_tag,
+  :nspaced_tagging,
+  :untaggable_model,
+  :untaggable_namespaced_model,
+  :non_standard_id_taggable_model,
+  :non_standard_id_taggable_namespaced_model,
+  :ordered_taggable_model,
+  :ordered_taggable_namespaced_model,
+  :cached_model_with_array,
+  :taggable_model_with_json,
+  :taggable_namespaced_model_with_json
+].each { |f| require File.join d, f.to_s }

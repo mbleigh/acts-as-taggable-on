@@ -14,19 +14,21 @@ module ActsAsTaggableOn
       #     acts_as_tagger
       #   end
       def acts_as_tagger(opts={})
+        ns = opts.delete(:namespace)
+
         class_eval do
           has_many_with_taggable_compatibility :owned_taggings,
-                                               opts.merge(
-                                                   as: :tagger,
-                                                   dependent: :destroy,
-                                                   class_name: 'ActsAsTaggableOn::Tagging'
-                                               )
+                                              opts.merge(
+                                                  as: :tagger,
+                                                  dependent: :destroy,
+                                                  class_name: ActsAsTaggableOn.namespaced_class(ns, :Tagging, as_constant: false)
+                                              )
 
           has_many_with_taggable_compatibility :owned_tags,
-                                               through: :owned_taggings,
-                                               source: :tag,
-                                               class_name: 'ActsAsTaggableOn::Tag',
-                                               uniq: true
+                                              through: :owned_taggings,
+                                              source: ActsAsTaggableOn.namespaced_attribute(ns, :tag),
+                                              class_name: ActsAsTaggableOn.namespaced_class(ns, :Tag, as_constant: false),
+                                              uniq: true
         end
 
         include ActsAsTaggableOn::Tagger::InstanceMethods

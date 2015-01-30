@@ -1,3 +1,4 @@
+ENV["RAILS_ENV"] = 'test'
 begin
   require 'byebug'
 rescue LoadError
@@ -18,4 +19,3 @@ Dir['./spec/support/**/*.rb'].sort.each { |f| require f }
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
 end
-

@@ -1,0 +1,2 @@
+class InheritingTaggableNamespacedModel < TaggableNamespacedModel
+end

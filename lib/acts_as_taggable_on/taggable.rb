@@ -12,8 +12,8 @@ module ActsAsTaggableOn
     #   class Book < ActiveRecord::Base
     #     acts_as_taggable
     #   end
-    def acts_as_taggable
-      acts_as_taggable_on :tags
+    def acts_as_taggable(options = {})
+      acts_as_taggable_on :tags, options
     end
 
     ##
@@ -23,8 +23,8 @@ module ActsAsTaggableOn
     #   class Book < ActiveRecord::Base
     #     acts_as_ordered_taggable
     #   end
-    def acts_as_ordered_taggable
-      acts_as_ordered_taggable_on :tags
+    def acts_as_ordered_taggable(options = {})
+      acts_as_ordered_taggable_on :tags, options
     end
 
     ##
@@ -36,8 +36,8 @@ module ActsAsTaggableOn
     #   class User < ActiveRecord::Base
     #     acts_as_taggable_on :languages, :skills
     #   end
-    def acts_as_taggable_on(*tag_types)
-      taggable_on(false, tag_types)
+    def acts_as_taggable_on(*options)
+      taggable_on false, options
     end
 
     ##
@@ -50,8 +50,8 @@ module ActsAsTaggableOn
     #   class User < ActiveRecord::Base
     #     acts_as_ordered_taggable_on :languages, :skills
     #   end
-    def acts_as_ordered_taggable_on(*tag_types)
-      taggable_on(true, tag_types)
+    def acts_as_ordered_taggable_on(*options)
+      taggable_on true, options
     end
 
     private
@@ -67,8 +67,9 @@ module ActsAsTaggableOn
       # NB: method overridden in core module in order to create tag type
       #     associations and methods after this logic has executed
       #
-    def taggable_on(preserve_tag_order, *tag_types)
-      tag_types = tag_types.to_a.flatten.compact.map(&:to_sym)
+    def taggable_on(preserve_tag_order, *options)
+      tag_types, opts = ActsAsTaggableOn::Utils.get_tag_types_and_options(options)
+      tag_types = tag_types.compact.map(&:to_sym)
 
       if taggable?
         self.tag_types = (self.tag_types + tag_types).uniq
@@ -78,15 +79,10 @@ module ActsAsTaggableOn
         self.tag_types = tag_types
         class_attribute :preserve_tag_order
         self.preserve_tag_order = preserve_tag_order
-
-        class_eval do
-          has_many :taggings, as: :taggable, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging'
-          has_many :base_tags, through: :taggings, source: :tag, class_name: 'ActsAsTaggableOn::Tag'
-
-          def self.taggable?
-            true
-          end
-        end
+        
+        ns = opts.delete(:namespace)
+        ActsAsTaggableOn.namespace_base_classes! ns
+        ActsAsTaggableOn.tagify_class! self, ns
       end
 
       # each of these add context-specific methods and must be
