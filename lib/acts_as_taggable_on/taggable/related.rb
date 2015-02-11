@@ -43,7 +43,7 @@ module ActsAsTaggableOn::Taggable
     def related_tags_for(context, klass, options = {})
       tags_to_ignore = Array.wrap(options[:ignore]).map(&:to_s) || []
       tags_to_find = tags_on(context).map { |t| t.name }.reject { |t| tags_to_ignore.include? t }
-      related_where(klass, ["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.base_class}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?)", tags_to_find])
+      related_where(klass, ["#{exclude_self(klass, id)} #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = '#{klass.base_class}' AND #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND #{ActsAsTaggableOn::Tag.table_name}.name IN (?) AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", tags_to_find, context])
     end
 
     private
