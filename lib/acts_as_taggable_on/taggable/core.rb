@@ -89,7 +89,10 @@ module ActsAsTaggableOn::Taggable
         options = options.dup
         empty_result = where('1 = 0')
 
-        return empty_result if tag_list.empty?
+        if tag_list.empty?
+          return empty_result unless options.delete(:exclude)
+          return all
+        end
 
         joins = []
         conditions = []

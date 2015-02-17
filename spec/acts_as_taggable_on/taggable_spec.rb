@@ -515,6 +515,17 @@ describe 'Taggable' do
     end
   end
 
+  context 'exclude: true' do
+    it 'should return the full scope for empty tags' do
+      TaggableModel.create(name: 'Bob', tag_list: 'happier, lazy')
+      TaggableModel.create(name: 'Frank', tag_list: 'happier')
+
+      ['', ' ', nil, []].each do |tag|
+        expect(TaggableModel.tagged_with(tag, exclude: true).size).to eq(2)
+      end
+    end
+  end
+
   it 'should options key not be deleted' do
     options = {:exclude => true}
     TaggableModel.tagged_with("foo", options)
