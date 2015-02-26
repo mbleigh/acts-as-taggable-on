@@ -2,6 +2,7 @@
 require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
 
+
 shared_examples_for 'without unique index' do
   prepend_before(:all) { AddMissingUniqueIndices.down }
   append_after(:all) do
@@ -309,7 +310,7 @@ describe ActsAsTaggableOn::Tag do
         tag.save!
       end
     end
-    
+
     it 'should find the most popular tags' do
       expect(ActsAsTaggableOn::Tag.most_used(3).first.name).to eq("golden_syrup")
       expect(ActsAsTaggableOn::Tag.most_used(3).length).to eq(3)
@@ -320,4 +321,5 @@ describe ActsAsTaggableOn::Tag do
       expect(ActsAsTaggableOn::Tag.least_used(3).length).to eq(3)
     end
   end
+
 end

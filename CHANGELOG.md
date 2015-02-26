@@ -4,13 +4,10 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### Master [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.4...master)
+### Master [fixes](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.4...master)
 
-  * Breaking Changes
-  * Features
   * Fixes
-  * Performance
-  * Misc
+   * [@rikettsie Fixed collation for MySql via rake rule or config parameter](https://github.com/mbleigh/acts-as-taggable-on/pull/634)
 
 ### [3.4.4 / 2015-02-11](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.3...v3.4.4)
 
