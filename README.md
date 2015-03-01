@@ -57,19 +57,21 @@ Review the generated migrations then migrate :
 rake db:migrate
 ```
 
-MySql users should also run the following rake task to get special characters
-work correctly for tag names, see [issue #623](https://github.com/mbleigh/acts-as-taggable-on/issues/623):
+#### For MySql users
+You can circumvent at any time the problem of special characters [issue 623](https://github.com/mbleigh/acts-as-taggable-on/issues/623) by setting in an initializer file:
 
-```shell
-rake acts_as_taggable_on_engine:tag_names:collate
+```ruby
+ActsAsTaggableOn.force_binary_collation = true
 ```
 
-or, alternatively, execute the following command in the MySql console:
+Or by running this rake task:
 
 ```shell
-USE my_wonderful_app_db;
-ALTER TABLE tags MODIFY name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;
+rake acts_as_taggable_on_engine:tag_names:collate_bin
 ```
+
+See the Configuration section for more details, and a general note valid for older
+version of the gem.
 
 #### Upgrading
 
@@ -421,13 +423,28 @@ If you would like tags to be case-sensitive and not use LIKE queries for creatio
 ActsAsTaggableOn.strict_case_match = true
 ```
 
+If you would like to have an exact match covering special characters with MySql:
+
+```ruby
+ActsAsTaggableOn.force_binary_collation = true
+```
+
 If you want to change the default delimiter (it defaults to ','). You can also pass in an array of delimiters such as ([',', '|']):
 
 ```ruby
 ActsAsTaggableOn.delimiter = ','
 ```
 
-*NOTE: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
+*NOTE 1: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
+
+*NOTE 2: the option `force_binary_collation` is strongest than `strict_case_match` and when
+set to true, the `strict_case_match` is ignored.
+To roughly apply the `force_binary_collation` behaviour with a version of the gem <= 3.4.4, execute the following commands in the MySql console:*
+
+```shell
+USE my_wonderful_app_db;
+ALTER TABLE tags MODIFY name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;
+```
 
 ## Contributors
 
