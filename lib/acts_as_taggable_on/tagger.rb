@@ -19,13 +19,13 @@ module ActsAsTaggableOn
                                                opts.merge(
                                                    as: :tagger,
                                                    dependent: :destroy,
-                                                   class_name: 'ActsAsTaggableOn::Tagging'
+                                                   class_name: '::ActsAsTaggableOn::Tagging'
                                                )
 
           has_many_with_taggable_compatibility :owned_tags,
                                                through: :owned_taggings,
                                                source: :tag,
-                                               class_name: 'ActsAsTaggableOn::Tag',
+                                               class_name: '::ActsAsTaggableOn::Tag',
                                                uniq: true
         end
 
