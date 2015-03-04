@@ -302,7 +302,7 @@ Now you can use this parser, passing it as parameter:
 Or change it globally:
 
 ```ruby
-ActsAsTaggable.default_parser = MyParser
+ActsAsTaggableOn.default_parser = MyParser
 @user = User.new(:name => "Bobby")
 @user.tag_list = "east|south"
 @user.tag_list # => ["east", "south"]
