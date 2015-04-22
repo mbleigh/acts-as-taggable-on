@@ -5,7 +5,7 @@ describe "Taggable To Preserve Order" do
     clean_database!
     @taggable = OrderedTaggableModel.new(:name => "Bob Jones")
   end
-
+  
   it "should have tag types" do
     [:tags, :colours].each do |type|
       OrderedTaggableModel.tag_types.should include type
@@ -13,21 +13,21 @@ describe "Taggable To Preserve Order" do
 
     @taggable.tag_types.should == OrderedTaggableModel.tag_types
   end
-
+  
   it "should have tag associations" do
     [:tags, :colours].each do |type|
       @taggable.respond_to?(type).should be_true
       @taggable.respond_to?("#{type.to_s.singularize}_taggings").should be_true
     end
   end
-
+  
   it "should have tag associations ordered by id" do
     [:tags, :colours].each do |type|
       OrderedTaggableModel.reflect_on_association(type).options[:order].should include('id')
       OrderedTaggableModel.reflect_on_association("#{type.to_s.singularize}_taggings".to_sym).options[:order].should include('id')
     end
   end
-
+  
   it "should have tag methods" do
     [:tags, :colours].each do |type|
       @taggable.respond_to?("#{type.to_s.singularize}_list").should be_true
@@ -40,69 +40,69 @@ describe "Taggable To Preserve Order" do
     # create
     @taggable.tag_list = "rails, ruby, css"
     @taggable.instance_variable_get("@tag_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
-
+    
     lambda {
       @taggable.save
     }.should change(ActsAsTaggableOn::Tag, :count).by(3)
-
+    
     @taggable.reload
     @taggable.tag_list.should == %w(rails ruby css)
-
+    
     # update
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.save
-
+        
     @taggable.reload
     @taggable.tag_list.should == %w(pow ruby rails)
-
+    
     # update with no change
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.save
-
+        
     @taggable.reload
     @taggable.tag_list.should == %w(pow ruby rails)
-
+    
     # update to clear tags
     @taggable.tag_list = ""
     @taggable.save
-
+        
     @taggable.reload
     @taggable.tag_list.should == []
   end
-
+  
   it "should return tag objects in the order the tags were created" do
     # create
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.instance_variable_get("@tag_list").instance_of?(ActsAsTaggableOn::TagList).should be_true
-
+    
     lambda {
       @taggable.save
     }.should change(ActsAsTaggableOn::Tag, :count).by(3)
-
+    
     @taggable.reload
     @taggable.tags.map{|t| t.name}.should == %w(pow ruby rails)
-
+    
     # update
     @taggable.tag_list = "rails, ruby, css, pow"
     @taggable.save
-
+    
     @taggable.reload
     @taggable.tags.map{|t| t.name}.should == %w(rails ruby css pow)
   end
-
+  
   it "should return tag objects in tagging id order" do
     # create
     @taggable.tag_list = "pow, ruby, rails"
     @taggable.save
-
+    
     @taggable.reload
     ids = @taggable.tags.map{|t| t.taggings.first.id}
     ids.should == ids.sort
-
+    
     # update
     @taggable.tag_list = "rails, ruby, css, pow"
     @taggable.save
-
+    
     @taggable.reload
     ids = @taggable.tags.map{|t| t.taggings.first.id}
     ids.should == ids.sort
@@ -588,15 +588,15 @@ describe "Taggable" do
     it 'should show changes of dirty object' do
       @taggable.changes.should == {}
       @taggable.tag_list = 'one'
-      @taggable.changes.should == {"tag_list"=>["awesome,epic", ["one"]]}
+      @taggable.changes.should == {"tag_list"=>["awesome, epic", ["one"]]}
 
       @taggable.tag_list_changed?.should be_true
-      @taggable.tag_list_was.should == "awesome,epic"
-      @taggable.tag_list_change.should == ["awesome,epic", ["one"]]
+      @taggable.tag_list_was.should == "awesome, epic"
+      @taggable.tag_list_change.should == ["awesome, epic", ["one"]]
     end
 
     it 'should show no changes if the same tag_list' do
-      @taggable.tag_list = "awesome,epic"
+      @taggable.tag_list = "awesome, epic"
       @taggable.tag_list_changed?.should be_false
       @taggable.changes.should == {}
     end
