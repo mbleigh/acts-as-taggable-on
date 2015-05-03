@@ -153,7 +153,6 @@ module ActsAsTaggableOn::Taggable
           # don't need to sanitize sql, map all ids and join with OR logic
           tag_ids = tags.map { |t| quote_value(t.id, nil) }.join(', ')
           tagging_cond << " AND #{taggings_alias}.tag_id in (#{tag_ids})"
-          select_clause << " #{table_name}.*" unless context and tag_types.one?
 
           if owned_by
             tagging_cond << ' AND ' +
@@ -432,7 +431,7 @@ module ActsAsTaggableOn::Taggable
       tag_lists = tag_types.map {|tags_type| "#{tags_type.to_s.singularize}_list"}
       super.delete_if {|attr| tag_lists.include? attr }
     end
-    
+
     ##
     # Override this hook if you wish to subclass {ActsAsTaggableOn::Tag} --
     # context is provided so that you may conditionally use a Tag subclass

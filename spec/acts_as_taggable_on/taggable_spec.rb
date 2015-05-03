@@ -208,6 +208,13 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('ruby').group(:created_at).count.count).to eq(1)
   end
 
+  it 'should be able to get a count when using any' do
+    @taggable.skill_list = 'ruby'
+    @taggable.save
+
+    expect(TaggableModel.tagged_with('ruby', any: true).count).to eq(1)
+  end
+
   it 'can be used as scope' do
     @taggable.skill_list = 'ruby'
     @taggable.save
