@@ -21,7 +21,7 @@ module ActsAsTaggableOn
         Digest::SHA1.hexdigest(string)[0..6]
       end
 
-      def active_record4?
+      def active_record_4_or_greater?
         ::ActiveRecord::VERSION::MAJOR >= 4
       end
 
