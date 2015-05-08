@@ -1,6 +1,6 @@
 module ActsAsTaggableOn::Compatibility
   def has_many_with_taggable_compatibility(name, options = {}, &extention)
-    if ActsAsTaggableOn::Utils.active_record4?
+    if ActsAsTaggableOn::Utils.active_record_4_or_greater?
       scope, opts = build_taggable_scope_and_options(options)
       has_many(name, scope, opts, &extention)
     else
