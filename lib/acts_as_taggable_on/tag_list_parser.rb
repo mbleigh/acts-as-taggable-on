@@ -12,7 +12,7 @@ module ActsAsTaggableOn
         ActiveRecord::Base.logger.warn <<WARNING
 ActsAsTaggableOn::TagListParser.parse is deprecated \
 and will be removed from v4.0+, use  \
-ActsAsTaggableOn::TagListParser.new instead
+ActsAsTaggableOn::DefaultParser.new instead
 WARNING
         DefaultParser.new(string).parse
       end
