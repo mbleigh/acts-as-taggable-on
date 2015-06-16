@@ -254,7 +254,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def custom_contexts
-      @custom_contexts ||= []
+      @custom_contexts ||= taggings.map(&:context).uniq
     end
 
     def is_taggable?
@@ -333,7 +333,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def tagging_contexts
-      custom_contexts + self.class.tag_types.map(&:to_s)
+      self.class.tag_types.map(&:to_s) + custom_contexts
     end
 
     def process_dirty_object(context, new_list)
@@ -432,7 +432,7 @@ module ActsAsTaggableOn::Taggable
       tag_lists = tag_types.map {|tags_type| "#{tags_type.to_s.singularize}_list"}
       super.delete_if {|attr| tag_lists.include? attr }
     end
-    
+
     ##
     # Override this hook if you wish to subclass {ActsAsTaggableOn::Tag} --
     # context is provided so that you may conditionally use a Tag subclass
