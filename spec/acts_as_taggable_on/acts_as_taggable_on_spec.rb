@@ -154,7 +154,7 @@ describe 'Acts As Taggable On' do
   describe 'Tagging Contexts' do
     it 'should eliminate duplicate tagging contexts ' do
       TaggableModel.acts_as_taggable_on(:skills, :skills)
-      expect(TaggableModel.tag_types.freq[:skills]).to_not eq(3)
+      expect(TaggableModel.tag_types.freq[:skills]).to eq(1)
     end
 
     it 'should not contain embedded/nested arrays' do
@@ -177,6 +177,15 @@ describe 'Acts As Taggable On' do
       expect(-> {
         TaggableModel.acts_as_taggable_on([nil])
       }).to_not raise_error
+    end
+
+    it 'should include dynamic contexts in tagging_contexts' do
+      taggable = TaggableModel.create!(name: 'Dynamic Taggable')
+      taggable.set_tag_list_on :colors, 'tag1, tag2, tag3'
+      expect(taggable.tagging_contexts).to eq(%w(tags languages skills needs offerings array colors))
+      taggable.save
+      taggable = TaggableModel.where(name: 'Dynamic Taggable').first
+      expect(taggable.tagging_contexts).to eq(%w(tags languages skills needs offerings array colors))
     end
   end
 
