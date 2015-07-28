@@ -331,6 +331,14 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations, :skip_save => true) #won't save @some_photo object
 ```
 
+Note that `tag_list` only returns tags whose taggings do not have an owner. Continuing from the above example:
+
+```ruby
+@some_photo.tag_list # => []
+```
+
+To retrieve all tags of an object (regardless of ownership) or if only one owner can tag the object, use `all_tags_list`. 
+
 ### Dirty objects
 
 ```ruby
