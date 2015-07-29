@@ -25,6 +25,16 @@ module ActsAsTaggableOn
         ::ActiveRecord::VERSION::MAJOR == 4
       end
 
+      def active_record5?
+        ::ActiveRecord::VERSION::MAJOR == 5
+      end
+
+      # Returns <tt>true</tt> if the present version of Active Record's
+      # <tt>has_many</tt> requires a scope parameter.
+      def has_many_requires_scope?
+        active_record4? || active_record5?
+      end
+
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'
       end
