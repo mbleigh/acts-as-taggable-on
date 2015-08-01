@@ -25,6 +25,10 @@ module ActsAsTaggableOn
         ::ActiveRecord::VERSION::MAJOR == 4
       end
 
+      def active_record5?
+        ::ActiveRecord::VERSION::MAJOR == 5
+      end
+
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'
       end
