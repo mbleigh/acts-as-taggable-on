@@ -55,6 +55,21 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
+  describe 'for context' do
+    before(:each) do
+      @user.skill_list.add('ruby')
+      @user.save
+    end
+
+    it 'should return tags that have been used in the given context' do
+      expect(ActsAsTaggableOn::Tag.for_context('skills').all.map(&:name)).to include('ruby')
+    end
+
+    it 'should not return tags that have been used in other contexts' do
+      expect(ActsAsTaggableOn::Tag.for_context('needs').all.map(&:name)).to_not include('ruby')
+    end
+  end
+
   describe 'find or create by name' do
     before(:each) do
       @tag.name = 'awesome'

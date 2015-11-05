@@ -50,6 +50,12 @@ module ActsAsTaggableOn
       where(clause)
     end
 
+    def self.for_context(context)
+      joins(:taggings).
+        where(["taggings.context = ?", context]).
+        select("DISTINCT tags.*")
+    end
+
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
