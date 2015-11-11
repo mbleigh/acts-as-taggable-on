@@ -169,9 +169,12 @@ module ActsAsTaggableOn::Taggable
     end
 
     module CalculationMethods
-      def count(column_name=:all, options = {})
+      # Rails 5 TODO: Remove options argument as soon we remove support to
+      # activerecord-deprecated_finders.
+      # See https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb#L38
+      def count(column_name = :all, options = {})
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
-        super
+        ActsAsTaggableOn::Utils.active_record5? ? super(column_name) : super(column_name, options)
       end
     end
   end

@@ -73,9 +73,7 @@ module ActsAsTaggableOn
     end
 
     def strict_case_match=(force_cs)
-      if @force_binary_collation == false
-        @strict_case_match = force_cs
-      end
+      @strict_case_match = force_cs unless @force_binary_collation
     end
 
     def delimiter=(string)
@@ -89,7 +87,7 @@ WARNING
 
     def force_binary_collation=(force_bin)
       if Utils.using_mysql?
-        if force_bin == true
+        if force_bin
           Configuration.apply_binary_collation(true)
           @force_binary_collation = true
           @strict_case_match = true
@@ -103,9 +101,7 @@ WARNING
     def self.apply_binary_collation(bincoll)
       if Utils.using_mysql?
         coll = 'utf8_general_ci'
-        if bincoll == true
-          coll = 'utf8_bin'
-        end
+        coll = 'utf8_bin' if bincoll
         begin
           ActiveRecord::Migration.execute("ALTER TABLE tags MODIFY name varchar(255) CHARACTER SET utf8 COLLATE #{coll};")
         rescue Exception => e

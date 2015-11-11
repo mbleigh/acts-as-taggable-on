@@ -14,3 +14,8 @@ appraise "activerecord-4.2" do
   gem "railties", github: "rails/rails" , branch: '4-2-stable'
   gem "activerecord", github: "rails/rails"  , branch: '4-2-stable'
 end
+
+appraise "activerecord-5.0" do
+  gem "railties", github: "rails/rails" , branch: 'master'
+  gem "activerecord", github: "rails/rails"  , branch: 'master'
+end
