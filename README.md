@@ -1,7 +1,8 @@
 # ActsAsTaggableOn
+[![Gem Version](https://badge.fury.io/rb/acts-as-taggable-on.svg)](http://badge.fury.io/rb/acts-as-taggable-on)
 [![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.png)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
 [![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.png)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
-[![Inline docs](http://inch-pages.github.io/github/mbleigh/acts-as-taggable-on.png)](http://inch-pages.github.io/github/mbleigh/acts-as-taggable-on)
+[![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.png)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
 
 This plugin was originally based on Acts as Taggable on Steroids by Jonathan Viney.
 It has evolved substantially since that point, but all credit goes to him for the
@@ -24,14 +25,14 @@ Versions 2.4.1 and up are compatible with Rails 4 too (thanks to arabonradar and
 
 Versions >= 3.x are compatible with Ruby 1.9.3+ and Rails 3 and 4.
 
-For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/issues/milestones
+For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
 
 ## Installation
 
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on'
+gem 'acts-as-taggable-on', '~> 3.4'
 ```
 
 and bundle:
@@ -56,6 +57,22 @@ Review the generated migrations then migrate :
 rake db:migrate
 ```
 
+#### For MySql users
+You can circumvent at any time the problem of special characters [issue 623](https://github.com/mbleigh/acts-as-taggable-on/issues/623) by setting in an initializer file:
+
+```ruby
+ActsAsTaggableOn.force_binary_collation = true
+```
+
+Or by running this rake task:
+
+```shell
+rake acts_as_taggable_on_engine:tag_names:collate_bin
+```
+
+See the Configuration section for more details, and a general note valid for older
+version of the gem.
+
 #### Upgrading
 
 see [UPGRADING](UPGRADING.md)
@@ -70,20 +87,26 @@ class User < ActiveRecord::Base
   acts_as_taggable_on :skills, :interests
 end
 
+class UsersController < ApplicationController
+  def user_params
+    params.require(:user).permit(:name, :tag_list) ## Rails 4 strong params usage
+  end
+end
+
 @user = User.new(:name => "Bobby")
 ```
 
 Add and remove a single tag
 
 ```ruby
-@user.tag_list.add("awesomer")   # add a single tag. alias for <<
+@user.tag_list.add("awesome")   # add a single tag. alias for <<
 @user.tag_list.remove("awesome") # remove a single tag
 ```
 
 Add and remove multiple tags in an array
 
 ```ruby
-@user.tag_list.add("awesomer", "slicker")
+@user.tag_list.add("awesome", "slick")
 @user.tag_list.remove("awesome", "slick")
 ```
 
@@ -98,7 +121,7 @@ a change on delimiter setting, make sure the string will match. See
 [configuration](#configuration) for more about delimiter.
 
 ```ruby
-@user.tag_list.add("awesomer, slicker", parse: true)
+@user.tag_list.add("awesome, slick", parse: true)
 @user.tag_list.remove("awesome, slick", parse: true)
 ```
 
@@ -107,29 +130,41 @@ remove existing tags so use it with attention.
 
 ```ruby
 @user.tag_list = "awesome, slick, hefty"
+@user.save
+@user.reload
 @user.tags
-# => [<Tag name:"awesome">,<Tag name:"slick">,<Tag name:"hefty">]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "awesome", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "slick", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "hefty", taggings_count: 1>]
 ```
 
 With the defined context in model, you have multiple new methods at disposal
 to manage and view the tags in the context. For example, with `:skill` context
 these methods are added to the model: `skill_list`(and `skill_list.add`, `skill_list.remove`
-`skill_list=`), `skills`(plural), skill_counts
-
+`skill_list=`), `skills`(plural), `skill_counts`.
 
 ```ruby
 @user.skill_list = "joking, clowning, boxing"
-
+@user.save
+@user.reload
 @user.skills
-# => [<Tag name:"joking">,<Tag name:"clowning">,<Tag name:"boxing">]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
 
 @user.skill_list.add("coding")
 
 @user.skill_list
-# => ["joking","clowning","boxing", "coding"]
+# => ["joking", "clowning", "boxing", "coding"]
+
+@another_user = User.new(:name => "Alice")
+@another_user.skill_list.add("clowning")
+@another_user.save
 
 User.skill_counts
-# => [<Tag name="joking" count=2>,<Tag name="clowning" count=1>...]
+=> [#<ActsAsTaggableOn::Tag id: 1, name: "joking", taggings_count: 1>,
+ #<ActsAsTaggableOn::Tag id: 2, name: "clowning", taggings_count: 2>,
+ #<ActsAsTaggableOn::Tag id: 3, name: "boxing", taggings_count: 1>]
 ```
 
 To preserve the order in which tags are created use `acts_as_ordered_taggable`:
@@ -152,6 +187,22 @@ end
 @user.tag_list # => ["north", "east", "south", "west"]
 ```
 
+### Finding most or least used tags
+
+You can find the most or least used tags by using:
+
+```ruby
+ActsAsTaggableOn::Tag.most_used
+ActsAsTaggableOn::Tag.least_used
+```
+
+You can also filter the results by passing the method a limit, however the default limit is 20.
+
+```ruby
+ActsAsTaggableOn::Tag.most_used(10)
+ActsAsTaggableOn::Tag.least_used(10)
+```
+
 ### Finding Tagged Objects
 
 Acts As Taggable On uses scopes to create an association for tags.
@@ -166,22 +217,23 @@ end
 User.tagged_with("awesome").by_join_date
 User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
-# Find a user with matching all tags, not just one
+# Find users that matches all given tags:
 User.tagged_with(["awesome", "cool"], :match_all => true)
 
-# Find a user with any of the tags:
+# Find users with any of the specified tags:
 User.tagged_with(["awesome", "cool"], :any => true)
 
-# Find a user that not tags with awesome or cool:
+# Find users that has not been tagged with awesome or cool:
 User.tagged_with(["awesome", "cool"], :exclude => true)
 
-# Find a user with any of tags based on context:
+# Find users with any of the tags based on context:
 User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
-You can also use `:wild => true` option along with `:any` or `:exclude` option. It will looking for `%awesome%` and `%cool%` in sql.
+You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
 
-__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, but not all records.
+__Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
+
 
 ### Relationships
 
@@ -199,7 +251,7 @@ matched tags.
 @tom = User.find_by_name("Tom")
 @tom.skill_list # => ["hacking", "jogging", "diving"]
 
-@tom.find_related_skills # => [<User name="Bobby">,<User name="Frankie">]
+@tom.find_related_skills # => [<User name="Bobby">, <User name="Frankie">]
 @bobby.find_related_skills # => [<User name="Tom">]
 @frankie.find_related_skills # => [<User name="Tom">]
 ```
@@ -212,11 +264,48 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 ```ruby
 @user = User.new(:name => "Bobby")
 @user.set_tag_list_on(:customs, "same, as, tag, list")
-@user.tag_list_on(:customs) # => ["same","as","tag","list"]
+@user.tag_list_on(:customs) # => ["same", "as", "tag", "list"]
 @user.save
 @user.tags_on(:customs) # => [<Tag name='same'>,...]
 @user.tag_counts_on(:customs)
 User.tagged_with("same", :on => :customs) # => [@user]
+```
+
+### Tag Parsers
+
+If you want to change how tags are parsed, you can define a your own implementation:
+
+```ruby
+class MyParser < ActsAsTaggableOn::GenericParser
+  def parse
+    ActsAsTaggableOn::TagList.new.tap do |tag_list|
+      tag_list.add @tag_list.split('|')
+    end
+  end
+end
+```
+
+Now you can use this parser, passing it as parameter:
+
+```ruby
+@user = User.new(:name => "Bobby")
+@user.tag_list = "east, south"
+@user.tag_list.add("north|west", parser: MyParser)
+@user.tag_list # => ["north", "east", "south", "west"]
+
+# Or also:
+@user.tag_list.parser = MyParser
+@user.tag_list.add("north|west")
+@user.tag_list # => ["north", "east", "south", "west"]
+```
+
+Or change it globally:
+
+```ruby
+ActsAsTaggableOn.default_parser = MyParser
+@user = User.new(:name => "Bobby")
+@user.tag_list = "east|south"
+@user.tag_list # => ["east", "south"]
 ```
 
 ### Tag Ownership
@@ -242,6 +331,14 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations, :skip_save => true) #won't save @some_photo object
 ```
 
+Note that `tag_list` only returns tags whose taggings do not have an owner. Continuing from the above example:
+
+```ruby
+@some_photo.tag_list # => []
+```
+
+To retrieve all tags of an object (regardless of ownership) or if only one owner can tag the object, use `all_tags_list`. 
+
 ### Dirty objects
 
 ```ruby
@@ -263,7 +360,7 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 To construct tag clouds, the frequency of each tag needs to be calculated.
 Because we specified `acts_as_taggable_on` on the `User` class, we can
 get a calculation of all the tag counts by using `User.tag_counts_on(:customs)`. But what if we wanted a tag count for
-an single user's posts? To achieve this we call tag_counts on the association:
+a single user's posts? To achieve this we call tag_counts on the association:
 
 ```ruby
 User.find(:first).posts.tag_counts_on(:tags)
@@ -334,13 +431,28 @@ If you would like tags to be case-sensitive and not use LIKE queries for creatio
 ActsAsTaggableOn.strict_case_match = true
 ```
 
+If you would like to have an exact match covering special characters with MySql:
+
+```ruby
+ActsAsTaggableOn.force_binary_collation = true
+```
+
 If you want to change the default delimiter (it defaults to ','). You can also pass in an array of delimiters such as ([',', '|']):
 
 ```ruby
 ActsAsTaggableOn.delimiter = ','
 ```
 
-*NOTE: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
+*NOTE 1: SQLite by default can't upcase or downcase multibyte characters, resulting in unwanted behavior. Load the SQLite ICU extension for proper handle of such characters. [See docs](http://www.sqlite.org/src/artifact?ci=trunk&filename=ext/icu/README.txt)*
+
+*NOTE 2: the option `force_binary_collation` is strongest than `strict_case_match` and when
+set to true, the `strict_case_match` is ignored.
+To roughly apply the `force_binary_collation` behaviour with a version of the gem <= 3.4.4, execute the following commands in the MySql console:*
+
+```shell
+USE my_wonderful_app_db;
+ALTER TABLE tags MODIFY name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;
+```
 
 ## Contributors
 
@@ -349,6 +461,11 @@ We have a long list of valued contributors. [Check them all](https://github.com/
 ## Maintainer
 
 * [Joost Baaij](https://github.com/tilsammans)
+
+## TODO
+
+- Write benchmark script
+- Resolve concurrency issues
 
 ## Testing
 

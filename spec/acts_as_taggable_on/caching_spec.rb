@@ -1,77 +1,83 @@
+# -*- encoding : utf-8 -*-
 require 'spec_helper'
 
-describe "Acts As Taggable On" do
-
-  before(:each) do
-    clean_database!
-  end
+describe 'Acts As Taggable On' do
 
   describe 'Caching' do
     before(:each) do
-      @taggable = CachedModel.new(:name => "Bob Jones")
-      @another_taggable = OtherCachedModel.new(:name => "John Smith")
+      @taggable = CachedModel.new(name: 'Bob Jones')
+      @another_taggable = OtherCachedModel.new(name: 'John Smith')
     end
 
-    it "should add saving of tag lists and cached tag lists to the instance" do
-      @taggable.should respond_to(:save_cached_tag_list)
-      @another_taggable.should respond_to(:save_cached_tag_list)
+    it 'should add saving of tag lists and cached tag lists to the instance' do
+      expect(@taggable).to respond_to(:save_cached_tag_list)
+      expect(@another_taggable).to respond_to(:save_cached_tag_list)
 
-      @taggable.should respond_to(:save_tags)
+      expect(@taggable).to respond_to(:save_tags)
     end
 
-    it "should add cached tag lists to the instance if cached column is not present" do
-      TaggableModel.new(:name => "Art Kram").should_not respond_to(:save_cached_tag_list)
+    it 'should add cached tag lists to the instance if cached column is not present' do
+      expect(TaggableModel.new(name: 'Art Kram')).to_not respond_to(:save_cached_tag_list)
     end
 
-    it "should generate a cached column checker for each tag type" do
-      CachedModel.should respond_to(:caching_tag_list?)
-      OtherCachedModel.should respond_to(:caching_language_list?)
+    it 'should generate a cached column checker for each tag type' do
+      expect(CachedModel).to respond_to(:caching_tag_list?)
+      expect(OtherCachedModel).to respond_to(:caching_language_list?)
     end
 
     it 'should not have cached tags' do
-      @taggable.cached_tag_list.should be_blank
-      @another_taggable.cached_language_list.should be_blank
+      expect(@taggable.cached_tag_list).to be_blank
+      expect(@another_taggable.cached_language_list).to be_blank
     end
 
     it 'should cache tags' do
-      @taggable.update_attributes(:tag_list => 'awesome, epic')
-      @taggable.cached_tag_list.should == 'awesome, epic'
+      @taggable.update_attributes(tag_list: 'awesome, epic')
+      expect(@taggable.cached_tag_list).to eq('awesome, epic')
 
-      @another_taggable.update_attributes(:language_list => 'ruby, .net')
-      @another_taggable.cached_language_list.should == 'ruby, .net'
+      @another_taggable.update_attributes(language_list: 'ruby, .net')
+      expect(@another_taggable.cached_language_list).to eq('ruby, .net')
     end
 
     it 'should keep the cache' do
-      @taggable.update_attributes(:tag_list => 'awesome, epic')
-      @taggable = CachedModel.find(@taggable)
+      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable = CachedModel.find(@taggable.id)
       @taggable.save!
-      @taggable.cached_tag_list.should == 'awesome, epic'
+      expect(@taggable.cached_tag_list).to eq('awesome, epic')
     end
 
     it 'should update the cache' do
-      @taggable.update_attributes(:tag_list => 'awesome, epic')
-      @taggable.update_attributes(:tag_list => 'awesome')
-      @taggable.cached_tag_list.should == 'awesome'
+      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable.update_attributes(tag_list: 'awesome')
+      expect(@taggable.cached_tag_list).to eq('awesome')
     end
 
     it 'should remove the cache' do
-      @taggable.update_attributes(:tag_list => 'awesome, epic')
-      @taggable.update_attributes(:tag_list => '')
-      @taggable.cached_tag_list.should be_blank
+      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable.update_attributes(tag_list: '')
+      expect(@taggable.cached_tag_list).to be_blank
     end
 
     it 'should have a tag list' do
-      @taggable.update_attributes(:tag_list => 'awesome, epic')
+      @taggable.update_attributes(tag_list: 'awesome, epic')
       @taggable = CachedModel.find(@taggable.id)
-      @taggable.tag_list.sort.should == %w(awesome epic).sort
+      expect(@taggable.tag_list.sort).to eq(%w(awesome epic).sort)
     end
 
     it 'should keep the tag list' do
-      @taggable.update_attributes(:tag_list => 'awesome, epic')
+      @taggable.update_attributes(tag_list: 'awesome, epic')
       @taggable = CachedModel.find(@taggable.id)
       @taggable.save!
-      @taggable.tag_list.sort.should == %w(awesome epic).sort
+      expect(@taggable.tag_list.sort).to eq(%w(awesome epic).sort)
+    end
+
+    it 'should clear the cache on reset_column_information' do
+      CachedModel.column_names
+      CachedModel.reset_column_information
+      expect(CachedModel.instance_variable_get(:@acts_as_taggable_on_cache_columns)).to eql(nil)
     end
   end
 
+  describe 'CachingWithArray' do
+    pending '#TODO'
+  end
 end

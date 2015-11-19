@@ -1,15 +1,21 @@
-appraise "rails-3.2" do
-  gem "rails", "~> 3.2"
+appraise "activerecord-3.2" do
+  gem "activerecord", github: "rails/rails" , branch: '3-2-stable'
 end
 
-appraise "rails-4.0" do
-  gem "rails", "~> 4.0"
+appraise "activerecord-4.0" do
+  gem "activerecord", github: "rails/rails" , branch: '4-0-stable'
 end
 
-appraise "rails-4.1" do
-  gem "rails", "~> 4.1.0.beta1"
+appraise "activerecord-4.1" do
+  gem "activerecord", github: "rails/rails" , branch: '4-1-stable'
 end
 
-appraise "rails-edge" do
-  gem "rails", github: "rails/rails"
+appraise "activerecord-4.2" do
+  gem "railties", github: "rails/rails" , branch: '4-2-stable'
+  gem "activerecord", github: "rails/rails"  , branch: '4-2-stable'
+end
+
+appraise "activerecord-5.0" do
+  gem "railties", github: "rails/rails" , branch: 'master'
+  gem "activerecord", github: "rails/rails"  , branch: 'master'
 end

@@ -15,26 +15,30 @@ module ActsAsTaggableOn
       #   end
       def acts_as_tagger(opts={})
         class_eval do
-          has_many_with_compatibility :owned_taggings,
-            opts.merge(
-              :as => :tagger,
-              :dependent => :destroy,
-              :class_name => "ActsAsTaggableOn::Tagging"
-            )
+          has_many_with_taggable_compatibility :owned_taggings,
+                                               opts.merge(
+                                                   as: :tagger,
+                                                   dependent: :destroy,
+                                                   class_name: '::ActsAsTaggableOn::Tagging'
+                                               )
 
-          has_many_with_compatibility :owned_tags,
-                                      :through => :owned_taggings,
-                                      :source => :tag,
-                                      :class_name => "ActsAsTaggableOn::Tag",
-                                      :uniq => true
+          has_many_with_taggable_compatibility :owned_tags,
+                                               through: :owned_taggings,
+                                               source: :tag,
+                                               class_name: '::ActsAsTaggableOn::Tag',
+                                               uniq: true
         end
 
         include ActsAsTaggableOn::Tagger::InstanceMethods
         extend ActsAsTaggableOn::Tagger::SingletonMethods
       end
 
-      def is_tagger?
+      def tagger?
         false
+      end
+
+      def is_tagger?
+        tagger?
       end
     end
 
@@ -50,26 +54,34 @@ module ActsAsTaggableOn
       # Example:
       #   @user.tag(@photo, :with => "paris, normandy", :on => :locations)
       def tag(taggable, opts={})
-        opts.reverse_merge!(:force => true)
+        opts.reverse_merge!(force: true)
         skip_save = opts.delete(:skip_save)
         return false unless taggable.respond_to?(:is_taggable?) && taggable.is_taggable?
 
-        raise "You need to specify a tag context using :on"                unless opts.has_key?(:on)
-        raise "You need to specify some tags using :with"                  unless opts.has_key?(:with)
-        raise "No context :#{opts[:on]} defined in #{taggable.class.to_s}" unless (opts[:force] || taggable.tag_types.include?(opts[:on]))
+        fail 'You need to specify a tag context using :on' unless opts.key?(:on)
+        fail 'You need to specify some tags using :with' unless opts.key?(:with)
+        fail "No context :#{opts[:on]} defined in #{taggable.class}" unless opts[:force] || taggable.tag_types.include?(opts[:on])
 
         taggable.set_owner_tag_list_on(self, opts[:on].to_s, opts[:with])
         taggable.save unless skip_save
       end
 
-      def is_tagger?
+      def tagger?
         self.class.is_tagger?
+      end
+
+      def is_tagger?
+        tagger?
       end
     end
 
     module SingletonMethods
-      def is_tagger?
+      def tagger?
         true
+      end
+
+      def is_tagger?
+        tagger?
       end
     end
   end

@@ -63,7 +63,7 @@ module ActsAsTaggableOn::Taggable
 
       cache = cached_owned_tag_list_on(context)
 
-      cache[owner] = ActsAsTaggableOn::TagList.from(new_list)
+      cache[owner] = ActsAsTaggableOn.default_parser.new(new_list).parse
     end
 
     def reload(*args)
@@ -79,10 +79,10 @@ module ActsAsTaggableOn::Taggable
         cached_owned_tag_list_on(context).each do |owner, tag_list|
 
           # Find existing tags or create non-existing tags:
-          tags = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list.uniq)
+          tags = find_or_create_tags_from_list_with_context(tag_list.uniq, context)
 
           # Tag objects for owned tags
-          owned_tags = owner_tags_on(owner, context)
+          owned_tags = owner_tags_on(owner, context).to_a
 
           # Tag maintenance based on whether preserving the created order of tags
           if self.class.preserve_tag_order?
@@ -108,20 +108,13 @@ module ActsAsTaggableOn::Taggable
 
           # Find all taggings that belong to the taggable (self), are owned by the owner,
           # have the correct context, and are removed from the list.
-          if old_tags.present?
-            old_taggings = ActsAsTaggableOn::Tagging.where(:taggable_id => id, :taggable_type => self.class.base_class.to_s,
-                                                            :tagger_type => owner.class.base_class.to_s, :tagger_id => owner.id,
-                                                            :tag_id => old_tags, :context => context)
-          end
-
-          # Destroy old taggings:
-          if old_taggings.present?
-            ActsAsTaggableOn::Tagging.destroy_all(:id => old_taggings.map(&:id))
-          end
+          ActsAsTaggableOn::Tagging.destroy_all(taggable_id: id, taggable_type: self.class.base_class.to_s,
+                                                            tagger_type: owner.class.base_class.to_s, tagger_id: owner.id,
+                                                            tag_id: old_tags, context: context) if old_tags.present?
 
           # Create new taggings:
           new_tags.each do |tag|
-            taggings.create!(:tag_id => tag.id, :context => context.to_s, :tagger => owner, :taggable => self)
+            taggings.create!(tag_id: tag.id, context: context.to_s, tagger: owner, taggable: self)
           end
         end
       end

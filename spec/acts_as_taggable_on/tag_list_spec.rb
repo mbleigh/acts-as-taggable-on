@@ -1,126 +1,150 @@
-# encoding: utf-8
+# -*- encoding : utf-8 -*-
+
 require 'spec_helper'
 
 describe ActsAsTaggableOn::TagList do
-  let(:tag_list) { ActsAsTaggableOn::TagList.new("awesome","radical") }
+  let(:tag_list) { ActsAsTaggableOn::TagList.new('awesome', 'radical') }
+  let(:another_tag_list) { ActsAsTaggableOn::TagList.new('awesome','crazy', 'alien') }
 
   it { should be_kind_of Array }
 
-  it "#from should return empty array if empty array is passed" do
-    ActsAsTaggableOn::TagList.from([]).should be_empty
+
+
+  describe '#add' do
+    it 'should be able to be add a new tag word' do
+      tag_list.add('cool')
+      expect(tag_list.include?('cool')).to be_truthy
+    end
+
+    it 'should be able to add delimited lists of words' do
+      tag_list.add('cool, wicked', parse: true)
+      expect(tag_list).to include('cool', 'wicked')
+    end
+
+    it 'should be able to add delimited list of words with quoted delimiters' do
+      tag_list.add("'cool, wicked', \"really cool, really wicked\"", parse: true)
+      expect(tag_list).to include('cool, wicked', 'really cool, really wicked')
+    end
+
+    it 'should be able to handle other uses of quotation marks correctly' do
+      tag_list.add("john's cool car, mary's wicked toy", parse: true)
+      expect(tag_list).to include("john's cool car", "mary's wicked toy")
+    end
+
+    it 'should be able to add an array of words' do
+      tag_list.add(%w(cool wicked), parse: true)
+      expect(tag_list).to include('cool', 'wicked')
+    end
+
+    it 'should quote escape tags with commas in them' do
+      tag_list.add('cool', 'rad,bodacious')
+      expect(tag_list.to_s).to eq("awesome, radical, cool, \"rad,bodacious\"")
+    end
+
   end
 
-  describe "#add" do
-    it "should be able to be add a new tag word" do
-      tag_list.add("cool")
-      tag_list.include?("cool").should be_true
+  describe '#remove' do
+    it 'should be able to remove words' do
+      tag_list.remove('awesome')
+      expect(tag_list).to_not include('awesome')
     end
 
-    it "should be able to add delimited lists of words" do
-      tag_list.add("cool, wicked", :parse => true)
-      tag_list.should include("cool", "wicked")
+    it 'should be able to remove delimited lists of words' do
+      tag_list.remove('awesome, radical', parse: true)
+      expect(tag_list).to be_empty
     end
 
-    it "should be able to add delimited list of words with quoted delimiters" do
-      tag_list.add("'cool, wicked', \"really cool, really wicked\"", :parse => true)
-      tag_list.should include("cool, wicked", "really cool, really wicked")
-    end
-
-    it "should be able to handle other uses of quotation marks correctly" do
-      tag_list.add("john's cool car, mary's wicked toy", :parse => true)
-      tag_list.should include("john's cool car", "mary's wicked toy")
-    end
-
-    it "should be able to add an array of words" do
-      tag_list.add(["cool", "wicked"], :parse => true)
-      tag_list.should include("cool", "wicked")
-    end
-
-    it "should quote escape tags with commas in them" do
-      tag_list.add("cool","rad,bodacious")
-      tag_list.to_s.should == "awesome, radical, cool, \"rad,bodacious\""
-    end
-
-  end
-
-  describe "#remove" do
-    it "should be able to remove words" do
-      tag_list.remove("awesome")
-      tag_list.should_not include("awesome")
-    end
-
-    it "should be able to remove delimited lists of words" do
-      tag_list.remove("awesome, radical", :parse => true)
-      tag_list.should be_empty
-    end
-
-    it "should be able to remove an array of words" do
-      tag_list.remove(["awesome", "radical"], :parse => true)
-      tag_list.should be_empty
+    it 'should be able to remove an array of words' do
+      tag_list.remove(%w(awesome radical), parse: true)
+      expect(tag_list).to be_empty
     end
   end
 
-  describe "#to_s" do
-    it "should give a delimited list of words when converted to string" do
-      tag_list.to_s.should == "awesome, radical"
+  describe '#+' do
+    it 'should not have duplicate tags' do
+      new_tag_list = tag_list + another_tag_list
+      expect(tag_list).to eq(%w[awesome radical])
+      expect(another_tag_list).to eq(%w[awesome crazy alien])
+      expect(new_tag_list).to eq(%w[awesome radical crazy alien])
     end
 
-    it "should be able to call to_s on a frozen tag list" do
+    it 'should have class : ActsAsTaggableOn::TagList' do
+      new_tag_list = tag_list + another_tag_list
+      expect(new_tag_list.class).to eq(ActsAsTaggableOn::TagList)
+    end
+  end
+
+  describe '#concat' do
+    it 'should not have duplicate tags' do
+      expect(tag_list.concat(another_tag_list)).to eq(%w[awesome radical crazy alien])
+    end
+
+    it 'should have class : ActsAsTaggableOn::TagList' do
+      new_tag_list = tag_list.concat(another_tag_list)
+      expect(new_tag_list.class).to eq(ActsAsTaggableOn::TagList)
+    end
+  end
+
+  describe '#to_s' do
+    it 'should give a delimited list of words when converted to string' do
+      expect(tag_list.to_s).to eq('awesome, radical')
+    end
+
+    it 'should be able to call to_s on a frozen tag list' do
       tag_list.freeze
-      lambda { tag_list.add("cool","rad,bodacious") }.should raise_error
-      lambda { tag_list.to_s }.should_not raise_error
+      expect(-> { tag_list.add('cool', 'rad,bodacious') }).to raise_error
+      expect(-> { tag_list.to_s }).to_not raise_error
     end
   end
 
-  describe "cleaning" do
-    it "should parameterize if force_parameterize is set to true" do
+  describe 'cleaning' do
+    it 'should parameterize if force_parameterize is set to true' do
       ActsAsTaggableOn.force_parameterize = true
-      tag_list = ActsAsTaggableOn::TagList.new("awesome()","radical)(cc")
+      tag_list = ActsAsTaggableOn::TagList.new('awesome()', 'radical)(cc')
 
-      tag_list.to_s.should == "awesome, radical-cc"
+      expect(tag_list.to_s).to eq('awesome, radical-cc')
       ActsAsTaggableOn.force_parameterize = false
     end
 
-    it "should lowercase if force_lowercase is set to true" do
+    it 'should lowercase if force_lowercase is set to true' do
       ActsAsTaggableOn.force_lowercase = true
 
-      tag_list = ActsAsTaggableOn::TagList.new("aweSomE","RaDicaL","Entrée")
-      tag_list.to_s.should == "awesome, radical, entrée"
+      tag_list = ActsAsTaggableOn::TagList.new('aweSomE', 'RaDicaL', 'Entrée')
+      expect(tag_list.to_s).to eq('awesome, radical, entrée')
 
       ActsAsTaggableOn.force_lowercase = false
     end
-
   end
 
-  describe "Multiple Delimiter" do
-    before do 
-      @old_delimiter = ActsAsTaggableOn.delimiter
+  describe 'custom parser' do
+    let(:parser)       { double(parse: %w(cool wicked)) }
+    let(:parser_class) { stub_const('MyParser', Class) }
+
+    it 'should use a the default parser if none is set as parameter' do
+      allow(ActsAsTaggableOn.default_parser).to receive(:new).and_return(parser)
+      ActsAsTaggableOn::TagList.new('cool, wicked', parse: true)
+
+      expect(parser).to have_received(:parse)
     end
 
-    after do 
-      ActsAsTaggableOn.delimiter = @old_delimiter
+    it 'should use the custom parser passed as parameter' do
+      allow(parser_class).to receive(:new).and_return(parser)
+
+      ActsAsTaggableOn::TagList.new('cool, wicked', parser: parser_class)
+
+      expect(parser).to have_received(:parse)
     end
 
-    it "should separate tags by delimiters" do
-      ActsAsTaggableOn.delimiter = [',', ' ', '\|']
-      tag_list = ActsAsTaggableOn::TagList.from "cool, data|I have"
-      tag_list.to_s.should == 'cool, data, I, have'
-    end
+    it 'should use the parser setted as attribute' do
+      allow(parser_class).to receive(:new).with('new, tag').and_return(parser)
 
-    it "should escape quote" do 
-      ActsAsTaggableOn.delimiter = [',', ' ', '\|']
-      tag_list = ActsAsTaggableOn::TagList.from "'I have'|cool, data"
-      tag_list.to_s.should == '"I have", cool, data'
+      tag_list = ActsAsTaggableOn::TagList.new('example')
+      tag_list.parser = parser_class
+      tag_list.add('new, tag', parse: true)
 
-      tag_list = ActsAsTaggableOn::TagList.from '"I, have"|cool, data'
-      tag_list.to_s.should == '"I, have", cool, data'
-    end
-
-    it "should work for utf8 delimiter and long delimiter" do 
-      ActsAsTaggableOn.delimiter = ['，', '的', '可能是']
-      tag_list = ActsAsTaggableOn::TagList.from "我的东西可能是不见了，还好有备份"
-      tag_list.to_s.should == "我， 东西， 不见了， 还好有备份"
+      expect(parser).to have_received(:parse)
     end
   end
+
 
 end

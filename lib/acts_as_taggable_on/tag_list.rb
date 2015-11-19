@@ -1,33 +1,14 @@
+
 require 'active_support/core_ext/module/delegation'
 
 module ActsAsTaggableOn
   class TagList < Array
     attr_accessor :owner
+    attr_accessor :parser
 
     def initialize(*args)
+      @parser = ActsAsTaggableOn.default_parser
       add(*args)
-    end
-
-    ##
-    # Returns a new TagList using the given tag string.
-    #
-    # Example:
-    #   tag_list = TagList.from("One , Two,  Three")
-    #   tag_list # ["One", "Two", "Three"]
-    def self.from(string)
-      string = string.join(ActsAsTaggableOn.glue) if string.respond_to?(:join)
-
-      new.tap do |tag_list|
-        string = string.to_s.dup
-
-        # Parse the quoted tags
-        d = ActsAsTaggableOn.delimiter
-        d = d.join("|") if d.kind_of?(Array) 
-        string.gsub!(/(\A|#{d})\s*"(.*?)"\s*(#{d}\s*|\z)/) { tag_list << $2; $3 }
-        string.gsub!(/(\A|#{d})\s*'(.*?)'\s*(#{d}\s*|\z)/) { tag_list << $2; $3 }
-
-        tag_list.add(string.split(Regexp.new d))
-      end
     end
 
     ##
@@ -42,6 +23,24 @@ module ActsAsTaggableOn
       concat(names)
       clean!
       self
+    end
+
+    # Append---Add the tag to the tag_list. This
+    # expression returns the tag_list itself, so several appends
+    # may be chained together.
+    def <<(obj)
+      add(obj)
+    end
+
+    # Concatenation --- Returns a new tag list built by concatenating the
+    # two tag lists together to produce a third tag list.
+    def +(other_tag_list)
+      TagList.new.add(self).add(other_tag_list)
+    end
+
+    # Appends the elements of +other_tag_list+ to +self+.
+    def concat(other_tag_list)
+      super(other_tag_list).send(:clean!)
     end
 
     ##
@@ -70,32 +69,48 @@ module ActsAsTaggableOn
 
       tags.map do |name|
         d = ActsAsTaggableOn.delimiter
-        d = Regexp.new d.join("|") if d.kind_of? Array
+        d = Regexp.new d.join('|') if d.kind_of? Array
         name.index(d) ? "\"#{name}\"" : name
       end.join(ActsAsTaggableOn.glue)
     end
 
     private
 
-    # Remove whitespace, duplicates, and blanks.
+    # Convert everything to string, remove whitespace, duplicates, and blanks.
     def clean!
       reject!(&:blank?)
+      map!(&:to_s)
       map!(&:strip)
-      map!{ |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
+      map! { |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
       uniq!
     end
 
+
     def extract_and_apply_options!(args)
       options = args.last.is_a?(Hash) ? args.pop : {}
-      options.assert_valid_keys :parse
+      options.assert_valid_keys :parse, :parser
 
-      if options[:parse]
-        args.map! { |a| self.class.from(a) }
-      end
+      parser = options[:parser] ? options[:parser] : @parser
+
+      args.map! { |a| parser.new(a).parse } if options[:parse] || options[:parser]
 
       args.flatten!
     end
+
+
+    ## DEPRECATED
+    def self.from(string)
+      ActiveRecord::Base.logger.warn <<WARNING
+ActsAsTaggableOn::TagList.from is deprecated \
+and will be removed from v4.0+, use  \
+ActsAsTaggableOn::DefaultParser.new instead
+WARNING
+      @parser.new(string).parse
+    end
+
+
   end
 end
+

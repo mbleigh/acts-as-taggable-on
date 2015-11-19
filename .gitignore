@@ -3,9 +3,11 @@
 /pkg/*
 .bundle
 .ruby-version
-spec/database.yml
+spec/internal/config/database.yml
 tmp*.sw?
 *.sw?
 tmp
 *.gem
 *.lock
+
+/.idea
