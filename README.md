@@ -331,13 +331,41 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations, :skip_save => true) #won't save @some_photo object
 ```
 
+#### Working with Owned Tags
 Note that `tag_list` only returns tags whose taggings do not have an owner. Continuing from the above example:
-
 ```ruby
 @some_photo.tag_list # => []
 ```
+To retrieve all tags of an object (regardless of ownership) or if only one owner can tag the object, use `all_tags_list`.
 
-To retrieve all tags of an object (regardless of ownership) or if only one owner can tag the object, use `all_tags_list`. 
+##### Adding owned tags
+Note that **owned tags** are added all at once, in the form of ***comma seperated tags*** in string.
+Also, when you try to add **owned tags** again, it simply overwrites the previous set of **owned tags**.
+So to append tags in previously existing **owned tags** list, go as follows:
+```ruby
+def add_owned_tag 
+    @some_item = Item.find(params[:id])
+    owned_tag_list = @some_item.all_tag_list - @some_item.tag_list
+    owned_tag_list += [(params[:tag])]
+    @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
+    @some_item.save   
+end
+
+def stringify(tag_list)
+    tag_list.inject('') { |memo, tag| memo += (tag + ',') }[0..-1]
+end
+```
+##### Removing owned tags
+Similarly as above, removing will be as follows:
+```ruby
+def remove_owned_tag 
+    @some_item = Item.find(params[:id])
+    owned_tag_list = @some_item.all_tag_list - @some_item.tag_list
+    owned_tag_list -= [(params[:tag])]
+    @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
+    @some_item.save   
+end
+```
 
 ### Dirty objects
 
