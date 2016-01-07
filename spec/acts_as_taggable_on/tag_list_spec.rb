@@ -114,6 +114,20 @@ describe ActsAsTaggableOn::TagList do
 
       ActsAsTaggableOn.force_lowercase = false
     end
+
+    it 'should ignore case when removing duplicates if strict_case_match is false' do
+      tag_list = ActsAsTaggableOn::TagList.new('Junglist', 'JUNGLIST', 'Junglist', 'Massive', 'MASSIVE', 'MASSIVE')
+
+      expect(tag_list.to_s).to eq('Junglist, Massive')
+    end
+
+    it 'should not ignore case when removing duplicates if strict_case_match is true' do
+      ActsAsTaggableOn.strict_case_match = true
+      tag_list = ActsAsTaggableOn::TagList.new('Junglist', 'JUNGLIST', 'Junglist', 'Massive', 'MASSIVE', 'MASSIVE')
+
+      expect(tag_list.to_s).to eq('Junglist, JUNGLIST, Massive, MASSIVE')
+      ActsAsTaggableOn.strict_case_match = false
+    end
   end
 
   describe 'custom parser' do
