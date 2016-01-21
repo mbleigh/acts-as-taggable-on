@@ -187,6 +187,18 @@ describe 'Acts As Taggable On' do
       taggable = TaggableModel.where(name: 'Dynamic Taggable').first
       expect(taggable.tagging_contexts).to eq(%w(tags languages skills needs offerings array colors))
     end
+
+    it "will not mark dynamic contexts as Dirty" do
+      taggable = TaggableModel.create!(name: 'Dynamic Taggable')
+      expect(taggable).not_to receive(:process_dirty_object)
+      taggable.set_tag_list_on :colors, 'tag1, tag2, tag3'
+    end
+
+    it "will mark object as dirty when context has been defined" do
+      taggable = TaggableModel.create!(name: 'Dynamic Taggable')
+      expect(taggable).to receive(:process_dirty_object)
+      taggable.set_tag_list_on :needs, 'tag1, tag2, tag3'
+    end
   end
 
   context 'when tagging context ends in an "s" when singular (ex. "status", "glass", etc.)' do
