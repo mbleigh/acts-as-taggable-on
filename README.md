@@ -273,7 +273,7 @@ User.tagged_with("same", :on => :customs) # => [@user]
 
 ### Tag Parsers
 
-If you want to change how tags are parsed, you can define a your own implementation:
+If you want to change how tags are parsed, you can define your own implementation:
 
 ```ruby
 class MyParser < ActsAsTaggableOn::GenericParser
