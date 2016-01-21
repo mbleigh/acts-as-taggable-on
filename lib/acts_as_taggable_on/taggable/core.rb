@@ -333,9 +333,11 @@ module ActsAsTaggableOn::Taggable
 
     def set_tag_list_on(context, new_list)
       add_custom_context(context)
-
       variable_name = "@#{context.to_s.singularize}_list"
-      process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
+
+      # Dirty objects require that there be an attribute defined. When using a Custom Context (spec/acts_as_taggable_on/taggable_spec.rb:466)
+      # this attribute is not defined. Set the record as Dirty on the original (defined) tag_types versus using Core#custom_contexts
+      process_dirty_object(context, new_list) if context.to_s.in?(tag_types.map(&:to_s))
 
       instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(new_list).parse)
     end

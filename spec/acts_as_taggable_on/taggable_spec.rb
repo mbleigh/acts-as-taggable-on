@@ -468,8 +468,19 @@ describe 'Taggable' do
     bob.set_tag_list_on(:rotors, 'spinning, jumping')
     expect(bob.tag_list_on(:rotors)).to eq(%w(spinning jumping))
     bob.save
-
     expect(TaggableModel.tagged_with('spinning', on: :rotors).to_a).to eq([bob])
+  end
+
+  it "should be able to call set_tag_list_on multiple times on a custom tag context" do
+    bob = TaggableModel.create(name: 'Bob')
+    bob.set_tag_list_on(:rotors, 'spinning, jumping')
+    expect(bob.tag_list_on(:rotors)).to eq(%w(spinning jumping))
+    bob.save
+    expect(TaggableModel.tagged_with('spinning', on: :rotors).to_a).to eq([bob])
+
+    bob.set_tag_list_on(:rotors, 'spinning, jumping, climbing')
+    bob.save
+    expect(TaggableModel.tagged_with('climbing', on: :rotors).to_a).to eq([bob])
   end
 
   it 'should be able to use named scopes to chain tag finds' do
