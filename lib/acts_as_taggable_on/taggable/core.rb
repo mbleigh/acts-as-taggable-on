@@ -262,7 +262,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def custom_contexts
-      @custom_contexts ||= taggings.map(&:context).uniq
+      @custom_contexts ||= (taggings.map(&:context).uniq - self.class.tag_types.map(&:to_s))
     end
 
     def is_taggable?
@@ -270,7 +270,8 @@ module ActsAsTaggableOn::Taggable
     end
 
     def add_custom_context(value)
-      custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
+      context = value.to_s.pluralize
+      custom_contexts << context unless custom_contexts.include?(context) or self.class.tag_types.map(&:to_s).include?(context)
     end
 
     def cached_tag_list_on(context)
@@ -310,7 +311,7 @@ module ActsAsTaggableOn::Taggable
     def all_tags_on(context)
       tagging_table_name = ActsAsTaggableOn::Tagging.table_name
 
-      opts = ["#{tagging_table_name}.context = ?", context.to_s]
+      opts = ["#{tagging_table_name}.context = ?", context.to_s.pluralize]
       scope = base_tags.where(opts)
 
       if ActsAsTaggableOn::Utils.using_postgresql?

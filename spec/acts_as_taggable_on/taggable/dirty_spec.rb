@@ -80,7 +80,8 @@ describe ActsAsTaggableOn::Taggable::Dirty do
 
   context 'with context tags' do
     before(:each) do
-      @taggable = TaggableModel.create('language_list' => 'awesome, epic')
+      taggable = TaggableModel.create('language_list' => 'awesome, epic')
+      @taggable = TaggableModel.find(taggable.id)
     end
 
     context 'when language_list changed' do

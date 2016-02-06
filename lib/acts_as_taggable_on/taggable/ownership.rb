@@ -46,7 +46,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def cached_owned_tag_list_on(context)
-      variable_name = "@owned_#{context}_list"
+      variable_name = "@owned_#{context.to_s.singularize}_list"
       (instance_variable_defined?(variable_name) && instance_variable_get(variable_name)) || instance_variable_set(variable_name, {})
     end
 
