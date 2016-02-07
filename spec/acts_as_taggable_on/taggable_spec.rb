@@ -226,8 +226,10 @@ describe 'Taggable' do
   it "should be able to find a tag using dates" do
     @taggable.skill_list = "ruby"
     @taggable.save
+    today = Date.today.to_time.utc
+    tomorrow = Date.tomorrow.to_time.utc
 
-    expect(TaggableModel.tagged_with("ruby", :start_at => Date.today, :end_at => Date.tomorrow).count).to eq(1)
+    expect(TaggableModel.tagged_with("ruby", :start_at => today, :end_at => tomorrow).count).to eq(1)
   end
 
     it "shouldn't be able to find a tag outside date range" do
