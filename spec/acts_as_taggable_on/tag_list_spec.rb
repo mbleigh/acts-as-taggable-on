@@ -83,6 +83,18 @@ describe ActsAsTaggableOn::TagList do
       new_tag_list = tag_list.concat(another_tag_list)
       expect(new_tag_list.class).to eq(ActsAsTaggableOn::TagList)
     end
+
+    context 'without duplicates' do
+      let(:arr) { ['crazy', 'alien'] }
+      let(:another_tag_list) { ActsAsTaggableOn::TagList.new(*arr) }
+      it 'adds other list' do
+        expect(tag_list.concat(another_tag_list)).to eq(%w[awesome radical crazy alien])
+      end
+
+      it 'adds other array' do
+        expect(tag_list.concat(arr)).to eq(%w[awesome radical crazy alien])
+      end
+    end
   end
 
   describe '#to_s' do
