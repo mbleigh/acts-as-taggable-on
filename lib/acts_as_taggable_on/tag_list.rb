@@ -41,6 +41,7 @@ module ActsAsTaggableOn
     # Appends the elements of +other_tag_list+ to +self+.
     def concat(other_tag_list)
       super(other_tag_list).send(:clean!)
+      self
     end
 
     ##
