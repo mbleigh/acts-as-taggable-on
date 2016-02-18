@@ -49,37 +49,42 @@ describe ActsAsTaggableOn::Tagging do
     ActsAsTaggableOn.remove_unused_tags = previous_setting
   end
 
-  describe '.owned_by' do
+  describe 'context scopes' do
     before do
       @tagging_2 = ActsAsTaggableOn::Tagging.new
-      @tagger = ActsAsTaggableOn::Tagger.new
-      @tagger_2 = ActsAsTaggableOn::Tagger.new
-    end
 
-    it "should belong to a specific user" do
+      @tagger = User.new
+      @tagger_2 = User.new
+
       @tagging.taggable = TaggableModel.create(name: "Black holes")
-      @tagging.tag = ActsAsTaggableOn::Tag.new("Physics")
+      @tagging.tag = ActsAsTaggableOn::Tag.create(name: "Physics")
       @tagging.tagger = @tagger
       @tagging.context = 'Science'
+      @tagging.save
 
       @tagging_2.taggable = TaggableModel.create(name: "Satellites")
-
-      @tagging_2.tag = ActsAsTaggableOn::Tag.new("Astronomy")
-      @tagging_2.tag = ActsAsTaggableOn::Tag.new("Physics")
+      @tagging_2.tag = ActsAsTaggableOn::Tag.create(name: "Technology")
       @tagging_2.tagger = @tagger_2
       @tagging_2.context = 'Science'
-
-      expect(@tagging.owned_by).to eq(@tagger)
-      expect(@tagging_2.owned_by).to eq(@tagger_2)
+      @tagging_2.save
     end
 
+    describe '.owned_by' do
+      it "should belong to a specific user" do
+        expect(@tagging).to be_valid
+        expect(@tagging_2).to be_valid
+
+        expect(ActsAsTaggableOn::Tagging.owned_by(@tagger).first).to eq(@tagging)
+        expect(ActsAsTaggableOn::Tagging.owned_by(@tagger_2).first).to eq(@tagging_2)
+      end
+    end
   end
 
   pending 'context scopes' do
+
     describe '.by_context'
 
     describe '.by_contexts'
-
 
     describe '.not_owned'
 
