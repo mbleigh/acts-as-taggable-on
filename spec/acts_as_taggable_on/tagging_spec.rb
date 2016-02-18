@@ -52,6 +52,7 @@ describe ActsAsTaggableOn::Tagging do
   describe 'context scopes' do
     before do
       @tagging_2 = ActsAsTaggableOn::Tagging.new
+      @tagging_3 = ActsAsTaggableOn::Tagging.new
 
       @tagger = User.new
       @tagger_2 = User.new
@@ -67,6 +68,13 @@ describe ActsAsTaggableOn::Tagging do
       @tagging_2.tagger = @tagger_2
       @tagging_2.context = 'Science'
       @tagging_2.save
+
+      @tagging_3.taggable = TaggableModel.create(name: "Satellites")
+      @tagging_3.tag = ActsAsTaggableOn::Tag.create(name: "Engineering")
+      @tagging_3.tagger = @tagger_2
+      @tagging_3.context = 'Astronomy'
+      @tagging_3.save
+
     end
 
     describe '.owned_by' do
@@ -84,15 +92,20 @@ describe ActsAsTaggableOn::Tagging do
         expect(ActsAsTaggableOn::Tagging.by_context('Science').length).to eq(2);
       end
     end
+
+    describe '.by_contexts' do
+      it "should find taggings by contexts" do
+        expect(@tagging_3).to be_valid
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).first).to eq(@tagging);
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).second).to eq(@tagging_2);
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).third).to eq(@tagging_3);
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).length).to eq(3);
+      end
+    end
   end
 
   pending 'context scopes' do
-
-
-    describe '.by_contexts'
-
     describe '.not_owned'
-
   end
 
 end
