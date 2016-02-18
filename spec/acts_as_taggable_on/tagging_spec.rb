@@ -78,11 +78,16 @@ describe ActsAsTaggableOn::Tagging do
         expect(ActsAsTaggableOn::Tagging.owned_by(@tagger_2).first).to eq(@tagging_2)
       end
     end
+
+    describe '.by_context' do
+      it "should be found by context" do
+        expect(ActsAsTaggableOn::Tagging.by_context('Science').length).to eq(2);
+      end
+    end
   end
 
   pending 'context scopes' do
 
-    describe '.by_context'
 
     describe '.by_contexts'
 
