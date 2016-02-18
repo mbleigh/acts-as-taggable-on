@@ -102,10 +102,21 @@ describe ActsAsTaggableOn::Tagging do
         expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).length).to eq(3);
       end
     end
-  end
 
-  pending 'context scopes' do
-    describe '.not_owned'
-  end
+    describe '.not_owned' do
+      before do
+        @tagging_4 = ActsAsTaggableOn::Tagging.new
+        @tagging_4.taggable = TaggableModel.create(name: "Gravity")
+        @tagging_4.tag = ActsAsTaggableOn::Tag.create(name: "Space")
+        @tagging_4.context = "Science"
+        @tagging_4.save
+      end
 
+      it "should found the taggings that do not have owner" do
+        expect(ActsAsTaggableOn::Tagging.all.length).to eq(4)
+        expect(ActsAsTaggableOn::Tagging.not_owned.length).to eq(1)
+        expect(ActsAsTaggableOn::Tagging.not_owned.first).to eq(@tagging_4)
+      end
+    end
+  end
 end
