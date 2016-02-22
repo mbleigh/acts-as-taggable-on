@@ -7,6 +7,12 @@ class TaggableModel < ActiveRecord::Base
 
   attr_reader :tag_list_submethod_called
 
+  class << self
+    attr_accessor :default_ordering
+  end
+
+  @default_ordering = "#{ActsAsTaggableOn::Tagging.table_name}.id"
+
   def tag_list=(v)
     @tag_list_submethod_called = true
     super
@@ -75,6 +81,12 @@ end
 class OrderedTaggableModel < ActiveRecord::Base
   acts_as_ordered_taggable
   acts_as_ordered_taggable_on :colours
+
+  class << self
+    attr_accessor :default_ordering
+  end
+
+  @default_ordering = "#{ActsAsTaggableOn::Tagging.table_name}.id"
 end
 
 if using_postgresql?
