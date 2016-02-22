@@ -175,6 +175,15 @@ describe 'Single Table Inheritance' do
       expect(taggable.owner_tags_on(student, :tags).count).to eq(2)
     end
 
+    it "returns owner tags on the tagger ordered by the default ordering in which the tags were created" do
+      student.tag(taggable, with: 'ruby, python, java', on: :languages)
+
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.count).to eq(3)
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.first.name).to eq("ruby")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.second.name).to eq("python")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.third.name).to eq("java")
+    end
+
     it 'should scope objects returned by tagged_with by owners' do
       student.tag(taggable, with: 'ruby, scheme', on: :tags)
       expect(TaggableModel.tagged_with(%w(ruby scheme), owned_by: student).count).to eq(1)
