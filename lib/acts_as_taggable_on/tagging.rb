@@ -28,6 +28,12 @@ module ActsAsTaggableOn
 
     after_destroy :remove_unused_tags
 
+    def self.recently_used_tags
+      taggings_ordered_by_id = self.order("#{ActsAsTaggableOn::Tagging.table_name}.id desc")
+      tags_ids = taggings_ordered_by_id.joins(:tag).pluck("#{ActsAsTaggableOn::Tag.table_name}.id").uniq
+      ActsAsTaggableOn::Tag.find(tags_ids).index_by(&:id).slice(*tags_ids).values
+    end
+
     private
 
     def remove_unused_tags
