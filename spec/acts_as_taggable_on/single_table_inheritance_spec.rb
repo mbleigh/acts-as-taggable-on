@@ -210,6 +210,17 @@ describe 'Single Table Inheritance' do
       expect(taggable.owner_tags_on(student, :languages).default_ordering.third.taggings_count).to eq(1)
     end
 
+     it "return the most recent used tags of all the taggings created by a tagger" do
+      student.tag(taggable, with: 'ruby, java, python', on: :languages)
+      student.tag(taggable, with: 'ruby, python', on: :technologies)
+      student.tag(taggable, with: 'ruby', on: :object_oriented)
+      student.tag(taggable, with: 'java', on: :servers)
+
+      expect(student.owned_taggings.recently_used_tags.first.name).to eq("java")
+      expect(student.owned_taggings.recently_used_tags.second.name).to eq("ruby")
+      expect(student.owned_taggings.recently_used_tags.third.name).to eq("python")
+    end
+
     it 'should scope objects returned by tagged_with by owners' do
       student.tag(taggable, with: 'ruby, scheme', on: :tags)
       expect(TaggableModel.tagged_with(%w(ruby scheme), owned_by: student).count).to eq(1)
