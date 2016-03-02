@@ -39,7 +39,7 @@ module ActsAsTaggableOn::Taggable
       # when preserving tag order, return tags in created order
       # if we added the order to the association this would always apply
       if self.class.preserve_tag_order?
-        scope.order(self.class.default_ordering)
+        scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id")
       else
         scope
       end
