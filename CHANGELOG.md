@@ -8,8 +8,6 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 
   * Fixes
    * [@rikettsie Fixed collation for MySql via rake rule or config parameter](https://github.com/mbleigh/acts-as-taggable-on/pull/634)
-  *Misc
-   * [@pcupueran Add rspec test for tagging_spec]()
 
   *Features
    * [@pcupueran Allow to set the default ordering to order tags]()
