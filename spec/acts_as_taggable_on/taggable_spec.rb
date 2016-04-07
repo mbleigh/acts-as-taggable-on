@@ -119,6 +119,21 @@ describe 'Taggable' do
     expect(@taggable.tag_counts_on(:tags).length).to eq(2)
   end
 
+  context 'tag_counts on a collection' do
+    context 'a select clause is specified on the collection' do
+      it 'should return tag counts without raising an error' do
+        expect(TaggableModel.tag_counts_on(:tags)).to be_empty
+
+        @taggable.tag_list = %w(awesome epic)
+        @taggable.save
+
+        expect {
+          expect(TaggableModel.select(:name).tag_counts_on(:tags).length).to eq(2)
+        }.not_to raise_error
+      end
+    end
+  end
+
   it 'should have tags_on' do
     expect(TaggableModel.tags_on(:tags)).to be_empty
 
