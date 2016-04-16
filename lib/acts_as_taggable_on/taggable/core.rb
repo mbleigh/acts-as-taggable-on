@@ -415,7 +415,7 @@ module ActsAsTaggableOn::Taggable
 
         # Destroy old taggings:
         if old_tags.present?
-          taggings.not_owned.by_context(context).destroy_all(tag_id: old_tags)
+          taggings.not_owned.by_context(context).where(tag_id: old_tags).destroy_all
         end
 
         # Create new taggings:
