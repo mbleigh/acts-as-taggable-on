@@ -59,7 +59,7 @@ module ActsAsTaggableOn
   class Configuration
     attr_accessor :force_lowercase, :force_parameterize,
                   :remove_unused_tags, :default_parser,
-                  :tags_counter
+                  :tags_counter, :preserve_tags_on_destroy
     attr_reader :delimiter, :strict_case_match
 
     def initialize
@@ -68,6 +68,7 @@ module ActsAsTaggableOn
       @force_parameterize = false
       @strict_case_match = false
       @remove_unused_tags = false
+      @preserve_tags_on_destroy = false
       @tags_counter = true
       @default_parser = DefaultParser
       @force_binary_collation = false
