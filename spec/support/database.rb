@@ -13,13 +13,7 @@ if File.exist?(database_yml)
   config = ActiveRecord::Base.configurations[db_name]
 
   begin
-    #activerecord 4 uses symbol
-    #TODO, remove when activerecord 3 support is dropped
-    if ActsAsTaggableOn::Utils.active_record4? || ActsAsTaggableOn::Utils.active_record5?
-      ActiveRecord::Base.establish_connection(db_name.to_sym)
-    else
-      ActiveRecord::Base.establish_connection(db_name)
-    end
+    ActiveRecord::Base.establish_connection(db_name.to_sym)
     ActiveRecord::Base.connection
   rescue
     case db_name
