@@ -104,7 +104,7 @@ WARNING
         coll = 'utf8_general_ci'
         coll = 'utf8_bin' if bincoll
         begin
-          ActiveRecord::Migration.execute("ALTER TABLE tags MODIFY name varchar(255) CHARACTER SET utf8 COLLATE #{coll};")
+          ActiveRecord::Migration.execute("ALTER TABLE #{Tag.table_name} MODIFY name varchar(255) CHARACTER SET utf8 COLLATE #{coll};")
         rescue Exception => e
           puts "Trapping #{e.class}: collation parameter ignored while migrating for the first time."
         end
