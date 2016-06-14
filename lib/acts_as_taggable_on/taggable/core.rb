@@ -23,18 +23,21 @@ module ActsAsTaggableOn::Taggable
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
-            has_many_with_taggable_compatibility context_taggings, as: :taggable,
-                                                 dependent: :destroy,
-                                                 class_name: 'ActsAsTaggableOn::Tagging',
-                                                 order: taggings_order,
-                                                 conditions: {context: tags_type},
-                                                 include: :tag
+            options = {as: :taggable,
+                       class_name: 'ActsAsTaggableOn::Tagging',
+                       order: taggings_order,
+                       conditions: {context: tags_type},
+                       include: :tag}
+            unless ActsAsTaggableOn.preserve_tags_on_destroy
+              options[:dependent] = :destroy
+            end
+
+            has_many_with_taggable_compatibility context_taggings, options
 
             has_many_with_taggable_compatibility context_tags, through: context_taggings,
                                                  source: :tag,
                                                  class_name: 'ActsAsTaggableOn::Tag',
                                                  order: taggings_order
-
           end
 
           taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
