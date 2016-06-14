@@ -1,7 +1,3 @@
-appraise "activerecord-3.2" do
-  gem "activerecord", github: "rails/rails" , branch: '3-2-stable'
-end
-
 appraise "activerecord-4.0" do
   gem "activerecord", github: "rails/rails" , branch: '4-0-stable'
 end

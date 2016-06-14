@@ -1,11 +1,7 @@
 module ActsAsTaggableOn::Compatibility
   def has_many_with_taggable_compatibility(name, options = {}, &extention)
-    if ActsAsTaggableOn::Utils.active_record4? || ActsAsTaggableOn::Utils.active_record5?
-      scope, opts = build_taggable_scope_and_options(options)
-      has_many(name, scope, opts, &extention)
-    else
-      has_many(name, options, &extention)
-    end
+    scope, opts = build_taggable_scope_and_options(options)
+    has_many(name, scope, opts, &extention)
   end
 
   def build_taggable_scope_and_options(opts)

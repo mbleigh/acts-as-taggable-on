@@ -745,7 +745,6 @@ describe 'Taggable' do
 
     context 'Model.limit(x).tag_counts.sum(:tags_count)' do
       it 'should not break on Mysql' do
-        # Activerecord 3.2 return a string
         expect(TaggableModel.limit(2).tag_counts.sum('tags_count').to_i).to eq(5)
       end
     end
