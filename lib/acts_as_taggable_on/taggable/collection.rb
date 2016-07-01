@@ -138,7 +138,7 @@ module ActsAsTaggableOn::Taggable
           scoped_ids = pluck(table_name_pkey)
           tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN (?)", scoped_ids)
         else
-          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(table_name_pkey))})")
+          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(except(:select).select(table_name_pkey))})")
         end
 
         tagging_scope
