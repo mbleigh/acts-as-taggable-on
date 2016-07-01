@@ -1,10 +1,10 @@
 language: ruby
 
 rvm:
-  - 2.1
+  - 2.3.1
   - 2.2
+  - 2.1
   - 2.0.0
-  - 1.9.3
   - rbx-2
 
 env:
@@ -31,10 +31,6 @@ matrix:
   exclude:
       - rvm: 2.2
         gemfile: gemfiles/activerecord_3.2.gemfile
-      - rvm: 1.9.3
-        gemfile: gemfiles/activerecord_4.0.gemfile
-      - rvm: 1.9.3
-        gemfile: gemfiles/activerecord_4.1.gemfile
       - rvm: rbx-2
         gemfile: gemfiles/activerecord_3.2.gemfile
 
