@@ -15,6 +15,7 @@ env:
 gemfile:
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_5.0.gemfile
 
 sudo: false
 
