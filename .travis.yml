@@ -2,7 +2,7 @@ language: ruby
 
 rvm:
   - 2.3.1
-  - 2.2
+  - 2.2.5
   - 2.1
   - 2.0.0
   - rbx-2
@@ -28,3 +28,10 @@ matrix:
   allow_failures:
       - gemfile: gemfiles/activerecord_edge.gemfile
       - rvm: rbx-2
+  exclude:
+    - rvm: 2.1
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: rbx-2
+      gemfile: gemfiles/activerecord_5.0.gemfile
