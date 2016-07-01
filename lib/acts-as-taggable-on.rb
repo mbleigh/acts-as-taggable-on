@@ -117,7 +117,6 @@ WARNING
 end
 
 ActiveSupport.on_load(:active_record) do
-  extend ActsAsTaggableOn::Compatibility
   extend ActsAsTaggableOn::Taggable
   include ActsAsTaggableOn::Tagger
 end

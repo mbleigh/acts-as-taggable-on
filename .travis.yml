@@ -13,7 +13,6 @@ env:
   - DB=postgresql
 
 gemfile:
-  - gemfiles/activerecord_3.2.gemfile
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
 
@@ -28,9 +27,3 @@ matrix:
   allow_failures:
       - gemfile: gemfiles/activerecord_edge.gemfile
       - rvm: rbx-2
-  exclude:
-      - rvm: 2.2
-        gemfile: gemfiles/activerecord_3.2.gemfile
-      - rvm: rbx-2
-        gemfile: gemfiles/activerecord_3.2.gemfile
-
