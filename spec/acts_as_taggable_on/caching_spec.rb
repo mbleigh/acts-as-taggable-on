@@ -77,6 +77,28 @@ describe 'Acts As Taggable On' do
     end
   end
 
+  describe 'with a custom delimiter' do
+    before(:each) do
+      @taggable = CachedModel.new(name: 'Bob Jones')
+      @another_taggable = OtherCachedModel.new(name: 'John Smith')
+      ActsAsTaggableOn.delimiter = ';'
+    end
+
+    after(:all) do
+      ActsAsTaggableOn.delimiter = ','
+    end
+
+    it 'should cache tags with custom delimiter' do
+      @taggable.update_attributes(tag_list: 'awesome; epic')
+      expect(@taggable.tag_list).to eq(['awesome', 'epic'])
+      expect(@taggable.cached_tag_list).to eq('awesome; epic')
+
+      @taggable = CachedModel.find_by_name('Bob Jones')
+      expect(@taggable.tag_list).to eq(['awesome', 'epic'])
+      expect(@taggable.cached_tag_list).to eq('awesome; epic')
+    end
+  end
+
   describe 'CachingWithArray' do
     pending '#TODO'
   end
