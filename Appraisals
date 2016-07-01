@@ -1,16 +1,15 @@
-appraise "activerecord-4.0" do
-  gem "activerecord", github: "rails/rails" , branch: '4-0-stable'
-end
-
-appraise "activerecord-4.1" do
-  gem "activerecord", github: "rails/rails" , branch: '4-1-stable'
+appraise 'activerecord-5.0' do
+  gem 'activerecord', "~> 5.0.0"
 end
 
 appraise "activerecord-4.2" do
-  gem "railties", github: "rails/rails" , branch: '4-2-stable'
-  gem "activerecord", github: "rails/rails"  , branch: '4-2-stable'
+  gem "activerecord", "~> 4.2.0"
 end
 
-appraise 'activerecord-5.0' do
-  gem 'activerecord', "~> 5.0.0"
+appraise "activerecord-4.0" do
+  gem "activerecord", "~> 4.0.0"
+end
+
+appraise "activerecord-4.1" do
+  gem "activerecord", "~> 4.1.0"
 end

@@ -13,9 +13,10 @@ env:
   - DB=postgresql
 
 gemfile:
-  - gemfiles/activerecord_4.0.gemfile
-  - gemfiles/activerecord_4.1.gemfile
   - gemfiles/activerecord_5.0.gemfile
+  - gemfiles/activerecord_4.2.gemfile
+  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_4.0.gemfile
 
 sudo: false
 
@@ -25,6 +26,3 @@ script: bundle exec rake
 
 matrix:
   fast_finish: true
-  allow_failures:
-      - gemfile: gemfiles/activerecord_edge.gemfile
-      - rvm: rbx-2
