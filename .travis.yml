@@ -22,6 +22,9 @@ sudo: false
 
 bundler_args: '--without local_development --jobs 3 --retry 3'
 
+before_install:
+   - gem install bundler
+
 script: bundle exec rake
 
 matrix:
