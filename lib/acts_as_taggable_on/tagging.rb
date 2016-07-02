@@ -7,8 +7,13 @@ module ActsAsTaggableOn
     scope :owned_by, ->(owner) { where(tagger: owner) }
     scope :not_owned, -> { where(tagger_id: nil, tagger_type: nil) }
 
-    scope :by_contexts, ->(contexts = ['tags']) { where(context: contexts) }
     scope :by_context, ->(context= 'tags') { by_contexts(context.to_s) }
+
+    # FIXME: scope with array as argument fails on Rails 5.0.0
+    # https://github.com/rails/rails/issues/25654
+    def self.by_contexts(contexts = ['tags'])
+      where(context: contexts)
+    end
 
     validates_presence_of :context
     validates_presence_of :tag_id
