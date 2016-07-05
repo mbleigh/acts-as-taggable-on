@@ -62,7 +62,7 @@ describe ActsAsTaggableOn::Tag do
     end
 
     it 'should return tags that have been used in the given context' do
-      expect(ActsAsTaggableOn::Tag.for_context('skills').all.map(&:name)).to include('ruby')
+      expect(ActsAsTaggableOn::Tag.for_context('skills').pluck(:name)).to include('ruby')
     end
 
     it 'should not return tags that have been used in other contexts' do

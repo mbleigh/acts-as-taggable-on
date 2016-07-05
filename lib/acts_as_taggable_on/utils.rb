@@ -13,16 +13,11 @@ module ActsAsTaggableOn
       end
 
       def using_mysql?
-        #We should probably use regex for mysql to support prehistoric adapters
         connection && connection.adapter_name == 'Mysql2'
       end
 
       def sha_prefix(string)
         Digest::SHA1.hexdigest(string)[0..6]
-      end
-
-      def active_record4?
-        ::ActiveRecord::VERSION::MAJOR == 4
       end
 
       def active_record5?
