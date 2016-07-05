@@ -7,7 +7,7 @@ module ActsAsTaggableOn
     scope :owned_by, ->(owner) { where(tagger: owner) }
     scope :not_owned, -> { where(tagger_id: nil, tagger_type: nil) }
 
-    scope :by_contexts, ->(*contexts) { where(context: (contexts || 'tags')) }
+    scope :by_contexts, ->(contexts) { where(context: (contexts || 'tags')) }
     scope :by_context, ->(context = 'tags') { by_contexts(context.to_s) }
 
     validates_presence_of :context

@@ -66,7 +66,7 @@ describe ActsAsTaggableOn::Tag do
     end
 
     it 'should not return tags that have been used in other contexts' do
-      expect(ActsAsTaggableOn::Tag.for_context('needs').all.map(&:name)).to_not include('ruby')
+      expect(ActsAsTaggableOn::Tag.for_context('needs').pluck(:name)).to_not include('ruby')
     end
   end
 
