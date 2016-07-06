@@ -1,6 +1,6 @@
 class AddMissingIndexes < ActiveRecord::Migration
   def change
-    add_index :taggings, :tag_id
+    add_index :taggings, :tag_id unless index_exists?(:taggings, :tag_id)
     add_index :taggings, :taggable_id
     add_index :taggings, :taggable_type
     add_index :taggings, :tagger_id

@@ -2,17 +2,14 @@
 
 source "https://rubygems.org"
 
-# You can change the gem to your local path with `gem 'arel', path: 'local_gem_path'`
-gem 'arel', github: "rails/arel" , branch: 'master'
-gem "railties", github: "rails/rails" , branch: 'master'
-gem "activerecord", github: "rails/rails" , branch: 'master'
+gem "activerecord", "~> 5.0.0"
 
 group :local_development do
   gem "guard"
   gem "guard-rspec"
   gem "appraisal"
   gem "rake"
-  gem "byebug", :platform => :mri_22
+  gem "byebug", :platform => :mri_21
 end
 
 gemspec :path => "../"
