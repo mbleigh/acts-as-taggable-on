@@ -397,7 +397,6 @@ describe 'Taggable' do
     # Test specific join syntaxes:
     frank.untaggable_models.create!
     expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tag_counts.size).to eq(2)
-    expect(TaggableModel.tagged_with('rails').joins(untaggable_models: :taggable_model).all_tag_counts.size).to eq(2)
     expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tag_counts.size).to eq(2)
   end
 
@@ -412,7 +411,6 @@ describe 'Taggable' do
     # Test specific join syntaxes:
     frank.untaggable_models.create!
     expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tags.size).to eq(2)
-    expect(TaggableModel.tagged_with('rails').joins(untaggable_models: :taggable_model).all_tags.size).to eq(2)
     expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tags.size).to eq(2)
   end
 
