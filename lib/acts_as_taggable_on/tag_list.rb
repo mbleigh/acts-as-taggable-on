@@ -41,7 +41,6 @@ module ActsAsTaggableOn
     # Appends the elements of +other_tag_list+ to +self+.
     def concat(other_tag_list)
       super(other_tag_list).send(:clean!)
-      self
     end
 
     ##
@@ -86,6 +85,7 @@ module ActsAsTaggableOn
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
       ActsAsTaggableOn.strict_case_match ? uniq! : uniq!{ |tag| tag.downcase }
+      self
     end
 
 
