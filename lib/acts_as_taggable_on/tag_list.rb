@@ -85,6 +85,7 @@ module ActsAsTaggableOn
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
       ActsAsTaggableOn.strict_case_match ? uniq! : uniq!{ |tag| tag.downcase }
+      self
     end
 
 
@@ -98,18 +99,6 @@ module ActsAsTaggableOn
 
       args.flatten!
     end
-
-
-    ## DEPRECATED
-    def self.from(string)
-      ActiveRecord::Base.logger.warn <<WARNING
-ActsAsTaggableOn::TagList.from is deprecated \
-and will be removed from v4.0+, use  \
-ActsAsTaggableOn::DefaultParser.new instead
-WARNING
-      @parser.new(string).parse
-    end
-
 
   end
 end

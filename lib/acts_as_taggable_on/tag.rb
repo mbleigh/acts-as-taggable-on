@@ -2,8 +2,6 @@
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
 
-    attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
-
     ### ASSOCIATIONS:
 
     has_many :taggings, dependent: :destroy, class_name: '::ActsAsTaggableOn::Tagging'
