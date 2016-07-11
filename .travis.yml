@@ -28,4 +28,7 @@ before_install:
 script: bundle exec rake
 
 matrix:
+  exclude:
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
   fast_finish: true
