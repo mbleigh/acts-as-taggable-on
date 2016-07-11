@@ -1,11 +1,11 @@
 language: ruby
+cache: bundler
 
 rvm:
   - 2.3.1
-  - 2.2
+  - 2.2.5
   - 2.1
   - 2.0.0
-  - rbx-2
 
 env:
   - DB=sqlite3
@@ -30,5 +30,7 @@ script: bundle exec rake
 matrix:
   exclude:
     - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: 2.1
       gemfile: gemfiles/activerecord_5.0.gemfile
   fast_finish: true
