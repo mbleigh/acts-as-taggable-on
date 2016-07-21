@@ -49,7 +49,11 @@ module ActsAsTaggableOn::Taggable
     end
 
     def owner_tags_on(owner, context)
-      scope = owner_tags(owner).where([%(#{ActsAsTaggableOn::Tagging.table_name}.context = ?), context.to_s])      
+      scope = owner_tags(owner).where(
+        "#{ActsAsTaggableOn::Tagging.table_name}" => {
+          context: context
+        }
+      )
     end
 
     def cached_owned_tag_list_on(context)
