@@ -19,22 +19,14 @@ Enter Acts as Taggable On. Rather than tying functionality to a specific keyword
 tag "contexts" that can be used locally or in combination in the same way steroids
 was used.
 
-## Compatibility
 
-Versions 2.x are compatible with Ruby 1.8.7+ and Rails 3.
-
-Versions 2.4.1 and up are compatible with Rails 4 too (thanks to arabonradar and cwoodcox).
-
-Versions >= 3.x are compatible with Ruby 1.9.3+ and Rails 3 and 4.
-
-For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
 
 ## Installation
 
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 3.4'
+gem 'acts-as-taggable-on', '~> 4.0'
 ```
 
 and bundle:
@@ -50,8 +42,6 @@ Install migrations
 ```shell
 # For the latest versions :
 rake acts_as_taggable_on_engine:install:migrations
-# For versions 2.4.1 and earlier :
-rails generate acts_as_taggable_on:migration
 ```
 
 Review the generated migrations then migrate :
@@ -75,9 +65,6 @@ rake acts_as_taggable_on_engine:tag_names:collate_bin
 See the Configuration section for more details, and a general note valid for older
 version of the gem.
 
-#### Upgrading
-
-see [UPGRADING](UPGRADING.md)
 
 ## Usage
 
@@ -484,13 +471,25 @@ USE my_wonderful_app_db;
 ALTER TABLE tags MODIFY name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;
 ```
 
+#### Upgrading
+
+see [UPGRADING](UPGRADING.md)
+
 ## Contributors
 
 We have a long list of valued contributors. [Check them all](https://github.com/mbleigh/acts-as-taggable-on/contributors)
 
-## Maintainer
+## Compatibility
 
-* [Joost Baaij](https://github.com/tilsammans)
+Versions 2.x are compatible with Ruby 1.8.7+ and Rails 3.
+
+Versions 2.4.1 and up are compatible with Rails 4 too (thanks to arabonradar and cwoodcox).
+
+Versions >= 3.x are compatible with Ruby 1.9.3+ and Rails 3 and 4.
+
+Versions >= 4.x are compatible with Ruby 2.0.0+ and Rails 4 and 5.
+
+For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
 
 ## TODO
 
