@@ -11,6 +11,9 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   *Misc
    * [@pcupueran Add rspec test for tagging_spec completeness]()
 
+  *Features
+   * [@pcupueran Ruby >= 2.2.1p85, Recently_used_tags method to find the recently used tags](https://github.com/mbleigh/acts-as-taggable-on/issues/731)
+
 ### [3.4.4 / 2015-02-11](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.3...v3.4.4)
 
   * Fixes
