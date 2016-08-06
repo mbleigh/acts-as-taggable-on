@@ -11,6 +11,9 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   *Misc
    * [@pcupueran Add rspec test for tagging_spec completeness]()
 
+  *Features
+   * [@pcupueran Allow to set the default ordering to order tags]()
+
 ### [3.4.4 / 2015-02-11](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.3...v3.4.4)
 
   * Fixes
