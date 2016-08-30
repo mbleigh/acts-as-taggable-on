@@ -4,6 +4,55 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
+### [4.0.0 / 2016-08-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.5.0...v4.0.0)
+ * Fixes
+  * [@rikettsie #623 collation parameter is ignored if it generates an exception] (https://github.com/mbleigh/acts-as-taggable-on/pull/650 )
+  * [@bwvoss References working parser in deprectation warning] (https://github.com/mbleigh/acts-as-taggable-on/pull/659 )
+  * [@jh125486 Updated tagging_contexts to include dynamic contexts ](https://github.com/mbleigh/acts-as-taggable-on/pull/660 )
+  * [@jh125486 Fixed wildcard test (postgres returning rows with unexpected order)] (https://github.com/mbleigh/acts-as-taggable-on/pull/660 )
+  * [@FlowerWrong Add rails 5.0.0 alpha support, not hack rails <5](https://github.com/mbleigh/acts-as-taggable-on/pull/673 )
+  * [@ryanfox1985 Added missed indexes. ](https://github.com/mbleigh/acts-as-taggable-on/pull/682 )
+   * [@ zapnap scope tags to specific tagging ](https://github.com/mbleigh/acts-as-taggable-on/pull/697 )
+   * [@ amatsuda method redefined](https://github.com/mbleigh/acts-as-taggable-on/pull/715 )
+   * [@ klacointe Rails 5: Tagger is optional in Tagging relation](https://github.com/mbleigh/acts-as-taggable-on/pull/720 )
+   * [@ mark-jacobs Update clean! method to use case insensitive uniq! when strict_case_match false] (https://github.com/mbleigh/acts-as-taggable-on/commit/90c86994b70a399b8b1cbc0ae88835e14d6aadfc )
+   * [@ lukeasrodgers BugFix flackey time test ] (https://github.com/mbleigh/acts-as-taggable-on/pull/727)
+   * [@ pcupueran Add rspec tests for context scopes for tagging_spec ]( https://github.com/mbleigh/acts-as-taggable-on/pull/740)
+   * [@ Emerson Huitt Remove existing selects from relation ]( https://github.com/mbleigh/acts-as-taggable-on/pull/743)
+   * [@keerthisiv fix issue with custom delimiter]( https://github.com/mbleigh/acts-as-taggable-on/pull/748)
+   * [@krzysiek1507  drop support for Ruby < 2 ](https://github.com/mbleigh/acts-as-taggable-on/pull/758)
+   * [@krzysiek1507  drop support for Rails < 4 ](https://github.com/mbleigh/acts-as-taggable-on/pull/757)
+   * [@jessieay  Rails 5 ](https://github.com/mbleigh/acts-as-taggable-on/pull/763)
+   * [@priyank-gupta  specify tag table name for mysql collation query ](https://github.com/mbleigh/acts-as-taggable-on/pull/760)
+   * [@seuros Remove warning messages](https://github.com/mbleigh/acts-as-taggable-on/commit/cda08c764b07a18b8582b948d1c5b3910a3769  65)
+   * [@rbritom  Fix migration, #references already adds index ]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/95f743010954b6b738a6e8c17315112c878f7a81  )
+   * [@rbritom  Fix deprecation warning]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/62e4a6fa74ae3faed615683cd3ad5b5cdacf5c96 )
+   * [@rbritom  fix scope array arguments ]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/a415a8d6367b2e91bd7e363589135f953929b8cc )
+   * [@seuros Remove more deprecations  ]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/05794170f64f8bf250b34d2d594e368721009278)
+     * [@lukeasrodgers   Bugfix `TagList#concat` with non-duplicates. ]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/2c6214f0ddf8c6440ab81eec04d1fbf9d97c8826)
+   * [@seuros  clean! should return self. ]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/c739422f56f8ff37e3f321235e74997422a1c980)
+  * [@rbritom  renable appraisals ]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/0ca1f1c5b059699c683a28b522e86a3d5cd7639e)
+  * [@rbritom  remove index conditionally on up method. ]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/9cc580e7f88164634eb10c8826e5b30ea0e00544)
+   *[@rbritom add index on down method . ]
+  (https://github.com/mbleigh/acts-as-taggable-on/pull/767)
+  q* [@rbritom remove index conditionally on up method]
+  (https://github.com/mbleigh/acts-as-taggable-on/commit/9cc580e7f88164634eb10c8826e5b30ea0e00544)
+
+ * Documentation
+  * [@jamesprior  Changing ActsAsTaggable to ActsAsTaggableOn ](https://github.com/mbleigh/acts-as-taggable-on/pull/637)
+  * [@markgandolfo Update README.md](https://github.com/mbleigh/acts-as-taggable-on/pull/645))
+  * [@snowblink Update release date for 3.5.0](https://github.com/mbleigh/acts-as-taggable-on/pull/647)
+  * [@AlexVPopov Update README.md ](https://github.com/mbleigh/acts-as-taggable-on/pull/671)
+  * [@schnmudgal README.md, Improve documentation for Tag Ownership](https://github.com/mbleigh/acts-as-taggable-on/pull/706)
+
 ### [3.5.0 / 2015-03-03](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.4...v3.5.0)
 
   * Fixes
