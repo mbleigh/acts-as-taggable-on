@@ -4,7 +4,7 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
-### [3.6.0 / 2016-08-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.5.0...v4.0.0)
+### [4.0.0 / 2016-08-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.5.0...v4.0.0)
  * Fixes
   * [@rikettsie #623 collation parameter is ignored if it generates an exception] (https://github.com/mbleigh/acts-as-taggable-on/pull/650 )
   * [@bwvoss References working parser in deprectation warning] (https://github.com/mbleigh/acts-as-taggable-on/pull/659 )
