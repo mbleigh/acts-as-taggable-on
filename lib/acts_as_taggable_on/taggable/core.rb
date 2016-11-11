@@ -120,7 +120,7 @@ module ActsAsTaggableOn::Taggable
             joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
           end
 
-        elsif any = options.delete(:any)
+        elsif options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
           tags = if options.delete(:wild)
                    ActsAsTaggableOn::Tag.named_like_any(tag_list)
