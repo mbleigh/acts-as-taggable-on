@@ -15,6 +15,21 @@ describe 'Acts As Taggable On' do
       expect(taggable1.find_related_tags).to_not include(taggable2)
     end
 
+    it 'should find related objects based on tag names on context - chained relation' do
+      taggable1 = TaggableModel.create!(name: 'Taggable 1',tag_list: 'one, two')
+      taggable2 = TaggableModel.create!(name: 'Taggable 2',tag_list: 'three, four')
+      taggable3 = TaggableModel.create!(name: 'Taggable 3',tag_list: 'one, four')
+      taggable4 = TaggableModel.create!(name: 'Taggable 4',tag_list: 'one, four')
+
+      # add related item
+      untaggable_name = 'Untaggable 1'
+      taggable3.untaggable_models.create(name: untaggable_name)
+
+      expect(taggable1.find_related_tags.joins(:untaggable_models).where(untaggable_models: { name: untaggable_name })).to include(taggable3)
+      expect(taggable1.find_related_tags.joins(:untaggable_models).where(untaggable_models: { name: untaggable_name })).to_not include(taggable2)
+      expect(taggable1.find_related_tags.joins(:untaggable_models).where(untaggable_models: { name: untaggable_name })).to_not include(taggable4)
+    end
+
     it 'finds related tags for ordered taggable on' do
       taggable1 = OrderedTaggableModel.create!(name: 'Taggable 1',colour_list: 'one, two')
       taggable2 = OrderedTaggableModel.create!(name: 'Taggable 2',colour_list: 'three, four')
