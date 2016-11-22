@@ -6,6 +6,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 
 ### [4.0.0 / 2016-08-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.5.0...v4.0.0)
  * Fixes
+  * [@iainad Updated find_related_tags to allow chaining with other table joins]
   * [@rikettsie #623 collation parameter is ignored if it generates an exception] (https://github.com/mbleigh/acts-as-taggable-on/pull/650 )
   * [@bwvoss References working parser in deprectation warning] (https://github.com/mbleigh/acts-as-taggable-on/pull/659 )
   * [@jh125486 Updated tagging_contexts to include dynamic contexts ](https://github.com/mbleigh/acts-as-taggable-on/pull/660 )
