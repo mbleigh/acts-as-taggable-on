@@ -62,7 +62,8 @@ module ActsAsTaggableOn::Taggable
 
     def related_where(klass, conditions)
       klass.select("#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count")
-      .from("#{klass.table_name}, #{ActsAsTaggableOn::Tag.table_name}, #{ActsAsTaggableOn::Tagging.table_name}")
+      .from("#{klass.table_name}")
+      .joins("INNER JOIN #{ActsAsTaggableOn::Tagging.table_name} ON #{klass.table_name}.#{klass.primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id INNER JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
       .group(group_columns(klass))
       .order('count DESC')
       .where(conditions)
