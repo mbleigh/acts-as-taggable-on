@@ -208,6 +208,7 @@ User.tagged_with("awesome").by_join_date
 User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
 # Find users that matches all given tags:
+# NOTE: This only matches users that have the exact set of specified tags. If a user has additional tags, they are not returned.
 User.tagged_with(["awesome", "cool"], :match_all => true)
 
 # Find users with any of the specified tags:
