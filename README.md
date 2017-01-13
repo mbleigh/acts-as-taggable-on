@@ -214,7 +214,7 @@ User.tagged_with(["awesome", "cool"], :match_all => true)
 # Find users with any of the specified tags:
 User.tagged_with(["awesome", "cool"], :any => true)
 
-# Find users that has not been tagged with awesome or cool:
+# Find users that have not been tagged with awesome or cool:
 User.tagged_with(["awesome", "cool"], :exclude => true)
 
 # Find users with any of the tags based on context:
