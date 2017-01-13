@@ -5,6 +5,11 @@ Each change should fall into categories that would affect whether the release is
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
 ### [4.0.0 / 2016-08-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.5.0...v4.0.0)
+ * Breaking Changes
+   * [@krzysiek1507  drop support for Ruby < 2 ](https://github.com/mbleigh/acts-as-taggable-on/pull/758)
+   * [@krzysiek1507  drop support for Rails < 4 ](https://github.com/mbleigh/acts-as-taggable-on/pull/757)
+ * Added
+   * [@jessieay  Rails 5 ](https://github.com/mbleigh/acts-as-taggable-on/pull/763)
  * Fixes
   * [@rikettsie #623 collation parameter is ignored if it generates an exception] (https://github.com/mbleigh/acts-as-taggable-on/pull/650 )
   * [@bwvoss References working parser in deprectation warning] (https://github.com/mbleigh/acts-as-taggable-on/pull/659 )
@@ -20,9 +25,6 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
    * [@ pcupueran Add rspec tests for context scopes for tagging_spec ]( https://github.com/mbleigh/acts-as-taggable-on/pull/740)
    * [@ Emerson Huitt Remove existing selects from relation ]( https://github.com/mbleigh/acts-as-taggable-on/pull/743)
    * [@keerthisiv fix issue with custom delimiter]( https://github.com/mbleigh/acts-as-taggable-on/pull/748)
-   * [@krzysiek1507  drop support for Ruby < 2 ](https://github.com/mbleigh/acts-as-taggable-on/pull/758)
-   * [@krzysiek1507  drop support for Rails < 4 ](https://github.com/mbleigh/acts-as-taggable-on/pull/757)
-   * [@jessieay  Rails 5 ](https://github.com/mbleigh/acts-as-taggable-on/pull/763)
    * [@priyank-gupta  specify tag table name for mysql collation query ](https://github.com/mbleigh/acts-as-taggable-on/pull/760)
    * [@seuros Remove warning messages](https://github.com/mbleigh/acts-as-taggable-on/commit/cda08c764b07a18b8582b948d1c5b3910a3769  65)
    * [@rbritom  Fix migration, #references already adds index ]

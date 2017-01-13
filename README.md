@@ -2,9 +2,10 @@
 
 [![Join the chat at https://gitter.im/mbleigh/acts-as-taggable-on](https://badges.gitter.im/mbleigh/acts-as-taggable-on.svg)](https://gitter.im/mbleigh/acts-as-taggable-on?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Gem Version](https://badge.fury.io/rb/acts-as-taggable-on.svg)](http://badge.fury.io/rb/acts-as-taggable-on)
-[![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.png)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
-[![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.png)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
-[![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.png)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
+[![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.svg)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
+[![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.svg)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
+[![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.svg)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
+[![Security](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master.svg)](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master)
 
 This plugin was originally based on Acts as Taggable on Steroids by Jonathan Viney.
 It has evolved substantially since that point, but all credit goes to him for the
@@ -206,10 +207,8 @@ end
 User.tagged_with("awesome").by_join_date
 User.tagged_with("awesome").by_join_date.paginate(:page => params[:page], :per_page => 20)
 
-# Find users tagged with all the given tags:
-User.tagged_with(["awesome", "cool"])
-
-# Find users tagged with all the given tags, but only the given tags:
+# Find users that matches all given tags:
+# NOTE: This only matches users that have the exact set of specified tags. If a user has additional tags, they are not returned.
 User.tagged_with(["awesome", "cool"], :match_all => true)
 
 # Find users with any of the specified tags:

@@ -107,20 +107,20 @@ module ActsAsTaggableOn::Taggable
             tags_conditions = tag_list.map { |t| sanitize_sql(["#{ActsAsTaggableOn::Tag.table_name}.name #{ActsAsTaggableOn::Utils.like_operator} ?", t]) }.join(' OR ')
           end
 
-          conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name, nil)})"
+          conditions << "#{table_name}.#{primary_key} NOT IN (SELECT #{ActsAsTaggableOn::Tagging.table_name}.taggable_id FROM #{ActsAsTaggableOn::Tagging.table_name} JOIN #{ActsAsTaggableOn::Tag.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key} AND (#{tags_conditions}) WHERE #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{self.connection.quote(base_class.name)})"
 
           if owned_by
             joins <<  "JOIN #{ActsAsTaggableOn::Tagging.table_name}" +
                       "  ON #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
-                      " AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{quote_value(base_class.name, nil)}" +
-                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = #{quote_value(owned_by.id, nil)}" +
-                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = #{quote_value(owned_by.class.base_class.to_s, nil)}"
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_type = #{self.connection.quote(base_class.name)}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id = #{self.connection.quote(owned_by.id)}" +
+                      " AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_type = #{self.connection.quote(owned_by.class.base_class.to_s)}"
 
             joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
             joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
           end
 
-        elsif any = options.delete(:any)
+        elsif options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
           tags = if options.delete(:wild)
                    ActsAsTaggableOn::Tag.named_like_any(tag_list)
@@ -140,7 +140,7 @@ module ActsAsTaggableOn::Taggable
 
           tagging_cond = "#{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" +
                           " WHERE #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
-                          " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}"
+                          " AND #{taggings_alias}.taggable_type = #{self.connection.quote(base_class.name)}"
 
           tagging_cond << " AND " + sanitize_sql(["#{taggings_alias}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
           tagging_cond << " AND " + sanitize_sql(["#{taggings_alias}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
@@ -148,7 +148,7 @@ module ActsAsTaggableOn::Taggable
           tagging_cond << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
 
           # don't need to sanitize sql, map all ids and join with OR logic
-          tag_ids = tags.map { |t| quote_value(t.id, nil) }.join(', ')
+          tag_ids = tags.map { |t| self.connection.quote(t.id) }.join(', ')
           tagging_cond << " AND #{taggings_alias}.tag_id in (#{tag_ids})"
           select_clause << " #{table_name}.*" unless context and tag_types.one?
 
@@ -174,8 +174,8 @@ module ActsAsTaggableOn::Taggable
             taggings_alias = adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag.name)}")
             tagging_join = "JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" \
                 "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" +
-                " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}" +
-                " AND #{taggings_alias}.tag_id = #{quote_value(tag.id, nil)}"
+                " AND #{taggings_alias}.taggable_type = #{self.connection.quote(base_class.name)}" +
+                " AND #{taggings_alias}.tag_id = #{self.connection.quote(tag.id)}"
 
             tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
             tagging_join << " AND " + sanitize_sql(["#{taggings_alias}.created_at <= ?", options.delete(:end_at)])   if options[:end_at]
@@ -206,7 +206,7 @@ module ActsAsTaggableOn::Taggable
           taggings_alias, _ = adjust_taggings_alias("#{alias_base_name}_taggings_group"), "#{alias_base_name}_tags_group"
           joins << "LEFT OUTER JOIN #{ActsAsTaggableOn::Tagging.table_name} #{taggings_alias}" \
               "  ON #{taggings_alias}.taggable_id = #{quote}#{table_name}#{quote}.#{primary_key}" \
-              " AND #{taggings_alias}.taggable_type = #{quote_value(base_class.name, nil)}"
+              " AND #{taggings_alias}.taggable_type = #{self.connection.quote(base_class.name)}"
 
           joins << " AND " + sanitize_sql(["#{taggings_alias}.context = ?", context.to_s]) if context
           joins << " AND " + sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
@@ -242,14 +242,6 @@ module ActsAsTaggableOn::Taggable
 
       def taggable_mixin
         @taggable_mixin ||= Module.new
-      end
-
-      private
-
-      # Rails 5 has merged sanitize and quote_value
-      # See https://github.com/rails/rails/blob/master/activerecord/lib/active_record/sanitization.rb#L10
-      def quote_value(value, column = nil)
-        ActsAsTaggableOn::Utils.active_record5? ? super(value) : super(value, column)
       end
     end
 
