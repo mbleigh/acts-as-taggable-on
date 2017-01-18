@@ -334,12 +334,12 @@ Note that **owned tags** are added all at once, in the form of ***comma seperate
 Also, when you try to add **owned tags** again, it simply overwrites the previous set of **owned tags**.
 So to append tags in previously existing **owned tags** list, go as follows:
 ```ruby
-def add_owned_tag 
+def add_owned_tag
     @some_item = Item.find(params[:id])
-    owned_tag_list = @some_item.all_tag_list - @some_item.tag_list
+    owned_tag_list = @some_item.all_tags_list - @some_item.tag_list
     owned_tag_list += [(params[:tag])]
     @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
-    @some_item.save   
+    @some_item.save
 end
 
 def stringify(tag_list)
@@ -349,12 +349,12 @@ end
 ##### Removing owned tags
 Similarly as above, removing will be as follows:
 ```ruby
-def remove_owned_tag 
+def remove_owned_tag
     @some_item = Item.find(params[:id])
-    owned_tag_list = @some_item.all_tag_list - @some_item.tag_list
+    owned_tag_list = @some_item.all_tags_list - @some_item.tag_list
     owned_tag_list -= [(params[:tag])]
     @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
-    @some_item.save   
+    @some_item.save
 end
 ```
 
