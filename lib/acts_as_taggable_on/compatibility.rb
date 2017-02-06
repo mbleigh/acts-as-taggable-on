@@ -24,7 +24,7 @@ module ActsAsTaggableOn::Compatibility
   def parse_taggable_options(opts)
     scope_opts = {}
     [:order, :having, :select, :group, :limit, :offset, :readonly].each do |o|
-      scope_opts[o] = opts.delete o if opts[o]
+      scope_opts[o] = opts.delete o if opts.key?(o)
     end
     scope_opts[:where] = opts.delete :conditions if opts[:conditions]
     scope_opts[:joins] = opts.delete :include if opts [:include]

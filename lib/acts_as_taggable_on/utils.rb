@@ -22,7 +22,7 @@ module ActsAsTaggableOn
       end
 
       def active_record4?
-        ::ActiveRecord::VERSION::MAJOR == 4
+        ::ActiveRecord::VERSION::MAJOR >= 4
       end
 
       def like_operator
