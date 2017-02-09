@@ -1,10 +1,10 @@
 class ActsAsTaggableOnMigration < ActiveRecord::Migration
   def self.up
-    create_table :tags do |t|
+    create_table :tags, id: :uuid do |t|
       t.string :name
     end
 
-    create_table :taggings do |t|
+    create_table :taggings, id: :uuid do |t|
       t.references :tag
 
       # You should make sure that the column created is
