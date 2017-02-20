@@ -101,13 +101,8 @@ describe 'Acts As Taggable On' do
 
   describe 'Cache methods initialization on new models' do
     before(:all) do
-      ActiveRecord::Schema.define do
-        create_table :cache_methods_injected_models do |t|
-          t.string :cached_tag_list
-        end
-      end
       ActiveRecord::Base.connection.execute(
-        'INSERT INTO cache_methods_injected_models VALUES (NULL, \'ciao\')'
+        'INSERT INTO cache_methods_injected_models (cached_tag_list) VALUES (\'ciao\')'
       )
       class CacheMethodsInjectedModel < ActiveRecord::Base
         acts_as_taggable
