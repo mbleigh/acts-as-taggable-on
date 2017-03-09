@@ -25,11 +25,11 @@ module ActsAsTaggableOn::Taggable
             # the associations tag_taggings & tags are always returned in created order
             has_many context_taggings, -> { includes(:tag).order(taggings_order).where(context: tags_type) },
                      as: :taggable,
-                     class_name: ActsAsTaggableOn::Tagging,
+                     class_name: 'ActsAsTaggableOn::Tagging',
                      dependent: :destroy
 
             has_many context_tags, -> { order(taggings_order) },
-                     class_name: ActsAsTaggableOn::Tag,
+                     class_name: 'ActsAsTaggableOn::Tag',
                      through: context_taggings,
                      source: :tag
           end
