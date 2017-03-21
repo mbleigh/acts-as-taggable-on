@@ -1,13 +1,18 @@
 # -*- encoding : utf-8 -*-
 require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
+require 'db/migrate/8_add_type_into_index_for_tags.rb'
 
 
 shared_examples_for 'without unique index' do
-  prepend_before(:all) { AddMissingUniqueIndices.down }
+  prepend_before(:all) do
+    AddTypeIntoIndexForTags.down
+    AddMissingUniqueIndices.down
+  end
   append_after(:all) do
     ActsAsTaggableOn::Tag.delete_all
     AddMissingUniqueIndices.up
+    AddTypeIntoIndexForTags.up
   end
 end
 
@@ -17,6 +22,23 @@ describe ActsAsTaggableOn::Tag do
     @user = TaggableModel.create(name: 'Pablo')
   end
 
+  describe 'exclusively_for' do
+    ActsAsTaggableOn::Tag::TestTag = Class.new(ActsAsTaggableOn::Tag)
+
+    before(:each) do
+      ActsAsTaggableOn::Tag::TestTag.create(name: 'Cool')
+      ActsAsTaggableOn::Tag.create(name: 'Epic')
+    end
+
+    it 'should find exclusive tags' do
+      expect(ActsAsTaggableOn::Tag.exclusively_for(:test).count).to eq(1)
+      expect(ActsAsTaggableOn::Tag.exclusively_for(:tests).count).to eq(1)
+    end
+
+    it 'should find none if no such exclusive class found' do
+      expect(ActsAsTaggableOn::Tag.exclusively_for(:nonexisting).count).to eq(1)
+    end
+  end
 
   describe 'named like any' do
     context 'case insensitive collation and unique index on tag name', if: using_case_insensitive_collation? do

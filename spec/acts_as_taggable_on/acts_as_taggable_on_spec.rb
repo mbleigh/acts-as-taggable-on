@@ -3,6 +3,10 @@ require 'spec_helper'
 
 describe 'Acts As Taggable On' do
 
+  before(:each) do
+    TaggableModel.tag_options = Hash.new { |h,k| h[k] = {} }
+  end
+
   it "should provide a class method 'taggable?' that is false for untaggable models" do
     expect(UntaggableModel).to_not be_taggable
   end
@@ -17,6 +21,21 @@ describe 'Acts As Taggable On' do
 
     it "should respond 'true' to preserve_tag_order?" do
       expect(@taggable.class.preserve_tag_order?).to be_truthy
+    end
+
+    it "should have default tag_options" do
+      expect(@taggable.class.tag_options.keys).to include 'ordered_tags'
+    end
+  end
+
+  describe 'Exclusive Scope Generation' do
+    before(:each) do
+      TaggableModel.tag_types = []
+      TaggableModel.acts_as_taggable exclusive: true
+    end
+
+    it 'should create proper subclasses' do
+      expect(TaggableModel.tag_options['tags'][:tags_class].name).to eq 'ActsAsTaggableOn::Tag::TaggableModelTag'
     end
   end
 
@@ -282,4 +301,25 @@ describe 'Acts As Taggable On' do
     end
   end
 
+  describe 'exclusivity' do
+    before do
+      TaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+      OtherTaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+    end
+
+    it 'allows to choose only specific tags if marked so' do
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+      taggable1.color_list = 'red, yellow, green'
+      taggable1.save!
+
+      taggable2 = OtherTaggableModel.create!(name: 'Other Taggable')
+      taggable2.color_list = 'blue, orange, green'
+      taggable2.save!
+
+      expect(ActsAsTaggableOn::Tag.exclusively_for(:taggable_model).pluck(:name)).to match_array %w[red yellow green]
+      expect(ActsAsTaggableOn::Tag.exclusively_for(:other_taggable_model).pluck(:name)).to match_array %w[blue orange green]
+      expect(ActsAsTaggableOn::Tag.where(name: 'green').count).to eq 2
+      expect(ActsAsTaggableOn::Tag.where(name: 'green').pluck(:type)).to match_array ["ActsAsTaggableOn::Tag::OtherTaggableModelTag", "ActsAsTaggableOn::Tag::TaggableModelTag"]
+    end
+  end
 end

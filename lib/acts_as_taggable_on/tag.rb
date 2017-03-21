@@ -9,7 +9,7 @@ module ActsAsTaggableOn
     ### VALIDATIONS:
 
     validates_presence_of :name
-    validates_uniqueness_of :name, if: :validates_name_uniqueness?
+    validates_uniqueness_of :name, scope: [:type], if: :validates_name_uniqueness?
     validates_length_of :name, maximum: 255
 
     # monkey patch this method if don't need name uniqueness validation
@@ -20,6 +20,15 @@ module ActsAsTaggableOn
     ### SCOPES:
     scope :most_used, ->(limit = 20) { order('taggings_count desc').limit(limit) }
     scope :least_used, ->(limit = 20) { order('taggings_count asc').limit(limit) }
+
+    def self.exclusively_for(class_name)
+      tag_class_name = "#{class_name.to_s.singularize.camelize}Tag"
+      if self.const_defined? tag_class_name
+        self.const_get(tag_class_name).all
+      else
+        where(type: [name, nil])
+      end
+    end
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
