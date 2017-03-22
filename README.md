@@ -424,6 +424,49 @@ CSS:
 .css4 { font-size: 1.6em; }
 ```
 
+### Exclusive tags depending on models
+
+Let's say you need a complete independent tag lists for 2 of your domain models,
+say `Order` and `Product`, so that they couldn't clash. Use `exclusive` parameter for that
+
+```ruby
+class Order < ActiveRecord::Base
+  acts_as_taggable exclusive: true
+end
+
+class Product < ActiveRecord::Base
+  acts_as_taggable exclusive: true
+end
+```
+
+And operate on orders and tags complete like usual, except tags will not clash:
+
+```ruby
+order = Order.create!
+order.tag_list = 'cool, nice, wow'
+order.save!
+
+product = Product.create!
+product.tag_list = 'super, nice'
+product.save!
+
+ActsAsTaggableOn::Tag.where(name: 'nice').count
+# => 2
+
+ActsAsTaggableOn::Tag.where(name: 'nice').pluck(:type)
+# => ["ActsAsTaggableOn::Tag::OrderTag", "ActsAsTaggableOn::Tag::ProductTag"]
+```
+
+You can also use this in your autocomplete endpoints:
+
+```ruby
+ActsAsTaggableOn::Tag.exclusively_for(:product).pluck(:name)
+# => ['cool', 'nice', 'wow']
+
+ActsAsTaggableOn::Tag.exclusively_for(:order).pluck(:name)
+# => ['super, 'nice']
+```
+
 ## Configuration
 
 If you would like to remove unused tag objects after removing taggings, add:
