@@ -321,20 +321,6 @@ describe 'Acts As Taggable On' do
       end
     end
 
-    describe 'without order' do
-      before do
-        TaggableModel.acts_as_taggable_on(:colors, exclusive: true)
-        OtherTaggableModel.acts_as_taggable_on(:colors, exclusive: true)
-      end
-
-      include_examples 'exclusive filtered tags'
-
-      it 'allows to choose only specific tags if marked so' do
-        expect(TaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[red yellow green]
-        expect(OtherTaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[blue orange green]
-      end
-    end
-
     describe 'with order' do
       before do
         TaggableModel.acts_as_ordered_taggable_on(:colors, exclusive: true)
@@ -346,6 +332,20 @@ describe 'Acts As Taggable On' do
       it 'allows to choose only specific tags if marked so' do
         expect(TaggableModel.includes(:colors).first.colors.map(&:name)).to eq %w[red yellow green]
         expect(OtherTaggableModel.includes(:colors).first.colors.map(&:name)).to eq %w[blue orange green]
+      end
+    end
+
+    describe 'without order' do
+      before do
+        TaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+        OtherTaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+      end
+
+      include_examples 'exclusive filtered tags'
+
+      it 'allows to choose only specific tags if marked so' do
+        expect(TaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[red yellow green]
+        expect(OtherTaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[blue orange green]
       end
     end
   end
