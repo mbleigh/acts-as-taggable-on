@@ -302,24 +302,51 @@ describe 'Acts As Taggable On' do
   end
 
   describe 'exclusivity' do
-    before do
-      TaggableModel.acts_as_taggable_on(:colors, exclusive: true)
-      OtherTaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+    shared_examples 'exclusive filtered tags' do
+      before do
+        taggable1 = TaggableModel.create!(name: 'Taggable 1')
+        taggable1.color_list = 'red, yellow, green'
+        taggable1.save!
+
+        taggable2 = OtherTaggableModel.create!(name: 'Other Taggable')
+        taggable2.color_list = 'blue, orange, green'
+        taggable2.save!
+      end
+
+      it 'creates different tags types with same name' do
+        expect(ActsAsTaggableOn::Tag.exclusively_for(:taggable_model).pluck(:name)).to match_array %w[red yellow green]
+        expect(ActsAsTaggableOn::Tag.exclusively_for(:other_taggable_model).pluck(:name)).to match_array %w[blue orange green]
+        expect(ActsAsTaggableOn::Tag.where(name: 'green').count).to eq 2
+        expect(ActsAsTaggableOn::Tag.where(name: 'green').pluck(:type)).to match_array ["ActsAsTaggableOn::Tag::OtherTaggableModelTag", "ActsAsTaggableOn::Tag::TaggableModelTag"]
+      end
     end
 
-    it 'allows to choose only specific tags if marked so' do
-      taggable1 = TaggableModel.create!(name: 'Taggable 1')
-      taggable1.color_list = 'red, yellow, green'
-      taggable1.save!
+    describe 'without order' do
+      before do
+        TaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+        OtherTaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+      end
 
-      taggable2 = OtherTaggableModel.create!(name: 'Other Taggable')
-      taggable2.color_list = 'blue, orange, green'
-      taggable2.save!
+      include_examples 'exclusive filtered tags'
 
-      expect(ActsAsTaggableOn::Tag.exclusively_for(:taggable_model).pluck(:name)).to match_array %w[red yellow green]
-      expect(ActsAsTaggableOn::Tag.exclusively_for(:other_taggable_model).pluck(:name)).to match_array %w[blue orange green]
-      expect(ActsAsTaggableOn::Tag.where(name: 'green').count).to eq 2
-      expect(ActsAsTaggableOn::Tag.where(name: 'green').pluck(:type)).to match_array ["ActsAsTaggableOn::Tag::OtherTaggableModelTag", "ActsAsTaggableOn::Tag::TaggableModelTag"]
+      it 'allows to choose only specific tags if marked so' do
+        expect(TaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[red yellow green]
+        expect(OtherTaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[blue orange green]
+      end
+    end
+
+    describe 'with order' do
+      before do
+        TaggableModel.acts_as_ordered_taggable_on(:colors, exclusive: true)
+        OtherTaggableModel.acts_as_ordered_taggable_on(:colors, exclusive: true)
+      end
+
+      include_examples 'exclusive filtered tags'
+
+      it 'allows to choose only specific tags if marked so' do
+        expect(TaggableModel.includes(:colors).first.colors.map(&:name)).to eq %w[red yellow green]
+        expect(OtherTaggableModel.includes(:colors).first.colors.map(&:name)).to eq %w[blue orange green]
+      end
     end
   end
 end
