@@ -20,7 +20,6 @@ module ActsAsTaggableOn::Taggable
           context_tags = tags_type.to_sym
           context_options = tag_options[tags_type] ||= Hash.new { |h,k| h[k] = {} }
           taggings_order = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.id" : [])
-          taggings_tag_reference = (preserve_tag_order? ? :joins : :includes)
 
           if context_options[:exclusive]
             context_options[:tags_class] ||= ActsAsTaggableOn::TagClass.new(name, ActsAsTaggableOn::Tag).class
@@ -37,7 +36,7 @@ module ActsAsTaggableOn::Taggable
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
-            has_many context_taggings, -> { send(taggings_tag_reference, :tag).order(taggings_order).where(context: tags_type) },
+            has_many context_taggings, -> { includes(:tag).references(:tag).order(taggings_order).where(context: tags_type) },
                      as: :taggable,
                      class_name: context_options[:taggings_class].name,
                      dependent: :destroy
