@@ -319,6 +319,16 @@ describe 'Acts As Taggable On' do
         expect(ActsAsTaggableOn::Tag.where(name: 'green').count).to eq 2
         expect(ActsAsTaggableOn::Tag.where(name: 'green').pluck(:type)).to match_array ["ActsAsTaggableOn::Tag::OtherTaggableModelTag", "ActsAsTaggableOn::Tag::TaggableModelTag"]
       end
+
+      it 'loads tags from specific subclass' do
+        expect {
+          taggable3 = OtherTaggableModel.create!(name: 'Other Taggable 3')
+          taggable3.color_list = 'blue, orange, green'
+          taggable3.save!
+        }.not_to change { ActsAsTaggableOn::Tag.count }
+
+        expect(ActsAsTaggableOn::Tag::OtherTaggableModelTag.where(name: 'green').pluck(:taggings_count)).to eq [2]
+      end
     end
 
     describe 'with order' do

@@ -380,13 +380,9 @@ module ActsAsTaggableOn::Taggable
     # Find existing tags or create non-existing tags
     def load_tags(tag_list, _context='tags')
       context_options = tag_options[_context.to_s]
-      if context_options[:exclusive]
-        base_relation_name = context_options[:base_tags_relation] || :base_tags
-        send(base_relation_name).find_or_create_all_with_like_by_name(tag_list)
-      else
-        tags_class = context_options[:tags_class] || ActsAsTaggableOn::Tag
-        tags_class.find_or_create_all_with_like_by_name(tag_list)
-      end
+      tags_class = context_options[:tags_class] if context_options[:exclusive]
+      tags_class ||= ActsAsTaggableOn::Tag
+      tags_class.find_or_create_all_with_like_by_name(tag_list)
     end
 
     def save_tags
