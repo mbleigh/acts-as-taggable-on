@@ -16,9 +16,14 @@ module ActsAsTaggableOn
 
     validates_uniqueness_of :tag_id, scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
 
+    after_update :update_tag_timestamps
     after_destroy :remove_unused_tags
 
     private
+
+    def update_tag_timestamps
+      tag.updated_at = DateTime.now
+    end
 
     def remove_unused_tags
       if ActsAsTaggableOn.remove_unused_tags
