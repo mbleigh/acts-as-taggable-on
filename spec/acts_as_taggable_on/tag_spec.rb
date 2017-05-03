@@ -170,7 +170,7 @@ describe ActsAsTaggableOn::Tag do
 
     context 'retry 3 times on not unique exception' do
       it 'performs 3 tries before raising the exception' do
-        allow(ActsAsTaggableOn::Tag).to receive(:named_any).and_raise(ActiveRecord::RecordNotUnique) # trigger error inside block
+        allow(ActsAsTaggableOn::Tag).to receive(:named_any).and_raise(ActiveRecord::RecordNotUnique.new('error')) # trigger error inside block
         expect(ActiveRecord::Base.connection).to receive(:execute).with('ROLLBACK').exactly(3).times
 
         expect {
