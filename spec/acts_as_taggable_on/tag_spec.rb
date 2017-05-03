@@ -89,6 +89,14 @@ describe ActsAsTaggableOn::Tag do
         ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('epic')
       }).to change(ActsAsTaggableOn::Tag, :count).by(1)
     end
+
+    context 'when invalid name' do
+      it 'should raise error' do
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('fgkgnkkgjymkypbuozmwwghblmzpqfsgjasflblywhgkwndnkzeifalfcpeaeqychjuuowlacmuidnnrkprgpcpybarbkrmziqihcrxirlokhnzfvmtzixgvhlxzncyywficpraxfnjptxxhkqmvicbcdcynkjvziefqzyndxkjmsjlvyvbwraklbalykyxoliqdlreeykuphdtmzfdwpphmrqvwvqffojkqhlzvinqajsxbszyvrqqyzusxranr')
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
   end
 
   describe 'find or create by unicode name', unless: using_sqlite? do
@@ -143,6 +151,14 @@ describe ActsAsTaggableOn::Tag do
       expect {
         ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('epic')
       }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+    end
+
+    context 'when invalid name' do
+      it 'should raise error' do
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('fgkgnkkgjymkypbuozmwwghblmzpqfsgjasflblywhgkwndnkzeifalfcpeaeqychjuuowlacmuidnnrkprgpcpybarbkrmziqihcrxirlokhnzfvmtzixgvhlxzncyywficpraxfnjptxxhkqmvicbcdcynkjvziefqzyndxkjmsjlvyvbwraklbalykyxoliqdlreeykuphdtmzfdwpphmrqvwvqffojkqhlzvinqajsxbszyvrqqyzusxranr')
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
 
     context 'case sensitive' do
