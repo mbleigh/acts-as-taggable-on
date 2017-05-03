@@ -49,6 +49,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
   (https://github.com/mbleigh/acts-as-taggable-on/commit/9cc580e7f88164634eb10c8826e5b30ea0e00544)
 
  * Documentation
+  * [@logicminds Adds table of contents using doctoc utility](https://github.com/mbleigh/acts-as-taggable-on/pull/803)
   * [@jamesprior  Changing ActsAsTaggable to ActsAsTaggableOn ](https://github.com/mbleigh/acts-as-taggable-on/pull/637)
   * [@markgandolfo Update README.md](https://github.com/mbleigh/acts-as-taggable-on/pull/645))
   * [@snowblink Update release date for 3.5.0](https://github.com/mbleigh/acts-as-taggable-on/pull/647)
