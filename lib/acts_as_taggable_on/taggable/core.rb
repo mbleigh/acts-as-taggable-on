@@ -275,7 +275,7 @@ module ActsAsTaggableOn::Taggable
       variable_name = "@#{context.to_s.singularize}_list"
       if instance_variable_get(variable_name)
         instance_variable_get(variable_name)
-      elsif cached_tag_list_on(context) && self.class.caching_tag_list_on?(context)
+      elsif cached_tag_list_on(context) && ensure_included_cache_methods! && self.class.caching_tag_list_on?(context)
         instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(cached_tag_list_on(context)).parse)
       else
         instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
@@ -417,6 +417,10 @@ module ActsAsTaggableOn::Taggable
     end
 
     private
+
+    def ensure_included_cache_methods!
+      self.class.columns
+    end
 
     # Filters the tag lists from the attribute names.
     def attributes_for_update(attribute_names)
