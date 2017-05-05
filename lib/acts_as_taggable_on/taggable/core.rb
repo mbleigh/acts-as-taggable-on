@@ -107,12 +107,14 @@ module ActsAsTaggableOn::Taggable
         select_clause = []
         order_by = []
 
+        default_scope = options.delete(:default_scope)
         context = options.delete(:on)
         owned_by = options.delete(:owned_by)
         alias_base_name = undecorated_table_name.gsub('.', '_')
         # FIXME use ActiveRecord's connection quote_column_name
         quote = ActsAsTaggableOn::Utils.using_postgresql? ? '"' : ''
-        tag_class = tag_options[(context || 'tags').to_s][:tag_class] || ActsAsTaggableOn::Tag
+        tag_class = tag_options[(context || 'tags').to_s][:tags_class] || ActsAsTaggableOn::Tag
+        tag_class = tag_class.all.merge(default_scope) if default_scope
 
         if options.delete(:exclude)
           if options.delete(:wild)
@@ -182,7 +184,8 @@ module ActsAsTaggableOn::Taggable
         else
           tags = tag_class.named_any(tag_list)
 
-          return empty_result unless tags.length == tag_list.length
+          return empty_result if default_scope.nil? && tags.length != tag_list.length
+          return empty_result if tags.length == 0
 
           tags.each do |tag|
             taggings_alias = adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag.name)}")
