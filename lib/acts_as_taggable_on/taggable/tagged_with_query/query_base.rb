@@ -25,22 +25,29 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def tag_match_type(tag)
+      matches_attribute = tag_arel_table[:name]
+      matches_attribute = matches_attribute.lower unless ActsAsTaggableOn.strict_case_match
+
       if options[:wild].present?
-        tag_arel_table[:name].matches("%#{escaped_tag(tag)}%", "!", ActsAsTaggableOn.strict_case_match)
+        tag_arel_table[:name].matches("%#{escaped_tag(tag)}%", "!")
       else
-        tag_arel_table[:name].matches(escaped_tag(tag), "!", ActsAsTaggableOn.strict_case_match)
+        tag_arel_table[:name].matches(escaped_tag(tag), "!")
       end
     end
 
     def tags_match_type
+      matches_attribute = tag_arel_table[:name]
+      matches_attribute = matches_attribute.lower unless ActsAsTaggableOn.strict_case_match
+
       if options[:wild].present?
-        tag_arel_table[:name].matches_any(tag_list.map{|tag| "%#{escaped_tag(tag)}%"}, "!", ActsAsTaggableOn.strict_case_match)
+        matches_attribute.matches_any(tag_list.map{|tag| "%#{escaped_tag(tag)}%"}, "!")
       else
-        tag_arel_table[:name].matches_any(tag_list.map{|tag| "#{escaped_tag(tag)}"}, "!", ActsAsTaggableOn.strict_case_match)
+        matches_attribute.matches_any(tag_list.map{|tag| "#{escaped_tag(tag)}"}, "!")
       end
     end
 
     def escaped_tag(tag)
+      tag = tag.downcase unless ActsAsTaggableOn.strict_case_match
       tag.gsub(/[!%_]/) { |x| '!' + x }
     end
 
