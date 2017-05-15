@@ -14,7 +14,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def model_has_at_least_one_tag
-      tagging_alias = tagging_arel_table.alias("#{tag_list.join('_')}_#{SecureRandom.hex(10)}")
+      tagging_alias = tagging_arel_table.alias(alias_name(tag_list))
 
 
       tagging_arel_table.project(Arel.star).where(at_least_one_tag).exists
@@ -59,6 +59,17 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
       order_by << options[:order] if options[:order].present?
       order_by.join(', ')
+    end
+
+    def alias_name(tag_list)
+      alias_base_name = taggable_model.base_class.name.downcase
+      taggings_context = options[:on] ? "_#{options[:on]}" : ''
+
+      taggings_alias = adjust_taggings_alias(
+          "#{alias_base_name[0..4]}#{taggings_context[0..6]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag_list.join('_'))}"
+       )
+
+      taggings_alias
     end
   end
 end

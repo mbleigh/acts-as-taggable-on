@@ -25,16 +25,30 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def tag_match_type(tag)
-      match_type = options[:wild].present? ? 'matches' : 'eq'
-
-      tag_arel_table[:name].lower.public_send(match_type, tag.downcase)
+      if options[:wild].present?
+        tag_arel_table[:name].matches("%#{escaped_tag(tag)}%", "!", ActsAsTaggableOn.strict_case_match)
+      else
+        tag_arel_table[:name].matches(escaped_tag(tag), "!", ActsAsTaggableOn.strict_case_match)
+      end
     end
 
     def tags_match_type
-      match_type = options[:wild].present? ? 'matches_any' : 'eq_any'
+      if options[:wild].present?
+        tag_arel_table[:name].matches_any(tag_list.map{|tag| "%#{escaped_tag(tag)}%"}, "!", ActsAsTaggableOn.strict_case_match)
+      else
+        tag_arel_table[:name].matches_any(tag_list.map{|tag| "#{escaped_tag(tag)}"}, "!", ActsAsTaggableOn.strict_case_match)
+      end
+    end
 
-      tags = options[:wild].present? ? tag_list.map { |tag| "%#{tag.downcase}%"} : tag_list.map(&:downcase)
-      tag_arel_table[:name].lower.public_send(match_type, tags)
+    def escaped_tag(tag)
+      tag.gsub(/[!%_]/) { |x| '!' + x }
+    end
+
+    def adjust_taggings_alias(taggings_alias)
+      if taggings_alias.size > 75
+        taggings_alias = 'taggings_alias_' + Digest::SHA1.hexdigest(taggings_alias)
+      end
+      taggings_alias
     end
   end
 end

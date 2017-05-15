@@ -14,7 +14,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       arel_join = taggable_arel_table
 
       tag_list.each do |tag|
-        tagging_alias = tagging_arel_table.alias("#{tag}_taggings_#{SecureRandom.hex(10)}")
+        tagging_alias = tagging_arel_table.alias(tagging_alias(tag))
         arel_join = arel_join
                       .join(tagging_alias)
                       .on(on_conditions(tag, tagging_alias))
@@ -103,6 +103,11 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
       order_by << options[:order] if options[:order].present?
       order_by.join(', ')
+    end
+
+    def tagging_alias(tag)
+      alias_base_name = taggable_model.base_class.name.downcase
+      adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag)}")
     end
   end
 end
