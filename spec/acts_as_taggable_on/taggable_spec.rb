@@ -260,7 +260,6 @@ describe 'Taggable' do
     @taggable.save
 
     expect(TaggableModel.tagged_with('ruby').first).to eq(@taggable)
-
     expect(TaggableModel.tagged_with('ruby, css').first).to eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :skills).first).to_not eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :tags).first).to eq(@taggable)
@@ -458,7 +457,6 @@ describe 'Taggable' do
     bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css')
     frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css')
     steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby')
-
 
     expect(TaggableModel.tagged_with(%w(ruby java), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([steve, bob, frank])
     expect(TaggableModel.tagged_with(%w(c++ fitter), any: true, order_by_matching_tag_count: true, order: 'taggable_models.name').to_a).to eq([steve, bob])

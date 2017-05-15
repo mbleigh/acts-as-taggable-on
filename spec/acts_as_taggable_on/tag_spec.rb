@@ -171,7 +171,7 @@ describe ActsAsTaggableOn::Tag do
     context 'retry 3 times on not unique exception' do
       it 'performs 3 tries before raising the exception' do
         allow(ActsAsTaggableOn::Tag).to receive(:named_any).and_raise(ActiveRecord::RecordNotUnique.new('error')) # trigger error inside block
-        expect(ActiveRecord::Base.connection).to receive(:execute).with('ROLLBACK').exactly(3).times
+        expect(ActiveRecord::Base.connection).to receive(:execute).with('ROLLBACK').exactly(4).times # one extra rollback from database cleaner
 
         expect {
           ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('AWESOME', 'awesome')
