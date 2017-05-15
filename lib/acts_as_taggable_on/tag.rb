@@ -78,7 +78,7 @@ module ActsAsTaggableOn
           existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
           existing_tag || create(name: tag_name)
         rescue ActiveRecord::RecordNotUnique
-          unless (tries -= 1).negative?
+          if (tries -= 1).positive?
             ActiveRecord::Base.connection.execute 'ROLLBACK'
             retry
           end
