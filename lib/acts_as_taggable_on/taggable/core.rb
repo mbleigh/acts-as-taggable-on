@@ -97,13 +97,6 @@ module ActsAsTaggableOn::Taggable
         true
       end
 
-      def adjust_taggings_alias(taggings_alias)
-        if taggings_alias.size > 75
-          taggings_alias = 'taggings_alias_' + Digest::SHA1.hexdigest(taggings_alias)
-        end
-        taggings_alias
-      end
-
       def taggable_mixin
         @taggable_mixin ||= Module.new
       end
