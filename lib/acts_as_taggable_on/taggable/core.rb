@@ -150,7 +150,6 @@ module ActsAsTaggableOn::Taggable
           # don't need to sanitize sql, map all ids and join with OR logic
           tag_ids = tags.map { |t| self.connection.quote(t.id) }.join(', ')
           tagging_cond << " AND #{taggings_alias}.tag_id in (#{tag_ids})"
-          select_clause << " #{table_name}.*" unless context and tag_types.one?
 
           if owned_by
             tagging_cond << ' AND ' +
