@@ -1,4 +1,9 @@
-class AddTaggingsCounterCacheToTags < ActiveRecord::Migration
+if ActiveRecord.gem_version >= Gem::Version.new('5.0')
+  class AddTaggingsCounterCacheToTags < ActiveRecord::Migration[4.2]; end
+else
+  class AddTaggingsCounterCacheToTags < ActiveRecord::Migration; end
+end
+AddTaggingsCounterCacheToTags.class_eval do
   def self.up
     add_column :tags, :taggings_count, :integer, default: 0
 
