@@ -4,7 +4,7 @@ ActiveRecord::Schema.define version: 0 do
     t.integer :taggings_count, default: 0
     t.string :type
   end
-  add_index 'tags', ['name'], name: 'index_tags_on_name', unique: true
+  add_index 'tags', ['name', 'type'], name: 'index_tags_on_name_and_type', unique: true
 
   create_table :taggings, force: true do |t|
     t.integer :tag_id

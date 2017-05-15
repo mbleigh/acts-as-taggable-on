@@ -16,6 +16,7 @@ module ActsAsTaggableOn
 
   autoload :Tag
   autoload :TagList
+  autoload :TagClass
   autoload :GenericParser
   autoload :DefaultParser
   autoload :Taggable

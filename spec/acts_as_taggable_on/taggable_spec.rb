@@ -530,6 +530,24 @@ describe 'Taggable' do
     end
   end
 
+  it 'should find tags inside given scope' do
+    frank = TaggableModel.create(name: 'Frank', tag_list: 'fitter, lazy')
+    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier')
+    bob = TaggableModel.create(name: 'Bob', tag_list: 'more productive')
+    scope = ActsAsTaggableOn::Tag.where('taggings_count > ?', 1)
+
+    expect(TaggableModel.tagged_with('fitter, happier, more productive, lazy', default_scope: scope)).to include(frank, steve)
+  end
+
+  it 'should respect none-scope' do
+    frank = TaggableModel.create(name: 'Frank', tag_list: 'fitter, lazy')
+    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier')
+    bob = TaggableModel.create(name: 'Bob', tag_list: 'more productive')
+    scope = ActsAsTaggableOn::Tag.none
+
+    expect(TaggableModel.tagged_with('fitter, happier, more productive, lazy', default_scope: scope)).to be_blank
+  end
+
   it 'should options key not be deleted' do
     options = {:exclude => true}
     TaggableModel.tagged_with("foo", options)

@@ -12,8 +12,8 @@ module ActsAsTaggableOn
     #   class Book < ActiveRecord::Base
     #     acts_as_taggable
     #   end
-    def acts_as_taggable
-      acts_as_taggable_on :tags
+    def acts_as_taggable(**options)
+      acts_as_taggable_on(:tags, options)
     end
 
     ##
@@ -23,8 +23,8 @@ module ActsAsTaggableOn
     #   class Book < ActiveRecord::Base
     #     acts_as_ordered_taggable
     #   end
-    def acts_as_ordered_taggable
-      acts_as_ordered_taggable_on :tags
+    def acts_as_ordered_taggable(**options)
+      acts_as_ordered_taggable_on(:tags, options)
     end
 
     ##
@@ -36,8 +36,8 @@ module ActsAsTaggableOn
     #   class User < ActiveRecord::Base
     #     acts_as_taggable_on :languages, :skills
     #   end
-    def acts_as_taggable_on(*tag_types)
-      taggable_on(false, tag_types)
+    def acts_as_taggable_on(*tag_types, **options)
+      taggable_on(false, tag_types, **options)
     end
 
     ##
@@ -50,8 +50,8 @@ module ActsAsTaggableOn
     #   class User < ActiveRecord::Base
     #     acts_as_ordered_taggable_on :languages, :skills
     #   end
-    def acts_as_ordered_taggable_on(*tag_types)
-      taggable_on(true, tag_types)
+    def acts_as_ordered_taggable_on(*tag_types, **options)
+      taggable_on(true, tag_types, options)
     end
 
     private
@@ -67,17 +67,22 @@ module ActsAsTaggableOn
       # NB: method overridden in core module in order to create tag type
       #     associations and methods after this logic has executed
       #
-    def taggable_on(preserve_tag_order, *tag_types)
+    def taggable_on(preserve_tag_order, *tag_types, **options)
       tag_types = tag_types.to_a.flatten.compact.map(&:to_sym)
+      tag_options = options.slice(:exclusive, :tags_class, :taggings_class)
 
       if taggable?
         self.tag_types = (self.tag_types + tag_types).uniq
         self.preserve_tag_order = preserve_tag_order
+        tag_types.each { |type| self.tag_options[type.to_s] = tag_options }
       else
         class_attribute :tag_types
         self.tag_types = tag_types
         class_attribute :preserve_tag_order
         self.preserve_tag_order = preserve_tag_order
+        class_attribute :tag_options
+        self.tag_options = Hash.new { |h,k| h[k] = {} }
+        tag_types.each { |type| self.tag_options[type.to_s] = tag_options }
 
         class_eval do
           has_many :taggings, as: :taggable, dependent: :destroy, class_name: '::ActsAsTaggableOn::Tagging'

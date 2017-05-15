@@ -18,18 +18,31 @@ module ActsAsTaggableOn::Taggable
           tag_type = tags_type.to_s.singularize
           context_taggings = "#{tag_type}_taggings".to_sym
           context_tags = tags_type.to_sym
+          context_options = tag_options[tags_type] ||= Hash.new { |h,k| h[k] = {} }
           taggings_order = (preserve_tag_order? ? "#{ActsAsTaggableOn::Tagging.table_name}.id" : [])
+
+          if context_options[:exclusive]
+            context_options[:tags_class] ||= ActsAsTaggableOn::TagClass.new(name, ActsAsTaggableOn::Tag).class
+            context_options[:taggings_class] ||= ActsAsTaggableOn::TagClass.new(name, ActsAsTaggableOn::Tagging).class
+            context_options[:base_tags_relation] = context_tags
+            context_options[:base_taggings_relation] = context_taggings
+          else
+            context_options[:tags_class] = ActsAsTaggableOn::Tag
+            context_options[:taggings_class] = ActsAsTaggableOn::Tagging
+            context_options[:base_tags_relation] = :base_tags
+            context_options[:base_taggings_relation] = :taggings
+          end
 
           class_eval do
             # when preserving tag order, include order option so that for a 'tags' context
             # the associations tag_taggings & tags are always returned in created order
-            has_many context_taggings, -> { includes(:tag).order(taggings_order).where(context: tags_type) },
+            has_many context_taggings, -> { includes(:tag).references(:tag).order(taggings_order).where(context: tags_type) },
                      as: :taggable,
-                     class_name: 'ActsAsTaggableOn::Tagging',
+                     class_name: context_options[:taggings_class].name,
                      dependent: :destroy
 
             has_many context_tags, -> { order(taggings_order) },
-                     class_name: 'ActsAsTaggableOn::Tag',
+                     class_name: context_options[:tags_class].name,
                      through: context_taggings,
                      source: :tag
           end
@@ -94,11 +107,14 @@ module ActsAsTaggableOn::Taggable
         select_clause = []
         order_by = []
 
+        default_scope = options.delete(:default_scope)
         context = options.delete(:on)
         owned_by = options.delete(:owned_by)
         alias_base_name = undecorated_table_name.gsub('.', '_')
         # FIXME use ActiveRecord's connection quote_column_name
         quote = ActsAsTaggableOn::Utils.using_postgresql? ? '"' : ''
+        tag_class = tag_options[(context || 'tags').to_s][:tags_class] || ActsAsTaggableOn::Tag
+        tag_class = tag_class.all.merge(default_scope) if default_scope
 
         if options.delete(:exclude)
           if options.delete(:wild)
@@ -123,9 +139,9 @@ module ActsAsTaggableOn::Taggable
         elsif options.delete(:any)
           # get tags, drop out if nothing returned (we need at least one)
           tags = if options.delete(:wild)
-                   ActsAsTaggableOn::Tag.named_like_any(tag_list)
+                   tag_class.named_like_any(tag_list)
                  else
-                   ActsAsTaggableOn::Tag.named_any(tag_list)
+                   tag_class.named_any(tag_list)
                  end
 
           return empty_result if tags.length == 0
@@ -166,9 +182,10 @@ module ActsAsTaggableOn::Taggable
             order_by << "(SELECT count(*) FROM #{tagging_cond}) desc"
           end
         else
-          tags = ActsAsTaggableOn::Tag.named_any(tag_list)
+          tags = tag_class.named_any(tag_list)
 
-          return empty_result unless tags.length == tag_list.length
+          return empty_result if default_scope.nil? && tags.length != tag_list.length
+          return empty_result if tags.length == 0
 
           tags.each do |tag|
             taggings_alias = adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag.name)}")
@@ -300,7 +317,8 @@ module ActsAsTaggableOn::Taggable
       tagging_table_name = ActsAsTaggableOn::Tagging.table_name
 
       opts = ["#{tagging_table_name}.context = ?", context.to_s]
-      scope = base_tags.where(opts)
+      base_relation_name = tag_options[context.to_s][:base_tags_relation] || :base_tags
+      scope = send(base_relation_name).where(opts)
 
       if ActsAsTaggableOn::Utils.using_postgresql?
         group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
@@ -313,7 +331,7 @@ module ActsAsTaggableOn::Taggable
     ##
     # Returns all tags that are not owned of a given context
     def tags_on(context)
-      scope = base_tags.where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s])
+      scope = send(tag_options[context.to_s][:base_tags_relation] || :base_tags).where(["#{ActsAsTaggableOn::Tagging.table_name}.context = ? AND #{ActsAsTaggableOn::Tagging.table_name}.tagger_id IS NULL", context.to_s]) rescue byebug
       # when preserving tag order, return tags in created order
       # if we added the order to the association this would always apply
       scope = scope.order("#{ActsAsTaggableOn::Tagging.table_name}.id") if self.class.preserve_tag_order?
@@ -362,8 +380,11 @@ module ActsAsTaggableOn::Taggable
 
     ##
     # Find existing tags or create non-existing tags
-    def load_tags(tag_list)
-      ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
+    def load_tags(tag_list, _context='tags')
+      context_options = tag_options[_context.to_s]
+      tags_class = context_options[:tags_class] if context_options[:exclusive]
+      tags_class ||= ActsAsTaggableOn::Tag
+      tags_class.find_or_create_all_with_like_by_name(tag_list)
     end
 
     def save_tags
@@ -402,14 +423,16 @@ module ActsAsTaggableOn::Taggable
           new_tags = tags - current_tags
         end
 
+        taggings_relation_name = self.class.tag_options[context.to_s][:base_taggings_relation] || :taggings
+
         # Destroy old taggings:
         if old_tags.present?
-          taggings.not_owned.by_context(context).where(tag_id: old_tags).destroy_all
+          send(taggings_relation_name).not_owned.by_context(context).where(tag_id: old_tags).destroy_all
         end
 
         # Create new taggings:
         new_tags.each do |tag|
-          taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
+          send(taggings_relation_name).create!(tag_id: tag.id, context: context.to_s, taggable: self)
         end
       end
 
@@ -454,7 +477,7 @@ module ActsAsTaggableOn::Taggable
     # @param [Array<String>] tag_list Tags to find or create
     # @param [Symbol] context The tag context for the tag_list
     def find_or_create_tags_from_list_with_context(tag_list, _context)
-      load_tags(tag_list)
+      load_tags(tag_list, _context)
     end
   end
 end

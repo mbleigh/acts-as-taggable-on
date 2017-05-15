@@ -3,6 +3,10 @@ require 'spec_helper'
 
 describe 'Acts As Taggable On' do
 
+  before(:each) do
+    TaggableModel.tag_options = Hash.new { |h,k| h[k] = {} }
+  end
+
   it "should provide a class method 'taggable?' that is false for untaggable models" do
     expect(UntaggableModel).to_not be_taggable
   end
@@ -17,6 +21,21 @@ describe 'Acts As Taggable On' do
 
     it "should respond 'true' to preserve_tag_order?" do
       expect(@taggable.class.preserve_tag_order?).to be_truthy
+    end
+
+    it "should have default tag_options" do
+      expect(@taggable.class.tag_options.keys).to include 'ordered_tags'
+    end
+  end
+
+  describe 'Exclusive Scope Generation' do
+    before(:each) do
+      TaggableModel.tag_types = []
+      TaggableModel.acts_as_taggable exclusive: true
+    end
+
+    it 'should create proper subclasses' do
+      expect(TaggableModel.tag_options['tags'][:tags_class].name).to eq 'ActsAsTaggableOn::Tag::TaggableModelTag'
     end
   end
 
@@ -282,4 +301,62 @@ describe 'Acts As Taggable On' do
     end
   end
 
+  describe 'exclusivity' do
+    shared_examples 'exclusive filtered tags' do
+      before do
+        taggable1 = TaggableModel.create!(name: 'Taggable 1')
+        taggable1.color_list = 'red, yellow, green'
+        taggable1.save!
+
+        taggable2 = OtherTaggableModel.create!(name: 'Other Taggable')
+        taggable2.color_list = 'blue, orange, green'
+        taggable2.save!
+      end
+
+      it 'creates different tags types with same name' do
+        expect(ActsAsTaggableOn::Tag.exclusively_for(:taggable_model).pluck(:name)).to match_array %w[red yellow green]
+        expect(ActsAsTaggableOn::Tag.exclusively_for(:other_taggable_model).pluck(:name)).to match_array %w[blue orange green]
+        expect(ActsAsTaggableOn::Tag.where(name: 'green').count).to eq 2
+        expect(ActsAsTaggableOn::Tag.where(name: 'green').pluck(:type)).to match_array ["ActsAsTaggableOn::Tag::OtherTaggableModelTag", "ActsAsTaggableOn::Tag::TaggableModelTag"]
+      end
+
+      it 'loads tags from specific subclass' do
+        expect {
+          taggable3 = OtherTaggableModel.create!(name: 'Other Taggable 3')
+          taggable3.color_list = 'blue, orange, green'
+          taggable3.save!
+        }.not_to change { ActsAsTaggableOn::Tag.count }
+
+        expect(ActsAsTaggableOn::Tag::OtherTaggableModelTag.where(name: 'green').pluck(:taggings_count)).to eq [2]
+      end
+    end
+
+    describe 'with order' do
+      before do
+        TaggableModel.acts_as_ordered_taggable_on(:colors, exclusive: true)
+        OtherTaggableModel.acts_as_ordered_taggable_on(:colors, exclusive: true)
+      end
+
+      include_examples 'exclusive filtered tags'
+
+      it 'allows to choose only specific tags if marked so' do
+        expect(TaggableModel.includes(:colors).first.colors.map(&:name)).to eq %w[red yellow green]
+        expect(OtherTaggableModel.includes(:colors).first.colors.map(&:name)).to eq %w[blue orange green]
+      end
+    end
+
+    describe 'without order' do
+      before do
+        TaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+        OtherTaggableModel.acts_as_taggable_on(:colors, exclusive: true)
+      end
+
+      include_examples 'exclusive filtered tags'
+
+      it 'allows to choose only specific tags if marked so' do
+        expect(TaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[red yellow green]
+        expect(OtherTaggableModel.includes(:colors).first.colors.map(&:name)).to match_array %w[blue orange green]
+      end
+    end
+  end
 end
