@@ -108,7 +108,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def unpersisted_custom_contexts
-      @unsaved_custom_contexts ||= []
+      @unpersisted_custom_contexts ||= []
     end
 
     def custom_contexts
