@@ -107,8 +107,12 @@ module ActsAsTaggableOn::Taggable
       self.class.grouped_column_names_for(object)
     end
 
+    def unpersisted_custom_contexts
+      @unsaved_custom_contexts ||= []
+    end
+
     def custom_contexts
-      @custom_contexts ||= taggings.map(&:context).uniq
+      @custom_contexts ||= (taggings.map(&:context) + unpersisted_custom_contexts).uniq
     end
 
     def is_taggable?
@@ -117,6 +121,14 @@ module ActsAsTaggableOn::Taggable
 
     def add_custom_context(value)
       custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
+    end
+
+    def add_custom_context_lazy(value)
+      if @custom_contexts.nil?
+        unpersisted_custom_contexts << value.to_s
+      else
+        add_custom_context(value)
+      end
     end
 
     def cached_tag_list_on(context)
@@ -140,7 +152,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def tag_list_on(context)
-      add_custom_context(context)
+      add_custom_context_lazy(context)
       tag_list_cache_on(context)
     end
 
