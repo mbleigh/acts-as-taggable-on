@@ -4,6 +4,36 @@ Each change should fall into categories that would affect whether the release is
 
 As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.  And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history.  Adding tests would be patch level.
 
+### [5.0.0 / 2017-05-18](https://github.com/mbleigh/acts-as-taggable-on/compare/v4.0.0...v5.0.0)
+  * Breaking Changes
+    * [@seuros  Drop support for old version of ActiveRecord and Ruby and prepare rel](https://github.com/mbleigh/acts-as-taggable-on/pull/828)
+  * Added
+    * [@rbritom Tagged with rewrite](https://github.com/mbleigh/acts-as-taggable-on/pull/829)
+    * [@fearenales Due to database collisions, retry finding or creating a tag](https://github.com/mbleigh/acts-as-taggable-on/pull/809)
+    * [@brilyuhns Add owner_tags method to taggable](https://github.com/mbleigh/acts-as-taggable-on/pull/771)
+    * [@brilyuhns upport array of contexts in owner_tags_on method](https://github.com/mbleigh/acts-as-taggable-on/pull/771)
+    * [@brilyuhns Add specs for owner_tags_on and owner_tags methods](https://github.com/mbleigh/acts-as-taggable-on/pull/771)
+  * Fixes
+    * [@rbritom bump ruby versions for travis](https://github.com/mbleigh/acts-as-taggable-on/pull/825)
+    * [@mnrk Fixed Rails 5.1 deprecation message, has_many needs String value for](https://github.com/mbleigh/acts-as-taggable-on/pull/813)
+    * [@ProGM ProGM Adding a test to demonstrate the bug](https://github.com/mbleigh/acts-as-taggable-on/pull/806)
+    * [@ProGM ProGM Ensure that `caching_tag_list_on?` is injected before using it](https://github.com/mbleigh/acts-as-taggable-on/pull/806)
+    * [@ProGM ProGM Fix insert query for postgresql. Move schema definition in schema.rb](https://github.com/mbleigh/acts-as-taggable-on/pull/806)
+    * [@amatsuda assigned but unused variable - any](https://github.com/mbleigh/acts-as-taggable-on/pull/787)
+    * [@gmcnaughton Fix incorrect call of 'self.class' on methods which are already class](https://github.com/mbleigh/acts-as-taggable-on/pull/782)
+    * [@gmcnaughton Fixed #712 (incompatibility with ActiveRecord::Sanitization#quoted_id)](https://github.com/mbleigh/acts-as-taggable-on/pull/782)
+    * [@arpitchauhan Guard against indexes already existing](https://github.com/mbleigh/acts-as-taggable-on/pull/779)
+    * [@arpitchauhan Rename migration to avoid conflicts](https://github.com/mbleigh/acts-as-taggable-on/pull/774)
+    * [@lukeasrodgers "Bugfix `TagList#concat` with non-duplicates."](https://github.com/mbleigh/acts-as-taggable-on/pull/729)
+    * [@fabn Revert "Added missed indexes."](https://github.com/mbleigh/acts-as-taggable-on/pull/709)
+   * Documentation
+    * [Corey Osman Adds a table of contents to the readme and contributing files](https://github.com/mbleigh/acts-as-taggable-on/pull/803)
+    * [@ashishg-qburst Fix typo in README](https://github.com/mbleigh/acts-as-taggable-on/pull/800)
+    * [@praveenangyan Update README.md](https://github.com/mbleigh/acts-as-taggable-on/pull/798)
+    * [@colemerrick update finding tagged objects in readme](https://github.com/mbleigh/acts-as-taggable-on/pull/794)
+    * [jaredbeck  Help people upgrade to 4.0.0](https://github.com/mbleigh/acts-as-taggable-on/pull/784)
+    * [@vasinov Update README.md](https://github.com/mbleigh/acts-as-taggable-on/pull/776)
+
 ### [4.0.0 / 2016-08-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.5.0...v4.0.0)
  * Breaking Changes
    * [@krzysiek1507  drop support for Ruby < 2 ](https://github.com/mbleigh/acts-as-taggable-on/pull/758)
