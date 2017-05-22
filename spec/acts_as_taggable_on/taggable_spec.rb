@@ -161,6 +161,25 @@ describe 'Taggable' do
     expect(@taggable.skill_list.sort).to eq(%w(ruby rails css).sort)
   end
 
+  context 'when invalid tag name is passed' do
+    context 'and call save' do
+      it 'should not be able to create tags' do
+        @taggable.tag_list << ('a' * 256)
+
+        expect{ @taggable.save }.not_to change(ActsAsTaggableOn::Tag, :count)
+        expect{ @taggable.save }.not_to raise_error
+      end
+    end
+
+    context 'and call save!' do
+      it 'should raise validation error' do
+        @taggable.tag_list << ('a' * 256)
+
+        expect{ @taggable.save! }.to raise_error(ActiveRecord::RecordInvalid, /Validation failed: Name is too long/)
+      end
+    end
+  end
+
   it 'should be able to create tags through the tag list directly' do
     @taggable.tag_list_on(:test).add('hello')
     expect(@taggable.tag_list_cache_on(:test)).to_not be_empty
