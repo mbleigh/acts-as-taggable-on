@@ -167,6 +167,17 @@ describe ActsAsTaggableOn::Tag do
     it 'should return an empty array if no tags are specified' do
       expect(ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name([])).to be_empty
     end
+
+    context 'retry 3 times on not unique exception' do
+      it 'performs 3 tries before raising the exception' do
+        allow(ActsAsTaggableOn::Tag).to receive(:named_any).and_raise(ActiveRecord::RecordNotUnique.new('error')) # trigger error inside block
+        expect(ActiveRecord::Base.connection).to receive(:execute).with('ROLLBACK').exactly(3).times
+
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('AWESOME', 'awesome')
+        }.to raise_error ActsAsTaggableOn::DuplicateTagError
+      end
+    end
   end
 
   it 'should require a name' do
