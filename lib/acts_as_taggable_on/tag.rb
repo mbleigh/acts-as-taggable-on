@@ -112,7 +112,7 @@ module ActsAsTaggableOn
         if ActsAsTaggableOn.strict_case_match
           str
         else
-          unicode_downcase(str.to_s)
+          I18n.transliterate(unicode_downcase(str.to_s))
         end
       end
 
