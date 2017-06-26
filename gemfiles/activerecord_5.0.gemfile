@@ -2,14 +2,14 @@
 
 source "https://rubygems.org"
 
-gem "activerecord", "~> 5.0.0"
+gem "activerecord", "~> 5.0.3"
 
 group :local_development do
   gem "guard"
   gem "guard-rspec"
   gem "appraisal"
   gem "rake"
-  gem "byebug", :platforms => [:mri_21, :mri_22, :mri_23]
+  gem "byebug", platforms: [:mri_21, :mri_22, :mri_23]
 end
 
-gemspec :path => "../"
+gemspec path: "../"

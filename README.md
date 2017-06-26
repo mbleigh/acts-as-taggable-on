@@ -1,3 +1,33 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [ActsAsTaggableOn](#actsastaggableon)
+  - [Installation](#installation)
+      - [Post Installation](#post-installation)
+      - [For MySql users](#for-mysql-users)
+  - [Usage](#usage)
+    - [Finding most or least used tags](#finding-most-or-least-used-tags)
+    - [Finding Tagged Objects](#finding-tagged-objects)
+    - [Relationships](#relationships)
+    - [Dynamic Tag Contexts](#dynamic-tag-contexts)
+    - [Tag Parsers](#tag-parsers)
+    - [Tag Ownership](#tag-ownership)
+      - [Working with Owned Tags](#working-with-owned-tags)
+        - [Adding owned tags](#adding-owned-tags)
+        - [Removing owned tags](#removing-owned-tags)
+    - [Dirty objects](#dirty-objects)
+    - [Tag cloud calculations](#tag-cloud-calculations)
+  - [Configuration](#configuration)
+      - [Upgrading](#upgrading)
+  - [Contributors](#contributors)
+  - [Compatibility](#compatibility)
+  - [TODO](#todo)
+  - [Testing](#testing)
+  - [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # ActsAsTaggableOn
 
 [![Join the chat at https://gitter.im/mbleigh/acts-as-taggable-on](https://badges.gitter.im/mbleigh/acts-as-taggable-on.svg)](https://gitter.im/mbleigh/acts-as-taggable-on?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -334,12 +364,12 @@ Note that **owned tags** are added all at once, in the form of ***comma seperate
 Also, when you try to add **owned tags** again, it simply overwrites the previous set of **owned tags**.
 So to append tags in previously existing **owned tags** list, go as follows:
 ```ruby
-def add_owned_tag 
+def add_owned_tag
     @some_item = Item.find(params[:id])
-    owned_tag_list = @some_item.all_tag_list - @some_item.tag_list
+    owned_tag_list = @some_item.all_tags_list - @some_item.tag_list
     owned_tag_list += [(params[:tag])]
     @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
-    @some_item.save   
+    @some_item.save
 end
 
 def stringify(tag_list)
@@ -349,12 +379,12 @@ end
 ##### Removing owned tags
 Similarly as above, removing will be as follows:
 ```ruby
-def remove_owned_tag 
+def remove_owned_tag
     @some_item = Item.find(params[:id])
-    owned_tag_list = @some_item.all_tag_list - @some_item.tag_list
+    owned_tag_list = @some_item.all_tags_list - @some_item.tag_list
     owned_tag_list -= [(params[:tag])]
     @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
-    @some_item.save   
+    @some_item.save
 end
 ```
 

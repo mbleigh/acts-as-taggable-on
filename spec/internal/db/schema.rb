@@ -78,6 +78,9 @@ ActiveRecord::Schema.define version: 0 do
     t.column :type, :string
   end
 
+  create_table :cache_methods_injected_models, force: true do |t|
+    t.column :cached_tag_list, :string
+  end
 
   # Special cases for postgresql
   if using_postgresql?

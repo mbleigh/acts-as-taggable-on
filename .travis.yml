@@ -2,10 +2,9 @@ language: ruby
 cache: bundler
 
 rvm:
-  - 2.3.1
-  - 2.2.5
-  - 2.1
-  - 2.0.0
+  - 2.4.1
+  - 2.3.3
+  - 2.2.7
 
 env:
   - DB=sqlite3
@@ -13,10 +12,9 @@ env:
   - DB=postgresql
 
 gemfile:
+  - gemfiles/activerecord_5.1.gemfile
   - gemfiles/activerecord_5.0.gemfile
   - gemfiles/activerecord_4.2.gemfile
-  - gemfiles/activerecord_4.1.gemfile
-  - gemfiles/activerecord_4.0.gemfile
 
 sudo: false
 
@@ -28,9 +26,4 @@ before_install:
 script: bundle exec rake
 
 matrix:
-  exclude:
-    - rvm: 2.0.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
-    - rvm: 2.1
-      gemfile: gemfiles/activerecord_5.0.gemfile
   fast_finish: true

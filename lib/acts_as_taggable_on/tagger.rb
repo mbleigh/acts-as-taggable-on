@@ -20,12 +20,12 @@ module ActsAsTaggableOn
           has_many :owned_taggings, owned_taggings_scope,
                    opts.merge(
                      as: :tagger,
-                     class_name: ::ActsAsTaggableOn::Tagging,
+                     class_name: '::ActsAsTaggableOn::Tagging',
                      dependent: :destroy
                    )
 
           has_many :owned_tags, -> { distinct },
-                   class_name: ::ActsAsTaggableOn::Tag,
+                   class_name: '::ActsAsTaggableOn::Tag',
                    source: :tag,
                    through: :owned_taggings
         end

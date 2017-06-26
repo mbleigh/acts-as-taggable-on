@@ -1,17 +1,11 @@
+appraise 'activerecord-5.1' do
+  gem 'activerecord', "~> 5.1.1"
+end
+
 appraise 'activerecord-5.0' do
-  gem 'activerecord', "~> 5.0.0"
+  gem 'activerecord', "~> 5.0.3"
 end
 
 appraise "activerecord-4.2" do
-  gem "activerecord", "~> 4.2.0"
-end
-
-appraise "activerecord-4.1" do
-  gem "activerecord", "~> 4.1.0"
-  gem 'mysql2', '~> 0.3.21'
-end
-
-appraise "activerecord-4.0" do
-  gem "activerecord", "~> 4.0.0"
-  gem 'mysql2', '~> 0.3.21'
+  gem "activerecord", "~> 4.2.8"
 end

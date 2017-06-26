@@ -99,6 +99,24 @@ describe 'Acts As Taggable On' do
     end
   end
 
+  describe 'Cache methods initialization on new models' do
+    before(:all) do
+      ActiveRecord::Base.connection.execute(
+        'INSERT INTO cache_methods_injected_models (cached_tag_list) VALUES (\'ciao\')'
+      )
+      class CacheMethodsInjectedModel < ActiveRecord::Base
+        acts_as_taggable
+      end
+    end
+    after(:all) { Object.send(:remove_const, :CacheMethodsInjectedModel) }
+
+    it 'cached_tag_list_on? get injected correctly' do
+      expect do
+        CacheMethodsInjectedModel.first.tag_list
+      end.not_to raise_error
+    end
+  end
+
   describe 'CachingWithArray' do
     pending '#TODO'
   end
