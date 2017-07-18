@@ -49,7 +49,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:on].present?
-        on_condition = on_condition.and(tagging_alias[:context].lteq(options[:on]))
+        on_condition = on_condition.and(tagging_alias[:context].eq(options[:on]))
       end
 
       if (owner = options[:owned_by]).present?
@@ -75,7 +75,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:on].present?
-        on_condition = on_condition.and(tagging_arel_table[:context].lteq(options[:on]))
+        on_condition = on_condition.and(tagging_arel_table[:context].eq(options[:on]))
       end
 
       on_condition
