@@ -263,7 +263,9 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('ruby, css').first).to eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :skills).first).to_not eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :tags).first).to eq(@taggable)
+    expect(TaggableModel.tagged_with('julia', on: :skills).size).to eq(1)
     expect(TaggableModel.tagged_with('julia', on: :tags).size).to eq(1)
+    expect(TaggableModel.tagged_with('julia', on: nil).size).to eq(2)
   end
 
   it 'should not care about case' do
