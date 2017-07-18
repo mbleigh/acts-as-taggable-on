@@ -255,14 +255,15 @@ describe 'Taggable' do
   end
 
   it 'should be able to find by tag with context' do
-    @taggable.skill_list = 'ruby, rails, css'
-    @taggable.tag_list = 'bob, charlie'
+    @taggable.skill_list = 'ruby, rails, css, julia'
+    @taggable.tag_list = 'bob, charlie, julia'
     @taggable.save
 
     expect(TaggableModel.tagged_with('ruby').first).to eq(@taggable)
     expect(TaggableModel.tagged_with('ruby, css').first).to eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :skills).first).to_not eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :tags).first).to eq(@taggable)
+    expect(TaggableModel.tagged_with('julia', on: :tags).size).to eq(1)
   end
 
   it 'should not care about case' do
