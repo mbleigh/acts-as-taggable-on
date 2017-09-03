@@ -214,6 +214,12 @@ module ActsAsTaggableOn::Taggable
       self.class.tag_types.map(&:to_s) + custom_contexts
     end
 
+    def tenant
+      if self.class.tenant_column
+        read_attribute(self.class.tenant_column)
+      end
+    end
+
     def reload(*args)
       self.class.tag_types.each do |context|
         instance_variable_set("@#{context.to_s.singularize}_list", nil)
@@ -272,7 +278,7 @@ module ActsAsTaggableOn::Taggable
 
         # Create new taggings:
         new_tags.each do |tag|
-          taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
+          taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self, tenant: tenant)
         end
       end
 

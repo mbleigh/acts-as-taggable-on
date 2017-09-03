@@ -61,12 +61,14 @@ describe ActsAsTaggableOn::Tagging do
       @tagging.tag = ActsAsTaggableOn::Tag.create(name: "Physics")
       @tagging.tagger = @tagger
       @tagging.context = 'Science'
+      @tagging.tenant = 'account1'
       @tagging.save
 
       @tagging_2.taggable = TaggableModel.create(name: "Satellites")
       @tagging_2.tag = ActsAsTaggableOn::Tag.create(name: "Technology")
       @tagging_2.tagger = @tagger_2
       @tagging_2.context = 'Science'
+      @tagging_2.tenant = 'account1'
       @tagging_2.save
 
       @tagging_3.taggable = TaggableModel.create(name: "Satellites")
@@ -95,6 +97,14 @@ describe ActsAsTaggableOn::Tagging do
         expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).second).to eq(@tagging_2);
         expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).third).to eq(@tagging_3);
         expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).length).to eq(3);
+      end
+    end
+
+    describe '.by_tenant' do
+      it "should find taggings by tenant" do
+        expect(ActsAsTaggableOn::Tagging.by_tenant('account1').length).to eq(2);
+        expect(ActsAsTaggableOn::Tagging.by_tenant('account1').first).to eq(@tagging);
+        expect(ActsAsTaggableOn::Tagging.by_tenant('account1').second).to eq(@tagging_2);
       end
     end
 

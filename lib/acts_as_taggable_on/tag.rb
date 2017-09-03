@@ -55,6 +55,12 @@ module ActsAsTaggableOn
         select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
     end
 
+    def self.for_tenant(tenant)
+      joins(:taggings).
+        where("taggings.tenant = ?", tenant).
+        select("DISTINCT tags.*")
+    end
+
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
