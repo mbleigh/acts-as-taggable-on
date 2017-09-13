@@ -30,7 +30,8 @@ module ActsAsTaggableOn
 
       # escape _ and % characters in strings, since these are wildcards in SQL.
       def escape_like(str)
-        str.gsub(/[!%_]/) { |x| '!' + x }
+        # str.gsub(/[!%_]/) { |x| '!' + x }
+        str
       end
     end
   end
