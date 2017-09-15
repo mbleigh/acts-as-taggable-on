@@ -68,6 +68,18 @@ describe ActsAsTaggableOn::Tag do
     it 'should not return tags that have been used in other contexts' do
       expect(ActsAsTaggableOn::Tag.for_context('needs').pluck(:name)).to_not include('ruby')
     end
+
+    context 'when multiple contexts are specified' do
+      before do
+        @user.language_list.add('go')
+        @user.save
+      end
+
+      it 'should return tags that have been used in all given contexts' do
+        expect(ActsAsTaggableOn::Tag.for_context('skills', 'languages').pluck(:name).sort)
+          .to include('go', 'ruby')
+      end
+    end
   end
 
   describe 'find or create by name' do

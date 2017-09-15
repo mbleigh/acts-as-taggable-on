@@ -49,9 +49,16 @@ module ActsAsTaggableOn
       where(clause)
     end
 
-    def self.for_context(context)
+    def self.for_context(*contexts)
+      contexts = contexts.flatten
+      clause = if contexts.length > 1
+        "#{ActsAsTaggableOn.taggings_table}.context IN (?)"
+      else
+        "#{ActsAsTaggableOn.taggings_table}.context = ?"
+      end
+
       joins(:taggings).
-        where(["#{ActsAsTaggableOn.taggings_table}.context = ?", context]).
+        where([clause, contexts]).
         select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
     end
 
