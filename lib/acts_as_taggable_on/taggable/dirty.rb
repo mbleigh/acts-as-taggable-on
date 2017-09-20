@@ -13,19 +13,20 @@ module ActsAsTaggableOn::Taggable
 
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{tag_type}_list_changed?
-              changed_attributes.include?("#{tag_type}_list")
+              @changed_attributes && @changed_attributes.include?("#{tag_type}_list")
             end
+            alias_method :will_save_change_to_#{tag_type}_list?, :#{tag_type}_list_changed?
 
             def #{tag_type}_list_was
-              changed_attributes.include?("#{tag_type}_list") ? changed_attributes["#{tag_type}_list"] : __send__("#{tag_type}_list")
+              @changed_attributes && @changed_attributes.include?("#{tag_type}_list") ? @changed_attributes["#{tag_type}_list"] : __send__("#{tag_type}_list")
             end
 
             def #{tag_type}_list_change
-              [changed_attributes['#{tag_type}_list'], __send__('#{tag_type}_list')] if changed_attributes.include?("#{tag_type}_list")
+              [@changed_attributes['#{tag_type}_list'], __send__('#{tag_type}_list')] if @changed_attributes && @changed_attributes.include?("#{tag_type}_list")
             end
 
             def #{tag_type}_list_changes
-              [changed_attributes['#{tag_type}_list'], __send__('#{tag_type}_list')] if changed_attributes.include?("#{tag_type}_list")
+              [@changed_attributes['#{tag_type}_list'], __send__('#{tag_type}_list')] if @changed_attributes && @changed_attributes.include?("#{tag_type}_list")
             end
           RUBY
 
