@@ -28,7 +28,9 @@ module ActsAsTaggableOn::Taggable
             has_many context_taggings, -> { includes(:tag).order(taggings_order).where(context: tags_type) },
                      as: :taggable,
                      class_name: 'ActsAsTaggableOn::Tagging',
-                     dependent: :destroy
+                     dependent: :destroy,
+                     after_add: :dirty_tag_list,
+                     after_remove: :dirty_tag_list
 
             has_many context_tags, -> { order(taggings_order) },
                      class_name: 'ActsAsTaggableOn::Tag',
@@ -47,6 +49,11 @@ module ActsAsTaggableOn::Taggable
 
             def all_#{tags_type}_list
               all_tags_list_on('#{tags_type}')
+            end
+
+            private
+            def dirty_tag_list tagging
+              attribute_will_change! tagging.context.singularize+"_list"
             end
           RUBY
         end
