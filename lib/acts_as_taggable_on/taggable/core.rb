@@ -52,8 +52,9 @@ module ActsAsTaggableOn::Taggable
             end
 
             private
-            def dirty_tag_list tagging
-              attribute_will_change! tagging.context.singularize+"_list"
+            def dirty_tag_list tagging_or_context
+              context = tagging_or_context.respond_to?(:context) ? tagging_or_context.context : tagging_or_context
+              attribute_will_change! context.singularize+"_list"
             end
           RUBY
         end
@@ -191,6 +192,7 @@ module ActsAsTaggableOn::Taggable
       process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
 
       instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(new_list).parse)
+      dirty_tag_list context
     end
 
     def tagging_contexts
