@@ -19,7 +19,6 @@ describe ActsAsTaggableOn::Taggable::Dirty do
 
       it 'flags tag_list as changed' do
         expect(@taggable.tag_list_changed?).to be_truthy
-        expect(@taggable.will_save_change_to_tag_list?).to be_truthy
       end
 
       it 'preserves original value' do
