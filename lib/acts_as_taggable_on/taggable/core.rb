@@ -37,7 +37,7 @@ module ActsAsTaggableOn::Taggable
                      through: context_taggings,
                      source: :tag
 
-           attribute "#{tags_type.singularize}_list".to_sym
+           attribute "#{tags_type.singularize}_list".to_sym, ActiveModel::Type::String.new
 
           end
 
