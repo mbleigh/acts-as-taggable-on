@@ -47,6 +47,9 @@ module ActsAsTaggableOn::Taggable
             end
 
             def #{tag_type}_list=(new_tags)
+              if self.class.preserve_tag_order? || ActsAsTaggableOn.default_parser.new(new_tags).parse.sort != #{tag_type}_list.sort
+                super new_tags
+              end
               set_tag_list_on('#{tags_type}', new_tags)
             end
 
