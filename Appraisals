@@ -1,3 +1,7 @@
+appraise 'activerecord-5.2' do
+  gem 'activerecord', "~> 5.2.x"
+end
+
 appraise 'activerecord-5.1' do
   gem 'activerecord', "~> 5.1.1"
 end
