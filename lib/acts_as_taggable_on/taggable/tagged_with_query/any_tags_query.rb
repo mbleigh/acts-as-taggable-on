@@ -38,7 +38,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:on].present?
-        exists_contition = exists_contition.and(tagging_arel_table[:context].lteq(options[:on]))
+        exists_contition = exists_contition.and(tagging_arel_table[:context].eq(options[:on]))
       end
 
       if (owner = options[:owned_by]).present?

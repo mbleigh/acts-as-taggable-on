@@ -215,6 +215,14 @@ describe 'Taggable' do
 
     expect(TaggableModel.tagged_with('ruby').first).to eq(@taggable)
   end
+  
+  it 'should be able to find by tag in a particular context' do
+    @taggable.skill_list = 'ruby'
+    @taggable.save
+
+    expect(TaggableModel.tagged_with('ruby', on: :tags)).to eq([])
+    expect(TaggableModel.tagged_with('ruby', on: :skills).first).to eq(@taggable)
+  end
 
   it 'should be able to get a count with find by tag when using a group by' do
     @taggable.skill_list = 'ruby'
