@@ -63,7 +63,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:on].present?
-        on_condition = on_condition.and(tagging_arel_table[:context].lteq(options[:on]))
+        on_condition = on_condition.and(tagging_arel_table[:context].eq(options[:on]))
       end
 
       on_condition
