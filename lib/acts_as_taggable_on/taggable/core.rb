@@ -4,6 +4,7 @@ module ActsAsTaggableOn::Taggable
   module Core
     def self.included(base)
       base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
+      base.include ActsAsTaggableOn::Taggable::Core::InstanceMethods
 
       base.class_eval do
         attr_writer :custom_contexts
@@ -99,6 +100,12 @@ module ActsAsTaggableOn::Taggable
 
       def taggable_mixin
         @taggable_mixin ||= Module.new
+      end
+    end
+
+    module InstanceMethods
+      def tagged_with?(tag)
+        tag_list.include?(tag)
       end
     end
 
