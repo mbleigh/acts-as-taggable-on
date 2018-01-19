@@ -55,9 +55,10 @@ module ActsAsTaggableOn
       # Example:
       #   @user.tag(@photo, :with => "paris, normandy", :on => :locations)
       def tag(taggable, opts={})
+        return false unless taggable.respond_to?(:is_taggable?) && taggable.is_taggable?
+
         opts.reverse_merge!(force: true)
         skip_save = opts.delete(:skip_save)
-        return false unless taggable.respond_to?(:is_taggable?) && taggable.is_taggable?
 
         fail 'You need to specify a tag context using :on' unless opts.key?(:on)
         fail 'You need to specify some tags using :with' unless opts.key?(:with)
