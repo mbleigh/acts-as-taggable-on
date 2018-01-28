@@ -108,7 +108,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def custom_contexts
-      @custom_contexts ||= taggings.map(&:context).uniq
+      @custom_contexts ||= taggings.map(&:context).uniq - declared_contexts
     end
 
     def is_taggable?
@@ -116,7 +116,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def add_custom_context(value)
-      custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or self.class.tag_types.map(&:to_s).include?(value.to_s)
+      custom_contexts << value.to_s unless custom_contexts.include?(value.to_s) or declared_contexts.include?(value.to_s)
     end
 
     def cached_tag_list_on(context)
@@ -180,16 +180,18 @@ module ActsAsTaggableOn::Taggable
     def set_tag_list_on(context, new_list)
       add_custom_context(context)
 
-      variable_name = "@#{context.to_s.singularize}_list"
+      # don't process dirty for custom contexts since those do not have related '_list' methods
       process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
 
+      variable_name = "@#{context.to_s.singularize}_list"
       instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(new_list).parse)
     end
 
     def tagging_contexts
-      self.class.tag_types.map(&:to_s) + custom_contexts
+      declared_contexts + custom_contexts
     end
 
+    # TODO: make private - this method should not be exposed
     def process_dirty_object(context, new_list)
       value = new_list.is_a?(Array) ? ActsAsTaggableOn::TagList.new(new_list) : new_list
       attrib = "#{context.to_s.singularize}_list"
@@ -312,6 +314,10 @@ module ActsAsTaggableOn::Taggable
     # @param [Symbol] context The tag context for the tag_list
     def find_or_create_tags_from_list_with_context(tag_list, _context)
       load_tags(tag_list)
+    end
+
+    def declared_contexts
+      @declared_contexts ||= self.class.tag_types.map(&:to_s)
     end
   end
 end

@@ -45,6 +45,18 @@ describe ActsAsTaggableOn::Taggable::Dirty do
           expect(taggable.tag_list_changed?).to be_truthy
         end
       end
+
+      context 'with existing tags when reloaded' do
+        before do
+          @taggable = TaggableModel.find(@taggable.id)
+          expect(@taggable.changes).to be_empty
+          @taggable.tag_list = 'one'
+        end
+
+        it 'flags tag_list as changed' do
+          expect(@taggable.tag_list_changed?).to be_truthy
+        end
+      end
     end
 
     context 'when tag_list is the same' do
