@@ -39,8 +39,6 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if (owner = options[:owned_by]).present?
-        owner_table = owner.class.base_class.arel_table
-
         exists_contition = exists_contition.and(tagging_arel_table[:tagger_id].eq(owner.id))
                                    .and(tagging_arel_table[:tagger_type].eq(owner.class.base_class.to_s))
       end
