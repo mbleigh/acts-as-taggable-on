@@ -14,9 +14,6 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def model_has_at_least_one_tag
-      tagging_alias = tagging_arel_table.alias(alias_name(tag_list))
-
-
       tagging_arel_table.project(Arel.star).where(at_least_one_tag).exists
     end
 
