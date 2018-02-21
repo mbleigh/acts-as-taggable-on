@@ -376,7 +376,9 @@ def remove_owned_tag(item, owner, tags_to_add, options = {})
 end
 
 def own_tag(item, owner, tags_to_add, direction = "add", opts)
-  owned_tag_list = item.owner_tags_on(owner, (options[:tag_type] || :tag))
+  tag_type = (options[:tag_type] || :tag)
+  owned_tag_list = item.owner_tags_on(owner, tag_type)
+  
   if direction == "subtract"
     owned_tag_list -= tags_to_add
   else
