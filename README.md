@@ -379,12 +379,12 @@ end
 
 def own_tag(item, owner, tags_to_add, direction = "add", opts)
   tag_type = (options[:tag_type] || DEFAULT_ACTSASTAGGABLEON_TYPE)
-  owned_tag_list = item.owner_tags_on(owner, tag_type)
+  owned_tag_list = item.owner_tags_on(owner, tag_type).map(&:name)
 
   if direction == "subtract"
-    owned_tag_list = owned_tag_list.map(&:name).reject{|n| n.in?(tags_to_add)}
+    owned_tag_list = owned_tag_list.reject{|n| n.in?(tags_to_add)}
   else
-    owned_tag_list.map(&:name).push(*tags_to_add)
+    owned_tag_list.push(*tags_to_add)
   end
 
   owner.tag(item, with: stringify(owned_tag_list), on: tag_type, skip_save: (options[:skip_save] || true))
