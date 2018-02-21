@@ -426,7 +426,6 @@ opts = {
   skip_save: false
 }
 add_owned_tag(self, current_user.team, tags, opts)
-item.save!
 ```
 
 
