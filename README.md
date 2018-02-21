@@ -367,6 +367,8 @@ So to append tags in previously existing **owned tags** list,
 add the following functions:
 
 ```ruby
+DEFAULT_ACTSASTAGGABLEON_TYPE = :tags
+
 def add_owned_tag(item, owner, tags_to_add, options = {})
   own_tag(item, owner, arrayify(tags_to_add), "add", options)
 end
@@ -376,9 +378,9 @@ def remove_owned_tag(item, owner, tags_to_add, options = {})
 end
 
 def own_tag(item, owner, tags_to_add, direction = "add", opts)
-  tag_type = (options[:tag_type] || :tag)
+  tag_type = (options[:tag_type] || DEFAULT_ACTSASTAGGABLEON_TYPE)
   owned_tag_list = item.owner_tags_on(owner, tag_type)
-  
+
   if direction == "subtract"
     owned_tag_list -= tags_to_add
   else
