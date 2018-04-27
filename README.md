@@ -121,6 +121,7 @@ Add and remove a single tag
 ```ruby
 @user.tag_list.add("awesome")   # add a single tag. alias for <<
 @user.tag_list.remove("awesome") # remove a single tag
+@user.save # save to persist tag_list
 ```
 
 Add and remove multiple tags in an array
@@ -128,6 +129,7 @@ Add and remove multiple tags in an array
 ```ruby
 @user.tag_list.add("awesome", "slick")
 @user.tag_list.remove("awesome", "slick")
+@user.save
 ```
 
 You can also add and remove tags in format of String. This would
