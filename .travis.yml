@@ -2,6 +2,8 @@ language: ruby
 cache: bundler
 
 rvm:
+  - ruby-head
+  - 2.5.0
   - 2.4.1
   - 2.3.3
   - 2.2.7
@@ -26,4 +28,6 @@ before_install:
 script: bundle exec rake
 
 matrix:
+  allow_failures:
+    - rvm: ruby-head
   fast_finish: true
