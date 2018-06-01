@@ -49,7 +49,7 @@ module ActsAsTaggableOn::Taggable
     end
 
     def owner_tags_on(owner, context)
-      scope = owner_tags(owner).where(
+      owner_tags(owner).where(
         "#{ActsAsTaggableOn::Tagging.table_name}" => {
           context: context
         }
