@@ -9,5 +9,5 @@ tmp*.sw?
 tmp
 *.gem
 *.lock
-
+*.iml
 /.idea
