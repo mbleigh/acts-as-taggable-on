@@ -40,10 +40,25 @@ module ActsAsTaggableOn::Taggable
           end
         end
 
+        ###
+        # Clear local column cache when parent does
+        # https://github.com/jpregracke/acts-as-taggable-on/commit/92ef120b9716e392285c1617f2e6838b8da45e00
+        #
         def reset_column_information
           super
+          clear_acts_as_taggable_on_cache_columns
+        end
+
+        def clear_caches_calculated_from_columns
+          super
+          clear_acts_as_taggable_on_cache_columns
+        end
+
+        def clear_acts_as_taggable_on_cache_columns
           @acts_as_taggable_on_cache_columns = nil
         end
+        #
+        ####
       end
     end
 
