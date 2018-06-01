@@ -1,5 +1,5 @@
 module ActsAsTaggableOn
-  class Tagging < ::ActiveRecord::Base #:nodoc:
+  class Tagging < ::ApplicationRecord #:nodoc:
     DEFAULT_CONTEXT = 'tags'
     belongs_to :tag, class_name: '::ActsAsTaggableOn::Tag', counter_cache: ActsAsTaggableOn.tags_counter
     belongs_to :taggable, polymorphic: true
