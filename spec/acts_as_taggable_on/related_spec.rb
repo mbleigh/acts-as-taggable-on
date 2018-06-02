@@ -33,6 +33,15 @@ describe 'Acts As Taggable On' do
       expect(taggable1.find_related_tags).to_not include(taggable2)
     end
 
+    it 'should find related objects based on tag names on context - uuid primary key' do
+      taggable1 = TaggableModelWithUuidPrimaryKey.create!(name: 'Taggable 1',tag_list: 'one, two')
+      taggable2 = TaggableModelWithUuidPrimaryKey.create!(name: 'Taggable 2',tag_list: 'three, four')
+      taggable3 = TaggableModelWithUuidPrimaryKey.create!(name: 'Taggable 3',tag_list: 'one, four')
+
+      expect(taggable1.find_related_tags).to include(taggable3)
+      expect(taggable1.find_related_tags).to_not include(taggable2)
+    end
+
     it 'should find other related objects based on tag names on context' do
       taggable1 = TaggableModel.create!(name: 'Taggable 1',tag_list: 'one, two')
       taggable2 = OtherTaggableModel.create!(name: 'Taggable 2',tag_list: 'three, four')
