@@ -41,6 +41,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
  * Added
    * [@jessieay  Rails 5 ](https://github.com/mbleigh/acts-as-taggable-on/pull/763)
  * Fixes
+  * [@eugen0329 Fix dirty triggering with existing custom context] (https://github.com/mbleigh/acts-as-taggable-on/issues/811)
   * [@rikettsie #623 collation parameter is ignored if it generates an exception] (https://github.com/mbleigh/acts-as-taggable-on/pull/650 )
   * [@bwvoss References working parser in deprectation warning] (https://github.com/mbleigh/acts-as-taggable-on/pull/659 )
   * [@jh125486 Updated tagging_contexts to include dynamic contexts ](https://github.com/mbleigh/acts-as-taggable-on/pull/660 )
