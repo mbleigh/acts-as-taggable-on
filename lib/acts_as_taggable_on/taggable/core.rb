@@ -28,12 +28,17 @@ module ActsAsTaggableOn::Taggable
             has_many context_taggings, -> { includes(:tag).order(taggings_order).where(context: tags_type) },
                      as: :taggable,
                      class_name: 'ActsAsTaggableOn::Tagging',
-                     dependent: :destroy
+                     dependent: :destroy,
+                     after_add: :dirty_tag_list,
+                     after_remove: :dirty_tag_list
 
             has_many context_tags, -> { order(taggings_order) },
                      class_name: 'ActsAsTaggableOn::Tag',
                      through: context_taggings,
                      source: :tag
+
+           attribute "#{tags_type.singularize}_list".to_sym, ActiveRecord::Type::String.new
+
           end
 
           taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -42,11 +47,19 @@ module ActsAsTaggableOn::Taggable
             end
 
             def #{tag_type}_list=(new_tags)
+              if self.class.preserve_tag_order? || ActsAsTaggableOn.default_parser.new(new_tags).parse.sort != #{tag_type}_list.sort
+                super ActsAsTaggableOn.default_parser.new(new_tags).parse
+              end
               set_tag_list_on('#{tags_type}', new_tags)
             end
 
             def all_#{tags_type}_list
               all_tags_list_on('#{tags_type}')
+            end
+
+            private
+            def dirty_tag_list tagging
+              attribute_will_change! tagging.context.singularize+"_list"
             end
           RUBY
         end
