@@ -42,7 +42,6 @@ module ActsAsTaggableOn::Taggable
           end
 
           taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-
             def #{tag_type}_list
               tag_list_on('#{tags_type}')
             end
@@ -63,7 +62,7 @@ module ActsAsTaggableOn::Taggable
             end
 
             private
-            def dirtify_tag_list tagging
+            def dirtify_tag_list(tagging)
               attribute_will_change! tagging.context.singularize+"_list"
             end
           RUBY
