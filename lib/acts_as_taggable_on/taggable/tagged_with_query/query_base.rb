@@ -48,7 +48,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
     def escaped_tag(tag)
       tag = tag.downcase unless ActsAsTaggableOn.strict_case_match
-      ActsAsTaggableOn::Utils.escape_like(tag)
+      tag.gsub(/[!%_]/) { |x| '!' + x }
     end
 
     def adjust_taggings_alias(taggings_alias)
