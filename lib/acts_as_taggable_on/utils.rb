@@ -20,10 +20,6 @@ module ActsAsTaggableOn
         Digest::SHA1.hexdigest(string)[0..6]
       end
 
-      def active_record5?
-        ::ActiveRecord::VERSION::MAJOR == 5
-      end
-
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'
       end

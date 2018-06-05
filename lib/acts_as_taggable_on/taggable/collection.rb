@@ -174,7 +174,7 @@ module ActsAsTaggableOn::Taggable
       # See https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb#L38
       def count(column_name = :all, options = {})
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
-        ActsAsTaggableOn::Utils.active_record5? ? super(column_name) : super(column_name, options)
+        super(column_name)
       end
     end
   end
