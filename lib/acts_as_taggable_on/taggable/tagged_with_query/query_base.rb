@@ -29,9 +29,9 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       matches_attribute = matches_attribute.lower unless ActsAsTaggableOn.strict_case_match
 
       if options[:wild].present?
-        matches_attribute.matches("%#{escaped_tag(tag)}%", "!")
+        tag_arel_table[:name].matches("%#{escaped_tag(tag)}%", "!")
       else
-        matches_attribute.matches(escaped_tag(tag), "!")
+        tag_arel_table[:name].matches(escaped_tag(tag), "!")
       end
     end
 
