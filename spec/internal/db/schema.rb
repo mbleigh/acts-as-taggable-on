@@ -41,6 +41,12 @@ ActiveRecord::Schema.define version: 0 do
     t.column :type, :string
   end
 
+  create_table :taggable_model_with_uuid_primary_keys, id: false, force: true do |t|
+    t.column :id, :string, null: false
+    t.column :name, :string
+    t.column :type, :string
+  end
+
   create_table :untaggable_models, force: true do |t|
     t.column :taggable_model_id, :integer
     t.column :name, :string
