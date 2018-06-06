@@ -20,16 +20,4 @@ describe ActsAsTaggableOn::Utils do
       expect(ActsAsTaggableOn::Utils.sha_prefix('puppies')).not_to eq(ActsAsTaggableOn::Utils.sha_prefix('kittens'))
     end
   end
-
-  describe '#escape_replacement' do
-    it 'should return ! when the adapter is not PostgreSQL' do
-      allow(ActsAsTaggableOn::Utils.connection).to receive(:adapter_name) { 'MySQL' }
-      expect(ActsAsTaggableOn::Utils.escape_replacement).to eq('!')
-    end
-
-    it 'should return \\ when the adapter is PostgreSQL' do
-      allow(ActsAsTaggableOn::Utils.connection).to receive(:adapter_name) { 'PostgreSQL' }
-      expect(ActsAsTaggableOn::Utils.escape_replacement).to eq('\\')
-    end
-  end
 end

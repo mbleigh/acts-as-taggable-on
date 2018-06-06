@@ -3,7 +3,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     def build
       taggable_model.select(all_fields)
                     .where(model_has_at_least_one_tag)
-                    .order(order_conditions)
+                    .order(Arel.sql(order_conditions))
                     .readonly(false)
     end
 
