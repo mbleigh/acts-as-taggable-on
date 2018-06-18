@@ -3,6 +3,14 @@
 source "https://rubygems.org"
 
 gem "activerecord", "~> 5.1.1"
+case ENV["DB"]
+when "postgresql"
+  gem 'pg'
+when "mysql"
+  gem 'mysql2', '~> 0.3'
+else
+  gem 'sqlite3'
+end
 
 group :local_development do
   gem "guard"
