@@ -152,6 +152,11 @@ describe 'Single Table Inheritance' do
 
       inheriting_model.update_attributes! name: 'foo'
     end
+
+    it "should only join with taggable's table to check type for inherited models" do
+      expect(TaggableModel.tag_counts_on(:tags).to_sql).to_not match /INNER JOIN taggable_models ON/
+      expect(InheritingTaggableModel.tag_counts_on(:tags).to_sql).to match /INNER JOIN taggable_models ON/
+    end
   end
 
   describe 'ownership' do
