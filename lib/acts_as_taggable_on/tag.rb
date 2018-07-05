@@ -50,9 +50,9 @@ module ActsAsTaggableOn
     end
 
     def self.for_context(context)
-      joins(:acts_taggings).
+      joins(:taggings).
         where(["acts_taggings.context = ?", context]).
-        select("DISTINCT tags.*")
+        select("DISTINCT acts_tags.*")
     end
 
     ### CLASS METHODS:
