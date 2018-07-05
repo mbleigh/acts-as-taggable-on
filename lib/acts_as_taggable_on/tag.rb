@@ -1,6 +1,7 @@
 # encoding: utf-8
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
+    self.table_name = 'acts_tags'
 
     ### ASSOCIATIONS:
 
@@ -49,8 +50,8 @@ module ActsAsTaggableOn
     end
 
     def self.for_context(context)
-      joins(:taggings).
-        where(["taggings.context = ?", context]).
+      joins(:acts_taggings).
+        where(["acts_taggings.context = ?", context]).
         select("DISTINCT tags.*")
     end
 
