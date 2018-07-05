@@ -127,9 +127,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tag_counts_on(:tags, order: 'acts_tags.id').map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, order: 'acts_tags.id').map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tag_counts_on(:tags, order: 'acts_tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should have different tags_on for inherited models' do
@@ -138,9 +138,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tags_on(:tags, order: 'acts_tags.id').map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tags_on(:tags, order: 'acts_tags.id').map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tags_on(:tags, order: 'acts_tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should store same tag without validation conflict' do
