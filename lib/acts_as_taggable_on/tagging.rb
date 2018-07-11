@@ -1,6 +1,6 @@
 module ActsAsTaggableOn
   class Tagging < ::ActiveRecord::Base #:nodoc:
-    self.table_name = 'acts_taggings'
+    self.table_name = ActsAsTaggableOn.taggings_table
 
     DEFAULT_CONTEXT = 'tags'
     belongs_to :tag, class_name: '::ActsAsTaggableOn::Tag', counter_cache: ActsAsTaggableOn.tags_counter
