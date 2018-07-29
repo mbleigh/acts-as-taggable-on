@@ -103,9 +103,8 @@ module ActsAsTaggableOn::Taggable
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn.default_parser.new(tags).parse
         options = options.dup
-        empty_result = where('1 = 0')
 
-        return empty_result if tag_list.empty?
+        return none if tag_list.empty?
 
         ::ActsAsTaggableOn::Taggable::TaggedWithQuery.build(self, ActsAsTaggableOn::Tag, ActsAsTaggableOn::Tagging, tag_list, options)
       end
