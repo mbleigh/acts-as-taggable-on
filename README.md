@@ -488,6 +488,13 @@ If you would like to have an exact match covering special characters with MySql:
 ActsAsTaggableOn.force_binary_collation = true
 ```
 
+If you would like to specify table names:
+
+```ruby
+ActsAsTaggableOn.tags_table = 'aato_tags'
+ActsAsTaggableOn.taggings_table = 'aato_taggings'
+```
+
 If you want to change the default delimiter (it defaults to ','). You can also pass in an array of delimiters such as ([',', '|']):
 
 ```ruby

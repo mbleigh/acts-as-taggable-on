@@ -6,7 +6,9 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch.
 
 ### [Master / Unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.1...master)
   * Misc
-    * [@gssbzn Remove legacy code for an empty query and replace it with ` ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
+    * [@gssbzn Remove legacy code for an empty query and replace it with `ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
+  * Features
+    * [@mizukami234 @junmoka Make table names configurable](https://github.com/mbleigh/acts-as-taggable-on/pull/910)
 
 ### [6.0.1 / 2018-06-27](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.0.1)
   * Fixes
