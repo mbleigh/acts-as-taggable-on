@@ -75,6 +75,12 @@ describe 'Acts As Taggable On' do
       CachedModel.reset_column_information
       expect(CachedModel.instance_variable_get(:@acts_as_taggable_on_cache_columns)).to eql(nil)
     end
+
+    it 'should not override a user-defined columns method' do
+      expect(ColumnsOverrideModel.columns.map(&:name)).not_to include('ignored_column')
+      ColumnsOverrideModel.acts_as_taggable
+      expect(ColumnsOverrideModel.columns.map(&:name)).not_to include('ignored_column')
+    end
   end
 
   describe 'with a custom delimiter' do

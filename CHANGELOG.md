@@ -11,13 +11,12 @@ Each change should fall into categories that would affect whether the release is
 As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
 ### [Master / Unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.1...master)
-
+* Fixes
+  * [@tonyta Avoid overriding user-defined columns cache methods](https://github.com/mbleigh/acts-as-taggable-on/pull/911)
 * Misc
-  * [@gssbzn Remove legacy code for an empty query and replace it with `ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
-
+  * [@gssbzn Remove legacy code for an empty query and replace it with ` ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
 * Documentation
   * [@tonyta Cleanup CHANGELOG.md formatting and references](https://github.com/mbleigh/acts-as-taggable-on/pull/913)
-
 ### [6.0.1 / 2018-06-27](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.0.1)
 
 * Fixes

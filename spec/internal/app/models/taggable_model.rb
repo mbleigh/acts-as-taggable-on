@@ -6,6 +6,7 @@ class TaggableModel < ActiveRecord::Base
   has_many :untaggable_models
 
   attr_reader :tag_list_submethod_called
+
   def tag_list=(v)
     @tag_list_submethod_called = true
     super
