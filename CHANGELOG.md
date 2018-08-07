@@ -24,7 +24,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
   * [@Fodoj Support Rails 5.2](https://github.com/mbleigh/acts-as-taggable-on/pull/887)
 
 * Fixes
-  * [@tekniklr matches_attribute was not being used in tag_match_type](https://github.com/mbleigh/acts-as-taggable-on/pull/869)
+  * [@tekniklr matches_attribute was not being used in tag_match_type](https://github.com/mbleigh/acts-as-taggable-on/issues/869)
 
 ### [5.0.0 / 2017-05-18](https://github.com/mbleigh/acts-as-taggable-on/compare/v4.0.0...v5.0.0)
 
@@ -53,11 +53,11 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
   * [@fabn Revert "Added missed indexes."](https://github.com/mbleigh/acts-as-taggable-on/pull/709)
 
 * Documentation
-  * [Corey Osman Adds a table of contents to the readme and contributing files](https://github.com/mbleigh/acts-as-taggable-on/pull/803)
+  * [@logicminds Adds a table of contents to the readme and contributing files](https://github.com/mbleigh/acts-as-taggable-on/pull/803)
   * [@ashishg-qburst Fix typo in README](https://github.com/mbleigh/acts-as-taggable-on/pull/800)
   * [@praveenangyan Update README.md](https://github.com/mbleigh/acts-as-taggable-on/pull/798)
   * [@colemerrick update finding tagged objects in readme](https://github.com/mbleigh/acts-as-taggable-on/pull/794)
-  * [jaredbeck Help people upgrade to 4.0.0](https://github.com/mbleigh/acts-as-taggable-on/pull/784)
+  * [@jaredbeck Help people upgrade to 4.0.0](https://github.com/mbleigh/acts-as-taggable-on/pull/784)
   * [@vasinov Update README.md](https://github.com/mbleigh/acts-as-taggable-on/pull/776)
 
 ### [4.0.0 / 2016-08-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.5.0...v4.0.0)
@@ -82,7 +82,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
   * [@mark-jacobs Update clean! method to use case insensitive uniq! when strict_case_match false](https://github.com/mbleigh/acts-as-taggable-on/commit/90c86994b70a399b8b1cbc0ae88835e14d6aadfc)
   * [@lukeasrodgers BugFix flackey time test](https://github.com/mbleigh/acts-as-taggable-on/pull/727)
   * [@pcupueran Add rspec tests for context scopes for tagging_spec](https://github.com/mbleigh/acts-as-taggable-on/pull/740)
-  * [@ Emerson Huitt Remove existing selects from relation](https://github.com/mbleigh/acts-as-taggable-on/pull/743)
+  * [@emerson-h Remove existing selects from relation](https://github.com/mbleigh/acts-as-taggable-on/pull/743)
   * [@keerthisiv fix issue with custom delimiter](https://github.com/mbleigh/acts-as-taggable-on/pull/748)
   * [@priyank-gupta specify tag table name for mysql collation query](https://github.com/mbleigh/acts-as-taggable-on/pull/760)
   * [@seuros Remove warning messages](https://github.com/mbleigh/acts-as-taggable-on/commit/cda08c764b07a18b8582b948d1c5b3910a376965)
@@ -121,7 +121,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 ### [3.4.3 / 2014-09-26](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.2...v3.4.3)
 
 * Fixes
-  * [@warp clears column cache on reset_column_information resolves](https://github.com/mbleigh/acts-as-taggable-on/pull/621)
+  * [@warp clears column cache on reset_column_information resolves](https://github.com/mbleigh/acts-as-taggable-on/issues/621)
 
 ### [3.4.2 / 2014-09-26](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.4.1...v3.4.2)
 
@@ -139,13 +139,13 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 
 * Features
   * [@ProGM Support for custom parsers for tags](https://github.com/mbleigh/acts-as-taggable-on/pull/579)
-  * [@damzcodes #577 Popular feature](https://github.com/mbleigh/acts-as-taggable-on/pull/577)
+  * [@lolaodelola #577 Popular feature](https://github.com/mbleigh/acts-as-taggable-on/pull/577)
 
 * Fixes
   * [@twalpole Update for rails edge (4.2)](https://github.com/mbleigh/acts-as-taggable-on/pull/583)
 
 * Performance
-  * [@dontfidget #587 Use pluck instead of select](https://github.com/mbleigh/acts-as-taggable-on/pull/587)
+  * [@ashanbrown #584 Use pluck instead of select](https://github.com/mbleigh/acts-as-taggable-on/pull/584)
 
 ### [3.3.0 / 2014-07-08](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.6...v3.3.0)
 
@@ -154,7 +154,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 
 * Fixes
   * [@tonytonyjan #560 Fix for `ActsAsTaggableOn.remove_unused_tags` doesn't work](https://github.com/mbleigh/acts-as-taggable-on/pull/560)
-  * [@ThearkInn #555 Fix for `tag_cloud` helper to generate correct css tags](https://github.com/mbleigh/acts-as-taggable-on/pull/555)
+  * [@TheLarkInn #555 Fix for `tag_cloud` helper to generate correct css tags](https://github.com/mbleigh/acts-as-taggable-on/pull/555)
 
 * Performance
   * [@pcai #556 Add back taggables index in the taggins table](https://github.com/mbleigh/acts-as-taggable-on/pull/556)
@@ -188,7 +188,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 
 * Fixes
   * [@seuros #540 Fix for tags removal (it was affecting all records with the same tag)](https://github.com/mbleigh/acts-as-taggable-on/pull/540)
-  * [@akcho8 #535 Fix for `options` Hash passed to methods from being deleted by those methods](https://github.com/mbleigh/acts-as-taggable-on/pull/535)
+  * [@akicho8 #535 Fix for `options` Hash passed to methods from being deleted by those methods](https://github.com/mbleigh/acts-as-taggable-on/pull/535)
 
 ### [3.2.2 / 2014-05-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.2.1...v3.2.2)
 
@@ -216,7 +216,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
   * ActsAsTaggableOn::Tag is not extend with ActsAsTaggableOn::Utils anymore
 
 * Features
-  * [@chess #413 Hook to support STI subclasses of Tag in save_tags](https://github.com/mbleigh/acts-as-taggable-on/pull/413)
+  * [@ches #413 Hook to support STI subclasses of Tag in save_tags](https://github.com/mbleigh/acts-as-taggable-on/pull/413)
 
 * Fixes
   * [@jdelStrother #515 Rename Compatibility methods to reduce chance of conflicts](https://github.com/mbleigh/acts-as-taggable-on/pull/515)
@@ -224,7 +224,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
   * [@sonots #510 fix IN subquery error for mysql](https://github.com/mbleigh/acts-as-taggable-on/pull/510)
   * [@jonseaberg #499 fix for race condition when multiple processes try to add the same tag](https://github.com/mbleigh/acts-as-taggable-on/pull/499)
   * [@leklund #496 Fix for distinct and postgresql json columns errors](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
-  * [@thatbettina & @plexus #394 Multiple quoted tags](https://github.com/mbleigh/acts-as-taggable-on/pull/496)
+  * [@thatbettina & @plexus #394 Multiple quoted tags](https://github.com/mbleigh/acts-as-taggable-on/pull/394)
 
 * Performance
 
@@ -247,11 +247,11 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 ### [3.1.0.rc1 / 2014-02-26](https://github.com/mbleigh/acts-as-taggable-on/compare/v3.0.1...v3.1.0.rc1)
 
 * Features
-  * [@jamesburke-examtime #467 Add :order_by_matching_tag_count option](https://github.com/mbleigh/acts-as-taggable-on/pull/469)
+  * [@Burkazoid #467 Add :order_by_matching_tag_count option](https://github.com/mbleigh/acts-as-taggable-on/pull/469)
 
 * Fixes
   * [@rafael #406 Dirty attributes not correctly derived](https://github.com/mbleigh/acts-as-taggable-on/pull/406)
-  * [@bzbnhang #440 Did not respect strict_case_match](https://github.com/mbleigh/acts-as-taggable-on/pull/440)
+  * [@BenZhang #440 Did not respect strict_case_match](https://github.com/mbleigh/acts-as-taggable-on/pull/440)
   * [@znz #456 Fix breaking encoding of tag](https://github.com/mbleigh/acts-as-taggable-on/pull/456)
   * [@rgould #417 Let '.count' work when tagged_with is accompanied by a group clause](https://github.com/mbleigh/acts-as-taggable-on/pull/417)
   * [@developer88 #461 Move 'Distinct' out of select string and use .uniq instead](https://github.com/mbleigh/acts-as-taggable-on/pull/461)
@@ -270,7 +270,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 
 * Fixes
   * [@rafael #406 Dirty attributes not correctly derived](https://github.com/mbleigh/acts-as-taggable-on/pull/406)
-  * [@bzbnhang #440 Did not respect strict_case_match](https://github.com/mbleigh/acts-as-taggable-on/pull/440)
+  * [@BenZhang #440 Did not respect strict_case_match](https://github.com/mbleigh/acts-as-taggable-on/pull/440)
   * [@znz #456 Fix breaking encoding of tag](https://github.com/mbleigh/acts-as-taggable-on/pull/456)
 
 * Misc
@@ -289,23 +289,23 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
   * Supports Rails 4.1.
 
 * Misc (TODO: expand)
-  * [zquest #359](https://github.com/mbleigh/acts-as-taggable-on/pull/359)
-  * [rsl #367](https://github.com/mbleigh/acts-as-taggable-on/pull/367)
-  * [ktdreyer #383](https://github.com/mbleigh/acts-as-taggable-on/pull/383)
-  * [cwoodcox #346](https://github.com/mbleigh/acts-as-taggable-on/pull/346)
-  * [mrb #421](https://github.com/mbleigh/acts-as-taggable-on/pull/421)
-  * [bf4 #430](https://github.com/mbleigh/acts-as-taggable-on/pull/430)
-  * [sanemat #368](https://github.com/mbleigh/acts-as-taggable-on/pull/368)
-  * [bf4 #343](https://github.com/mbleigh/acts-as-taggable-on/pull/343)
-  * [marclennox #429](https://github.com/mbleigh/acts-as-taggable-on/pull/429)
-  * [shekibobo #403](https://github.com/mbleigh/acts-as-taggable-on/pull/403)
-  * [ches ktdreyer #410](https://github.com/mbleigh/acts-as-taggable-on/pull/410)
-  * [makaroni4 #371](https://github.com/mbleigh/acts-as-taggable-on/pull/371)
-  * [kenzai dstosik awt #431](https://github.com/mbleigh/acts-as-taggable-on/pull/431)
-  * [bf4 joelcogen shekibobo aaronchi #438](https://github.com/mbleigh/acts-as-taggable-on/pull/438)
-  * [seuros #442](https://github.com/mbleigh/acts-as-taggable-on/pull/442)
-  * [bf4 #445](https://github.com/mbleigh/acts-as-taggable-on/pull/445)
-  * [eaglemt #446](https://github.com/mbleigh/acts-as-taggable-on/pull/446)
+  * [@zquestz #359](https://github.com/mbleigh/acts-as-taggable-on/pull/359)
+  * [@rsl #367](https://github.com/mbleigh/acts-as-taggable-on/pull/367)
+  * [@ktdreyer #383](https://github.com/mbleigh/acts-as-taggable-on/pull/383)
+  * [@cwoodcox #346](https://github.com/mbleigh/acts-as-taggable-on/pull/346)
+  * [@mrb #421](https://github.com/mbleigh/acts-as-taggable-on/pull/421)
+  * [@bf4 #430](https://github.com/mbleigh/acts-as-taggable-on/pull/430)
+  * [@sanemat #368](https://github.com/mbleigh/acts-as-taggable-on/pull/368)
+  * [@bf4 #343](https://github.com/mbleigh/acts-as-taggable-on/pull/343)
+  * [@marclennox #429](https://github.com/mbleigh/acts-as-taggable-on/pull/429)
+  * [@shekibobo #403](https://github.com/mbleigh/acts-as-taggable-on/pull/403)
+  * [@ches @ktdreyer #410](https://github.com/mbleigh/acts-as-taggable-on/pull/410)
+  * [@makaroni4 #371](https://github.com/mbleigh/acts-as-taggable-on/pull/371)
+  * [kenzai @davidstosik @awt #431](https://github.com/mbleigh/acts-as-taggable-on/pull/431)
+  * [@bf4 @joelcogen @shekibobo @aaronchi #438](https://github.com/mbleigh/acts-as-taggable-on/pull/438)
+  * [@seuros #442](https://github.com/mbleigh/acts-as-taggable-on/pull/442)
+  * [@bf4 #445](https://github.com/mbleigh/acts-as-taggable-on/pull/445)
+  * [@eagletmt #446](https://github.com/mbleigh/acts-as-taggable-on/pull/446)
 
 ### 3.0.0.rc2 [changes](https://github.com/mbleigh/acts-as-taggable-on/compare/fork-v3.0.0.rc1...fork-v3.0.0.rc2)
 
