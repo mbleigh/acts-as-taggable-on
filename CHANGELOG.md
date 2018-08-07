@@ -15,6 +15,9 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
 * Misc
   * [@gssbzn Remove legacy code for an empty query and replace it with `ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
 
+* Documentation
+  * [@tonyta Cleanup CHANGELOG.md formatting and references](https://github.com/mbleigh/acts-as-taggable-on/pull/913)
+
 ### [6.0.1 / 2018-06-27](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.0.1)
 
 * Fixes
