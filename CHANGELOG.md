@@ -1,8 +1,14 @@
-Changes are below categorized as `Features, Fixes, or Misc`.
+Changes are below categorized as follows:
+- Breaking Changes
+- Features
+- Fixes
+- Performance
+- Misc
+- Documentation
 
-Each change should fall into categories that would affect whether the release is major (breaking changes), minor (new behavior), or patch (bug fix). See [semver](http://semver.org/) and [pessimistic versioning](http://guides.rubygems.org/patterns/#pessimistic_version_constraint)
+Each change should fall into categories that would affect whether the release is major (breaking changes), minor (new behavior), or patch (bug fix). See [semver](http://semver.org/) and [pessimistic versioning](http://guides.rubygems.org/patterns/#pessimistic_version_constraint).
 
-As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch And _misc_ is either minor or patch, the difference being kind of fuzzy for the purposes of history Adding tests would be patch level.
+As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
 ### [Master / Unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.1...master)
 
@@ -19,7 +25,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 * Breaking Changes
   * [@Fodoj Drop support for Rails 4.2](https://github.com/mbleigh/acts-as-taggable-on/pull/887)
 
-* Added
+* Features
   * [@CalvertYang Add support for uuid primary keys](https://github.com/mbleigh/acts-as-taggable-on/pull/898)
   * [@Fodoj Support Rails 5.2](https://github.com/mbleigh/acts-as-taggable-on/pull/887)
 
@@ -31,7 +37,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
 * Breaking Changes
   * [@seuros Drop support for old version of ActiveRecord and Ruby and prepare rel](https://github.com/mbleigh/acts-as-taggable-on/pull/828)
 
-* Added
+* Features
   * [@rbritom Tagged with rewrite](https://github.com/mbleigh/acts-as-taggable-on/pull/829)
   * [@fearenales Due to database collisions, retry finding or creating a tag](https://github.com/mbleigh/acts-as-taggable-on/pull/809)
   * [@brilyuhns Add owner_tags method to taggable](https://github.com/mbleigh/acts-as-taggable-on/pull/771)
@@ -66,7 +72,7 @@ As such, a _Feature_ would map to either major or minor. A _bug fix_ to a patch 
   * [@krzysiek1507 drop support for Ruby < 2](https://github.com/mbleigh/acts-as-taggable-on/pull/758)
   * [@krzysiek1507 drop support for Rails < 4](https://github.com/mbleigh/acts-as-taggable-on/pull/757)
 
-* Added
+* Features
   * [@jessieay Rails 5](https://github.com/mbleigh/acts-as-taggable-on/pull/763)
 
 * Fixes
