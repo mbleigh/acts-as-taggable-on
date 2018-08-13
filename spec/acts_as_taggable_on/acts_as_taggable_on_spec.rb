@@ -142,7 +142,7 @@ describe 'Acts As Taggable On' do
       taggable1.save
 
       column = TaggableModel.connection.quote_column_name("context")
-      offer_alias = TaggableModel.connection.quote_table_name("taggings")
+      offer_alias = TaggableModel.connection.quote_table_name(ActsAsTaggableOn.taggings_table)
       need_alias = TaggableModel.connection.quote_table_name("need_taggings_taggable_models_join")
 
       expect(TaggableModel.joins(:offerings, :needs).to_sql).to include "#{offer_alias}.#{column}"
