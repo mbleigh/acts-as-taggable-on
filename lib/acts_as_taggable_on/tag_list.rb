@@ -4,8 +4,10 @@ require 'active_support/core_ext/module/delegation'
 module ActsAsTaggableOn
   class TagList < Array
     attr_accessor :owner
+    attr_accessor :parser
 
     def initialize(*args)
+      @parser = ActsAsTaggableOn.default_parser
       add(*args)
     end
 
@@ -39,6 +41,7 @@ module ActsAsTaggableOn
     # Appends the elements of +other_tag_list+ to +self+.
     def concat(other_tag_list)
       super(other_tag_list).send(:clean!)
+      self
     end
 
     ##
@@ -82,30 +85,21 @@ module ActsAsTaggableOn
       map! { |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
-      uniq!
+      ActsAsTaggableOn.strict_case_match ? uniq! : uniq!{ |tag| tag.downcase }
+      self
     end
 
 
     def extract_and_apply_options!(args)
       options = args.last.is_a?(Hash) ? args.pop : {}
-      options.assert_valid_keys :parse
+      options.assert_valid_keys :parse, :parser
 
-      args.map! { |a| TagListParser.parse(a) } if options[:parse]
+      parser = options[:parser] ? options[:parser] : @parser
+
+      args.map! { |a| parser.new(a).parse } if options[:parse] || options[:parser]
 
       args.flatten!
     end
-
-
-    ## DEPRECATED
-    def self.from(string)
-      ActiveRecord::Base.logger.warn <<WARNING
-ActsAsTaggableOn::TagList.from is deprecated \
-and will be removed from v4.0+, use  \
-ActsAsTaggableOn::TagListParser.parse instead
-WARNING
-      TagListParser.parse(string)
-    end
-
 
   end
 end

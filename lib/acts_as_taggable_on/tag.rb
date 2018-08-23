@@ -2,11 +2,9 @@
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
 
-    attr_accessible :name if defined?(ActiveModel::MassAssignmentSecurity)
-
     ### ASSOCIATIONS:
 
-    has_many :taggings, dependent: :destroy, class_name: 'ActsAsTaggableOn::Tagging'
+    has_many :taggings, dependent: :destroy, class_name: '::ActsAsTaggableOn::Tagging'
 
     ### VALIDATIONS:
 
@@ -20,6 +18,8 @@ module ActsAsTaggableOn
     end
 
     ### SCOPES:
+    scope :most_used, ->(limit = 20) { order('taggings_count desc').limit(limit) }
+    scope :least_used, ->(limit = 20) { order('taggings_count asc').limit(limit) }
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
@@ -30,17 +30,10 @@ module ActsAsTaggableOn
     end
 
     def self.named_any(list)
-      if ActsAsTaggableOn.strict_case_match
-        clause = list.map { |tag|
-          sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
-        }.join(' OR ')
-        where(clause)
-      else
-        clause = list.map { |tag|
-          sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
-        }.join(' OR ')
-        where(clause)
-      end
+      clause = list.map { |tag|
+        sanitize_sql_for_named_any(tag).force_encoding('BINARY')
+      }.join(' OR ')
+      where(clause)
     end
 
     def self.named_like(name)
@@ -53,6 +46,12 @@ module ActsAsTaggableOn
         sanitize_sql(["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(tag.to_s)}%"])
       }.join(' OR ')
       where(clause)
+    end
+
+    def self.for_context(context)
+      joins(:taggings).
+        where(["taggings.context = ?", context]).
+        select("DISTINCT tags.*")
     end
 
     ### CLASS METHODS:
@@ -70,17 +69,20 @@ module ActsAsTaggableOn
 
       return [] if list.empty?
 
-      existing_tags = named_any(list)
-
       list.map do |tag_name|
-        comparable_tag_name = comparable_name(tag_name)
-        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
         begin
+          tries ||= 3
+
+          existing_tags = named_any(list)
+          comparable_tag_name = comparable_name(tag_name)
+          existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
           existing_tag || create(name: tag_name)
         rescue ActiveRecord::RecordNotUnique
-          # Postgres aborts the current transaction with
-          # PG::InFailedSqlTransaction: ERROR:  current transaction is aborted, commands ignored until end of transaction block
-          # so we have to rollback this transaction
+          if (tries -= 1).positive?
+            ActiveRecord::Base.connection.execute 'ROLLBACK'
+            retry
+          end
+
           raise DuplicateTagError.new("'#{tag_name}' has already been taken")
         end
       end
@@ -101,6 +103,9 @@ module ActsAsTaggableOn
     end
 
     class << self
+
+
+
       private
 
       def comparable_name(str)
@@ -128,6 +133,14 @@ module ActsAsTaggableOn
           string.to_s.dup.force_encoding('BINARY')
         else
           string.to_s.mb_chars
+        end
+      end
+
+      def sanitize_sql_for_named_any(tag)
+        if ActsAsTaggableOn.strict_case_match
+          sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
+        else
+          sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
         end
       end
     end

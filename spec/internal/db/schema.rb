@@ -7,12 +7,15 @@ ActiveRecord::Schema.define version: 0 do
   add_index 'tags', ['name'], name: 'index_tags_on_name', unique: true
 
   create_table :taggings, force: true do |t|
-    t.references :tag
+    t.integer :tag_id
 
     # You should make sure that the column created is
     # long enough to store the required class names.
-    t.references :taggable, polymorphic: true
-    t.references :tagger, polymorphic: true
+    t.string :taggable_type
+    t.integer :taggable_id
+
+    t.string :tagger_type
+    t.integer :tagger_id
 
     # Limit is created to prevent MySQL error on index
     # length for MyISAM table type: http://bit.ly/vgW2Ql
@@ -23,6 +26,7 @@ ActiveRecord::Schema.define version: 0 do
   add_index 'taggings',
             ['tag_id', 'taggable_id', 'taggable_type', 'context', 'tagger_id', 'tagger_type'],
             unique: true, name: 'taggings_idx'
+  add_index 'taggings', :tag_id , name: 'index_taggings_on_tag_id'
 
   # above copied from
   # generators/acts_as_taggable_on/migration/migration_generator
@@ -74,6 +78,9 @@ ActiveRecord::Schema.define version: 0 do
     t.column :type, :string
   end
 
+  create_table :cache_methods_injected_models, force: true do |t|
+    t.column :cached_tag_list, :string
+  end
 
   # Special cases for postgresql
   if using_postgresql?

@@ -135,10 +135,10 @@ module ActsAsTaggableOn::Taggable
         table_name_pkey = "#{table_name}.#{primary_key}"
         if ActsAsTaggableOn::Utils.using_mysql?
           # See https://github.com/mbleigh/acts-as-taggable-on/pull/457 for details
-          scoped_ids = select(table_name_pkey).map(&:id)
+          scoped_ids = pluck(table_name_pkey)
           tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN (?)", scoped_ids)
         else
-          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(select(table_name_pkey))})")
+          tagging_scope = tagging_scope.where("#{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN(#{safe_to_sql(except(:select).select(table_name_pkey))})")
         end
 
         tagging_scope
@@ -169,9 +169,12 @@ module ActsAsTaggableOn::Taggable
     end
 
     module CalculationMethods
-      def count(column_name=:all)
+      # Rails 5 TODO: Remove options argument as soon we remove support to
+      # activerecord-deprecated_finders.
+      # See https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb#L38
+      def count(column_name = :all, options = {})
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
-        super
+        ActsAsTaggableOn::Utils.active_record5? ? super(column_name) : super(column_name, options)
       end
     end
   end

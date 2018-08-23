@@ -49,15 +49,69 @@ describe ActsAsTaggableOn::Tagging do
     ActsAsTaggableOn.remove_unused_tags = previous_setting
   end
 
-  pending 'context scopes' do
-    describe '.by_context'
+  describe 'context scopes' do
+    before do
+      @tagging_2 = ActsAsTaggableOn::Tagging.new
+      @tagging_3 = ActsAsTaggableOn::Tagging.new
 
-    describe '.by_contexts'
+      @tagger = User.new
+      @tagger_2 = User.new
 
-    describe '.owned_by'
+      @tagging.taggable = TaggableModel.create(name: "Black holes")
+      @tagging.tag = ActsAsTaggableOn::Tag.create(name: "Physics")
+      @tagging.tagger = @tagger
+      @tagging.context = 'Science'
+      @tagging.save
 
-    describe '.not_owned'
+      @tagging_2.taggable = TaggableModel.create(name: "Satellites")
+      @tagging_2.tag = ActsAsTaggableOn::Tag.create(name: "Technology")
+      @tagging_2.tagger = @tagger_2
+      @tagging_2.context = 'Science'
+      @tagging_2.save
 
+      @tagging_3.taggable = TaggableModel.create(name: "Satellites")
+      @tagging_3.tag = ActsAsTaggableOn::Tag.create(name: "Engineering")
+      @tagging_3.tagger = @tagger_2
+      @tagging_3.context = 'Astronomy'
+      @tagging_3.save
+
+    end
+
+    describe '.owned_by' do
+      it "should belong to a specific user" do
+        expect(ActsAsTaggableOn::Tagging.owned_by(@tagger).first).to eq(@tagging)
+      end
+    end
+
+    describe '.by_context' do
+      it "should be found by context" do
+        expect(ActsAsTaggableOn::Tagging.by_context('Science').length).to eq(2);
+      end
+    end
+
+    describe '.by_contexts' do
+      it "should find taggings by contexts" do
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).first).to eq(@tagging);
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).second).to eq(@tagging_2);
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).third).to eq(@tagging_3);
+        expect(ActsAsTaggableOn::Tagging.by_contexts(['Science', 'Astronomy']).length).to eq(3);
+      end
+    end
+
+    describe '.not_owned' do
+      before do
+        @tagging_4 = ActsAsTaggableOn::Tagging.new
+        @tagging_4.taggable = TaggableModel.create(name: "Gravity")
+        @tagging_4.tag = ActsAsTaggableOn::Tag.create(name: "Space")
+        @tagging_4.context = "Science"
+        @tagging_4.save
+      end
+
+      it "should found the taggings that do not have owner" do
+        expect(ActsAsTaggableOn::Tagging.all.length).to eq(4)
+        expect(ActsAsTaggableOn::Tagging.not_owned.length).to eq(1)
+        expect(ActsAsTaggableOn::Tagging.not_owned.first).to eq(@tagging_4)
+      end
+    end
   end
-
 end

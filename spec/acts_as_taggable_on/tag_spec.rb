@@ -2,6 +2,7 @@
 require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
 
+
 shared_examples_for 'without unique index' do
   prepend_before(:all) { AddMissingUniqueIndices.down }
   append_after(:all) do
@@ -43,6 +44,29 @@ describe ActsAsTaggableOn::Tag do
       it 'should find both tags' do
         expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic)).count).to eq(3)
       end
+    end
+  end
+
+  describe 'named any' do
+    context 'with some special characters combinations', if: using_mysql? do
+      it 'should not raise an invalid encoding exception' do
+        expect{ActsAsTaggableOn::Tag.named_any(["holä", "hol'ä"])}.not_to raise_error
+      end
+    end
+  end
+
+  describe 'for context' do
+    before(:each) do
+      @user.skill_list.add('ruby')
+      @user.save
+    end
+
+    it 'should return tags that have been used in the given context' do
+      expect(ActsAsTaggableOn::Tag.for_context('skills').pluck(:name)).to include('ruby')
+    end
+
+    it 'should not return tags that have been used in other contexts' do
+      expect(ActsAsTaggableOn::Tag.for_context('needs').pluck(:name)).to_not include('ruby')
     end
   end
 
@@ -250,12 +274,18 @@ describe ActsAsTaggableOn::Tag do
       end
     end
 
-    it 'should not change enconding' do
+    it 'should not change encoding' do
       name = "\u3042"
       original_encoding = name.encoding
       record = ActsAsTaggableOn::Tag.find_or_create_with_like_by_name(name)
       record.reload
       expect(record.name.encoding).to eq(original_encoding)
+    end
+
+    context 'named any with some special characters combinations', if: using_mysql? do
+      it 'should not raise an invalid encoding exception' do
+        expect{ActsAsTaggableOn::Tag.named_any(["holä", "hol'ä"])}.not_to raise_error
+      end
     end
   end
 
@@ -286,4 +316,25 @@ describe ActsAsTaggableOn::Tag do
       end
     end
   end
+
+  describe 'popular tags' do
+    before do
+      %w(sports rails linux tennis golden_syrup).each_with_index do |t, i|
+        tag = ActsAsTaggableOn::Tag.new(name: t)
+        tag.taggings_count = i
+        tag.save!
+      end
+    end
+
+    it 'should find the most popular tags' do
+      expect(ActsAsTaggableOn::Tag.most_used(3).first.name).to eq("golden_syrup")
+      expect(ActsAsTaggableOn::Tag.most_used(3).length).to eq(3)
+    end
+
+    it 'should find the least popular tags' do
+      expect(ActsAsTaggableOn::Tag.least_used(3).first.name).to eq("sports")
+      expect(ActsAsTaggableOn::Tag.least_used(3).length).to eq(3)
+    end
+  end
+
 end
