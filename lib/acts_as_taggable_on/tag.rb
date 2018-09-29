@@ -21,7 +21,7 @@ module ActsAsTaggableOn
     ### SCOPES:
     scope :most_used, ->(limit = 20) { order('taggings_count desc').limit(limit) }
     scope :least_used, ->(limit = 20) { order('taggings_count asc').limit(limit) }
-    scope :for_taggable_type, -> (type = nil) { joins(:taggings).where('taggings.taggable_type' => type.to_s) }
+    scope :for_taggable_type, -> (type = nil) { joins(:taggings).where('taggings.taggable_type' => Array.wrap(type)) }
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
