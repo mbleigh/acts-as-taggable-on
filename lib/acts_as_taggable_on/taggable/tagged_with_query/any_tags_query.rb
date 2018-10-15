@@ -21,7 +21,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       exists_contition = tagging_arel_table[:taggable_id].eq(taggable_arel_table[taggable_model.primary_key])
                           .and(tagging_arel_table[:taggable_type].eq(taggable_model.base_class.name))
                           .and(
-                            if options[:wild].present?
+                            if options[:wild].present? || tag_list.size > 1
                               tagging_arel_table[:tag_id].in(
                                 tag_arel_table.project(tag_arel_table[:id]).where(tags_match_type)
                               )
