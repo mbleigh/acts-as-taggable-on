@@ -21,7 +21,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def tagging_arel_table
-      @tagging_arel_table ||=tagging_model.arel_table
+      @tagging_arel_table ||= tagging_model.arel_table
     end
 
     def tag_match_type(tag)
