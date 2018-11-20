@@ -38,6 +38,14 @@ describe 'Acts As Taggable On' do
       expect(@another_taggable.cached_language_list).to eq('ruby, .net')
     end
 
+    it 'should cache tags when the model is freshly loaded' do
+      taggable = SingleUseCachedModel.new
+      taggable.tag_list = 'awesome, epic'
+      taggable.save!
+
+      expect(taggable.cached_tag_list).to eq('awesome, epic')
+    end
+
     it 'should keep the cache' do
       @taggable.update_attributes(tag_list: 'awesome, epic')
       @taggable = CachedModel.find(@taggable.id)
