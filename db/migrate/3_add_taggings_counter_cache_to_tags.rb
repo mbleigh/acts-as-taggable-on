@@ -9,7 +9,7 @@ AddTaggingsCounterCacheToTags.class_eval do
 
     ActsAsTaggableOn::Tag.reset_column_information
     ActsAsTaggableOn::Tag.find_each do |tag|
-      ActsAsTaggableOn::Tag.reset_counters(tag.id, ActsAsTaggableOn.taggings_table)
+      ActsAsTaggableOn::Tag.reset_counters(tag.id, :taggings)
     end
   end
 
