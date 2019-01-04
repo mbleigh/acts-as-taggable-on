@@ -2,7 +2,12 @@ require 'active_record'
 require 'active_record/version'
 require 'active_support/core_ext/module'
 
-require_relative 'acts_as_taggable_on/engine'  if defined?(Rails)
+begin
+  require 'rails/engine'
+  require 'acts_as_taggable_on/engine'
+  rescue LoadError
+
+end
 
 require 'digest/sha1'
 
@@ -13,7 +18,6 @@ module ActsAsTaggableOn
   autoload :TagList
   autoload :GenericParser
   autoload :DefaultParser
-  autoload :TagListParser
   autoload :Taggable
   autoload :Tagger
   autoload :Tagging
@@ -59,7 +63,8 @@ module ActsAsTaggableOn
   class Configuration
     attr_accessor :force_lowercase, :force_parameterize,
                   :remove_unused_tags, :default_parser,
-                  :tags_counter
+                  :tags_counter, :tags_table,
+                  :taggings_table
     attr_reader :delimiter, :strict_case_match
 
     def initialize
@@ -71,6 +76,8 @@ module ActsAsTaggableOn
       @tags_counter = true
       @default_parser = DefaultParser
       @force_binary_collation = false
+      @tags_table = :tags
+      @taggings_table = :taggings
     end
 
     def strict_case_match=(force_cs)
@@ -104,7 +111,7 @@ WARNING
         coll = 'utf8_general_ci'
         coll = 'utf8_bin' if bincoll
         begin
-          ActiveRecord::Migration.execute("ALTER TABLE tags MODIFY name varchar(255) CHARACTER SET utf8 COLLATE #{coll};")
+          ActiveRecord::Migration.execute("ALTER TABLE #{Tag.table_name} MODIFY name varchar(255) CHARACTER SET utf8 COLLATE #{coll};")
         rescue Exception => e
           puts "Trapping #{e.class}: collation parameter ignored while migrating for the first time."
         end
@@ -117,7 +124,6 @@ WARNING
 end
 
 ActiveSupport.on_load(:active_record) do
-  extend ActsAsTaggableOn::Compatibility
   extend ActsAsTaggableOn::Taggable
   include ActsAsTaggableOn::Tagger
 end

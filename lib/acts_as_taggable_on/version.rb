@@ -1,4 +1,3 @@
 module ActsAsTaggableOn
-  VERSION = '3.5.0'
+  VERSION = '6.0.1'
 end
-

@@ -16,17 +16,13 @@ Gem::Specification.new do |gem|
   gem.files         = `git ls-files`.split($/)
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ['lib']
-  gem.required_ruby_version     = '>= 1.9.3'
+  gem.required_ruby_version     = '>= 2.2.7'
 
   if File.exist?('UPGRADING.md')
     gem.post_install_message = File.read('UPGRADING.md')
   end
 
-  gem.add_runtime_dependency 'activerecord', ['>= 3.2', '< 5']
-
-  gem.add_development_dependency 'sqlite3'
-  gem.add_development_dependency 'mysql2', '~> 0.3.7'
-  gem.add_development_dependency 'pg'
+  gem.add_runtime_dependency 'activerecord', ['~> 5.0']
 
   gem.add_development_dependency 'rspec-rails'
   gem.add_development_dependency 'rspec-its'

@@ -15,18 +15,19 @@ module ActsAsTaggableOn
       #   end
       def acts_as_tagger(opts={})
         class_eval do
-          has_many_with_taggable_compatibility :owned_taggings,
-                                               opts.merge(
-                                                   as: :tagger,
-                                                   dependent: :destroy,
-                                                   class_name: '::ActsAsTaggableOn::Tagging'
-                                               )
+          owned_taggings_scope = opts.delete(:scope)
 
-          has_many_with_taggable_compatibility :owned_tags,
-                                               through: :owned_taggings,
-                                               source: :tag,
-                                               class_name: '::ActsAsTaggableOn::Tag',
-                                               uniq: true
+          has_many :owned_taggings, owned_taggings_scope,
+                   opts.merge(
+                     as: :tagger,
+                     class_name: '::ActsAsTaggableOn::Tagging',
+                     dependent: :destroy
+                   )
+
+          has_many :owned_tags, -> { distinct },
+                   class_name: '::ActsAsTaggableOn::Tag',
+                   source: :tag,
+                   through: :owned_taggings
         end
 
         include ActsAsTaggableOn::Tagger::InstanceMethods

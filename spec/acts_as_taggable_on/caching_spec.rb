@@ -75,6 +75,52 @@ describe 'Acts As Taggable On' do
       CachedModel.reset_column_information
       expect(CachedModel.instance_variable_get(:@acts_as_taggable_on_cache_columns)).to eql(nil)
     end
+
+    it 'should not override a user-defined columns method' do
+      expect(ColumnsOverrideModel.columns.map(&:name)).not_to include('ignored_column')
+      ColumnsOverrideModel.acts_as_taggable
+      expect(ColumnsOverrideModel.columns.map(&:name)).not_to include('ignored_column')
+    end
+  end
+
+  describe 'with a custom delimiter' do
+    before(:each) do
+      @taggable = CachedModel.new(name: 'Bob Jones')
+      @another_taggable = OtherCachedModel.new(name: 'John Smith')
+      ActsAsTaggableOn.delimiter = ';'
+    end
+
+    after(:all) do
+      ActsAsTaggableOn.delimiter = ','
+    end
+
+    it 'should cache tags with custom delimiter' do
+      @taggable.update_attributes(tag_list: 'awesome; epic')
+      expect(@taggable.tag_list).to eq(['awesome', 'epic'])
+      expect(@taggable.cached_tag_list).to eq('awesome; epic')
+
+      @taggable = CachedModel.find_by_name('Bob Jones')
+      expect(@taggable.tag_list).to eq(['awesome', 'epic'])
+      expect(@taggable.cached_tag_list).to eq('awesome; epic')
+    end
+  end
+
+  describe 'Cache methods initialization on new models' do
+    before(:all) do
+      ActiveRecord::Base.connection.execute(
+        'INSERT INTO cache_methods_injected_models (cached_tag_list) VALUES (\'ciao\')'
+      )
+      class CacheMethodsInjectedModel < ActiveRecord::Base
+        acts_as_taggable
+      end
+    end
+    after(:all) { Object.send(:remove_const, :CacheMethodsInjectedModel) }
+
+    it 'cached_tag_list_on? get injected correctly' do
+      expect do
+        CacheMethodsInjectedModel.first.tag_list
+      end.not_to raise_error
+    end
   end
 
   describe 'CachingWithArray' do

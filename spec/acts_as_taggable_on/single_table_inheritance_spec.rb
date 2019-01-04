@@ -127,9 +127,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tag_counts_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tag_counts_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should have different tags_on for inherited models' do
@@ -138,9 +138,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tags_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tags_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tags_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should store same tag without validation conflict' do
@@ -151,6 +151,11 @@ describe 'Single Table Inheritance' do
       inheriting_model.save!
 
       inheriting_model.update_attributes! name: 'foo'
+    end
+
+    it "should only join with taggable's table to check type for inherited models" do
+      expect(TaggableModel.tag_counts_on(:tags).to_sql).to_not match /INNER JOIN taggable_models ON/
+      expect(InheritingTaggableModel.tag_counts_on(:tags).to_sql).to match /INNER JOIN taggable_models ON/
     end
   end
 
@@ -170,9 +175,25 @@ describe 'Single Table Inheritance' do
       expect(taggable.tags_from(student)).to eq(%w(ruby scheme))
     end
 
+    it 'returns all owner tags on the taggable' do
+      student.tag(taggable, with: 'ruby, scheme', on: :tags)
+      student.tag(taggable, with: 'skill_one', on: :skills)
+      student.tag(taggable, with: 'english, spanish', on: :language)
+      expect(taggable.owner_tags(student).count).to eq(5)
+      expect(taggable.owner_tags(student).sort == %w(english ruby scheme skill_one spanish))
+    end
+
+
     it 'returns owner tags on the tagger' do
       student.tag(taggable, with: 'ruby, scheme', on: :tags)
       expect(taggable.owner_tags_on(student, :tags).count).to eq(2)
+    end
+
+    it 'returns owner tags on the taggable for an array of contexts' do
+      student.tag(taggable, with: 'ruby, scheme', on: :tags)
+      student.tag(taggable, with: 'skill_one, skill_two', on: :skills)
+      expect(taggable.owner_tags_on(student, [:tags, :skills]).count).to eq(4)
+      expect(taggable.owner_tags_on(student, [:tags, :skills]).sort == %w(ruby scheme skill_one skill_two))
     end
 
     it 'should scope objects returned by tagged_with by owners' do
@@ -208,4 +229,3 @@ describe 'Single Table Inheritance' do
     end
   end
 end
-

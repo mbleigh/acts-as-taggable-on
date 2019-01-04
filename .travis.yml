@@ -1,11 +1,12 @@
 language: ruby
+cache: bundler
 
 rvm:
-  - 2.1
-  - 2.2
-  - 2.0.0
-  - 1.9.3
-  - rbx-2
+  - ruby-head
+  - 2.5.1
+  - 2.4.4
+  - 2.3.7
+  - 2.2.7
 
 env:
   - DB=sqlite3
@@ -13,28 +14,20 @@ env:
   - DB=postgresql
 
 gemfile:
-  - gemfiles/activerecord_3.2.gemfile
-  - gemfiles/activerecord_4.0.gemfile
-  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_5.2.gemfile
+  - gemfiles/activerecord_5.1.gemfile
+  - gemfiles/activerecord_5.0.gemfile
 
 sudo: false
 
 bundler_args: '--without local_development --jobs 3 --retry 3'
 
+before_install:
+   - gem install bundler
+
 script: bundle exec rake
 
 matrix:
-  fast_finish: true
   allow_failures:
-      - gemfile: gemfiles/activerecord_edge.gemfile
-      - rvm: rbx-2
-  exclude:
-      - rvm: 2.2
-        gemfile: gemfiles/activerecord_3.2.gemfile
-      - rvm: 1.9.3
-        gemfile: gemfiles/activerecord_4.0.gemfile
-      - rvm: 1.9.3
-        gemfile: gemfiles/activerecord_4.1.gemfile
-      - rvm: rbx-2
-        gemfile: gemfiles/activerecord_3.2.gemfile
-
+    - rvm: ruby-head
+  fast_finish: true
