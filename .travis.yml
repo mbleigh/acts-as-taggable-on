@@ -23,7 +23,7 @@ sudo: false
 bundler_args: '--without local_development --jobs 3 --retry 3'
 
 before_install:
-   - gem install bundler
+   - gem install bundler -v 1.17.3
 
 script: bundle exec rake
 
