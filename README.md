@@ -547,7 +547,7 @@ bundle
 rake spec
 ```
 
-You can run all the tests across all the Rails versions by running `rake appraise`.  If you'd also like to [run the tests across all rubies and databases as configured for Travis CI, install and run `wwtd`](https://github.com/grosser/wwtd).
+You can run all the tests across all the Rails versions by running `bundle exec appraisal install && bundle exec appraisal rspec`.  If you'd also like to [run the tests across all rubies and databases as configured for Travis CI, install and run `wwtd`](https://github.com/grosser/wwtd).
 
 
 ## License
