@@ -73,14 +73,6 @@ describe 'Acts As Taggable On' do
     end
   end
 
-  describe 'Reloading' do
-    it 'should save a model instantiated by Model.find' do
-      taggable = TaggableModel.create!(name: 'Taggable')
-      found_taggable = TaggableModel.find(taggable.id)
-      found_taggable.save
-    end
-  end
-
   describe 'Matching Contexts' do
     it 'should find objects with tags of matching contexts' do
       taggable1 = TaggableModel.create!(name: 'Taggable 1')
