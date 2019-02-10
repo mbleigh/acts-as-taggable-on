@@ -16,7 +16,29 @@ describe ActsAsTaggableOn::Tag do
     @tag = ActsAsTaggableOn::Tag.new
     @user = TaggableModel.create(name: 'Pablo')
   end
-
+  
+  
+  # scopes
+  describe 'for_taggable_type' do
+    before(:each) do
+      @tag_1 = ActsAsTaggableOn::Tag.create(name: 'Awesome')
+      @tag_2 = ActsAsTaggableOn::Tag.create(name: 'notSoCool')
+      @tagging_1 = ActsAsTaggableOn::Tagging.create(taggable: @user, tag: @tag_1, context: 'tags')
+      @tagging_2 = ActsAsTaggableOn::Tagging.create(taggable_type: 'AnyClass', taggable_id: 1, tag: @tag_2, context: 'tags')
+      # this one is not to be found...
+      @tagging_3 = ActsAsTaggableOn::Tagging.create(taggable_type: 'DontCare', taggable_id: 1, tag: @tag_2, context: 'tags')
+    end
+    
+    specify "finds one given taggable type" do
+      expect(ActsAsTaggableOn::Tag.for_taggable_type(TaggableModel.to_s)).to match_array([@tag_1])
+    end
+    
+    specify "finds multiple give taggable type" do
+      expect(ActsAsTaggableOn::Tag.for_taggable_type([TaggableModel.to_s, @tagging_2.taggable_type])).to match_array([@tag_1, @tag_2])
+    end
+    
+    
+  end
 
   describe 'named like any' do
     context 'case insensitive collation and unique index on tag name', if: using_case_insensitive_collation? do
