@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec-rails'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'sqlite3', '~> 1.3.6'
   gem.add_development_dependency 'barrier'
   gem.add_development_dependency 'database_cleaner'
 end
