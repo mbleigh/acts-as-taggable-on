@@ -31,40 +31,40 @@ describe 'Acts As Taggable On' do
     end
 
     it 'should cache tags' do
-      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable.update(tag_list: 'awesome, epic')
       expect(@taggable.cached_tag_list).to eq('awesome, epic')
 
-      @another_taggable.update_attributes(language_list: 'ruby, .net')
+      @another_taggable.update(language_list: 'ruby, .net')
       expect(@another_taggable.cached_language_list).to eq('ruby, .net')
     end
 
     it 'should keep the cache' do
-      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable.update(tag_list: 'awesome, epic')
       @taggable = CachedModel.find(@taggable.id)
       @taggable.save!
       expect(@taggable.cached_tag_list).to eq('awesome, epic')
     end
 
     it 'should update the cache' do
-      @taggable.update_attributes(tag_list: 'awesome, epic')
-      @taggable.update_attributes(tag_list: 'awesome')
+      @taggable.update(tag_list: 'awesome, epic')
+      @taggable.update(tag_list: 'awesome')
       expect(@taggable.cached_tag_list).to eq('awesome')
     end
 
     it 'should remove the cache' do
-      @taggable.update_attributes(tag_list: 'awesome, epic')
-      @taggable.update_attributes(tag_list: '')
+      @taggable.update(tag_list: 'awesome, epic')
+      @taggable.update(tag_list: '')
       expect(@taggable.cached_tag_list).to be_blank
     end
 
     it 'should have a tag list' do
-      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable.update(tag_list: 'awesome, epic')
       @taggable = CachedModel.find(@taggable.id)
       expect(@taggable.tag_list.sort).to eq(%w(awesome epic).sort)
     end
 
     it 'should keep the tag list' do
-      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable.update(tag_list: 'awesome, epic')
       @taggable = CachedModel.find(@taggable.id)
       @taggable.save!
       expect(@taggable.tag_list.sort).to eq(%w(awesome epic).sort)
@@ -95,7 +95,7 @@ describe 'Acts As Taggable On' do
     end
 
     it 'should cache tags with custom delimiter' do
-      @taggable.update_attributes(tag_list: 'awesome; epic')
+      @taggable.update(tag_list: 'awesome; epic')
       expect(@taggable.tag_list).to eq(['awesome', 'epic'])
       expect(@taggable.cached_tag_list).to eq('awesome; epic')
 
