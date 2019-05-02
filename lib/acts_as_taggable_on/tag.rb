@@ -122,11 +122,7 @@ module ActsAsTaggableOn
       end
 
       def unicode_downcase(string)
-        if ActiveSupport::Multibyte::Unicode.respond_to?(:downcase)
-          ActiveSupport::Multibyte::Unicode.downcase(string)
-        else
-          ActiveSupport::Multibyte::Chars.new(string).downcase.to_s
-        end
+        string.mb_chars.downcase.to_s
       end
 
       def as_8bit_ascii(string)
