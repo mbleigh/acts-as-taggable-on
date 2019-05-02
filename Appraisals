@@ -11,5 +11,5 @@ appraise 'activerecord-5.0' do
 end
 
 appraise 'activerecord-6.0' do
-  gem 'activerecord', "~> 6.0.0.beta1"
+  gem 'activerecord', "~> 6.0.0.rc1"
 end
