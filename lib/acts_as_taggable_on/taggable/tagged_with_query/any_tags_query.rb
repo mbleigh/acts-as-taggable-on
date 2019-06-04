@@ -44,7 +44,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:ignore_deleted].present?
-        on_condition = on_condition.and(tagging_arel_table[:deleted_at].eq(nil))
+        exists_contition = exists_contition.and(tagging_arel_table[:deleted_at].eq(nil))
       end
 
       exists_contition

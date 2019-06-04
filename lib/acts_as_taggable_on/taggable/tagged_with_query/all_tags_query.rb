@@ -81,7 +81,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:ignore_deleted].present?
-        on_condition = on_condition.and(tagging_alias[:deleted_at].eq(nil))
+        on_condition = on_condition.and(tagging_arel_table[:deleted_at].eq(nil))
       end
 
       on_condition

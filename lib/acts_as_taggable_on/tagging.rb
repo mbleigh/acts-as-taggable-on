@@ -1,9 +1,5 @@
-require 'acts_as_paranoid'
-
 module ActsAsTaggableOn
   class Tagging < ::ActiveRecord::Base #:nodoc:
-    acts_as_paranoid
-
     self.table_name = ActsAsTaggableOn.taggings_table
 
     DEFAULT_CONTEXT = 'tags'
@@ -41,11 +37,11 @@ module ActsAsTaggableOn
     end
 
     def mark_as_deleted
-       self.update_columns(deleted_at: Time.current)
-     end
+      self.update_columns(deleted_at: Time.current)
+    end
 
-     def has_deleted_at?
-       ActiveRecord::Base.connection.column_exists?(ActsAsTaggableOn.taggings_table, :deleted_at)
-     end
+    def has_deleted_at?
+      ActiveRecord::Base.connection.column_exists?(ActsAsTaggableOn.taggings_table, :deleted_at)
+    end
   end
 end
