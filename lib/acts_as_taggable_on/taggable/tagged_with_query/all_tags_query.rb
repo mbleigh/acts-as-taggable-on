@@ -57,6 +57,10 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
                                    .and(tagging_alias[:tagger_type].eq(owner.class.base_class.to_s))
       end
 
+      if options[:ignore_deleted].present?
+        on_condition = on_condition.and(tagging_alias[:deleted_at].eq(nil))
+      end
+
       on_condition
     end
 
@@ -74,6 +78,10 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
       if options[:on].present?
         on_condition = on_condition.and(tagging_arel_table[:context].eq(options[:on]))
+      end
+
+      if options[:ignore_deleted].present?
+        on_condition = on_condition.and(tagging_alias[:deleted_at].eq(nil))
       end
 
       on_condition

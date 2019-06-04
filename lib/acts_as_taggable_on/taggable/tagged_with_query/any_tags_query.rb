@@ -43,6 +43,10 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
                                    .and(tagging_arel_table[:tagger_type].eq(owner.class.base_class.to_s))
       end
 
+      if options[:ignore_deleted].present?
+        on_condition = on_condition.and(tagging_arel_table[:deleted_at].eq(nil))
+      end
+
       exists_contition
     end
 

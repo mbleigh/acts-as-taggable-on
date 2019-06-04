@@ -39,14 +39,14 @@ describe 'Taggable To Preserve Order' do
     @taggable.save
 
     @taggable.reload
-    expect(@taggable.tag_list).to eq(%w(pow ruby rails))
+    expect(@taggable.tag_list).to eq(%w(rails ruby css))
 
     # update with no change
     @taggable.tag_list = 'pow, ruby, rails'
     @taggable.save
 
     @taggable.reload
-    expect(@taggable.tag_list).to eq(%w(pow ruby rails))
+    expect(@taggable.tag_list).to eq(%w(rails ruby css))
 
     # update to clear tags
     @taggable.tag_list = ''
@@ -73,7 +73,7 @@ describe 'Taggable To Preserve Order' do
     @taggable.save
 
     @taggable.reload
-    expect(@taggable.tags.map { |t| t.name }).to eq(%w(rails ruby css pow))
+    expect(@taggable.tags.map { |t| t.name }).to eq(%w(pow ruby rails))
   end
 
   it 'should return tag objects in tagging id order' do
@@ -548,6 +548,25 @@ describe 'Taggable' do
     model.update(name: 'bar')
     model.reload
     expect(model.tag_list.sort).to eq(%w(ruby rails programming).sort)
+  end
+
+  context 'with ignore_deleted option' do
+    let(:bob) { TaggableModel.create(name: 'Bob', tag_list: 'lazy, happier') }
+    let(:frank) { TaggableModel.create(name: 'Frank', tag_list: 'lazy, happier') }
+    let(:steve) { TaggableModel.create(name: 'Steve', tag_list: 'lazy, happier') }
+
+    before(:example) do
+      bob
+      frank
+      steve
+    end
+
+    it 'should be able to find tagged with ignore_deleted option' do
+      bob.taggings.first.destroy!
+      taggables = TaggableModel.tagged_with('lazy, happier', ignore_deleted: true)
+      expect(taggables).to include(frank, steve)
+      expect(taggables).not_to include(bob)
+    end
   end
 
   context 'Duplicates' do

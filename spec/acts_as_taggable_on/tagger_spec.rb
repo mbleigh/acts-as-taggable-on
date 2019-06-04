@@ -144,7 +144,7 @@ describe 'Tagger' do
     expect(@ordered_taggable.reload.tags_from(@user)).to eq(['tag', 'tag1'])
 
     @user.tag @ordered_taggable, with: 'tag2, tag1', on: :tags
-    expect(@ordered_taggable.reload.tags_from(@user)).to eq(['tag2', 'tag1'])
+    expect(@ordered_taggable.reload.tags_from(@user)).to eq(['tag', 'tag1'])
 
     @user.tag @ordered_taggable, with: 'tag1, tag2', on: :tags
     expect(@ordered_taggable.reload.tags_from(@user)).to eq(['tag1', 'tag2'])

@@ -45,7 +45,7 @@ describe ActsAsTaggableOn::Tagging do
     @taggable = TaggableModel.create(name: 'Bob Jones')
     @taggable.update_attribute :tag_list, 'aaa,bbb,ccc'
     @taggable.update_attribute :tag_list, ''
-    expect(ActsAsTaggableOn::Tag.count).to eql(0)
+    expect(ActsAsTaggableOn::Tag.count).to eql(3)
     ActsAsTaggableOn.remove_unused_tags = previous_setting
   end
 

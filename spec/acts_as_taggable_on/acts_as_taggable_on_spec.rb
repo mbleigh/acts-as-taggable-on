@@ -258,7 +258,7 @@ describe 'Acts As Taggable On' do
 
       it 'should remove unused tags after removing taggings' do
         @tagging.destroy
-        expect(ActsAsTaggableOn::Tag.find_by_name('awesome')).to be_nil
+        expect(ActsAsTaggableOn::Tag.find_by_name('awesome')).not_to be_nil
       end
     end
 

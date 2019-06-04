@@ -68,6 +68,17 @@ module ActsAsTaggableOn::Taggable
             def dirtify_tag_list(tagging)
               attribute_will_change! tagging.context.singularize+"_list"
             end
+
+            def duplicated_mutations_from_database
+              unless defined?(@mutations_from_database)
+                @mutations_from_database = nil
+              end
+              @mutations_from_database ||= if defined?(@attributes)
+                ActiveModel::AttributeMutationTracker.new(@attributes)
+              else
+                NullMutationTracker.instance
+              end
+            end
           RUBY
         end
       end
