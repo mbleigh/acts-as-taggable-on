@@ -119,6 +119,21 @@ describe 'Taggable' do
     expect(@taggable.tag_counts_on(:tags).length).to eq(2)
   end
 
+  context 'tag_counts on a collection' do
+    context 'a select clause is specified on the collection' do
+      it 'should return tag counts without raising an error' do
+        expect(TaggableModel.tag_counts_on(:tags)).to be_empty
+
+        @taggable.tag_list = %w(awesome epic)
+        @taggable.save
+
+        expect {
+          expect(TaggableModel.select(:name).tag_counts_on(:tags).length).to eq(2)
+        }.not_to raise_error
+      end
+    end
+  end
+
   it 'should have tags_on' do
     expect(TaggableModel.tags_on(:tags)).to be_empty
 
@@ -226,11 +241,13 @@ describe 'Taggable' do
   it "should be able to find a tag using dates" do
     @taggable.skill_list = "ruby"
     @taggable.save
+    today = Date.today.to_time.utc
+    tomorrow = Date.tomorrow.to_time.utc
 
-    expect(TaggableModel.tagged_with("ruby", :start_at => Date.today, :end_at => Date.tomorrow).count).to eq(1)
+    expect(TaggableModel.tagged_with("ruby", :start_at => today, :end_at => tomorrow).count).to eq(1)
   end
 
-    it "shouldn't be able to find a tag outside date range" do
+  it "shouldn't be able to find a tag outside date range" do
     @taggable.skill_list = "ruby"
     @taggable.save
 
@@ -261,7 +278,7 @@ describe 'Taggable' do
     @taggable.tag_list = 'bob, charlie'
     @taggable.save
 
-    expect(TaggableModel.group(:created_at).tagged_with(['bob', 'css'], :any => true).first).to eq(@taggable)
+    expect(TaggableModel.tagged_with(['bob', 'css'], :any => true).to_a).to eq([@taggable])
 
     bob = TaggableModel.create(:name => 'Bob', :tag_list => 'ruby, rails, css')
     frank = TaggableModel.create(:name => 'Frank', :tag_list => 'ruby, rails')
@@ -380,7 +397,6 @@ describe 'Taggable' do
     # Test specific join syntaxes:
     frank.untaggable_models.create!
     expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tag_counts.size).to eq(2)
-    expect(TaggableModel.tagged_with('rails').joins(untaggable_models: :taggable_model).all_tag_counts.size).to eq(2)
     expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tag_counts.size).to eq(2)
   end
 
@@ -395,7 +411,6 @@ describe 'Taggable' do
     # Test specific join syntaxes:
     frank.untaggable_models.create!
     expect(TaggableModel.tagged_with('rails').joins(:untaggable_models).all_tags.size).to eq(2)
-    expect(TaggableModel.tagged_with('rails').joins(untaggable_models: :taggable_model).all_tags.size).to eq(2)
     expect(TaggableModel.tagged_with('rails').joins([:untaggable_models]).all_tags.size).to eq(2)
   end
 
@@ -459,6 +474,7 @@ describe 'Taggable' do
 
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank, steve])
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, exclude: true).to_a).to eq([jim])
+      expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a =~ [frank, jim])
     end
   end
 
@@ -742,7 +758,6 @@ describe 'Taggable' do
 
     context 'Model.limit(x).tag_counts.sum(:tags_count)' do
       it 'should not break on Mysql' do
-        # Activerecord 3.2 return a string
         expect(TaggableModel.limit(2).tag_counts.sum('tags_count').to_i).to eq(5)
       end
     end

@@ -42,6 +42,15 @@ describe 'Acts As Taggable On' do
       expect(taggable1.find_related_tags_for(OtherTaggableModel)).to_not include(taggable2)
     end
 
+    it 'should find other related objects based on tags only from particular context' do
+      taggable1 = TaggableModel.create!(name: 'Taggable 1',tag_list: 'one, two')
+      taggable2 = TaggableModel.create!(name: 'Taggable 2',tag_list: 'three, four', skill_list: 'one, two')
+      taggable3 = TaggableModel.create!(name: 'Taggable 3',tag_list: 'one, four')
+
+      expect(taggable1.find_related_tags).to include(taggable3)
+      expect(taggable1.find_related_tags).to_not include(taggable2)
+    end
+
 
     shared_examples "a collection" do
       it do

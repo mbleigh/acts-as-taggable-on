@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'bundler/setup'
 
+import "./lib/tasks/tags_collate_utf8.rake"
+
 desc 'Default: run specs'
 task default: :spec
 

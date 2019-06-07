@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [How to contribute:](#how-to-contribute)
+  - [Bug reports / Issues](#bug-reports--issues)
+  - [Code](#code)
+    - [Commit Messages](#commit-messages)
+    - [About Pull Requests (PR's)](#about-pull-requests-prs)
+  - [Documentation](#documentation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # How to contribute:
 
 ## Bug reports / Issues

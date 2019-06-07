@@ -133,12 +133,28 @@ describe 'Acts As Taggable On' do
       expect(taggable1.find_matching_contexts_for(TaggableModel, :offerings, :needs)).to_not include(taggable1)
     end
 
+    it 'should ensure joins to multiple taggings maintain their contexts when aliasing' do
+      taggable1 = TaggableModel.create!(name: 'Taggable 1')
+
+      taggable1.offering_list = 'one'
+      taggable1.need_list = 'two'
+
+      taggable1.save
+
+      column = TaggableModel.connection.quote_column_name("context")
+      offer_alias = TaggableModel.connection.quote_table_name("taggings")
+      need_alias = TaggableModel.connection.quote_table_name("need_taggings_taggable_models_join")
+
+      expect(TaggableModel.joins(:offerings, :needs).to_sql).to include "#{offer_alias}.#{column}"
+      expect(TaggableModel.joins(:offerings, :needs).to_sql).to include "#{need_alias}.#{column}"
+    end
+
   end
 
   describe 'Tagging Contexts' do
     it 'should eliminate duplicate tagging contexts ' do
       TaggableModel.acts_as_taggable_on(:skills, :skills)
-      expect(TaggableModel.tag_types.freq[:skills]).to_not eq(3)
+      expect(TaggableModel.tag_types.freq[:skills]).to eq(1)
     end
 
     it 'should not contain embedded/nested arrays' do
@@ -161,6 +177,15 @@ describe 'Acts As Taggable On' do
       expect(-> {
         TaggableModel.acts_as_taggable_on([nil])
       }).to_not raise_error
+    end
+
+    it 'should include dynamic contexts in tagging_contexts' do
+      taggable = TaggableModel.create!(name: 'Dynamic Taggable')
+      taggable.set_tag_list_on :colors, 'tag1, tag2, tag3'
+      expect(taggable.tagging_contexts).to eq(%w(tags languages skills needs offerings array colors))
+      taggable.save
+      taggable = TaggableModel.where(name: 'Dynamic Taggable').first
+      expect(taggable.tagging_contexts).to eq(%w(tags languages skills needs offerings array colors))
     end
   end
 
