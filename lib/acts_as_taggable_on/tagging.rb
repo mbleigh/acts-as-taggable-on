@@ -1,9 +1,5 @@
-require 'acts_as_paranoid'
-
 module ActsAsTaggableOn
   class Tagging < ::ActiveRecord::Base #:nodoc:
-    acts_as_paranoid
-
     self.table_name = ActsAsTaggableOn.taggings_table
 
     DEFAULT_CONTEXT = 'tags'
