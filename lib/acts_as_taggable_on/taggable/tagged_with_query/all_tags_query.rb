@@ -113,7 +113,8 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
     def tagging_alias(tag)
       alias_base_name = taggable_model.base_class.name.downcase
-      adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag)}")
+      random_string = SecureRandom.hex(4)
+      adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(random_string)}")
     end
   end
 end
