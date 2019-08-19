@@ -50,7 +50,7 @@ module ActsAsTaggableOn::Taggable
               parsed_new_list = ActsAsTaggableOn.default_parser.new(new_tags).parse
 
               if self.class.preserve_tag_order? || parsed_new_list.sort != #{tag_type}_list.sort
-                if Gem.loaded_specs["rails"].version < Gem::Version.new("5.0.0.beta1")
+                if Gem.loaded_specs["rails"].version < Gem::Version.new("6.0.0.beta1")
                   set_attribute_was('#{tag_type}_list', #{tag_type}_list)
                 else
                   duplicated_mutations_from_database.change_to_attribute('#{tag_type}_list')
