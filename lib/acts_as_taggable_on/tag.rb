@@ -123,7 +123,7 @@ module ActsAsTaggableOn
 
       def unicode_downcase(string)
         if ActiveSupport::Multibyte::Unicode.respond_to?(:downcase)
-          ActiveSupport::Multibyte::Unicode.downcase(string)
+          string.downcase
         else
           ActiveSupport::Multibyte::Chars.new(string).downcase.to_s
         end
