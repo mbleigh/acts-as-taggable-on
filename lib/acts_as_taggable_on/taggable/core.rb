@@ -53,7 +53,7 @@ module ActsAsTaggableOn::Taggable
                 if Rails.version.to_f < 6.0
                   set_attribute_was('#{tag_type}_list', #{tag_type}_list)
                 else
-                  duplicated_mutations_from_database.change_to_attribute('#{tag_type}_list')
+                  d_mutations_from_database.change_to_attribute('#{tag_type}_list')
                 end
                 write_attribute("#{tag_type}_list", parsed_new_list)
               end
@@ -69,17 +69,6 @@ module ActsAsTaggableOn::Taggable
             def dirtify_tag_list(tagging)
               attribute_will_change! tagging.context.singularize+"_list"
             end
-              
-            def duplicated_mutations_from_database
-            unless defined?(@mutations_from_database)
-              @mutations_from_database = nil
-            end
-            @mutations_from_database ||= if defined?(@attributes)
-              ActiveModel::AttributeMutationTracker.new(@attributes)
-            else
-              NullMutationTracker.instance
-            end
-          end
           RUBY
         end
       end
