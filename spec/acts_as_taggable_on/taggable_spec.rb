@@ -541,7 +541,7 @@ describe 'Taggable' do
 
   it 'should not delete tags if not updated' do
     model = TaggableModel.create(name: 'foo', tag_list: 'ruby, rails, programming')
-    model.update_attributes(name: 'bar')
+    model.update(name: 'bar')
     model.reload
     expect(model.tag_list.sort).to eq(%w(ruby rails programming).sort)
   end

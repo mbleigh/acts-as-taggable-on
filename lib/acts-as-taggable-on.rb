@@ -31,6 +31,7 @@ module ActsAsTaggableOn
     autoload :Dirty
     autoload :Ownership
     autoload :Related
+    autoload :TagListType
   end
 
   autoload :Utils

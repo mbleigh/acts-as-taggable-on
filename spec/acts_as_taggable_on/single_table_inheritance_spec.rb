@@ -150,7 +150,7 @@ describe 'Single Table Inheritance' do
       inheriting_model.tag_list = 'one'
       inheriting_model.save!
 
-      inheriting_model.update_attributes! name: 'foo'
+      inheriting_model.update! name: 'foo'
     end
 
     it "should only join with taggable's table to check type for inherited models" do
