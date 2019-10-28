@@ -54,7 +54,9 @@ module ActsAsTaggableOn::Taggable
                 if ActsAsTaggableOn::Utils.legacy_activerecord?
                   set_attribute_was("#{tag_type}_list", #{tag_type}_list)
                 else
-                  attribute_change("#{tag_type}_list")
+                  unless #{tag_type}_list_changed?
+                    @attributes["#{tag_type}_list"] = ActiveModel::Attribute.from_user("#{tag_type}_list", #{tag_type}_list, ActsAsTaggableOn::Taggable::TagListType.new)
+                  end
                 end
                 write_attribute("#{tag_type}_list", parsed_new_list)
               end
