@@ -4,6 +4,10 @@ cache: bundler
 addons:
   postgresql: '10'
 
+services:
+  - mysql
+  - postgresql
+
 rvm:
   - 2.6.5
   - 2.5.5
@@ -35,5 +39,5 @@ matrix:
   exclude:
     - rvm: 2.3.7
       gemfile: gemfiles/activerecord_6.0.gemfile
-    - rvm: 2.4.4
+    - rvm: 2.4.6
       gemfile: gemfiles/activerecord_6.0.gemfile
