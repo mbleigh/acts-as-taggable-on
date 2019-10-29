@@ -2,14 +2,17 @@ language: ruby
 cache: bundler
 
 addons:
-  postgresql: '9.4'
+  postgresql: '10'
+
+services:
+  - mysql
+  - postgresql
 
 rvm:
-  - ruby-head
-  - 2.5.1
-  - 2.4.4
+  - 2.6.5
+  - 2.5.5
+  - 2.4.6
   - 2.3.7
-  - 2.2.7
 
 env:
   - DB=sqlite3
@@ -22,13 +25,10 @@ gemfile:
   - gemfiles/activerecord_5.0.gemfile
   - gemfiles/activerecord_6.0.gemfile
 
-sudo: false
-
 bundler_args: '--without local_development --jobs 3 --retry 3'
 
 before_install:
-    - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
-    - gem install bundler -v '< 2'
+    - gem install bundler
 
 script: bundle exec rake
 
@@ -37,9 +37,7 @@ matrix:
     - rvm: ruby-head
   fast_finish: true
   exclude:
-    - rvm: 2.2.7
-      gemfile: gemfiles/activerecord_6.0.gemfile
     - rvm: 2.3.7
       gemfile: gemfiles/activerecord_6.0.gemfile
-    - rvm: 2.4.4
+    - rvm: 2.4.6
       gemfile: gemfiles/activerecord_6.0.gemfile

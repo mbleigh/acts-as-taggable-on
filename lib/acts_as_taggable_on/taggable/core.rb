@@ -1,4 +1,5 @@
 require_relative 'tagged_with_query'
+require_relative 'tag_list_type'
 
 module ActsAsTaggableOn::Taggable
   module Core
@@ -38,7 +39,7 @@ module ActsAsTaggableOn::Taggable
                      through: context_taggings,
                      source: :tag
 
-            attribute "#{tags_type.singularize}_list".to_sym, ActiveModel::Type::Value.new
+            attribute "#{tags_type.singularize}_list".to_sym, ActsAsTaggableOn::Taggable::TagListType.new
           end
 
           taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -49,8 +50,14 @@ module ActsAsTaggableOn::Taggable
             def #{tag_type}_list=(new_tags)
               parsed_new_list = ActsAsTaggableOn.default_parser.new(new_tags).parse
 
-              if self.class.preserve_tag_order? || parsed_new_list.sort != #{tag_type}_list.sort
-                set_attribute_was('#{tag_type}_list', #{tag_type}_list)
+              if self.class.preserve_tag_order? || (parsed_new_list.sort != #{tag_type}_list.sort)
+                if ActsAsTaggableOn::Utils.legacy_activerecord?
+                  set_attribute_was("#{tag_type}_list", #{tag_type}_list)
+                else
+                  unless #{tag_type}_list_changed?
+                    @attributes["#{tag_type}_list"] = ActiveModel::Attribute.from_user("#{tag_type}_list", #{tag_type}_list, ActsAsTaggableOn::Taggable::TagListType.new)
+                  end
+                end
                 write_attribute("#{tag_type}_list", parsed_new_list)
               end
 

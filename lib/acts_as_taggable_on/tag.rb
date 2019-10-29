@@ -105,8 +105,6 @@ module ActsAsTaggableOn
 
     class << self
 
-
-
       private
 
       def comparable_name(str)
@@ -121,20 +119,12 @@ module ActsAsTaggableOn
         ActsAsTaggableOn::Utils.using_mysql? ? 'BINARY ' : nil
       end
 
-      def unicode_downcase(string)
-        if ActiveSupport::Multibyte::Unicode.respond_to?(:downcase)
-          ActiveSupport::Multibyte::Unicode.downcase(string)
-        else
-          ActiveSupport::Multibyte::Chars.new(string).downcase.to_s
-        end
+      def as_8bit_ascii(string)
+        string.to_s.mb_chars
       end
 
-      def as_8bit_ascii(string)
-        if defined?(Encoding)
-          string.to_s.dup.force_encoding('BINARY')
-        else
-          string.to_s.mb_chars
-        end
+      def unicode_downcase(string)
+        as_8bit_ascii(string).downcase
       end
 
       def sanitize_sql_for_named_any(tag)
