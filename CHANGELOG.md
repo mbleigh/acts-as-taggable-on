@@ -15,6 +15,7 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
   * [@mizukami234 @junmoka Make table names configurable](https://github.com/mbleigh/acts-as-taggable-on/pull/910)
 * Fixes
   * [@tonyta Avoid overriding user-defined columns cache methods](https://github.com/mbleigh/acts-as-taggable-on/pull/911)
+  * [@kratob Fix caching on first save for an unused model](https://github.com/mbleigh/acts-as-taggable-on/pull/928)
 * Misc
   * [@gssbzn Remove legacy code for an empty query and replace it with ` ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
 * Documentation
