@@ -44,14 +44,14 @@ describe 'Taggable To Preserve Order' do
     @taggable.save
 
     @taggable.reload
-    expect(@taggable.tag_list).to eq(%w(rails ruby css))
+    expect(@taggable.tag_list).to eq(%w(pow ruby rails))
 
     # update with no change
     @taggable.tag_list = 'pow, ruby, rails'
     @taggable.save
 
     @taggable.reload
-    expect(@taggable.tag_list).to eq(%w(rails ruby css))
+    expect(@taggable.tag_list).to eq(%w(pow ruby rails))
 
     # update to clear tags
     @taggable.tag_list = ''
@@ -78,7 +78,7 @@ describe 'Taggable To Preserve Order' do
     @taggable.save
 
     @taggable.reload
-    expect(@taggable.tags.map { |t| t.name }).to eq(%w(pow ruby rails))
+    expect(@taggable.tags.map { |t| t.name }).to eq(%w(rails ruby css pow))
   end
 
   it 'should return tag objects in tagging id order' do
@@ -565,13 +565,6 @@ describe 'Taggable' do
       frank
       steve
     end
-
-    # it 'should be able to find tagged with ignore_deleted option' do
-    #   bob.taggings.first.destroy!
-    #   taggables = TaggableModel.tagged_with('lazy, happier', ignore_deleted: true)
-    #   expect(taggables).to include(frank, steve)
-    #   expect(taggables).not_to include(bob)
-    # end
 
     context 'when deleted_at is not present' do
       include_context 'without deleted_at column'
