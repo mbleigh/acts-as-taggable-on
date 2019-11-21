@@ -102,7 +102,8 @@ WARNING
           @force_binary_collation = true
           @strict_case_match = true
         else
-          Configuration.apply_binary_collation(false)
+          # TODO: Add rake task to unset binary collation on db
+          # Configuration.apply_binary_collation(false)
           @force_binary_collation = false
         end
       end
