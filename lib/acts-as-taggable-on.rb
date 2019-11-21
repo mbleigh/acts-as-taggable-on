@@ -97,7 +97,8 @@ WARNING
     def force_binary_collation=(force_bin)
       if Utils.using_mysql?
         if force_bin
-          Configuration.apply_binary_collation(true)
+          # This script should be executed only once not every time when rails is booted.
+          # Configuration.apply_binary_collation(true)
           @force_binary_collation = true
           @strict_case_match = true
         else
