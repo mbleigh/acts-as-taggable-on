@@ -10,19 +10,21 @@ Each change should fall into categories that would affect whether the release is
 
 As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
-### [Master / Unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.1...master)
+### [6.5.0 / 2019-11-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.5.0)
+
 * Features
   * [@mizukami234 @junmoka Make table names configurable](https://github.com/mbleigh/acts-as-taggable-on/pull/910)
+  * [@damianlegawiec Rails 6.0.0.beta1 support](https://github.com/mbleigh/acts-as-taggable-on/pull/937)
 * Fixes
   * [@tonyta Avoid overriding user-defined columns cache methods](https://github.com/mbleigh/acts-as-taggable-on/pull/911)
+  * [@hengwoon tags_count only need to join on the taggable's table if using STI](https://github.com/mbleigh/acts-as-taggable-on/pull/904)
+  * [@bduran82 Avoid unnecessary queries when finding or creating tags](https://github.com/mbleigh/acts-as-taggable-on/pull/839)
+  * [@iiwo simplify relation options syntax](https://github.com/mbleigh/acts-as-taggable-on/pull/940)
 * Misc
   * [@gssbzn Remove legacy code for an empty query and replace it with ` ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
+  * [@iiwo remove unneeded spec case](https://github.com/mbleigh/acts-as-taggable-on/pull/941)
 * Documentation
   * [@tonyta Cleanup CHANGELOG.md formatting and references](https://github.com/mbleigh/acts-as-taggable-on/pull/913)
-### [6.0.1 / 2018-06-27](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.0.1)
-
-* Fixes
-  * [@hengwoon tags_count only need to join on the taggable's table if using STI](https://github.com/mbleigh/acts-as-taggable-on/pull/904)
 
 ### [6.0.0 / 2018-06-19](https://github.com/mbleigh/acts-as-taggable-on/compare/v5.0.0...v6.0.0)
 
