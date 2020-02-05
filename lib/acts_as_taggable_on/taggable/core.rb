@@ -270,10 +270,17 @@ module ActsAsTaggableOn::Taggable
           taggings.not_owned.by_context(context).where(tag_id: old_tags).destroy_all
         end
 
-        # Create new taggings:
+        # we have used activerecord-import to bulk create tagging at once
+        # creating each tag one by one giving performance issue
+        all_taggings = []
         new_tags.each do |tag|
-          taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
+          new_tagging = taggings.new(
+            tag_id: tag.id, context: context.to_s, taggable: self
+          )
+          debugger
+          all_taggings << new_tagging if new_tagging.valid?
         end
+        ActsAsTaggableOn::Tagging.import all_taggings
       end
 
       true
