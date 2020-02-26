@@ -24,13 +24,15 @@ module ActsAsTaggableOn
     private
 
     def remove_unused_tags
-      if ActsAsTaggableOn.remove_unused_tags
-        if ActsAsTaggableOn.tags_counter
-          tag.destroy if tag.reload.taggings_count.zero?
-        else
-          tag.destroy if tag.reload.taggings.count.zero?
-        end
+      return if !ActsAsTaggableOn.remove_unused_tags || tag.blank?
+
+      if ActsAsTaggableOn.tags_counter
+        tag.destroy if tag.reload.taggings_count.zero?
+      else
+        tag.destroy if tag.reload.taggings.count.zero?
       end
+    rescue ActiveRecord::RecordNotFound
+      # Tag already deleted - nothing else to do
     end
   end
 end
