@@ -19,7 +19,7 @@ module ActsAsTaggableOn
     validates_presence_of :context
     validates_presence_of :tag_id
 
-    validates_uniqueness_of :tag_id, scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
+    validates_uniqueness_of :tag_id, case_sensitive: false, scope: [:taggable_type, :taggable_id, :context, :tagger_id, :tagger_type]
 
     before_destroy :mark_as_deleted, if: :has_deleted_at?
     after_destroy :remove_unused_tags
