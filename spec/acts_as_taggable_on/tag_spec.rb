@@ -42,7 +42,7 @@ describe ActsAsTaggableOn::Tag do
       end
 
       it 'should find both tags' do
-        expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic)).count).to eq(3)
+        expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic)).count).to eq(2)
       end
     end
   end
@@ -146,11 +146,11 @@ describe ActsAsTaggableOn::Tag do
         include_context 'without unique index'
       end
 
-      it 'should find by name case sensitive' do
+      it 'should not find by name case sensitive' do
         ActsAsTaggableOn.strict_case_match = true
         expect {
           ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('AWESOME')
-        }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+        }.not_to change(ActsAsTaggableOn::Tag, :count)
       end
     end
 
@@ -169,7 +169,7 @@ describe ActsAsTaggableOn::Tag do
         ActsAsTaggableOn.strict_case_match = true
         expect {
           expect(ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name('AWESOME', 'awesome').map(&:name)).to eq(%w(AWESOME awesome))
-        }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+        }.not_to change(ActsAsTaggableOn::Tag, :count)
       end
     end
 
@@ -265,12 +265,12 @@ describe ActsAsTaggableOn::Tag do
         include_context 'without unique index'
       end
 
-      it 'should find by name case sensitively' do
+      it 'should not find by name case sensitively' do
         expect {
           ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('AWESOME')
-        }.to change(ActsAsTaggableOn::Tag, :count)
+        }.not_to change(ActsAsTaggableOn::Tag, :count)
 
-        expect(ActsAsTaggableOn::Tag.last.name).to eq('AWESOME')
+        expect(ActsAsTaggableOn::Tag.last.name).to eq('awesome')
       end
     end
 
@@ -281,11 +281,10 @@ describe ActsAsTaggableOn::Tag do
 
       it 'should have a named_scope named(something) that matches exactly' do
         uppercase_tag = ActsAsTaggableOn::Tag.create(name: 'Cool')
-        @tag.name = 'cool'
         @tag.save!
 
-        expect(ActsAsTaggableOn::Tag.named('cool')).to include(@tag)
-        expect(ActsAsTaggableOn::Tag.named('cool')).to_not include(uppercase_tag)
+        expect(ActsAsTaggableOn::Tag.named('cool')).not_to include(@tag)
+        expect(ActsAsTaggableOn::Tag.named('Cool')).to include(uppercase_tag)
       end
     end
 
