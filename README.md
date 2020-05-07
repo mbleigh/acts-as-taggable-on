@@ -356,27 +356,6 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations, :skip_save => true) #won't save @some_photo object
 ```
 
-### Tag Tenancy
-
-Tags support multi-tenancy. This is useful for applications where a Tag belongs to a scoped set of models:
-
-```ruby
-class Account < ActiveRecord::Base
-  has_many :photos
-end
-
-class User < ActiveRecord::Base
-  belongs_to :account
-  acts_as_taggable_on :tags
-  acts_as_taggable_tenant :account_id
-end
-
-@user1.tag_list = ["foo", "bar"] # these taggings will automatically have the tenant saved
-@user2.tag_list = ["bar", "baz"] 
-
-ActsAsTaggableOn::Tag.for_tenant(@user1.account.id) # returns Tag models for "foo" and "bar", but not "baz"
-```
-
 #### Working with Owned Tags
 Note that `tag_list` only returns tags whose taggings do not have an owner. Continuing from the above example:
 ```ruby
@@ -411,6 +390,27 @@ def remove_owned_tag
     @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
     @some_item.save
 end
+```
+
+### Tag Tenancy
+
+Tags support multi-tenancy. This is useful for applications where a Tag belongs to a scoped set of models:
+
+```ruby
+class Account < ActiveRecord::Base
+  has_many :photos
+end
+
+class User < ActiveRecord::Base
+  belongs_to :account
+  acts_as_taggable_on :tags
+  acts_as_taggable_tenant :account_id
+end
+
+@user1.tag_list = ["foo", "bar"] # these taggings will automatically have the tenant saved
+@user2.tag_list = ["bar", "baz"]
+
+ActsAsTaggableOn::Tag.for_tenant(@user1.account.id) # returns Tag models for "foo" and "bar", but not "baz"
 ```
 
 ### Dirty objects

@@ -283,7 +283,7 @@ module ActsAsTaggableOn::Taggable
           else
             taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
           end
-         end
+        end
       end
 
       true
