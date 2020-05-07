@@ -57,8 +57,8 @@ module ActsAsTaggableOn
 
     def self.for_tenant(tenant)
       joins(:taggings).
-        where("taggings.tenant = ?", tenant).
-        select("DISTINCT tags.*")
+        where("#{ActsAsTaggableOn.taggings_table}.tenant = ?", tenant.to_s).
+        select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
     end
 
     ### CLASS METHODS:

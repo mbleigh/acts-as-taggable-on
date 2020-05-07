@@ -80,6 +80,8 @@ Review the generated migrations then migrate :
 rake db:migrate
 ```
 
+If you do not wish or need to support multi-tenancy, the migration for `add_tenant_to_taggings` is optional and can be discarded safely.
+
 #### For MySql users
 You can circumvent at any time the problem of special characters [issue 623](https://github.com/mbleigh/acts-as-taggable-on/issues/623) by setting in an initializer file:
 
@@ -352,6 +354,27 @@ Photo.tagged_with("paris", :on => :locations, :owned_by => @some_user)
 @some_photo.owner_tags_on(@some_user, :locations) # => [#<ActsAsTaggableOn::Tag id: 1, name: "paris">...]
 @some_photo.owner_tags_on(nil, :locations) # => Ownerships equivalent to saying @some_photo.locations
 @some_user.tag(@some_photo, :with => "paris, normandy", :on => :locations, :skip_save => true) #won't save @some_photo object
+```
+
+### Tag Tenancy
+
+Tags support multi-tenancy. This is useful for applications where a Tag belongs to a scoped set of models:
+
+```ruby
+class Account < ActiveRecord::Base
+  has_many :photos
+end
+
+class User < ActiveRecord::Base
+  belongs_to :account
+  acts_as_taggable_on :tags
+  acts_as_taggable_tenant :account_id
+end
+
+@user1.tag_list = ["foo", "bar"] # these taggings will automatically have the tenant saved
+@user2.tag_list = ["bar", "baz"] 
+
+ActsAsTaggableOn::Tag.for_tenant(@user1.account.id) # returns Tag models for "foo" and "bar", but not "baz"
 ```
 
 #### Working with Owned Tags
