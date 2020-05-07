@@ -477,7 +477,7 @@ describe 'Taggable' do
 
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank, steve])
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, exclude: true).to_a).to eq([jim])
-      expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a =~ [frank, jim])
+      expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a).to match_array([frank, jim])
     end
   end
 

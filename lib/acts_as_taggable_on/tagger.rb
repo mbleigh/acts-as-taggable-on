@@ -18,7 +18,7 @@ module ActsAsTaggableOn
           owned_taggings_scope = opts.delete(:scope)
 
           has_many :owned_taggings, owned_taggings_scope,
-                   opts.merge(
+                   **opts.merge(
                      as: :tagger,
                      class_name: '::ActsAsTaggableOn::Tagging',
                      dependent: :destroy
