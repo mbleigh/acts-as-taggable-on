@@ -21,6 +21,7 @@ module ActsAsTaggableOn
     ### SCOPES:
     scope :most_used, ->(limit = 20) { order('taggings_count desc').limit(limit) }
     scope :least_used, ->(limit = 20) { order('taggings_count asc').limit(limit) }
+    scope :search, -> (name) { where('lower(title) LIKE ?', '%' + name.downcase + '%') }
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
