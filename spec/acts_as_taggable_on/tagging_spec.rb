@@ -49,6 +49,26 @@ describe ActsAsTaggableOn::Tagging do
     ActsAsTaggableOn.remove_unused_tags = previous_setting
   end
 
+  it 'should succesfully destroy taggings if tag already destroyed' do
+    previous_setting = ActsAsTaggableOn.remove_unused_tags
+    ActsAsTaggableOn.remove_unused_tags = true
+    ActsAsTaggableOn::Tag.destroy_all
+    expect(ActsAsTaggableOn::Tagging.count).to eql(0)
+    @taggable = TaggableModel.create(name: 'Bob Jones')
+    @taggable.update_attribute :tag_list, 'aaa,bbb,ccc'
+
+    # Initalize taggings with preloaded tags
+    taggings = ActsAsTaggableOn::Tagging.preload(:tag).all
+    taggings.to_a
+
+    # Delete tags before destroying taggings
+    ActsAsTaggableOn::Tag.delete_all
+    taggings.destroy_all
+
+    expect(ActsAsTaggableOn::Tagging.count).to eql(0)
+    ActsAsTaggableOn.remove_unused_tags = previous_setting
+  end
+
   describe 'context scopes' do
     before do
       @tagging_2 = ActsAsTaggableOn::Tagging.new
