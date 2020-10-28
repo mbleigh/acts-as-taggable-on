@@ -1,13 +1,24 @@
 # -*- encoding : utf-8 -*-
 require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
-
+require 'db/migrate/5_change_collation_for_tag_names'
 
 shared_examples_for 'without unique index' do
-  prepend_before(:all) { AddMissingUniqueIndices.down }
+  prepend_before(:all) { AddMissingUniqueIndices.new.down }
   append_after(:all) do
     ActsAsTaggableOn::Tag.delete_all
-    AddMissingUniqueIndices.up
+    AddMissingUniqueIndices.new.up
+  end
+end
+
+shared_context 'with case sensitive collation' do
+  around do |example|
+    ChangeCollationForTagNames.new.up
+
+    example.call
+
+    ActsAsTaggableOn::Tag.delete_all
+    ChangeCollationForTagNames.new.down
   end
 end
 
@@ -15,8 +26,9 @@ describe ActsAsTaggableOn::Tag do
   before(:each) do
     @tag = ActsAsTaggableOn::Tag.new
     @user = TaggableModel.create(name: 'Pablo', tenant_id: 100)
-  end
 
+    ActsAsTaggableOn.strict_case_match = false # default to false
+  end
 
   describe 'named like any' do
     context 'case insensitive collation and unique index on tag name', if: using_case_insensitive_collation? do
@@ -36,12 +48,14 @@ describe ActsAsTaggableOn::Tag do
       end
 
       before(:each) do
+        ActsAsTaggableOn.strict_case_match = true
+
         ActsAsTaggableOn::Tag.create(name: 'Awesome')
         ActsAsTaggableOn::Tag.create(name: 'awesome')
         ActsAsTaggableOn::Tag.create(name: 'epic')
       end
 
-      it 'should find both tags' do
+      it 'should find all three tags' do
         expect(ActsAsTaggableOn::Tag.named_like_any(%w(awesome epic)).count).to eq(3)
       end
     end
@@ -91,12 +105,31 @@ describe ActsAsTaggableOn::Tag do
       @tag.save
     end
 
-    it 'should find by name' do
+    it "should find the tag with the name 'awesome'" do
       expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('awesome')).to eq(@tag)
     end
 
-    it 'should find by name case insensitive' do
-      expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('AWESOME')).to eq(@tag)
+    context 'when `ActsAsTaggableOn.strict_case_match` is set to false' do
+      it "should find the tag with the name 'awesome' when 'AWESOME' is requested" do
+        expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('AWESOME')).to eq(@tag)
+      end
+    end
+
+    context 'when `ActsAsTaggableOn.strict_case_match` is set to true' do
+      include_context 'with case sensitive collation'
+
+      before do
+        ActsAsTaggableOn.strict_case_match = true
+      end
+
+      it "should create a new tag with the name 'AWESOME'" do
+        expect do
+          result = ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('AWESOME')
+
+          expect(result).not_to eq(@tag)
+          expect(result.name).to eq 'AWESOME'
+        end.to change(ActsAsTaggableOn::Tag, :count).by(1)
+      end
     end
 
     it 'should create by name' do
@@ -116,8 +149,27 @@ describe ActsAsTaggableOn::Tag do
       expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('привет')).to eq(@tag)
     end
 
-    it 'should find by name case insensitive' do
-      expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('ПРИВЕТ')).to eq(@tag)
+    context 'when `ActsAsTaggableOn.strict_case_match` is set to false' do
+      it 'should find by name case insensitive' do
+        expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('ПРИВЕТ')).to eq(@tag)
+      end
+    end
+
+    context 'when `ActsAsTaggableOn.strict_case_match` is set to true' do
+      include_context 'with case sensitive collation'
+
+      before do
+        ActsAsTaggableOn.strict_case_match = true
+      end
+
+      it 'should create a new record' do
+        expect do
+          result = ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('ПРИВЕТ')
+
+          expect(result).not_to eq(@tag)
+          expect(result.name).to eq 'ПРИВЕТ'
+        end.to change(ActsAsTaggableOn::Tag, :count).by(1)
+      end
     end
 
     it 'should find by name accent insensitive', if: using_case_insensitive_collation? do
@@ -304,30 +356,37 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
-  describe 'name uniqeness validation' do
-    let(:duplicate_tag) { ActsAsTaggableOn::Tag.new(name: 'ror') }
+  describe 'name uniqueness validation' do
+    let(:duplicate_tag_downcase) { ActsAsTaggableOn::Tag.new(name: 'ror') }
+    let(:duplicate_tag_upcase) { ActsAsTaggableOn::Tag.new(name: 'ROR') }
 
-    before { ActsAsTaggableOn::Tag.create(name: 'ror') }
+    before { ActsAsTaggableOn::Tag.create!(name: 'ror') }
 
-    context "when don't need unique names" do
-      include_context 'without unique index'
-      it 'should not run uniqueness validation' do
-        allow(duplicate_tag).to receive(:validates_name_uniqueness?) { false }
-        duplicate_tag.save
-        expect(duplicate_tag).to be_persisted
+    context 'when `ActsAsTaggableOn.strict_case_match` is set to false' do
+      it 'should run uniqueness validation case-insensitively' do
+        expect(duplicate_tag_downcase).to_not be_valid
+        expect(duplicate_tag_downcase.errors.size).to eq(1)
+        expect(duplicate_tag_downcase.errors.messages[:name].first).to include('has already been taken')
+
+        expect(duplicate_tag_upcase).to_not be_valid
+        expect(duplicate_tag_upcase.errors.size).to eq(1)
+        expect(duplicate_tag_upcase.errors.messages[:name].first).to include('has already been taken')
       end
     end
 
-    context 'when do need unique names' do
-      it 'should run uniqueness validation' do
-        expect(duplicate_tag).to_not be_valid
+    context 'when `ActsAsTaggableOn.strict_case_match` is set to true' do
+      include_context 'with case sensitive collation'
+
+      before do
+        ActsAsTaggableOn.strict_case_match = true
       end
 
-      it 'add error to name' do
-        duplicate_tag.save
+      it 'should run uniqueness validation case-sensitively' do
+        expect(duplicate_tag_downcase).to_not be_valid
+        expect(duplicate_tag_downcase.errors.size).to eq(1)
+        expect(duplicate_tag_downcase.errors.messages[:name].first).to include('has already been taken')
 
-        expect(duplicate_tag.errors.size).to eq(1)
-        expect(duplicate_tag.errors.messages[:name]).to include('has already been taken')
+        expect(duplicate_tag_upcase).to be_valid
       end
     end
   end
