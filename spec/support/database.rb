@@ -10,7 +10,7 @@ if File.exist?(database_yml)
   ActiveRecord::Base.configurations = YAML.load_file(database_yml)
   ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), '../debug.log'))
   ActiveRecord::Base.logger.level = ENV['TRAVIS'] ? ::Logger::ERROR : ::Logger::DEBUG
-  config = ActiveRecord::Base.configurations[db_name]
+  config = ActiveSupport::HashWithIndifferentAccess.new(ActiveRecord::Base.configurations[db_name])
 
   begin
     ActiveRecord::Base.establish_connection(db_name.to_sym)
