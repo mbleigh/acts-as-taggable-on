@@ -1,6 +1,7 @@
 require 'active_record'
 require 'active_record/version'
 require 'active_support/core_ext/module'
+require 'active_support/core_ext/string/starts_ends_with'
 
 begin
   require 'rails/engine'
