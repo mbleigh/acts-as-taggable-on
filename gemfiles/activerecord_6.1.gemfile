@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "activerecord", "~> 6.0"
+gem "activerecord", "~> 6.1"
 
 case ENV["DB"]
 when "postgresql"
