@@ -32,7 +32,7 @@
 
 [![Join the chat at https://gitter.im/mbleigh/acts-as-taggable-on](https://badges.gitter.im/mbleigh/acts-as-taggable-on.svg)](https://gitter.im/mbleigh/acts-as-taggable-on?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Gem Version](https://badge.fury.io/rb/acts-as-taggable-on.svg)](http://badge.fury.io/rb/acts-as-taggable-on)
-[![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.svg)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
+[![Build Status](https://secure.travis-ci.com/mbleigh/acts-as-taggable-on.svg)](http://travis-ci.com/mbleigh/acts-as-taggable-on)
 [![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.svg)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
 [![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.svg)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
 [![Security](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master.svg)](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master)
@@ -57,7 +57,7 @@ was used.
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 6.0'
+gem 'acts-as-taggable-on', '~> 7.0'
 ```
 
 and bundle:
@@ -529,6 +529,8 @@ Versions 2.4.1 and up are compatible with Rails 4 too (thanks to arabonradar and
 Versions >= 3.x are compatible with Ruby 1.9.3+ and Rails 3 and 4.
 
 Versions >= 4.x are compatible with Ruby 2.0.0+ and Rails 4 and 5.
+
+Versions >= 7.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
 
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
 
