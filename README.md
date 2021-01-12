@@ -361,34 +361,75 @@ Note that `tag_list` only returns tags whose taggings do not have an owner. Cont
 ```
 To retrieve all tags of an object (regardless of ownership) or if only one owner can tag the object, use `all_tags_list`.
 
-##### Adding owned tags
-Note that **owned tags** are added all at once, in the form of ***comma seperated tags*** in string.
-Also, when you try to add **owned tags** again, it simply overwrites the previous set of **owned tags**.
-So to append tags in previously existing **owned tags** list, go as follows:
+##### Adding and removing owned tags
+Note that **owned tags** are added all at once, in the form of
+***comma seperated tags*** in string. Also, when you try to add
+**owned tags** again, it simply overwrites the previous set of **owned tags**.
+So to append tags in previously existing **owned tags** list,
+add the following functions:
+
 ```ruby
-def add_owned_tag
-    @some_item = Item.find(params[:id])
-    owned_tag_list = @some_item.all_tags_list - @some_item.tag_list
-    owned_tag_list += [(params[:tag])]
-    @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
-    @some_item.save
+DEFAULT_ACTSASTAGGABLEON_TYPE = :tags
+
+def add_owned_tag(item, owner, tags_to_add, options = {})
+  own_tag(item, owner, arrayify(tags_to_add), "add", options)
+end
+
+def remove_owned_tag(item, owner, tags_to_add, options = {})
+  own_tag(item, owner, arrayify(tags_to_add), "subtract", options)
+end
+
+def own_tag(item, owner, tags_to_add, direction = "add", opts)
+  tag_type = (options[:tag_type] || DEFAULT_ACTSASTAGGABLEON_TYPE)
+  owned_tag_list = item.owner_tags_on(owner, tag_type).map(&:name)
+
+  if direction == "subtract"
+    owned_tag_list = owned_tag_list.reject{|n| n.in?(tags_to_add)}
+  else
+    owned_tag_list.push(*tags_to_add)
+  end
+
+  owner.tag(item, with: stringify(owned_tag_list), on: tag_type, skip_save: (options[:skip_save] || true))
+end
+
+def arrayify(tags_to_add)
+  return tags_to_add if tags_to_add.is_a?(Array)
+  tags_to_add.split(",")
 end
 
 def stringify(tag_list)
-    tag_list.inject('') { |memo, tag| memo += (tag + ',') }[0..-1]
+  tag_list.inject('') { |memo, tag| memo += (tag + ',') }.chomp(",")
 end
 ```
-##### Removing owned tags
-Similarly as above, removing will be as follows:
+
+###### Examples
+
+
+`User`s are your tag owners, and  your tag type is `:tag`, and
+the tags are coming from a web request, via the `params`,
+to your controller
+
+
 ```ruby
-def remove_owned_tag
-    @some_item = Item.find(params[:id])
-    owned_tag_list = @some_item.all_tags_list - @some_item.tag_list
-    owned_tag_list -= [(params[:tag])]
-    @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
-    @some_item.save
-end
+item = MyModel.find(123) # or more likely `before_action :set_my_model`
+add_owned_tag(item, current_user, params[:tags_list])
+
+if item.save
+  # ...
 ```
+
+`Team`s are your tag owners, and  your tag type is `:locations`, and
+the tags are set by a background task in your model.
+
+```ruby
+tags = calculate_tags
+opts = {
+  tag_name: :locations,
+  skip_save: false
+}
+add_owned_tag(self, current_user.team, tags, opts)
+```
+
 
 ### Dirty objects
 
