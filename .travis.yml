@@ -9,6 +9,7 @@ services:
   - postgresql
 
 rvm:
+  - 2.7.0
   - 2.6.5
   - 2.5.5
   - 2.4.6
@@ -24,6 +25,7 @@ gemfile:
   - gemfiles/activerecord_5.1.gemfile
   - gemfiles/activerecord_5.0.gemfile
   - gemfiles/activerecord_6.0.gemfile
+  - gemfiles/activerecord_6.1.gemfile
 
 bundler_args: '--without local_development --jobs 3 --retry 3'
 
@@ -41,3 +43,7 @@ matrix:
       gemfile: gemfiles/activerecord_6.0.gemfile
     - rvm: 2.4.6
       gemfile: gemfiles/activerecord_6.0.gemfile
+    - rvm: 2.3.7
+      gemfile: gemfiles/activerecord_6.1.gemfile
+    - rvm: 2.4.6
+      gemfile: gemfiles/activerecord_6.1.gemfile
