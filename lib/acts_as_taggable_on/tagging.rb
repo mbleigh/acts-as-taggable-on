@@ -28,7 +28,7 @@ module ActsAsTaggableOn
         if ActsAsTaggableOn.tags_counter
           tag.destroy if tag.reload.taggings_count.zero?
         else
-          tag.destroy if tag.reload.taggings.count.zero?
+          tag.destroy if tag.reload.taggings.none?
         end
       end
     end

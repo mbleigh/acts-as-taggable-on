@@ -49,6 +49,22 @@ describe ActsAsTaggableOn::Tagging do
     ActsAsTaggableOn.remove_unused_tags = previous_setting
   end
 
+  it 'should destroy unused tags after tagging destroyed when not using tags_counter' do
+    remove_unused_tags_previous_setting = ActsAsTaggableOn.remove_unused_tags
+    tags_counter_previous_setting = ActsAsTaggableOn.tags_counter
+    ActsAsTaggableOn.remove_unused_tags = true
+    ActsAsTaggableOn.tags_counter = false
+
+    ActsAsTaggableOn::Tag.destroy_all
+    @taggable = TaggableModel.create(name: 'Bob Jones')
+    @taggable.update_attribute :tag_list, 'aaa,bbb,ccc'
+    @taggable.update_attribute :tag_list, ''
+    expect(ActsAsTaggableOn::Tag.count).to eql(0)
+
+    ActsAsTaggableOn.remove_unused_tags = remove_unused_tags_previous_setting
+    ActsAsTaggableOn.tags_counter = tags_counter_previous_setting
+  end
+
   describe 'context scopes' do
     before do
       @tagging_2 = ActsAsTaggableOn::Tagging.new
