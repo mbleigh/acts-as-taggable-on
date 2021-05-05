@@ -25,6 +25,8 @@ module ActsAsTaggableOn
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
         where(["name = #{binary}?", as_8bit_ascii(name)])
+      elsif ActsAsTaggableOn.strict_default_collation_match
+        where(["name = ?", as_8bit_ascii(name)])
       else
         where(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(name))])
       end
@@ -58,7 +60,7 @@ module ActsAsTaggableOn
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
-      if ActsAsTaggableOn.strict_case_match
+      if ActsAsTaggableOn.strict_case_match || ActsAsTaggableOn.strict_default_collation_match
         self.find_or_create_all_with_like_by_name([name]).first
       else
         named_like(name).first || create(name: name)
@@ -108,7 +110,7 @@ module ActsAsTaggableOn
       private
 
       def comparable_name(str)
-        if ActsAsTaggableOn.strict_case_match
+        if ActsAsTaggableOn.strict_case_match || ActsAsTaggableOn.strict_default_collation_match
           str
         else
           unicode_downcase(str.to_s)
@@ -130,6 +132,8 @@ module ActsAsTaggableOn
       def sanitize_sql_for_named_any(tag)
         if ActsAsTaggableOn.strict_case_match
           sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
+        elsif ActsAsTaggableOn.strict_default_collation_match
+          sanitize_sql(["name = ?", as_8bit_ascii(tag)])
         else
           sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
         end

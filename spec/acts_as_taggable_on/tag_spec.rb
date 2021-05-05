@@ -289,6 +289,65 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
+  describe 'when using strict_default_collation_match' do
+    before do
+      ActsAsTaggableOn.strict_default_collation_match = true
+      @tag.name = 'awesome'
+      @tag.save!
+    end
+
+    after do
+      ActsAsTaggableOn.strict_default_collation_match = false
+    end
+
+    it 'should find by name' do
+      expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('awesome')).to eq(@tag)
+    end
+
+    context 'case sensitive' do
+      if using_case_insensitive_collation?
+        include_context 'without unique index'
+      end
+
+      it 'should find by name case sensitively' do
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('AWESOME')
+        }.to change(ActsAsTaggableOn::Tag, :count)
+
+        expect(ActsAsTaggableOn::Tag.last.name).to eq('AWESOME')
+      end
+    end
+
+    context 'case sensitive' do
+      if using_case_insensitive_collation?
+        include_context 'without unique index'
+      end
+
+      it 'should have a named_scope named(something) that matches exactly' do
+        uppercase_tag = ActsAsTaggableOn::Tag.create(name: 'Cool')
+        @tag.name = 'cool'
+        @tag.save!
+
+        expect(ActsAsTaggableOn::Tag.named('cool')).to include(@tag)
+        expect(ActsAsTaggableOn::Tag.named('cool')).to_not include(uppercase_tag)
+      end
+    end
+
+    it 'should not change encoding' do
+      name = "\u3042"
+      original_encoding = name.encoding
+      record = ActsAsTaggableOn::Tag.find_or_create_with_like_by_name(name)
+      record.reload
+      expect(record.name.encoding).to eq(original_encoding)
+    end
+
+    context 'named any with some special characters combinations', if: using_mysql? do
+      it 'should not raise an invalid encoding exception' do
+        expect{ActsAsTaggableOn::Tag.named_any(["holä", "hol'ä"])}.not_to raise_error
+      end
+    end
+  end
+
   describe 'name uniqeness validation' do
     let(:duplicate_tag) { ActsAsTaggableOn::Tag.new(name: 'ror') }
 

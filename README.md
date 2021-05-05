@@ -488,6 +488,12 @@ If you would like to have an exact match covering special characters with MySql:
 ActsAsTaggableOn.force_binary_collation = true
 ```
 
+If you would like to not use `LOWER` for comparison queries and do not need to use `strict_case_match` or `force_binary_collation`. 
+
+```ruby
+ActsAsTaggableOn.strict_default_collation_match = true
+```
+
 If you would like to specify table names:
 
 ```ruby

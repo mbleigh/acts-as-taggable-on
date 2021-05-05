@@ -66,7 +66,7 @@ module ActsAsTaggableOn
                   :remove_unused_tags, :default_parser,
                   :tags_counter, :tags_table,
                   :taggings_table
-    attr_reader :delimiter, :strict_case_match
+    attr_reader :delimiter, :strict_case_match, :strict_default_collation_match
 
     def initialize
       @delimiter = ','
@@ -79,10 +79,15 @@ module ActsAsTaggableOn
       @force_binary_collation = false
       @tags_table = :tags
       @taggings_table = :taggings
+      @strict_default_collation_match = false
     end
 
     def strict_case_match=(force_cs)
       @strict_case_match = force_cs unless @force_binary_collation
+    end
+
+    def strict_default_collation_match=(force_cs)
+      @strict_default_collation_match = force_cs unless @strict_case_match
     end
 
     def delimiter=(string)
