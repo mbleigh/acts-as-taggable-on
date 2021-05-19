@@ -54,6 +54,23 @@ module ActsAsTaggableOn
       taggable_on(true, tag_types)
     end
 
+    def acts_as_taggable_tenant(tenant)
+      if taggable?
+        self.tenant_column = tenant
+      else
+        class_attribute :tenant_column
+        self.tenant_column = tenant
+      end
+
+      # each of these add context-specific methods and must be
+      # called on each call of taggable_on
+      include Core
+      include Collection
+      include Cache
+      include Ownership
+      include Related
+    end
+
     private
 
       # Make a model taggable on specified contexts
@@ -78,6 +95,7 @@ module ActsAsTaggableOn
         self.tag_types = tag_types
         class_attribute :preserve_tag_order
         self.preserve_tag_order = preserve_tag_order
+        class_attribute :tenant_column
 
         class_eval do
           has_many :taggings, as: :taggable, dependent: :destroy, class_name: '::ActsAsTaggableOn::Tagging'

@@ -14,7 +14,7 @@ end
 describe ActsAsTaggableOn::Tag do
   before(:each) do
     @tag = ActsAsTaggableOn::Tag.new
-    @user = TaggableModel.create(name: 'Pablo')
+    @user = TaggableModel.create(name: 'Pablo', tenant_id: 100)
   end
 
 
@@ -67,6 +67,21 @@ describe ActsAsTaggableOn::Tag do
 
     it 'should not return tags that have been used in other contexts' do
       expect(ActsAsTaggableOn::Tag.for_context('needs').pluck(:name)).to_not include('ruby')
+    end
+  end
+
+  describe 'for tenant' do
+    before(:each) do
+      @user.skill_list.add('ruby')
+      @user.save
+    end
+
+    it 'should return tags for the tenant' do
+      expect(ActsAsTaggableOn::Tag.for_tenant('100').pluck(:name)).to include('ruby')
+    end
+
+    it 'should not return tags for other tenants' do
+      expect(ActsAsTaggableOn::Tag.for_tenant('200').pluck(:name)).to_not include('ruby')
     end
   end
 

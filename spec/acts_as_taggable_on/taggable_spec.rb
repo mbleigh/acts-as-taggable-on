@@ -109,6 +109,10 @@ describe 'Taggable' do
     expect(@taggable.tag_types).to eq(TaggableModel.tag_types)
   end
 
+  it 'should have tenant column' do
+    expect(TaggableModel.tenant_column).to eq(:tenant_id)
+  end
+
   it 'should have tag_counts_on' do
     expect(TaggableModel.tag_counts_on(:tags)).to be_empty
 
@@ -676,11 +680,11 @@ describe 'Taggable' do
     end
 
     it 'should return all column names joined for TaggableModel GROUP clause' do
-      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq('taggable_models.id, taggable_models.name, taggable_models.type')
+      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq('taggable_models.id, taggable_models.name, taggable_models.type, taggable_models.tenant_id')
     end
 
     it 'should return all column names joined for NonStandardIdTaggableModel GROUP clause' do
-      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq("taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type")
+      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq("taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type, taggable_models.tenant_id")
     end
   end
 

@@ -14,6 +14,8 @@ module ActsAsTaggableOn
     scope :by_contexts, ->(contexts) { where(context: (contexts || DEFAULT_CONTEXT)) }
     scope :by_context, ->(context = DEFAULT_CONTEXT) { by_contexts(context.to_s) }
 
+    scope :by_tenant, ->(tenant) { where(tenant: tenant) }
+
     validates_presence_of :context
     validates_presence_of :tag_id
 
