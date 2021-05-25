@@ -28,7 +28,7 @@ module ActsAsTaggableOn
       elsif ActsAsTaggableOn.strict_default_collation_match
         where(["name = ?", as_8bit_ascii(name)])
       else
-        where(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(name))])
+        where(['LOWER(name) = LOWER(?)', unicode_downcase(name)])
       end
     end
 
@@ -135,7 +135,7 @@ module ActsAsTaggableOn
         elsif ActsAsTaggableOn.strict_default_collation_match
           sanitize_sql(["name = ?", as_8bit_ascii(tag)])
         else
-          sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
+          sanitize_sql(['LOWER(name) = LOWER(?)', unicode_downcase(tag)])
         end
       end
     end
