@@ -1,7 +1,9 @@
 require_relative 'tagged_with_query'
+require_relative 'tag_list_type'
 
 module ActsAsTaggableOn::Taggable
   module Core
+
     def self.included(base)
       base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
 
@@ -28,12 +30,16 @@ module ActsAsTaggableOn::Taggable
             has_many context_taggings, -> { includes(:tag).order(taggings_order).where(context: tags_type) },
                      as: :taggable,
                      class_name: 'ActsAsTaggableOn::Tagging',
-                     dependent: :destroy
+                     dependent: :destroy,
+                     after_add: :dirtify_tag_list,
+                     after_remove: :dirtify_tag_list
 
             has_many context_tags, -> { order(taggings_order) },
                      class_name: 'ActsAsTaggableOn::Tag',
                      through: context_taggings,
                      source: :tag
+
+            attribute "#{tags_type.singularize}_list".to_sym, ActsAsTaggableOn::Taggable::TagListType.new
           end
 
           taggable_mixin.class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -42,11 +48,29 @@ module ActsAsTaggableOn::Taggable
             end
 
             def #{tag_type}_list=(new_tags)
+              parsed_new_list = ActsAsTaggableOn.default_parser.new(new_tags).parse
+
+              if self.class.preserve_tag_order? || (parsed_new_list.sort != #{tag_type}_list.sort)
+                if ActsAsTaggableOn::Utils.legacy_activerecord?
+                  set_attribute_was("#{tag_type}_list", #{tag_type}_list)
+                else
+                  unless #{tag_type}_list_changed?
+                    @attributes["#{tag_type}_list"] = ActiveModel::Attribute.from_user("#{tag_type}_list", #{tag_type}_list, ActsAsTaggableOn::Taggable::TagListType.new)
+                  end
+                end
+                write_attribute("#{tag_type}_list", parsed_new_list)
+              end
+
               set_tag_list_on('#{tags_type}', new_tags)
             end
 
             def all_#{tags_type}_list
               all_tags_list_on('#{tags_type}')
+            end
+
+            private
+            def dirtify_tag_list(tagging)
+              attribute_will_change! tagging.context.singularize+"_list"
             end
           RUBY
         end
@@ -86,9 +110,8 @@ module ActsAsTaggableOn::Taggable
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn.default_parser.new(tags).parse
         options = options.dup
-        empty_result = where('1 = 0')
 
-        return empty_result if tag_list.empty?
+        return none if tag_list.empty?
 
         ::ActsAsTaggableOn::Taggable::TaggedWithQuery.build(self, ActsAsTaggableOn::Tag, ActsAsTaggableOn::Tagging, tag_list, options)
       end
@@ -161,7 +184,7 @@ module ActsAsTaggableOn::Taggable
 
       if ActsAsTaggableOn::Utils.using_postgresql?
         group_columns = grouped_column_names_for(ActsAsTaggableOn::Tag)
-        scope.order("max(#{tagging_table_name}.created_at)").group(group_columns)
+        scope.order(Arel.sql("max(#{tagging_table_name}.created_at)")).group(group_columns)
       else
         scope.group("#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}")
       end.to_a
@@ -181,30 +204,19 @@ module ActsAsTaggableOn::Taggable
       add_custom_context(context)
 
       variable_name = "@#{context.to_s.singularize}_list"
-      process_dirty_object(context, new_list) unless custom_contexts.include?(context.to_s)
 
-      instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(new_list).parse)
+      parsed_new_list = ActsAsTaggableOn.default_parser.new(new_list).parse
+
+      instance_variable_set(variable_name, parsed_new_list)
     end
 
     def tagging_contexts
       self.class.tag_types.map(&:to_s) + custom_contexts
     end
 
-    def process_dirty_object(context, new_list)
-      value = new_list.is_a?(Array) ? ActsAsTaggableOn::TagList.new(new_list) : new_list
-      attrib = "#{context.to_s.singularize}_list"
-
-      if changed_attributes.include?(attrib)
-        # The attribute already has an unsaved change.
-        old = changed_attributes[attrib]
-        @changed_attributes.delete(attrib) if old.to_s == value.to_s
-      else
-        old = tag_list_on(context)
-        if self.class.preserve_tag_order
-          @changed_attributes[attrib] = old if old.to_s != value.to_s
-        else
-          @changed_attributes[attrib] = old.to_s if old.sort != ActsAsTaggableOn.default_parser.new(value).parse.sort
-        end
+    def tenant
+      if self.class.tenant_column
+        read_attribute(self.class.tenant_column)
       end
     end
 
@@ -266,7 +278,11 @@ module ActsAsTaggableOn::Taggable
 
         # Create new taggings:
         new_tags.each do |tag|
-          taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
+          if tenant
+            taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self, tenant: tenant)
+          else
+            taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
+          end
         end
       end
 
@@ -315,3 +331,4 @@ module ActsAsTaggableOn::Taggable
     end
   end
 end
+

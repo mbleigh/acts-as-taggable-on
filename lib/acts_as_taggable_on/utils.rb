@@ -20,12 +20,12 @@ module ActsAsTaggableOn
         Digest::SHA1.hexdigest(string)[0..6]
       end
 
-      def active_record5?
-        ::ActiveRecord::VERSION::MAJOR == 5
-      end
-
       def like_operator
         using_postgresql? ? 'ILIKE' : 'LIKE'
+      end
+
+      def legacy_activerecord?
+        ActiveRecord.version <= Gem::Version.new('5.3.0')
       end
 
       # escape _ and % characters in strings, since these are wildcards in SQL.

@@ -94,16 +94,18 @@ module ActsAsTaggableOn::Taggable
         ## Generate conditions:
         options[:conditions] = sanitize_sql(options[:conditions]) if options[:conditions]
 
-        ## Generate joins:
-        taggable_join = "INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
-        taggable_join << " AND #{table_name}.#{inheritance_column} = '#{name}'" unless descends_from_active_record? # Current model is STI descendant, so add type checking to the join condition
-
         ## Generate scope:
         tagging_scope = ActsAsTaggableOn::Tagging.select("#{ActsAsTaggableOn::Tagging.table_name}.tag_id, COUNT(#{ActsAsTaggableOn::Tagging.table_name}.tag_id) AS tags_count")
         tag_scope = ActsAsTaggableOn::Tag.select("#{ActsAsTaggableOn::Tag.table_name}.*, #{ActsAsTaggableOn::Tagging.table_name}.tags_count AS count").order(options[:order]).limit(options[:limit])
 
-        # Joins and conditions
-        tagging_scope = tagging_scope.joins(taggable_join)
+        # Current model is STI descendant, so add type checking to the join condition
+        unless descends_from_active_record?
+          taggable_join = "INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id"
+          taggable_join << " AND #{table_name}.#{inheritance_column} = '#{name}'"
+          tagging_scope = tagging_scope.joins(taggable_join)
+        end
+
+        # Conditions
         tagging_conditions(options).each { |condition| tagging_scope = tagging_scope.where(condition) }
         tag_scope = tag_scope.where(options[:conditions])
 
@@ -174,7 +176,7 @@ module ActsAsTaggableOn::Taggable
       # See https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb#L38
       def count(column_name = :all, options = {})
         # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
-        ActsAsTaggableOn::Utils.active_record5? ? super(column_name) : super(column_name, options)
+        super(column_name)
       end
     end
   end

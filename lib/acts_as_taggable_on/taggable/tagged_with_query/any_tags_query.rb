@@ -3,7 +3,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     def build
       taggable_model.select(all_fields)
                     .where(model_has_at_least_one_tag)
-                    .order(order_conditions)
+                    .order(Arel.sql(order_conditions))
                     .readonly(false)
     end
 
@@ -14,9 +14,6 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def model_has_at_least_one_tag
-      tagging_alias = tagging_arel_table.alias(alias_name(tag_list))
-
-
       tagging_arel_table.project(Arel.star).where(at_least_one_tag).exists
     end
 
@@ -38,12 +35,10 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:on].present?
-        exists_contition = exists_contition.and(tagging_arel_table[:context].lteq(options[:on]))
+        exists_contition = exists_contition.and(tagging_arel_table[:context].eq(options[:on]))
       end
 
       if (owner = options[:owned_by]).present?
-        owner_table = owner.class.base_class.arel_table
-
         exists_contition = exists_contition.and(tagging_arel_table[:tagger_id].eq(owner.id))
                                    .and(tagging_arel_table[:tagger_type].eq(owner.class.base_class.to_s))
       end

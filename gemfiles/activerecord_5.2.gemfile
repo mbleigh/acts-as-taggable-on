@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "activerecord", "~> 5.1.1"
+gem "activerecord", "~> 5.2.0"
 case ENV["DB"]
 when "postgresql"
   gem 'pg'

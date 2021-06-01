@@ -32,7 +32,7 @@
 
 [![Join the chat at https://gitter.im/mbleigh/acts-as-taggable-on](https://badges.gitter.im/mbleigh/acts-as-taggable-on.svg)](https://gitter.im/mbleigh/acts-as-taggable-on?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Gem Version](https://badge.fury.io/rb/acts-as-taggable-on.svg)](http://badge.fury.io/rb/acts-as-taggable-on)
-[![Build Status](https://secure.travis-ci.org/mbleigh/acts-as-taggable-on.svg)](http://travis-ci.org/mbleigh/acts-as-taggable-on)
+[![Build Status](https://github.com/mbleigh/acts-as-taggable-on/workflows/spec/badge.svg)](https://github.com/mbleigh/acts-as-taggable-on/actions)
 [![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.svg)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
 [![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.svg)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
 [![Security](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master.svg)](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master)
@@ -57,7 +57,7 @@ was used.
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 4.0'
+gem 'acts-as-taggable-on', '~> 7.0'
 ```
 
 and bundle:
@@ -79,6 +79,8 @@ Review the generated migrations then migrate :
 ```shell
 rake db:migrate
 ```
+
+If you do not wish or need to support multi-tenancy, the migration for `add_tenant_to_taggings` is optional and can be discarded safely.
 
 #### For MySql users
 You can circumvent at any time the problem of special characters [issue 623](https://github.com/mbleigh/acts-as-taggable-on/issues/623) by setting in an initializer file:
@@ -103,8 +105,8 @@ Setup
 
 ```ruby
 class User < ActiveRecord::Base
-  acts_as_taggable # Alias for acts_as_taggable_on :tags
-  acts_as_taggable_on :skills, :interests
+  acts_as_taggable_on :tags
+  acts_as_taggable_on :skills, :interests #You can also configure multiple tag types per model
 end
 
 class UsersController < ApplicationController
@@ -121,6 +123,7 @@ Add and remove a single tag
 ```ruby
 @user.tag_list.add("awesome")   # add a single tag. alias for <<
 @user.tag_list.remove("awesome") # remove a single tag
+@user.save # save to persist tag_list
 ```
 
 Add and remove multiple tags in an array
@@ -128,6 +131,7 @@ Add and remove multiple tags in an array
 ```ruby
 @user.tag_list.add("awesome", "slick")
 @user.tag_list.remove("awesome", "slick")
+@user.save
 ```
 
 You can also add and remove tags in format of String. This would
@@ -388,6 +392,27 @@ def remove_owned_tag
 end
 ```
 
+### Tag Tenancy
+
+Tags support multi-tenancy. This is useful for applications where a Tag belongs to a scoped set of models:
+
+```ruby
+class Account < ActiveRecord::Base
+  has_many :photos
+end
+
+class User < ActiveRecord::Base
+  belongs_to :account
+  acts_as_taggable_on :tags
+  acts_as_taggable_tenant :account_id
+end
+
+@user1.tag_list = ["foo", "bar"] # these taggings will automatically have the tenant saved
+@user2.tag_list = ["bar", "baz"]
+
+ActsAsTaggableOn::Tag.for_tenant(@user1.account.id) # returns Tag models for "foo" and "bar", but not "baz"
+```
+
 ### Dirty objects
 
 ```ruby
@@ -486,6 +511,13 @@ If you would like to have an exact match covering special characters with MySql:
 ActsAsTaggableOn.force_binary_collation = true
 ```
 
+If you would like to specify table names:
+
+```ruby
+ActsAsTaggableOn.tags_table = 'aato_tags'
+ActsAsTaggableOn.taggings_table = 'aato_taggings'
+```
+
 If you want to change the default delimiter (it defaults to ','). You can also pass in an array of delimiters such as ([',', '|']):
 
 ```ruby
@@ -520,6 +552,8 @@ Versions 2.4.1 and up are compatible with Rails 4 too (thanks to arabonradar and
 Versions >= 3.x are compatible with Ruby 1.9.3+ and Rails 3 and 4.
 
 Versions >= 4.x are compatible with Ruby 2.0.0+ and Rails 4 and 5.
+
+Versions >= 7.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
 
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
 

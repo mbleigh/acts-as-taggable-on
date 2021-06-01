@@ -127,9 +127,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tag_counts_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tag_counts_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tag_counts_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tag_counts_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should have different tags_on for inherited models' do
@@ -138,9 +138,9 @@ describe 'Single Table Inheritance' do
       altered_inheriting.tag_list = 'fork, spoon'
       altered_inheriting.save!
 
-      expect(InheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso))
-      expect(AlteredInheritingTaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(fork spoon))
-      expect(TaggableModel.tags_on(:tags, order: 'tags.id').map(&:name)).to eq(%w(bob kelso fork spoon))
+      expect(InheritingTaggableModel.tags_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso))
+      expect(AlteredInheritingTaggableModel.tags_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(fork spoon))
+      expect(TaggableModel.tags_on(:tags, order: "#{ActsAsTaggableOn.tags_table}.id").map(&:name)).to eq(%w(bob kelso fork spoon))
     end
 
     it 'should store same tag without validation conflict' do
@@ -150,7 +150,12 @@ describe 'Single Table Inheritance' do
       inheriting_model.tag_list = 'one'
       inheriting_model.save!
 
-      inheriting_model.update_attributes! name: 'foo'
+      inheriting_model.update! name: 'foo'
+    end
+
+    it "should only join with taggable's table to check type for inherited models" do
+      expect(TaggableModel.tag_counts_on(:tags).to_sql).to_not match /INNER JOIN taggable_models ON/
+      expect(InheritingTaggableModel.tag_counts_on(:tags).to_sql).to match /INNER JOIN taggable_models ON/
     end
   end
 

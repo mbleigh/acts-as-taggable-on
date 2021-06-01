@@ -49,12 +49,10 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:on].present?
-        on_condition = on_condition.and(tagging_alias[:context].lteq(options[:on]))
+        on_condition = on_condition.and(tagging_alias[:context].eq(options[:on]))
       end
 
       if (owner = options[:owned_by]).present?
-        owner_table = owner.class.base_class.arel_table
-
         on_condition = on_condition.and(tagging_alias[:tagger_id].eq(owner.id))
                                    .and(tagging_alias[:tagger_type].eq(owner.class.base_class.to_s))
       end
@@ -75,7 +73,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       end
 
       if options[:on].present?
-        on_condition = on_condition.and(tagging_arel_table[:context].lteq(options[:on]))
+        on_condition = on_condition.and(tagging_arel_table[:context].eq(options[:on]))
       end
 
       on_condition

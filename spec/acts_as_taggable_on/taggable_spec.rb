@@ -109,6 +109,10 @@ describe 'Taggable' do
     expect(@taggable.tag_types).to eq(TaggableModel.tag_types)
   end
 
+  it 'should have tenant column' do
+    expect(TaggableModel.tenant_column).to eq(:tenant_id)
+  end
+
   it 'should have tag_counts_on' do
     expect(TaggableModel.tag_counts_on(:tags)).to be_empty
 
@@ -200,8 +204,8 @@ describe 'Taggable' do
     @taggables[1].skill_list = 'css'
     @taggables.each { |taggable| taggable.save }
 
-    @found_taggables_by_tag = TaggableModel.joins(:tags).where(tags: {name: ['bob']})
-    @found_taggables_by_skill = TaggableModel.joins(:skills).where(tags: {name: ['ruby']})
+    @found_taggables_by_tag = TaggableModel.joins(:tags).where(ActsAsTaggableOn.tags_table => {name: ['bob']})
+    @found_taggables_by_skill = TaggableModel.joins(:skills).where(ActsAsTaggableOn.tags_table => {name: ['ruby']})
 
     expect(@found_taggables_by_tag).to include @taggables[0]
     expect(@found_taggables_by_tag).to_not include @taggables[1]
@@ -255,14 +259,17 @@ describe 'Taggable' do
   end
 
   it 'should be able to find by tag with context' do
-    @taggable.skill_list = 'ruby, rails, css'
-    @taggable.tag_list = 'bob, charlie'
+    @taggable.skill_list = 'ruby, rails, css, julia'
+    @taggable.tag_list = 'bob, charlie, julia'
     @taggable.save
 
     expect(TaggableModel.tagged_with('ruby').first).to eq(@taggable)
     expect(TaggableModel.tagged_with('ruby, css').first).to eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :skills).first).to_not eq(@taggable)
     expect(TaggableModel.tagged_with('bob', on: :tags).first).to eq(@taggable)
+    expect(TaggableModel.tagged_with('julia', on: :skills).size).to eq(1)
+    expect(TaggableModel.tagged_with('julia', on: :tags).size).to eq(1)
+    expect(TaggableModel.tagged_with('julia', on: nil).size).to eq(2)
   end
 
   it 'should not care about case' do
@@ -335,7 +342,7 @@ describe 'Taggable' do
     TaggableModel.create(name: 'Charlie', skill_list: 'ruby')
 
     expect(TaggableModel.all_tag_counts).to_not be_empty
-    expect(TaggableModel.all_tag_counts(order: 'tags.id').first.count).to eq(3) # ruby
+    expect(TaggableModel.all_tag_counts(order: "#{ActsAsTaggableOn.tags_table}.id").first.count).to eq(3) # ruby
   end
 
   it 'should be able to get all tags on model as whole' do
@@ -344,7 +351,7 @@ describe 'Taggable' do
     TaggableModel.create(name: 'Charlie', skill_list: 'ruby')
 
     expect(TaggableModel.all_tags).to_not be_empty
-    expect(TaggableModel.all_tags(order: 'tags.id').first.name).to eq('ruby')
+    expect(TaggableModel.all_tags(order: "#{ActsAsTaggableOn.tags_table}.id").first.name).to eq('ruby')
   end
 
   it 'should be able to use named scopes to chain tag finds by any tags by context' do
@@ -366,7 +373,7 @@ describe 'Taggable' do
     TaggableModel.create(name: 'Frank', tag_list: 'ruby, rails')
     TaggableModel.create(name: 'Charlie', skill_list: 'ruby')
 
-    expect(TaggableModel.tagged_with('ruby').tag_counts(order: 'tags.id').first.count).to eq(2) # ruby
+    expect(TaggableModel.tagged_with('ruby').tag_counts(order: "#{ActsAsTaggableOn.tags_table}.id").first.count).to eq(2) # ruby
     expect(TaggableModel.tagged_with('ruby').skill_counts.first.count).to eq(1) # ruby
   end
 
@@ -375,7 +382,7 @@ describe 'Taggable' do
     TaggableModel.create(name: 'Frank', tag_list: 'ruby, rails')
     TaggableModel.create(name: 'Charlie', skill_list: 'ruby')
 
-    expect(TaggableModel.tagged_with('ruby').all_tag_counts(order: 'tags.id').first.count).to eq(3) # ruby
+    expect(TaggableModel.tagged_with('ruby').all_tag_counts(order: "#{ActsAsTaggableOn.tags_table}.id").first.count).to eq(3) # ruby
   end
 
   it 'should be able to get all scoped tags' do
@@ -383,7 +390,7 @@ describe 'Taggable' do
     TaggableModel.create(name: 'Frank', tag_list: 'ruby, rails')
     TaggableModel.create(name: 'Charlie', skill_list: 'ruby')
 
-    expect(TaggableModel.tagged_with('ruby').all_tags(order: 'tags.id').first.name).to eq('ruby')
+    expect(TaggableModel.tagged_with('ruby').all_tags(order: "#{ActsAsTaggableOn.tags_table}.id").first.name).to eq('ruby')
   end
 
   it 'should only return tag counts for the available scope' do
@@ -474,7 +481,7 @@ describe 'Taggable' do
 
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank, steve])
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, exclude: true).to_a).to eq([jim])
-      expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a =~ [frank, jim])
+      expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a).to match_array([frank, jim])
     end
   end
 
@@ -538,7 +545,7 @@ describe 'Taggable' do
 
   it 'should not delete tags if not updated' do
     model = TaggableModel.create(name: 'foo', tag_list: 'ruby, rails, programming')
-    model.update_attributes(name: 'bar')
+    model.update(name: 'bar')
     model.reload
     expect(model.tag_list.sort).to eq(%w(ruby rails programming).sort)
   end
@@ -669,15 +676,15 @@ describe 'Taggable' do
       # NOTE: type column supports an STI Tag subclass in the test suite, though
       # isn't included by default in the migration generator
       expect(@taggable.grouped_column_names_for(ActsAsTaggableOn::Tag))
-      .to eq('tags.id, tags.name, tags.taggings_count, tags.type')
+      .to eq("#{ActsAsTaggableOn.tags_table}.id, #{ActsAsTaggableOn.tags_table}.name, #{ActsAsTaggableOn.tags_table}.taggings_count, #{ActsAsTaggableOn.tags_table}.type")
     end
 
     it 'should return all column names joined for TaggableModel GROUP clause' do
-      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq('taggable_models.id, taggable_models.name, taggable_models.type')
+      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq('taggable_models.id, taggable_models.name, taggable_models.type, taggable_models.tenant_id')
     end
 
     it 'should return all column names joined for NonStandardIdTaggableModel GROUP clause' do
-      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq("taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type")
+      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq("taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type, taggable_models.tenant_id")
     end
   end
 
