@@ -62,10 +62,10 @@ module ActsAsTaggableOn::Taggable
 
     def related_where(klass, conditions)
       klass.select("#{klass.table_name}.*, COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) AS count")
-      .from("(#{klass.table_name}, #{ActsAsTaggableOn::Tag.table_name}, #{ActsAsTaggableOn::Tagging.table_name})")
-      .group(group_columns(klass))
-      .order("COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) DESC")
-      .where(conditions)
+           .from("(#{klass.table_name}, #{ActsAsTaggableOn::Tag.table_name}, #{ActsAsTaggableOn::Tagging.table_name})")
+           .group(group_columns(klass))
+           .order(Arel.sql("COUNT(#{ActsAsTaggableOn::Tag.table_name}.#{ActsAsTaggableOn::Tag.primary_key}) DESC"))
+           .where(conditions)
     end
   end
 end
