@@ -10,7 +10,7 @@ AddTenantToTaggings.class_eval do
   end
 
   def self.down
-    remove_column :taggings, :tenant
     remove_index :taggings, :tenant
+    remove_column :taggings, :tenant
   end
 end
