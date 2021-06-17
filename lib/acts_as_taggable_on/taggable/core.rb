@@ -214,9 +214,9 @@ module ActsAsTaggableOn::Taggable
       self.class.tag_types.map(&:to_s) + custom_contexts
     end
 
-    def tenant
+    def taggable_tenant
       if self.class.tenant_column
-        read_attribute(self.class.tenant_column)
+        public_send(self.class.tenant_column)
       end
     end
 
@@ -278,8 +278,8 @@ module ActsAsTaggableOn::Taggable
 
         # Create new taggings:
         new_tags.each do |tag|
-          if tenant
-            taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self, tenant: tenant)
+          if taggable_tenant
+            taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self, tenant: taggable_tenant)
           else
             taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
           end
