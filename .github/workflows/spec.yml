@@ -19,7 +19,6 @@ jobs:
           - 2.7
           - 3.0
           - head
-          - truffleruby-head
         gemfile:
           - gemfiles/activerecord_5.0.gemfile
           - gemfiles/activerecord_5.2.gemfile
@@ -30,6 +29,10 @@ jobs:
           - mysql
           - postgresql
           - sqlite3
+        include:
+          - ruby: truffleruby-head
+            db: postgresql
+            gemfile: gemfiles/activerecord_6.1.gemfile
         exclude:
           # Unfortunately, the mysql2 gem encounters a segfault in the ruby 2.3 environment:
           - ruby: 2.3
