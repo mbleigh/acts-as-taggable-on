@@ -19,6 +19,7 @@ jobs:
           - 2.7
           - 3.0
           - head
+          - truffleruby-head
         gemfile:
           - gemfiles/activerecord_5.0.gemfile
           - gemfiles/activerecord_5.2.gemfile
