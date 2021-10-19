@@ -153,7 +153,14 @@ module ActsAsTaggableOn::Taggable
 
         taggable_conditions = sanitize_sql(["#{ActsAsTaggableOn::Tagging.table_name}.taggable_type = ?", base_class.name])
         taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.context = ?", options.delete(:on).to_s]) if options[:on]
-        taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]]) if options[:id]
+
+        if options[:id]
+          if options[:id].is_a? Array
+            taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id IN (?)", options[:id]])
+          else
+            taggable_conditions << sanitize_sql([" AND #{ActsAsTaggableOn::Tagging.table_name}.taggable_id = ?", options[:id]])
+          end
+        end
 
         tagging_conditions.push taggable_conditions
 
