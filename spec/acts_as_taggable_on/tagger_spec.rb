@@ -112,7 +112,7 @@ describe 'Tagger' do
   end
 
   it 'should not lose tags' do
-    @taggable.update_attributes(tag_list: 'ruby')
+    @taggable.update(tag_list: 'ruby')
     @user.tag(@taggable, with: 'ruby, scheme', on: :tags)
 
     [@taggable, @user].each(&:reload)
@@ -120,7 +120,7 @@ describe 'Tagger' do
     expect(@taggable.all_tags_list.sort).to eq(%w(ruby scheme).sort)
 
     expect(-> {
-      @taggable.update_attributes(tag_list: '')
+      @taggable.update(tag_list: '')
     }).to change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
     expect(@taggable.tag_list).to be_empty

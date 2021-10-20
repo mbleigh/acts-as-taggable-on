@@ -73,14 +73,6 @@ describe 'Acts As Taggable On' do
     end
   end
 
-  describe 'Reloading' do
-    it 'should save a model instantiated by Model.find' do
-      taggable = TaggableModel.create!(name: 'Taggable')
-      found_taggable = TaggableModel.find(taggable.id)
-      found_taggable.save
-    end
-  end
-
   describe 'Matching Contexts' do
     it 'should find objects with tags of matching contexts' do
       taggable1 = TaggableModel.create!(name: 'Taggable 1')
@@ -200,7 +192,7 @@ describe 'Acts As Taggable On' do
       its(:cached_glass_list)    { should be_blank }
 
       context 'language taggings cache after update' do
-        before  { @taggable.update_attributes(language_list: 'ruby, .net') }
+        before  { @taggable.update(language_list: 'ruby, .net') }
         subject { @taggable }
 
         its(:language_list)        { should == ['ruby', '.net']}
@@ -209,7 +201,7 @@ describe 'Acts As Taggable On' do
       end
 
       context 'status taggings cache after update' do
-        before  { @taggable.update_attributes(status_list: 'happy, married') }
+        before  { @taggable.update(status_list: 'happy, married') }
         subject { @taggable }
 
         its(:status_list)        { should     == ['happy', 'married'] }
@@ -222,7 +214,7 @@ describe 'Acts As Taggable On' do
 
       context 'glass taggings cache after update' do
         before do
-          @taggable.update_attributes(glass_list: 'rectangle, aviator')
+          @taggable.update(glass_list: 'rectangle, aviator')
         end
 
         subject { @taggable }

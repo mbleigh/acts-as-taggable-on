@@ -10,19 +10,39 @@ Each change should fall into categories that would affect whether the release is
 
 As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
-### [Master / Unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.1...master)
+### [v8.1.0) / 2021-06-19](https://github.com/mbleigh/acts-as-taggable-on/compare/v8.0.0...v8.1.0)
+* Fixes
+ * [@ngouy Fix rollbackable tenant migrations](https://github.com/mbleigh/acts-as-taggable-on/pull/1038)
+ * [@ngouy Fix gem conflict with already existing tenant model](https://github.com/mbleigh/acts-as-taggable-on/pull/1037)
+
+### [v8.0.0) / 2021-06-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v7.0.0...v8.0.0)
+* Features
+  * [@lunaru Support tenants for taggings](https://github.com/mbleigh/acts-as-taggable-on/pull/1000)
+* Fixes
+  * [@gr-eg Use none? instead of count.zero?](https://github.com/mbleigh/acts-as-taggable-on/pull/1030)
+  
+### [v7.0.0) / 2020-12-31](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.5.0...v7.0.0)
+* Features
+  * [@kvokka Rails 6.1 support](https://github.com/mbleigh/acts-as-taggable-on/pull/1013)
+* Fixes
+  * [@nbulaj Add support for Ruby 2.7 and it's kwargs](https://github.com/mbleigh/acts-as-taggable-on/pull/910)  
+  * [@Andythurlow @endorfin case sensitivity fix for tagged_with](https://github.com/mbleigh/acts-as-taggable-on/pull/965)  
+
+### [6.5.0 / 2019-11-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.5.0)
+
 * Features
   * [@mizukami234 @junmoka Make table names configurable](https://github.com/mbleigh/acts-as-taggable-on/pull/910)
+  * [@damianlegawiec Rails 6.0.0.beta1 support](https://github.com/mbleigh/acts-as-taggable-on/pull/937)
 * Fixes
   * [@tonyta Avoid overriding user-defined columns cache methods](https://github.com/mbleigh/acts-as-taggable-on/pull/911)
+  * [@hengwoon tags_count only need to join on the taggable's table if using STI](https://github.com/mbleigh/acts-as-taggable-on/pull/904)
+  * [@bduran82 Avoid unnecessary queries when finding or creating tags](https://github.com/mbleigh/acts-as-taggable-on/pull/839)
+  * [@iiwo simplify relation options syntax](https://github.com/mbleigh/acts-as-taggable-on/pull/940)
 * Misc
   * [@gssbzn Remove legacy code for an empty query and replace it with ` ActiveRecord::none`](https://github.com/mbleigh/acts-as-taggable-on/pull/906)
+  * [@iiwo remove unneeded spec case](https://github.com/mbleigh/acts-as-taggable-on/pull/941)
 * Documentation
   * [@tonyta Cleanup CHANGELOG.md formatting and references](https://github.com/mbleigh/acts-as-taggable-on/pull/913)
-### [6.0.1 / 2018-06-27](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.0.1)
-
-* Fixes
-  * [@hengwoon tags_count only need to join on the taggable's table if using STI](https://github.com/mbleigh/acts-as-taggable-on/pull/904)
 
 ### [6.0.0 / 2018-06-19](https://github.com/mbleigh/acts-as-taggable-on/compare/v5.0.0...v6.0.0)
 

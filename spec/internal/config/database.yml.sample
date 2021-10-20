@@ -4,16 +4,12 @@ sqlite3:
 
 mysql:
   adapter: mysql2
-  host: localhost
+  host: 127.0.0.1
   username: root
   password:
   database: acts_as_taggable_on
-  charset: utf8
+  encoding: utf8
   
 postgresql:
-  adapter: postgresql
-  hostname: localhost
-  username: postgres
-  password:
-  database: acts_as_taggable_on
-  encoding: utf8
+  # Needs to be given as a URL to force connection via TCP
+  url: postgresql://postgres:postgres@127.0.0.1:5432/acts_as_taggable_on?encoding=utf8
