@@ -35,9 +35,16 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
       on_condition = tagging_alias[:taggable_id].eq(taggable_arel_table[taggable_model.primary_key])
         .and(tagging_alias[:taggable_type].eq(taggable_model.base_class.name))
         .and(
-          tagging_alias[:tag_id].in(
-            tag_arel_table.project(tag_arel_table[:id]).where(tag_match_type(tag))
-          )
+          if options[:wild].present?
+            tagging_alias[:tag_id].in(
+              tag_arel_table.project(tag_arel_table[:id]).where(tag_match_type(tag))
+            )
+          else
+            # If it's not a wildcard query then the uniqueness on tag name should mean we can just do equals, and equals is MUCH faster!
+            tagging_alias[:tag_id].eq(
+              tag_arel_table.project(tag_arel_table[:id]).where(tag_match_type(tag))
+            )
+          end
         )
 
       if options[:start_at].present?
