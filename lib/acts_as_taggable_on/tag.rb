@@ -10,7 +10,7 @@ module ActsAsTaggableOn
     ### VALIDATIONS:
 
     validates_presence_of :name
-    validates_uniqueness_of :name, if: :validates_name_uniqueness?
+    validates_uniqueness_of :name, if: :validates_name_uniqueness?, case_sensitive: true
     validates_length_of :name, maximum: 255
 
     # monkey patch this method if don't need name uniqueness validation
@@ -55,6 +55,12 @@ module ActsAsTaggableOn
         select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
     end
 
+    def self.for_tenant(tenant)
+      joins(:taggings).
+        where("#{ActsAsTaggableOn.taggings_table}.tenant = ?", tenant.to_s).
+        select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
+    end
+
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
@@ -70,17 +76,17 @@ module ActsAsTaggableOn
 
       return [] if list.empty?
 
+      existing_tags = named_any(list)
       list.map do |tag_name|
         begin
           tries ||= 3
-
-          existing_tags = named_any(list)
           comparable_tag_name = comparable_name(tag_name)
           existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
           existing_tag || create(name: tag_name)
         rescue ActiveRecord::RecordNotUnique
           if (tries -= 1).positive?
             ActiveRecord::Base.connection.execute 'ROLLBACK'
+            existing_tags = named_any(list)
             retry
           end
 
@@ -105,8 +111,6 @@ module ActsAsTaggableOn
 
     class << self
 
-
-
       private
 
       def comparable_name(str)
@@ -121,20 +125,12 @@ module ActsAsTaggableOn
         ActsAsTaggableOn::Utils.using_mysql? ? 'BINARY ' : nil
       end
 
-      def unicode_downcase(string)
-        if ActiveSupport::Multibyte::Unicode.respond_to?(:downcase)
-          ActiveSupport::Multibyte::Unicode.downcase(string)
-        else
-          ActiveSupport::Multibyte::Chars.new(string).downcase.to_s
-        end
+      def as_8bit_ascii(string)
+        string.to_s.mb_chars
       end
 
-      def as_8bit_ascii(string)
-        if defined?(Encoding)
-          string.to_s.dup.force_encoding('BINARY')
-        else
-          string.to_s.mb_chars
-        end
+      def unicode_downcase(string)
+        as_8bit_ascii(string).downcase
       end
 
       def sanitize_sql_for_named_any(tag)

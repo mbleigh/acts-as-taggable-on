@@ -109,6 +109,10 @@ describe 'Taggable' do
     expect(@taggable.tag_types).to eq(TaggableModel.tag_types)
   end
 
+  it 'should have tenant column' do
+    expect(TaggableModel.tenant_column).to eq(:tenant_id)
+  end
+
   it 'should have tag_counts_on' do
     expect(TaggableModel.tag_counts_on(:tags)).to be_empty
 
@@ -477,7 +481,7 @@ describe 'Taggable' do
 
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank, steve])
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, exclude: true).to_a).to eq([jim])
-      expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a =~ [frank, jim])
+      expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a).to match_array([frank, jim])
     end
   end
 
@@ -541,7 +545,7 @@ describe 'Taggable' do
 
   it 'should not delete tags if not updated' do
     model = TaggableModel.create(name: 'foo', tag_list: 'ruby, rails, programming')
-    model.update_attributes(name: 'bar')
+    model.update(name: 'bar')
     model.reload
     expect(model.tag_list.sort).to eq(%w(ruby rails programming).sort)
   end
@@ -676,11 +680,11 @@ describe 'Taggable' do
     end
 
     it 'should return all column names joined for TaggableModel GROUP clause' do
-      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq('taggable_models.id, taggable_models.name, taggable_models.type')
+      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq('taggable_models.id, taggable_models.name, taggable_models.type, taggable_models.tenant_id')
     end
 
     it 'should return all column names joined for NonStandardIdTaggableModel GROUP clause' do
-      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq("taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type")
+      expect(@taggable.grouped_column_names_for(TaggableModel)).to eq("taggable_models.#{TaggableModel.primary_key}, taggable_models.name, taggable_models.type, taggable_models.tenant_id")
     end
   end
 

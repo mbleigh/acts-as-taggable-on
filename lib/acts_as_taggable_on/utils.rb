@@ -24,6 +24,10 @@ module ActsAsTaggableOn
         using_postgresql? ? 'ILIKE' : 'LIKE'
       end
 
+      def legacy_activerecord?
+        ActiveRecord.version <= Gem::Version.new('5.3.0')
+      end
+
       # escape _ and % characters in strings, since these are wildcards in SQL.
       def escape_like(str)
         str.gsub(/[!%_]/) { |x| '!' + x }
