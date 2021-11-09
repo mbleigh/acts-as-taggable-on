@@ -11,12 +11,12 @@ when "mysql"
 else
   gem 'sqlite3'
 end
-
 group :local_development do
   gem "guard"
   gem "guard-rspec"
   gem "appraisal"
   gem "rake"
+  gem "sqlite3"
   gem "byebug", platforms: [:mri]
 end
 
