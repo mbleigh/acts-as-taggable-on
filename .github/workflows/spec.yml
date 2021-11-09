@@ -25,6 +25,10 @@ jobs:
           - mysql
           - postgresql
           - sqlite3
+        include:
+          - ruby: truffleruby-head
+            db: postgresql
+            gemfile: gemfiles/activerecord_6.1.gemfile
         exclude:
           - ruby: 2.5
             gemfile: gemfiles/activerecord_7.0.gemfile
