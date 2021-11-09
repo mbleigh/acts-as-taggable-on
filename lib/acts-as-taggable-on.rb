@@ -85,15 +85,6 @@ module ActsAsTaggableOn
       @strict_case_match = force_cs unless @force_binary_collation
     end
 
-    def delimiter=(string)
-      ActiveRecord::Base.logger.warn <<WARNING
-ActsAsTaggableOn.delimiter is deprecated \
-and will be removed from v4.0+, use  \
-a ActsAsTaggableOn.default_parser instead
-WARNING
-      @delimiter = string
-    end
-
     def force_binary_collation=(force_bin)
       if Utils.using_mysql?
         if force_bin

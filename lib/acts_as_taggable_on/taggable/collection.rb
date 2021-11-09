@@ -161,23 +161,12 @@ module ActsAsTaggableOn::Taggable
       end
 
       def tag_scope_joins(tag_scope, tagging_scope)
-        tag_scope = tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
-        tag_scope.extending(CalculationMethods)
+        tag_scope.joins("JOIN (#{safe_to_sql(tagging_scope)}) AS #{ActsAsTaggableOn::Tagging.table_name} ON #{ActsAsTaggableOn::Tagging.table_name}.tag_id = #{ActsAsTaggableOn::Tag.table_name}.id")
       end
     end
 
     def tag_counts_on(context, options={})
       self.class.tag_counts_on(context, options.merge(id: id))
-    end
-
-    module CalculationMethods
-      # Rails 5 TODO: Remove options argument as soon we remove support to
-      # activerecord-deprecated_finders.
-      # See https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb#L38
-      def count(column_name = :all, options = {})
-        # https://github.com/rails/rails/commit/da9b5d4a8435b744fcf278fffd6d7f1e36d4a4f2
-        super(column_name)
-      end
     end
   end
 end
