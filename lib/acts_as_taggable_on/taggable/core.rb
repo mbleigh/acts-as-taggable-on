@@ -51,12 +51,8 @@ module ActsAsTaggableOn::Taggable
               parsed_new_list = ActsAsTaggableOn.default_parser.new(new_tags).parse
 
               if self.class.preserve_tag_order? || (parsed_new_list.sort != #{tag_type}_list.sort)
-                if ActsAsTaggableOn::Utils.legacy_activerecord?
-                  set_attribute_was("#{tag_type}_list", #{tag_type}_list)
-                else
-                  unless #{tag_type}_list_changed?
-                    @attributes["#{tag_type}_list"] = ActiveModel::Attribute.from_user("#{tag_type}_list", #{tag_type}_list, ActsAsTaggableOn::Taggable::TagListType.new)
-                  end
+                unless #{tag_type}_list_changed?
+                  @attributes["#{tag_type}_list"] = ActiveModel::Attribute.from_user("#{tag_type}_list", #{tag_type}_list, ActsAsTaggableOn::Taggable::TagListType.new)
                 end
                 write_attribute("#{tag_type}_list", parsed_new_list)
               end
