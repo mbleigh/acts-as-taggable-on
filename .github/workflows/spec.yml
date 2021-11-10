@@ -1,6 +1,12 @@
 name: spec
 
-on: [push, pull_request]
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -17,6 +23,7 @@ jobs:
           - 2.7
           - 3.0
           - head
+          - truffleruby-head
         gemfile:
           - gemfiles/activerecord_6.0.gemfile
           - gemfiles/activerecord_6.1.gemfile
@@ -25,10 +32,6 @@ jobs:
           - mysql
           - postgresql
           - sqlite3
-        include:
-          - ruby: truffleruby-head
-            db: postgresql
-            gemfile: gemfiles/activerecord_6.1.gemfile
         exclude:
           - ruby: 2.5
             gemfile: gemfiles/activerecord_7.0.gemfile
