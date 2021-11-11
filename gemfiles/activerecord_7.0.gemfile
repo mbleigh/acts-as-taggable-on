@@ -11,7 +11,6 @@ when "mysql"
 else
   gem 'sqlite3'
 end
-gem 'acts_as_paranoid'
 
 group :local_development do
   gem "guard"
