@@ -20,13 +20,13 @@ ActiveRecord::Schema.define version: 0 do
     # Limit is created to prevent MySQL error on index
     # length for MyISAM table type: http://bit.ly/vgW2Ql
     t.string :context, limit: 128
-
     t.string :tenant , limit: 128
 
+    t.datetime :deleted_at
     t.datetime :created_at
   end
   add_index ActsAsTaggableOn.taggings_table,
-            ['tag_id', 'taggable_id', 'taggable_type', 'context', 'tagger_id', 'tagger_type'],
+            ['tag_id', 'taggable_id', 'taggable_type', 'context', 'tagger_id', 'tagger_type', 'deleted_at'],
             unique: true, name: 'taggings_idx'
   add_index ActsAsTaggableOn.taggings_table, :tag_id , name: 'index_taggings_on_tag_id'
 

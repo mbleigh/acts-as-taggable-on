@@ -1,11 +1,16 @@
 # encoding: utf-8
 require 'spec_helper'
+require 'db/migrate/7_add_deleted_at_on_taggings.rb'
+
+shared_examples_for 'without deleted_at column' do
+  prepend_before(:all) { AddDeletedAtOnTaggings.down }
+  append_after(:all) { AddDeletedAtOnTaggings.up }
+end
 
 describe 'Taggable To Preserve Order' do
   before(:each) do
     @taggable = OrderedTaggableModel.new(name: 'Bob Jones')
   end
-
 
   it 'should have tag associations' do
     [:tags, :colours].each do |type|
@@ -548,6 +553,40 @@ describe 'Taggable' do
     model.update(name: 'bar')
     model.reload
     expect(model.tag_list.sort).to eq(%w(ruby rails programming).sort)
+  end
+
+  context 'with ignore_deleted option' do
+    let(:bob) { TaggableModel.create(name: 'Bob', tag_list: 'lazy, happier') }
+    let(:frank) { TaggableModel.create(name: 'Frank', tag_list: 'lazy, happier') }
+    let(:steve) { TaggableModel.create(name: 'Steve', tag_list: 'lazy, happier') }
+
+    before(:example) do
+      bob
+      frank
+      steve
+    end
+
+    context 'when deleted_at is not present' do
+      include_context 'without deleted_at column'
+
+      it 'should be able to find tagged with ignore_deleted option' do
+        bob.taggings.first.destroy!
+        taggables = TaggableModel.tagged_with('lazy, happier')
+        expect(taggables).to include(frank, steve)
+        expect(taggables).not_to include(bob)
+        expect(bob.taggings.first.deleted_at).to be(nil)
+      end
+    end
+
+    context 'when deleted_at is present' do
+      it 'should be able to find tagged with ignore_deleted option' do
+        bob.taggings.first.destroy!
+        taggables = TaggableModel.tagged_with('lazy, happier', ignore_deleted: true)
+        expect(taggables).to include(frank, steve)
+        expect(taggables).not_to include(bob)
+        expect(bob.taggings.first.deleted_at).to be_within(10).of(Time.current.utc)
+      end
+    end
   end
 
   context 'Duplicates' do
