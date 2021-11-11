@@ -2,6 +2,68 @@
 require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
 
+def case_comparison_test_cases
+  it 'should find by name' do
+    expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('awesome')).to eq(@tag)
+  end
+
+  context 'case sensitive' do
+    if using_case_insensitive_collation?
+      include_context 'without unique index'
+    end
+
+    it 'should find by name case sensitively' do
+      expect {
+        ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('AWESOME')
+      }.to change(ActsAsTaggableOn::Tag, :count)
+
+      expect(ActsAsTaggableOn::Tag.last.name).to eq('AWESOME')
+    end
+  end
+
+  context 'case sensitive' do
+    if using_case_insensitive_collation?
+      include_context 'without unique index'
+    end
+
+    it 'should have a named_scope named(something) that matches exactly' do
+      uppercase_tag = ActsAsTaggableOn::Tag.create(name: 'Cool')
+      @tag.name = 'cool'
+      @tag.save!
+
+      expect(ActsAsTaggableOn::Tag.named('cool')).to include(@tag)
+      expect(ActsAsTaggableOn::Tag.named('cool')).to_not include(uppercase_tag)
+    end
+  end
+
+  it 'should not change encoding' do
+    name = "\u3042"
+    original_encoding = name.encoding
+    record = ActsAsTaggableOn::Tag.find_or_create_with_like_by_name(name)
+    record.reload
+    expect(record.name.encoding).to eq(original_encoding)
+  end
+
+  context 'named any with some special characters combinations', if: using_mysql? do
+    it 'should not raise an invalid encoding exception' do
+      expect{ActsAsTaggableOn::Tag.named_any(["holä", "hol'ä"])}.not_to raise_error
+    end
+  end
+end
+
+def strict_default_collation_match_test_cases
+  before do
+    ActsAsTaggableOn.strict_default_collation_match = true
+    @tag.name = 'awesome'
+    @tag.save!
+  end
+
+  after do
+    ActsAsTaggableOn.strict_default_collation_match = false
+  end
+
+  case_comparison_test_cases
+end
 
 shared_examples_for 'without unique index' do
   prepend_before(:all) { AddMissingUniqueIndices.down }
@@ -256,52 +318,47 @@ describe ActsAsTaggableOn::Tag do
       ActsAsTaggableOn.strict_case_match = false
     end
 
-    it 'should find by name' do
-      expect(ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('awesome')).to eq(@tag)
-    end
+    case_comparison_test_cases
+  end
 
-    context 'case sensitive' do
-      if using_case_insensitive_collation?
-        include_context 'without unique index'
+  describe 'when using strict_default_collation_match' do
+    describe 'using mysql', if: using_mysql? do
+      describe 'using binary collation' do
+        before do
+          ActsAsTaggableOn::Configuration.apply_binary_collation(true)
+        end
+
+        after do
+          ActsAsTaggableOn::Configuration.apply_binary_collation(false)
+        end
+
+        strict_default_collation_match_test_cases
       end
 
-      it 'should find by name case sensitively' do
-        expect {
-          ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('AWESOME')
-        }.to change(ActsAsTaggableOn::Tag, :count)
+      describe 'without binary collation' do
+        before do
+          ActsAsTaggableOn::Configuration.apply_binary_collation(false)
+        end
 
-        expect(ActsAsTaggableOn::Tag.last.name).to eq('AWESOME')
+        context 'fails case sensitive' do
+          include_context 'without unique index'
+    
+          it 'should have a named_scope named(something) that matches exactly' do
+            uppercase_tag = ActsAsTaggableOn::Tag.create(name: 'Cool')
+            @tag.name = 'cool'
+            @tag.save!
+    
+            expect(ActsAsTaggableOn::Tag.named('cool')).to include(@tag)
+            expect(ActsAsTaggableOn::Tag.named('cool')).to include(uppercase_tag)
+          end
+        end
       end
+
+    end
+    describe 'not using mysql', if: !using_mysql? do
+      strict_default_collation_match_test_cases
     end
 
-    context 'case sensitive' do
-      if using_case_insensitive_collation?
-        include_context 'without unique index'
-      end
-
-      it 'should have a named_scope named(something) that matches exactly' do
-        uppercase_tag = ActsAsTaggableOn::Tag.create(name: 'Cool')
-        @tag.name = 'cool'
-        @tag.save!
-
-        expect(ActsAsTaggableOn::Tag.named('cool')).to include(@tag)
-        expect(ActsAsTaggableOn::Tag.named('cool')).to_not include(uppercase_tag)
-      end
-    end
-
-    it 'should not change encoding' do
-      name = "\u3042"
-      original_encoding = name.encoding
-      record = ActsAsTaggableOn::Tag.find_or_create_with_like_by_name(name)
-      record.reload
-      expect(record.name.encoding).to eq(original_encoding)
-    end
-
-    context 'named any with some special characters combinations', if: using_mysql? do
-      it 'should not raise an invalid encoding exception' do
-        expect{ActsAsTaggableOn::Tag.named_any(["holä", "hol'ä"])}.not_to raise_error
-      end
-    end
   end
 
   describe 'name uniqeness validation' do

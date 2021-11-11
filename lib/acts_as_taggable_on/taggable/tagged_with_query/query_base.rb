@@ -26,7 +26,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
     def tag_match_type(tag)
       matches_attribute = tag_arel_table[:name]
-      matches_attribute = matches_attribute.lower unless ActsAsTaggableOn.strict_case_match
+      matches_attribute = matches_attribute.lower unless ActsAsTaggableOn.strict_case_match || ActsAsTaggableOn.strict_default_collation_match
 
       if options[:wild].present?
         matches_attribute.matches("%#{escaped_tag(tag)}%", "!", ActsAsTaggableOn.strict_case_match)
@@ -37,7 +37,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
     def tags_match_type
       matches_attribute = tag_arel_table[:name]
-      matches_attribute = matches_attribute.lower unless ActsAsTaggableOn.strict_case_match
+      matches_attribute = matches_attribute.lower unless ActsAsTaggableOn.strict_case_match || ActsAsTaggableOn.strict_default_collation_match
 
       if options[:wild].present?
         matches_attribute.matches_any(tag_list.map{|tag| "%#{escaped_tag(tag)}%"}, "!", ActsAsTaggableOn.strict_case_match)
@@ -47,7 +47,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def escaped_tag(tag)
-      tag = tag.downcase unless ActsAsTaggableOn.strict_case_match
+      tag = tag.downcase unless ActsAsTaggableOn.strict_case_match || ActsAsTaggableOn.strict_default_collation_match
       ActsAsTaggableOn::Utils.escape_like(tag)
     end
 
