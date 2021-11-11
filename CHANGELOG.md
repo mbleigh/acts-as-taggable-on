@@ -37,7 +37,7 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
 * Features
   * [@mizukami234 @junmoka Make table names configurable](https://github.com/mbleigh/acts-as-taggable-on/pull/910)
   * [@damianlegawiec Rails 6.0.0.beta1 support](https://github.com/mbleigh/acts-as-taggable-on/pull/937)
-  * [@rolandoalvarado Integrated act_as_paranoid and added ignore_deleted option](https://github.com/mbleigh/acts-as-taggable-on/pull/958)
+  * [@rolandoalvarado Added ignore_deleted option](https://github.com/mbleigh/acts-as-taggable-on/pull/958)
 * Fixes
   * [@tonyta Avoid overriding user-defined columns cache methods](https://github.com/mbleigh/acts-as-taggable-on/pull/911)
   * [@hengwoon tags_count only need to join on the taggable's table if using STI](https://github.com/mbleigh/acts-as-taggable-on/pull/904)
