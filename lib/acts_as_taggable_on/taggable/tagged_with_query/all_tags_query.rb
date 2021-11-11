@@ -33,7 +33,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
     def on_conditions(tag, tagging_alias)
       on_condition = tagging_alias[:taggable_id].eq(taggable_arel_table[taggable_model.primary_key])
-        .and(tagging_alias[:taggable_type].eq(taggable_model.base_class.name))
+        .and(tagging_alias[:taggable_type].eq(taggable_model_type))
         .and(
           tagging_alias[:tag_id].in(
             tag_arel_table.project(tag_arel_table[:id]).where(tag_match_type(tag))
@@ -62,7 +62,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
     def match_all_on_conditions
       on_condition = tagging_arel_table[:taggable_id].eq(taggable_arel_table[taggable_model.primary_key])
-                      .and(tagging_arel_table[:taggable_type].eq(taggable_model.base_class.name))
+                      .and(tagging_arel_table[:taggable_type].eq(taggable_model_type))
 
       if options[:start_at].present?
         on_condition = on_condition.and(tagging_arel_table[:created_at].gteq(options[:start_at]))
@@ -104,7 +104,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def tagging_alias(tag)
-      alias_base_name = taggable_model.base_class.name.downcase
+      alias_base_name = taggable_model_type.downcase
       adjust_taggings_alias("#{alias_base_name[0..11]}_taggings_#{ActsAsTaggableOn::Utils.sha_prefix(tag)}")
     end
   end

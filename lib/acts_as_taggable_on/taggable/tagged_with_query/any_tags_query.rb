@@ -19,7 +19,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
 
     def at_least_one_tag
       exists_contition = tagging_arel_table[:taggable_id].eq(taggable_arel_table[taggable_model.primary_key])
-                          .and(tagging_arel_table[:taggable_type].eq(taggable_model.base_class.name))
+                          .and(tagging_arel_table[:taggable_type].eq(taggable_model_type))
                           .and(
                             tagging_arel_table[:tag_id].in(
                               tag_arel_table.project(tag_arel_table[:id]).where(tags_match_type)
@@ -57,7 +57,7 @@ module ActsAsTaggableOn::Taggable::TaggedWithQuery
     end
 
     def alias_name(tag_list)
-      alias_base_name = taggable_model.base_class.name.downcase
+      alias_base_name = taggable_model_type.downcase
       taggings_context = options[:on] ? "_#{options[:on]}" : ''
 
       taggings_alias = adjust_taggings_alias(
