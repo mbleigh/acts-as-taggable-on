@@ -16,6 +16,17 @@ describe 'Acts As Taggable On' do
       expect(@taggable).to respond_to(:save_tags)
     end
 
+    it 'should perform no queries when reading from the cached column' do
+      stored_model = CachedModel.create!(tag_list: 'lol, lol2')
+      reloaded_model = CachedModel.find(stored_model.id)
+      count = count_queries! { reloaded_model.tag_list_cache_on(:tags) }
+
+      expect(count).to be_zero
+
+      count = count_queries! { reloaded_model.tag_list }
+      expect(count).to be_zero
+    end
+
     it 'should add cached tag lists to the instance if cached column is not present' do
       expect(TaggableModel.new(name: 'Art Kram')).to_not respond_to(:save_cached_tag_list)
     end

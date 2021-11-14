@@ -30,3 +30,15 @@ end
 def using_case_insensitive_collation?
   using_mysql? && ActsAsTaggableOn::Utils.connection.collation =~ /_ci\Z/
 end
+
+def count_queries!
+  query_count = 0
+  instance = ActiveSupport::Notifications.subscribe 'sql.active_record' do
+    query_count += 1
+  end
+  yield
+  query_count
+ensure
+  ActiveSupport::Notifications.unsubscribe(instance) if instance
+  query_count
+end
