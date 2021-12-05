@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActsAsTaggableOn
   ##
   # Returns a new TagList using the given tag string.

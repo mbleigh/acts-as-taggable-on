@@ -12,10 +12,10 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - 2.5
-          - 2.6
-          - 2.7
           - 3.0
+          - 2.7
+          - 2.6
+          - 2.5
           - head
         gemfile:
           - gemfiles/activerecord_6.0.gemfile
@@ -29,6 +29,9 @@ jobs:
           - ruby: truffleruby-head
             db: postgresql
             gemfile: gemfiles/activerecord_6.1.gemfile
+          - ruby: truffleruby-head
+            db: postgresql
+            gemfile: gemfiles/activerecord_7.0.gemfile
         exclude:
           - ruby: 2.5
             gemfile: gemfiles/activerecord_7.0.gemfile

@@ -1,4 +1,5 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 module ActsAsTaggableOn
   class Tag < ::ActiveRecord::Base
     self.table_name = ActsAsTaggableOn.tags_table
@@ -31,41 +32,43 @@ module ActsAsTaggableOn
     end
 
     def self.named_any(list)
-      clause = list.map { |tag|
+      clause = list.map do |tag|
         sanitize_sql_for_named_any(tag).force_encoding('BINARY')
-      }.join(' OR ')
+      end.join(' OR ')
       where(clause)
     end
 
     def self.named_like(name)
-      clause = ["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(name)}%"]
+      clause = ["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'",
+                "%#{ActsAsTaggableOn::Utils.escape_like(name)}%"]
       where(clause)
     end
 
     def self.named_like_any(list)
-      clause = list.map { |tag|
-        sanitize_sql(["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'", "%#{ActsAsTaggableOn::Utils.escape_like(tag.to_s)}%"])
-      }.join(' OR ')
+      clause = list.map do |tag|
+        sanitize_sql(["name #{ActsAsTaggableOn::Utils.like_operator} ? ESCAPE '!'",
+                      "%#{ActsAsTaggableOn::Utils.escape_like(tag.to_s)}%"])
+      end.join(' OR ')
       where(clause)
     end
 
     def self.for_context(context)
-      joins(:taggings).
-        where(["#{ActsAsTaggableOn.taggings_table}.context = ?", context]).
-        select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
+      joins(:taggings)
+        .where(["#{ActsAsTaggableOn.taggings_table}.context = ?", context])
+        .select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
     end
 
     def self.for_tenant(tenant)
-      joins(:taggings).
-        where("#{ActsAsTaggableOn.taggings_table}.tenant = ?", tenant.to_s).
-        select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
+      joins(:taggings)
+        .where("#{ActsAsTaggableOn.taggings_table}.tenant = ?", tenant.to_s)
+        .select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
     end
 
     ### CLASS METHODS:
 
     def self.find_or_create_with_like_by_name(name)
       if ActsAsTaggableOn.strict_case_match
-        self.find_or_create_all_with_like_by_name([name]).first
+        find_or_create_all_with_like_by_name([name]).first
       else
         named_like(name).first || create(name: name)
       end
@@ -78,27 +81,25 @@ module ActsAsTaggableOn
 
       existing_tags = named_any(list)
       list.map do |tag_name|
-        begin
-          tries ||= 3
-          comparable_tag_name = comparable_name(tag_name)
-          existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
-          existing_tag || create(name: tag_name)
-        rescue ActiveRecord::RecordNotUnique
-          if (tries -= 1).positive?
-            ActiveRecord::Base.connection.execute 'ROLLBACK'
-            existing_tags = named_any(list)
-            retry
-          end
-
-          raise DuplicateTagError.new("'#{tag_name}' has already been taken")
+        tries ||= 3
+        comparable_tag_name = comparable_name(tag_name)
+        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
+        existing_tag || create(name: tag_name)
+      rescue ActiveRecord::RecordNotUnique
+        if (tries -= 1).positive?
+          ActiveRecord::Base.connection.execute 'ROLLBACK'
+          existing_tags = named_any(list)
+          retry
         end
+
+        raise DuplicateTagError, "'#{tag_name}' has already been taken"
       end
     end
 
     ### INSTANCE METHODS:
 
-    def ==(object)
-      super || (object.is_a?(Tag) && name == object.name)
+    def ==(other)
+      super || (other.is_a?(Tag) && name == other.name)
     end
 
     def to_s
@@ -110,7 +111,6 @@ module ActsAsTaggableOn
     end
 
     class << self
-
       private
 
       def comparable_name(str)
