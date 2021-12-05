@@ -10,9 +10,11 @@ Each change should fall into categories that would affect whether the release is
 
 As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
-### [v9.0.0) / 2021-10-19](https://github.com/mbleigh/acts-as-taggable-on/compare/v8.1.0...v9.0.0)
+### [v9.0.0) / unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v8.1.0...v9.0.0)
+* Fixes
+  * Support postgis adapter
 * Features
- * [@moliver-hemasystems Add support for a list of taggable IDs in tagging conditions](https://github.com/mbleigh/acts-as-taggable-on/pull/1053)
+  * [@moliver-hemasystems Add support for a list of taggable IDs in tagging conditions](https://github.com/mbleigh/acts-as-taggable-on/pull/1053)
 
 ### [v8.1.0) / 2021-06-19](https://github.com/mbleigh/acts-as-taggable-on/compare/v8.0.0...v8.1.0)
 * Fixes
