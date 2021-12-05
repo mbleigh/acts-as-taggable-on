@@ -1,9 +1,6 @@
-if ActiveRecord.gem_version >= Gem::Version.new('5.0')
-  class AddTenantToTaggings < ActiveRecord::Migration[4.2]; end
-else
-  class AddTenantToTaggings < ActiveRecord::Migration; end
-end
-AddTenantToTaggings.class_eval do
+# frozen_string_literal: true
+
+class AddTenantToTaggings < ActiveRecord::Migration[6.0]
   def self.up
     add_column ActsAsTaggableOn.taggings_table, :tenant, :string, limit: 128
     add_index ActsAsTaggableOn.taggings_table, :tenant unless index_exists? ActsAsTaggableOn.taggings_table, :tenant
