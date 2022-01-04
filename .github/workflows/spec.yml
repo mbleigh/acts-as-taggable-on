@@ -16,7 +16,6 @@ jobs:
           - 2.7
           - 2.6
           - 2.5
-          - head
         gemfile:
           - gemfiles/activerecord_6.0.gemfile
           - gemfiles/activerecord_6.1.gemfile
