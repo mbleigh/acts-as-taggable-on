@@ -1,0 +1,8 @@
+en:
+  activerecord:
+    errors:
+      models:
+        acts_as_taggable_on/tag:
+          attributes:
+            name:
+              not_unique: has already been taken (using %{type_of_comparison} comparison)

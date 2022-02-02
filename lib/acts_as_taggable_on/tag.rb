@@ -117,9 +117,7 @@ module ActsAsTaggableOn
       return unless self.class.named(name).exists?
 
       type_of_comparison = ActsAsTaggableOn.strict_case_match ? 'case-sensitive' : 'case-insensitive'
-      error_message = "has already been taken (using #{type_of_comparison} comparison)"
-
-      errors.add(:name, error_message)
+      errors.add(:name, :not_unique, type_of_comparison: type_of_comparison)
     end
 
     class << self
