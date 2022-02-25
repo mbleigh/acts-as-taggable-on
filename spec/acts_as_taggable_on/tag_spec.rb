@@ -352,4 +352,9 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
+  context "base_class is default" do
+    it "inherits from ActiveRecord::Base if no base_class is set" do
+      expect(ActsAsTaggableOn::Tag.ancestors).to include(ActiveRecord::Base)
+    end
+  end
 end
