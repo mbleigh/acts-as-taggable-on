@@ -120,7 +120,7 @@ WARNING
       end
     end
 
-    def self.base_class
+    def base_class
       Module.const_get("::#{@base_class}")
     end
 
