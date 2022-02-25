@@ -79,6 +79,7 @@ module ActsAsTaggableOn
       @force_binary_collation = false
       @tags_table = :tags
       @taggings_table = :taggings
+      @base_class = ActiveRecord::Base
     end
 
     def strict_case_match=(force_cs)
@@ -117,6 +118,10 @@ WARNING
           puts "Trapping #{e.class}: collation parameter ignored while migrating for the first time."
         end
       end
+    end
+
+    def self.base_class
+      Module.const_get("::#{@base_class}")
     end
 
   end
