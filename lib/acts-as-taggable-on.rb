@@ -79,7 +79,7 @@ module ActsAsTaggableOn
       @force_binary_collation = false
       @tags_table = :tags
       @taggings_table = :taggings
-      @base_class = ::ActiveRecord::Base
+      @base_class = ActiveRecord::Base
     end
 
     def strict_case_match=(force_cs)
