@@ -357,4 +357,27 @@ describe ActsAsTaggableOn::Tag do
       expect(ActsAsTaggableOn::Tag.ancestors).to include(ActiveRecord::Base)
     end
   end
+
+  context "base_class is set" do
+    before do
+      class Foo < ActiveRecord::Base; end
+      ActsAsTaggableOn.base_class = Foo
+      if defined?(ActsAsTaggableOn::Tag)
+        hide_const("ActsAsTaggableOn::Tag")
+        load("lib/acts_as_taggable_on/tag.rb")
+      end
+    end
+
+    after do
+      ActsAsTaggableOn.base_class = ActiveRecord::Base
+      if defined?(ActsAsTaggableOn::Tag)
+        hide_const("ActsAsTaggableOn::Tag")
+        load("lib/acts_as_taggable_on/tag.rb")
+      end
+    end
+
+    it "inherits from ActiveRecord::Base if no base_class is set" do
+      expect(ActsAsTaggableOn::Tag.ancestors).to include(Foo)
+    end
+  end
 end
