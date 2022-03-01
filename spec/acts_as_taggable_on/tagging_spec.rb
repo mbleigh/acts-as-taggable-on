@@ -141,20 +141,28 @@ describe ActsAsTaggableOn::Tagging do
     end
   end
 
-  context "base_class is default" do
-    it "inherits from ActiveRecord::Base if no base_class is set" do
-      expect(ActsAsTaggableOn::Tagging.ancestors).to include(ActiveRecord::Base)
-    end
-  end
-
-  context "base_class is set" do
-    it "inherits from ActiveRecord::Base if no base_class is set" do
+  describe 'base_class' do
+    before do
       class Foo < ActiveRecord::Base; end
-      ActsAsTaggableOn.base_class = Foo
-      hide_const("ActsAsTaggableOn::Tagging")
-      load("lib/acts_as_taggable_on/tagging.rb")
+    end
 
-      expect(ActsAsTaggableOn::Tagging.ancestors).to include(Foo)
+    context "default" do
+      it "inherits from ActiveRecord::Base" do
+
+        expect(ActsAsTaggableOn::Tagging.ancestors).to include(ActiveRecord::Base)
+        expect(ActsAsTaggableOn::Tagging.ancestors).to_not include(Foo)
+      end
+    end
+
+    context "custom" do
+      it "inherits from custom class" do
+
+        ActsAsTaggableOn.base_class = Foo
+        hide_const("ActsAsTaggableOn::Tagging")
+        load("lib/acts_as_taggable_on/tagging.rb")
+
+        expect(ActsAsTaggableOn::Tagging.ancestors).to include(Foo)
+      end
     end
   end
 
