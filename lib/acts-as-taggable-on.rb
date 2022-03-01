@@ -122,7 +122,7 @@ WARNING
 
     def base_class=(base_class)
       raise "base_class must be a class constant" unless base_class.is_a?(Class)
-      @base_class = Module.const_get("::#{base_class}")
+      @base_class = base_class
     end
 
   end
