@@ -70,9 +70,9 @@ describe 'acts_as_tagger' do
 
       it 'should throw an exception when the default is over-ridden' do
         expect(@taggable.tag_list_on(:foo_boo)).to be_empty
-        expect(-> {
+        expect {
           @tagger.tag(@taggable, with: 'this, and, that', on: :foo_boo, force: false)
-        }).to raise_error(RuntimeError)
+        }.to raise_error(RuntimeError)
       end
 
       it 'should not create the tag context on-the-fly when the default is over-ridden' do
