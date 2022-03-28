@@ -640,26 +640,29 @@ describe 'Taggable' do
 
     end
 
-    xit 'should not duplicate tags added on different threads', if: supports_concurrency?, skip: 'FIXME, Deadlocks in travis' do
-      #TODO, try with more threads and fix deadlock
-      thread_count = 4
-      barrier = Barrier.new thread_count
+    it 'should not duplicate tags' do
+      connor = TaggableModel.new(name: 'Connor', tag_list: 'There, can, be, only, one')
 
-      expect {
-        thread_count.times.map do |idx|
-          Thread.start do
-            connor = TaggableModel.first_or_create(name: 'Connor')
-            connor.tag_list = 'There, can, be, only, one'
-            barrier.wait
-            begin
-              connor.save
-            rescue ActsAsTaggableOn::DuplicateTagError
-              # second save should succeed
-              connor.save
-            end
-          end
-        end.map(&:join)
-      }.to change(ActsAsTaggableOn::Tag, :count).by(5)
+      allow(ActsAsTaggableOn::Tag).to receive(:create).and_call_original
+      expect(ActsAsTaggableOn::Tag).to receive(:create).with(name: 'can') do
+        # Simulate concurrent tag creation
+        ActsAsTaggableOn::Tag.new(name: 'can').save!
+
+        raise ActiveRecord::RecordNotUnique
+      end
+
+      expect(ActsAsTaggableOn::Tag).to receive(:create).with(name: 'be') do
+        # Simulate concurrent tag creation
+        ActsAsTaggableOn::Tag.new(name: 'be').save!
+
+        raise ActiveRecord::RecordNotUnique
+      end
+
+      expect { connor.save! }.to change(ActsAsTaggableOn::Tag, :count).by(5)
+
+      %w[There can only be one].each do |tag|
+        expect(TaggableModel.tagged_with(tag).count).to eq(1)
+      end
     end
   end
 
