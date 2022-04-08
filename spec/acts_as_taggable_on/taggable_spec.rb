@@ -480,6 +480,10 @@ describe 'Taggable' do
       jim = TaggableModel.create(name: 'Jim', tag_list: 'jim, steve')
 
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank, steve])
+      expect(TaggableModel.tagged_with(%w(bob tricia), wild: :prefix, any: true).to_a.sort_by { |o| o.id }).to eq([bob, steve])
+      expect(TaggableModel.tagged_with(%w(bob tricia), wild: :suffix, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank])
+      expect(TaggableModel.tagged_with(%w(cia), wild: :prefix, any: true).to_a.sort_by { |o| o.id }).to eq([bob, steve])
+      expect(TaggableModel.tagged_with(%w(j), wild: :suffix, any: true).to_a.sort_by { |o| o.id }).to eq([frank, steve, jim])
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, exclude: true).to_a).to eq([jim])
       expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a).to match_array([frank, jim])
     end
