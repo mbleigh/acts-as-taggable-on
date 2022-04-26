@@ -100,9 +100,9 @@ describe ActsAsTaggableOn::Tag do
     end
 
     it 'should create by name' do
-      expect(-> {
+      expect {
         ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('epic')
-      }).to change(ActsAsTaggableOn::Tag, :count).by(1)
+      }.to change(ActsAsTaggableOn::Tag, :count).by(1)
     end
   end
 

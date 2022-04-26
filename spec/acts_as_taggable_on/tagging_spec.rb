@@ -20,9 +20,9 @@ describe ActsAsTaggableOn::Tagging do
     @taggable = TaggableModel.create(name: 'Bob Jones')
     @tag = ActsAsTaggableOn::Tag.create(name: 'awesome')
 
-    expect(-> {
+    expect {
       2.times { ActsAsTaggableOn::Tagging.create(taggable: @taggable, tag: @tag, context: 'tags') }
-    }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+    }.to change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
 
   it 'should not delete tags of other records' do
