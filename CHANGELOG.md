@@ -43,7 +43,7 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
 * Features
   * [@kvokka Rails 6.1 support](https://github.com/mbleigh/acts-as-taggable-on/pull/1013)
 * Fixes
-  * [@nbulaj Add support for Ruby 2.7 and it's kwargs](https://github.com/mbleigh/acts-as-taggable-on/pull/910)
+  * [@nbulaj Add support for Ruby 2.7 and it's kwargs](https://github.com/mbleigh/acts-as-taggable-on/pull/999)
   * [@Andythurlow @endorfin case sensitivity fix for tagged_with](https://github.com/mbleigh/acts-as-taggable-on/pull/965)
 
 ### [6.5.0 / 2019-11-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v6.0.0...v6.5.0)
