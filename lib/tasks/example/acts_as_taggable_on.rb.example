@@ -1,0 +1,4 @@
+# This works because the classes where the base class is a concern, Tag and Tagging
+# are autoloaded, and won't be started until after the initializers run.
+
+# ActsAsTaggableOn.base_class = ApplicationRecord

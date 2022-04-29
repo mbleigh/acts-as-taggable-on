@@ -140,4 +140,30 @@ describe ActsAsTaggableOn::Tagging do
       end
     end
   end
+
+  describe 'base_class' do
+    before do
+      class Foo < ActiveRecord::Base; end
+    end
+
+    context "default" do
+      it "inherits from ActiveRecord::Base" do
+
+        expect(ActsAsTaggableOn::Tagging.ancestors).to include(ActiveRecord::Base)
+        expect(ActsAsTaggableOn::Tagging.ancestors).to_not include(Foo)
+      end
+    end
+
+    context "custom" do
+      it "inherits from custom class" do
+
+        ActsAsTaggableOn.base_class = Foo
+        hide_const("ActsAsTaggableOn::Tagging")
+        load("lib/acts_as_taggable_on/tagging.rb")
+
+        expect(ActsAsTaggableOn::Tagging.ancestors).to include(Foo)
+      end
+    end
+  end
+
 end
