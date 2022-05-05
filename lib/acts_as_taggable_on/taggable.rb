@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module ActsAsTaggableOn
   module Taggable
-
     def taggable?
       false
     end
@@ -56,11 +57,10 @@ module ActsAsTaggableOn
 
     def acts_as_taggable_tenant(tenant)
       if taggable?
-        self.tenant_column = tenant
       else
         class_attribute :tenant_column
-        self.tenant_column = tenant
       end
+      self.tenant_column = tenant
 
       # each of these add context-specific methods and must be
       # called on each call of taggable_on
@@ -73,17 +73,17 @@ module ActsAsTaggableOn
 
     private
 
-      # Make a model taggable on specified contexts
-      # and optionally preserves the order in which tags are created
-      #
-      # Separate methods used above for backwards compatibility
-      # so that the original acts_as_taggable_on method is unaffected
-      # as it's not possible to add another argument to the method
-      # without the tag_types being enclosed in square brackets
-      #
-      # NB: method overridden in core module in order to create tag type
-      #     associations and methods after this logic has executed
-      #
+    # Make a model taggable on specified contexts
+    # and optionally preserves the order in which tags are created
+    #
+    # Separate methods used above for backwards compatibility
+    # so that the original acts_as_taggable_on method is unaffected
+    # as it's not possible to add another argument to the method
+    # without the tag_types being enclosed in square brackets
+    #
+    # NB: method overridden in core module in order to create tag type
+    #     associations and methods after this logic has executed
+    #
     def taggable_on(preserve_tag_order, *tag_types)
       tag_types = tag_types.to_a.flatten.compact.map(&:to_sym)
 

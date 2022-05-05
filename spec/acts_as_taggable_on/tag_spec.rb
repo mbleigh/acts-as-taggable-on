@@ -100,9 +100,9 @@ describe ActsAsTaggableOn::Tag do
     end
 
     it 'should create by name' do
-      expect(-> {
+      expect {
         ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('epic')
-      }).to change(ActsAsTaggableOn::Tag, :count).by(1)
+      }.to change(ActsAsTaggableOn::Tag, :count).by(1)
     end
   end
 
@@ -352,4 +352,28 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
+  describe 'base_class' do
+    before do
+      class Foo < ActiveRecord::Base; end
+    end
+
+    context "default" do
+      it "inherits from ActiveRecord::Base" do
+
+        expect(ActsAsTaggableOn::Tag.ancestors).to include(ActiveRecord::Base)
+        expect(ActsAsTaggableOn::Tag.ancestors).to_not include(Foo)
+      end
+    end
+
+    context "custom" do
+      it "inherits from custom class" do
+
+        ActsAsTaggableOn.base_class = Foo
+        hide_const("ActsAsTaggableOn::Tag")
+        load("lib/acts_as_taggable_on/tag.rb")
+
+        expect(ActsAsTaggableOn::Tag.ancestors).to include(Foo)
+      end
+    end
+  end
 end

@@ -57,7 +57,7 @@ was used.
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 7.0'
+gem 'acts-as-taggable-on', '~> 9.0'
 ```
 
 and bundle:
@@ -255,7 +255,11 @@ User.tagged_with(["awesome", "cool"], :exclude => true)
 User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
-You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
+#### Wildcard tag search
+You now have the following options for prefix, suffix and containment search, along with `:any` or `:exclude` option.
+Use `wild: :suffix` to place a wildcard at the end of the tag. It will be looking for `awesome%` and `cool%` in SQL.
+Use `wild: :prefix` to place a wildcard at the beginning of the tag. It will be looking for `%awesome` and `%cool` in SQL.
+Use `wild: true` to place a wildcard both at the beginning and the end of the tag. It will be looking for `%awesome%` and `%cool%` in SQL.
 
 __Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
 
@@ -555,12 +559,11 @@ Versions >= 4.x are compatible with Ruby 2.0.0+ and Rails 4 and 5.
 
 Versions >= 7.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
 
+Versions >= 8.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
+
+Versions >= 9.x are compatible with Ruby 2.5.0 and Rails 6 and 7.
+
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
-
-## TODO
-
-- Write benchmark script
-- Resolve concurrency issues
 
 ## Testing
 
@@ -572,7 +575,8 @@ bundle
 rake spec
 ```
 
-You can run all the tests across all the Rails versions by running `rake appraise`.  If you'd also like to [run the tests across all rubies and databases as configured for Travis CI, install and run `wwtd`](https://github.com/grosser/wwtd).
+You can run all the tests across all the Rails versions by running `rake appraise`.
+If you'd also like to [run the tests across all rubies and databases as configured for Github Actions, install and run `wwtd`](https://github.com/grosser/wwtd).
 
 
 ## License
