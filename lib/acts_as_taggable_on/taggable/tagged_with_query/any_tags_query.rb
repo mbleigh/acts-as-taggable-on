@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActsAsTaggableOn
   module Taggable
     module TaggedWithQuery
