@@ -280,6 +280,16 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('ruby').to_a).to eq(TaggableModel.tagged_with('Ruby').to_a)
   end
 
+  it "should be able to used in subquery" do
+    TaggableModel.create(name: 'Bob', tag_list: 'ruby, python')
+    TaggableModel.create(name: 'Frank', tag_list: 'ruby')
+
+    expect(TaggableModel.where(id: TaggableModel.tagged_with('ruby', any: true)).count).to eq(2)
+    expect(TaggableModel.where(id: TaggableModel.tagged_with('ruby', exclude: true)).count).to eq(0)
+    expect(TaggableModel.where(id: TaggableModel.tagged_with('ruby', match_all: true)).count).to eq(1)
+    expect(TaggableModel.where(id: TaggableModel.tagged_with('ruby')).count).to eq(2)
+  end
+
   it 'should be able to find by tags with other joins in the query' do
     @taggable.skill_list = 'ruby, rails, css'
     @taggable.tag_list = 'bob, charlie'
