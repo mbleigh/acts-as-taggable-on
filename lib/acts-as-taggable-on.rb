@@ -66,7 +66,7 @@ module ActsAsTaggableOn
                   :remove_unused_tags, :default_parser,
                   :tags_counter, :tags_table,
                   :taggings_table
-    attr_reader :delimiter, :strict_case_match
+    attr_reader :delimiter, :strict_case_match, :base_class
 
     def initialize
       @delimiter = ','
@@ -79,6 +79,7 @@ module ActsAsTaggableOn
       @force_binary_collation = false
       @tags_table = :tags
       @taggings_table = :taggings
+      @base_class = ::ActiveRecord::Base
     end
 
     def strict_case_match=(force_cs)
@@ -117,6 +118,11 @@ WARNING
           puts "Trapping #{e.class}: collation parameter ignored while migrating for the first time."
         end
       end
+    end
+
+    def base_class=(base_class)
+      raise "base_class must be a class constant" unless base_class.is_a?(Class)
+      @base_class = base_class
     end
 
   end
