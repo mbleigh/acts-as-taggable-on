@@ -53,15 +53,11 @@ module ActsAsTaggableOn
     end
 
     def self.for_context(context)
-      joins(:taggings)
-        .where(["#{ActsAsTaggableOn.taggings_table}.context = ?", context])
-        .select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
+      where(ActsAsTaggableOn::Tagging.where(context: context).arel.exists)
     end
 
     def self.for_tenant(tenant)
-      joins(:taggings)
-        .where("#{ActsAsTaggableOn.taggings_table}.tenant = ?", tenant.to_s)
-        .select("DISTINCT #{ActsAsTaggableOn.tags_table}.*")
+      where(ActsAsTaggableOn::Tagging.where(tenant: tenant).arel.exists)
     end
 
     ### CLASS METHODS:
