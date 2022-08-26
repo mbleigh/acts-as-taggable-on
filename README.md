@@ -300,6 +300,15 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 User.tagged_with("same", :on => :customs) # => [@user]
 ```
 
+### Finding tags based on context
+
+You can find tags for a specific contest by using the ```for_context``` scope:
+
+```ruby
+ActsAsTaggableOn::Tag.for_context(:tags)
+ActsAsTaggableOn::Tag.for_context(:skills)
+```
+
 ### Tag Parsers
 
 If you want to change how tags are parsed, you can define your own implementation:
