@@ -157,7 +157,7 @@ describe ActsAsTaggableOn::Tagging do
     context "custom" do
       it "inherits from custom class" do
 
-        ActsAsTaggableOn.base_class = Foo
+        ActsAsTaggableOn.base_class = 'Foo'
         hide_const("ActsAsTaggableOn::Tagging")
         load("lib/acts_as_taggable_on/tagging.rb")
 

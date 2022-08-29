@@ -79,7 +79,7 @@ module ActsAsTaggableOn
       @force_binary_collation = false
       @tags_table = :tags
       @taggings_table = :taggings
-      @base_class = ::ActiveRecord::Base
+      @base_class = '::ActiveRecord::Base'
     end
 
     def strict_case_match=(force_cs)
@@ -121,7 +121,7 @@ WARNING
     end
 
     def base_class=(base_class)
-      raise "base_class must be a class constant" unless base_class.is_a?(Class)
+      raise "base_class must be a String" unless base_class.is_a?(String)
       @base_class = base_class
     end
 

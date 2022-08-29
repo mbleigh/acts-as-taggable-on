@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ActsAsTaggableOn
-  class Tagging < ActsAsTaggableOn.base_class # :nodoc:
+  class Tagging < ActsAsTaggableOn.base_class.constantize # :nodoc:
     self.table_name = ActsAsTaggableOn.taggings_table
 
     DEFAULT_CONTEXT = 'tags'
