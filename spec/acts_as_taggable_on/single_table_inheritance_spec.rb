@@ -174,6 +174,41 @@ describe 'Single Table Inheritance' do
       student.tag(taggable, with: 'ruby, scheme', on: :tags)
       expect(taggable.tags_from(student)).to eq(%w(ruby scheme))
     end
+    
+    it "returns owner tags on the tagger ordered by the default ordering in which the tags were created" do
+      student.tag(taggable, with: 'ruby, python, java', on: :languages)
+
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.count).to eq(3)
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.first.name).to eq("ruby")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.second.name).to eq("python")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.third.name).to eq("java")
+    end
+
+    it "returns owner tags on the tagger ordered by default ordering equals to name" do
+      student.tag(taggable, with: 'ruby, python, java', on: :languages)
+
+      taggable.class.default_ordering = :name
+
+      expect(taggable.owner_tags_on(student, :languages).count).to eq(3)
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.first.name).to eq("java")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.second.name).to eq("python")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.third.name).to eq("ruby")
+    end
+
+    it "returns owner tags on the tagger ordered by default ordering equals to taggings_count desc" do
+      student.tag(taggable, with: 'ruby, java, python', on: :languages)
+      student.tag(taggable, with: 'ruby, python', on: :technologies)
+      student.tag(taggable, with: 'ruby', on: :object_oriented)
+
+      taggable.class.default_ordering = "taggings_count desc"
+      expect(taggable.owner_tags_on(student, :languages).count).to eq(3)
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.first.name).to eq("ruby")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.first.taggings_count).to eq(3)
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.second.name).to eq("python")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.second.taggings_count).to eq(2)
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.third.name).to eq("java")
+      expect(taggable.owner_tags_on(student, :languages).default_ordering.third.taggings_count).to eq(1)
+    end
 
     it 'returns all owner tags on the taggable' do
       student.tag(taggable, with: 'ruby, scheme', on: :tags)
