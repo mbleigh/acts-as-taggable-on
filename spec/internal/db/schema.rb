@@ -28,7 +28,6 @@ ActiveRecord::Schema.define version: 0 do
   add_index ActsAsTaggableOn.taggings_table,
             ['tag_id', 'taggable_id', 'taggable_type', 'context', 'tagger_id', 'tagger_type'],
             unique: true, name: 'taggings_idx'
-  add_index ActsAsTaggableOn.taggings_table, :tag_id , name: 'index_taggings_on_tag_id'
 
   # above copied from
   # generators/acts_as_taggable_on/migration/migration_generator
