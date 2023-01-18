@@ -29,7 +29,7 @@
   * Use well-described, small (atomic) commits.
   * Include links to any relevant github issues.
   * *Don't* change the VERSION file.
-6. Extra Credit: [Confirm it runs and tests pass on the rubies specified in the travis config](.travis.yml). I will otherwise confirm it runs on these.
+6. Extra Credit: [Confirm it runs and tests pass on the rubies specified in the Github Actions config](.github/workflows/spec.yml). I will otherwise confirm it runs on these.
 
 How I handle pull requests:
 
@@ -44,13 +44,13 @@ How I handle pull requests:
 
 * [A Note About Git Commit Messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
 * [http://stopwritingramblingcommitmessages.com/](http://stopwritingramblingcommitmessages.com/)
-* [ThoughtBot style guide](https://github.com/thoughtbot/guides/tree/master/style#git)
+* [ThoughtBot style guide](https://github.com/thoughtbot/guides/tree/main/git)
 
 ### About Pull Requests (PR's)
 
 * [All Your Open Source Code Are Belong To Us](http://www.benjaminfleischer.com/2013/07/30/all-your-open-source-code-are-belong-to-us/)
 * [Using Pull Requests](https://help.github.com/articles/using-pull-requests)
-* [Github pull requests made easy](http://www.element84.com/github-pull-requests-made-easy.html)
+* [Github pull requests made easy](https://www.element84.com/blog/github-pull-requests-made-easy)
 
 ## Documentation
 
