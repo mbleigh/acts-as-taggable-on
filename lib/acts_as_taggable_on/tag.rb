@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ActsAsTaggableOn
-  class Tag < ActsAsTaggableOn.base_class
+  class Tag < ActsAsTaggableOn.base_class.constantize
     self.table_name = ActsAsTaggableOn.tags_table
 
     ### ASSOCIATIONS:
