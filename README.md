@@ -302,7 +302,7 @@ User.tagged_with("same", :on => :customs) # => [@user]
 
 ### Finding tags based on context
 
-You can find tags for a specific contest by using the ```for_context``` scope:
+You can find tags for a specific context by using the ```for_context``` scope:
 
 ```ruby
 ActsAsTaggableOn::Tag.for_context(:tags)
