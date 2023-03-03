@@ -277,7 +277,19 @@ describe 'Taggable' do
     TaggableModel.create(name: 'Frank', tag_list: 'Ruby')
 
     expect(ActsAsTaggableOn::Tag.all.size).to eq(1)
+    expect(TaggableModel.tagged_with('ruby').size).to eq(2)
     expect(TaggableModel.tagged_with('ruby').to_a).to eq(TaggableModel.tagged_with('Ruby').to_a)
+  end
+
+  it 'should care about case when strict case matching is enabled' do
+    ActsAsTaggableOn.strict_case_match = true
+    bob = TaggableModel.create(name: 'Bob', tag_list: 'ruby')
+    frank = TaggableModel.create(name: 'Frank', tag_list: 'Ruby')
+
+    expect(ActsAsTaggableOn::Tag.all.size).to eq(2)
+    expect(TaggableModel.tagged_with('ruby').to_a).to eq([bob])
+    expect(TaggableModel.tagged_with('Ruby').to_a).to eq([frank])
+    expect(TaggableModel.tagged_with('RUBY').to_a.size).to eq(0)
   end
 
   it 'should be able to find by tags with other joins in the query' do
@@ -458,6 +470,22 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with(%w(ruby java), order: 'taggable_models.name', any: true).to_a).to eq([bob, frank, steve])
     expect(TaggableModel.tagged_with(%w(c++ fitter), order: 'taggable_models.name', any: true).to_a).to eq([bob, steve])
     expect(TaggableModel.tagged_with(%w(depressed css), order: 'taggable_models.name', any: true).to_a).to eq([bob, frank])
+  end
+
+  it 'should be able to find tagged with any tag when strict case matching is enabled' do
+    ActsAsTaggableOn.strict_case_match = true
+    bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css')
+    frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css')
+    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby')
+
+    expect(TaggableModel.tagged_with(%w(ruby java), order: 'taggable_models.name', any: true).to_a).to eq([bob, frank, steve])
+    expect(TaggableModel.tagged_with(%w(c++ fitter), order: 'taggable_models.name', any: true).to_a).to eq([bob, steve])
+    expect(TaggableModel.tagged_with(%w(depressed css), order: 'taggable_models.name', any: true).to_a).to eq([bob, frank])
+
+    expect(TaggableModel.tagged_with(%w(RUBY java), order: 'taggable_models.name', any: true).to_a).to eq([steve])
+    expect(TaggableModel.tagged_with(%w(c++ FITTER), order: 'taggable_models.name', any: true).to_a).to eq([steve])
+    expect(TaggableModel.tagged_with(%w(depressed CSS), order: 'taggable_models.name', any: true).to_a).to eq([frank])
+    expect(TaggableModel.tagged_with(%w(happier CSS), order: 'taggable_models.name', any: true).to_a).to eq([bob, steve])
   end
 
   it 'should be able to order by number of matching tags when matching any' do
