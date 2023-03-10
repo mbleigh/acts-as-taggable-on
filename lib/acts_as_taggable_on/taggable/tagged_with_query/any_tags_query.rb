@@ -47,6 +47,10 @@ module ActsAsTaggableOn
                                                .and(tagging_arel_table[:tagger_type].eq(owner.class.base_class.to_s))
           end
 
+          if options[:tenant].present?
+            exists_contition = exists_contition.and(tagging_arel_table[:tenant].eq(options[:tenant]))
+          end
+
           exists_contition
         end
 

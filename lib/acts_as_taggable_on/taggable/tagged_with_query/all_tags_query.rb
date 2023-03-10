@@ -59,6 +59,10 @@ module ActsAsTaggableOn
                                        .and(tagging_alias[:tagger_type].eq(owner.class.base_class.to_s))
           end
 
+          if options[:tenant].present?
+            on_condition = on_condition.and(tagging_alias[:tenant].eq(options[:tenant]))
+          end
+
           on_condition
         end
 

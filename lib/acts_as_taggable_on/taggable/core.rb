@@ -97,6 +97,7 @@ module ActsAsTaggableOn
         #                       * <tt>:owned_by</tt> - return objects that are *ONLY* owned by the owner
         #                       * <tt>:start_at</tt> - Restrict the tags to those created after a certain time
         #                       * <tt>:end_at</tt> - Restrict the tags to those created before a certain time
+        #                       * <tt>:tenant</tt> - *ONLY* consider tags with a given tenant
         #
         # Example:
         #   User.tagged_with(["awesome", "cool"])                     # Users that are tagged with awesome and cool
@@ -106,6 +107,9 @@ module ActsAsTaggableOn
         #   User.tagged_with(["awesome", "cool"], :match_all => true) # Users that are tagged with just awesome and cool
         #   User.tagged_with(["awesome", "cool"], :owned_by => foo ) # Users that are tagged with just awesome and cool by 'foo'
         #   User.tagged_with(["awesome", "cool"], :owned_by => foo, :start_at => Date.today ) # Users that are tagged with just awesome, cool by 'foo' and starting today
+        #   User.tagged_with(["awesome", "cool"], :tenant => "account_15") # Users that are tagged with awesome and cool within the "account_15" tenant
+        #   User.tagged_with(["awesome", "cool"], :tenant => "account_15", :any => true ) # Users that are tagged with awesome or cool within the "account_15" tenant
+        #   User.tagged_with(["awesome", "cool"], :tenant => "account_15", :exclude => true ) # Users that are not tagged with awesome or cool within the "account_15" tenant
         def tagged_with(tags, options = {})
           tag_list = ActsAsTaggableOn.default_parser.new(tags).parse
           options = options.dup

@@ -14,6 +14,7 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
 * Features
   * [@glampr Add support for prefix and suffix searches alongside previously supported containment (wildcard) searches](https://github.com/mbleigh/acts-as-taggable-on/pull/1082)
   * [@donquxiote Add support for horizontally sharded databases](https://github.com/mbleigh/acts-as-taggable-on/pull/1079)
+  * [@flickgradley Add tenant: option to tagged_with](https://github.com/mbleigh/acts-as-taggable-on/pull/1102)
 
 ### [v9.0.1) / 2022-01-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v9.0.0..v9.0.1)
 * Fixes

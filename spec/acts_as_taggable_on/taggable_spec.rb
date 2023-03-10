@@ -535,6 +535,43 @@ describe 'Taggable' do
     expect(TaggableModel.tagged_with('lazy', exclude: true).size).to eq(2)
   end
 
+  it 'should be able to find tagged with any tag belonging to a tenant' do
+    bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css', tenant_id: 1)
+    frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css', tenant_id: 1)
+    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby', tenant_id: 2)
+
+    expect(TaggableModel.tagged_with(%w(ruby java), tenant: 1, order: 'taggable_models.name', any: true).to_a).to eq([bob, frank])
+    expect(TaggableModel.tagged_with(%w(ruby java), tenant: 2, order: 'taggable_models.name', any: true).to_a).to eq([steve])
+    expect(TaggableModel.tagged_with(%w(c++ fitter), tenant: 1, order: 'taggable_models.name', any: true).to_a).to eq([bob])
+    expect(TaggableModel.tagged_with(%w(c++ fitter), tenant: 2, order: 'taggable_models.name', any: true).to_a).to eq([steve])
+    expect(TaggableModel.tagged_with(%w(depressed css), tenant: 1, order: 'taggable_models.name', any: true).to_a).to eq([bob, frank])
+    expect(TaggableModel.tagged_with(%w(depressed css), tenant: 2, order: 'taggable_models.name', any: true).to_a).to eq([])
+  end
+
+  it 'should be able to find tagged belonging to a tenant' do
+    bob = TaggableModel.create(name: 'Bob', tag_list: 'fitter, happier, more productive', skill_list: 'ruby, rails, css', tenant_id: 1)
+    frank = TaggableModel.create(name: 'Frank', tag_list: 'weaker, depressed, inefficient', skill_list: 'ruby, rails, css', tenant_id: 2)
+    steve = TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier, more productive', skill_list: 'c++, java, ruby', tenant_id: 2)
+
+    expect(TaggableModel.tagged_with('ruby', tenant: 1, order: 'taggable_models.name').to_a).to eq([bob])
+    expect(TaggableModel.tagged_with('ruby', tenant: 2, order: 'taggable_models.name').to_a).to eq([frank, steve])
+    expect(TaggableModel.tagged_with('ruby, rails', tenant: 1, order: 'taggable_models.name').to_a).to eq([bob])
+    expect(TaggableModel.tagged_with('ruby, rails', tenant: 2, order: 'taggable_models.name').to_a).to eq([frank])
+    expect(TaggableModel.tagged_with(%w(ruby rails), tenant: 1, order: 'taggable_models.name').to_a).to eq([bob])
+    expect(TaggableModel.tagged_with(%w(ruby rails), tenant: 2, order: 'taggable_models.name').to_a).to eq([frank])
+  end
+
+  it 'should be able to find tagged with some excluded tags' do
+    bob = TaggableModel.create(name: 'Bob', tag_list: 'happier, lazy', tenant_id: 1)
+    frank = TaggableModel.create(name: 'Frank', tag_list: 'happier, lazy', tenant_id: 2)
+    steve = TaggableModel.create(name: 'Steve', tag_list: 'happier', tenant_id: 2)
+
+    expect(TaggableModel.tagged_with('lazy', tenant: 1, exclude: true)).to eq([frank, steve])
+    expect(TaggableModel.tagged_with('lazy', tenant: 2, exclude: true)).to eq([bob, steve])
+    expect(TaggableModel.tagged_with('happier', tenant: 1, exclude: true)).to eq([frank, steve])
+    expect(TaggableModel.tagged_with('happier', tenant: 2, exclude: true)).to eq([bob])
+  end
+
   it 'should return an empty scope for empty tags' do
     ['', ' ', nil, []].each do |tag|
       expect(TaggableModel.tagged_with(tag)).to be_empty
