@@ -35,7 +35,8 @@ module ActsAsTaggableOn
           if options[:wild].present?
             matches_attribute.matches(wildcard_escaped_tag(tag), '!', ActsAsTaggableOn.strict_case_match)
           else
-            matches_attribute.matches(escaped_tag(tag), '!', ActsAsTaggableOn.strict_case_match)
+            tag = tag.downcase unless ActsAsTaggableOn.strict_case_match
+            matches_attribute.eq(tag)
           end
         end
 
@@ -48,9 +49,9 @@ module ActsAsTaggableOn
                                             wildcard_escaped_tag(tag)
                                           end, '!', ActsAsTaggableOn.strict_case_match)
           else
-            matches_attribute.matches_any(tag_list.map do |tag|
-                                            escaped_tag(tag).to_s
-                                          end, '!', ActsAsTaggableOn.strict_case_match)
+            matches_attribute.eq_any(tag_list.map do |tag|
+                                       ActsAsTaggableOn.strict_case_match ? tag : tag.downcase
+                                     end)
           end
         end
 
