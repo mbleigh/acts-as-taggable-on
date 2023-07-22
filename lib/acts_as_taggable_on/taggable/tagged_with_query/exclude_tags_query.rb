@@ -14,15 +14,19 @@ module ActsAsTaggableOn
         private
 
         def tags_not_in_list
+          arel_join_on = tagging_arel_table[:tag_id].eq(tag_arel_table[:id])
+                                                    .and(tagging_arel_table[:taggable_type].eq(taggable_model.base_class.name))
+                                                    .and(tags_match_type)
+
+          if options[:tenant]
+            arel_join_on = arel_join_on.and(tagging_arel_table[:tenant].eq(options[:tenant]))
+          end
+
           taggable_arel_table[:id].not_in(
             tagging_arel_table
               .project(tagging_arel_table[:taggable_id])
               .join(tag_arel_table)
-              .on(
-                tagging_arel_table[:tag_id].eq(tag_arel_table[:id])
-                .and(tagging_arel_table[:taggable_type].eq(taggable_model.base_class.name))
-                .and(tags_match_type)
-              )
+              .on(arel_join_on)
           )
 
           # FIXME: missing time scope, this is also missing in the original implementation
@@ -66,6 +70,10 @@ module ActsAsTaggableOn
           end
 
           on_condition = on_condition.and(tagging_arel_table[:context].eq(options[:on])) if options[:on].present?
+
+          if options[:tenant].present?
+            on_condition = on_condition.and(tagging_arel_table[:tenant].eq(options[:tenant]))
+          end
 
           on_condition
         end
