@@ -10,10 +10,11 @@ Each change should fall into categories that would affect whether the release is
 
 As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
-### [v9.0.2) / unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v9.0.1...master)
+### [v9.1.0) / unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v9.0.1...master)
 * Features
   * [@glampr Add support for prefix and suffix searches alongside previously supported containment (wildcard) searches](https://github.com/mbleigh/acts-as-taggable-on/pull/1082)
   * [@donquxiote Add support for horizontally sharded databases](https://github.com/mbleigh/acts-as-taggable-on/pull/1079)
+  * [aovertus Remove restriction around ActiveRecord 7.x versions allowing support until next major is released](https://github.com/mbleigh/acts-as-taggable-on/pull/1110)
 
 ### [v9.0.1) / 2022-01-07](https://github.com/mbleigh/acts-as-taggable-on/compare/v9.0.0..v9.0.1)
 * Fixes
