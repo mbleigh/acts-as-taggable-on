@@ -13,7 +13,7 @@ appraise 'activerecord-7.0' do
 end
 
 appraise 'activerecord-7.1' do
-    gem 'activerecord', '~> 7.1.0'
-    gem 'pg'
-    gem 'mysql2', '~> 0.5'
+  gem 'activerecord', '~> 7.1.0'
+  gem 'pg'
+  gem 'mysql2', '~> 0.5'
 end
