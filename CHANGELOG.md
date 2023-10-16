@@ -10,7 +10,9 @@ Each change should fall into categories that would affect whether the release is
 
 As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
-### [v10.0.0) / unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v9.0.1...master)
+### [unreleased](https://github.com/mbleigh/acts-as-taggable-on/compare/v10.0.0...master)
+
+### [v10.0.0) / 2023-10-14](https://github.com/mbleigh/acts-as-taggable-on/compare/v9.0.1...v10.0.0)
 * Features
   * [@glampr Add support for prefix and suffix searches alongside previously supported containment (wildcard) searches](https://github.com/mbleigh/acts-as-taggable-on/pull/1082)
   * [@donquxiote Add support for horizontally sharded databases](https://github.com/mbleigh/acts-as-taggable-on/pull/1079)
