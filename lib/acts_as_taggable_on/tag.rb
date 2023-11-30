@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ActsAsTaggableOn
-  class Tag < ::ActiveRecord::Base
+  class Tag < ActsAsTaggableOn.base_class.constantize
     self.table_name = ActsAsTaggableOn.tags_table
 
     ### ASSOCIATIONS:
@@ -84,10 +84,11 @@ module ActsAsTaggableOn
         tries ||= 3
         comparable_tag_name = comparable_name(tag_name)
         existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
-        existing_tag || create(name: tag_name)
+        next existing_tag if existing_tag
+
+        transaction(requires_new: true) { create(name: tag_name) }
       rescue ActiveRecord::RecordNotUnique
         if (tries -= 1).positive?
-          ActiveRecord::Base.connection.execute 'ROLLBACK'
           existing_tags = named_any(list)
           retry
         end

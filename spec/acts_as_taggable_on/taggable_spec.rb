@@ -27,9 +27,9 @@ describe 'Taggable To Preserve Order' do
     @taggable.tag_list = 'rails, ruby, css'
     expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to be_truthy
 
-    expect(-> {
+    expect{
       @taggable.save
-    }).to change(ActsAsTaggableOn::Tag, :count).by(3)
+    }.to change(ActsAsTaggableOn::Tag, :count).by(3)
 
     @taggable.reload
     expect(@taggable.tag_list).to eq(%w(rails ruby css))
@@ -61,9 +61,9 @@ describe 'Taggable To Preserve Order' do
     @taggable.tag_list = 'pow, ruby, rails'
     expect(@taggable.instance_variable_get('@tag_list').instance_of?(ActsAsTaggableOn::TagList)).to be_truthy
 
-    expect(-> {
+    expect {
       @taggable.save
-    }).to change(ActsAsTaggableOn::Tag, :count).by(3)
+    }.to change(ActsAsTaggableOn::Tag, :count).by(3)
 
     @taggable.reload
     expect(@taggable.tags.map { |t| t.name }).to eq(%w(pow ruby rails))
@@ -157,9 +157,9 @@ describe 'Taggable' do
     @taggable.skill_list = 'ruby, rails, css'
     expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to be_truthy
 
-    expect(-> {
+    expect{
       @taggable.save
-    }).to change(ActsAsTaggableOn::Tag, :count).by(3)
+    }.to change(ActsAsTaggableOn::Tag, :count).by(3)
 
     @taggable.reload
     expect(@taggable.skill_list.sort).to eq(%w(ruby rails css).sort)
@@ -480,6 +480,10 @@ describe 'Taggable' do
       jim = TaggableModel.create(name: 'Jim', tag_list: 'jim, steve')
 
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank, steve])
+      expect(TaggableModel.tagged_with(%w(bob tricia), wild: :prefix, any: true).to_a.sort_by { |o| o.id }).to eq([bob, steve])
+      expect(TaggableModel.tagged_with(%w(bob tricia), wild: :suffix, any: true).to_a.sort_by { |o| o.id }).to eq([bob, frank])
+      expect(TaggableModel.tagged_with(%w(cia), wild: :prefix, any: true).to_a.sort_by { |o| o.id }).to eq([bob, steve])
+      expect(TaggableModel.tagged_with(%w(j), wild: :suffix, any: true).to_a.sort_by { |o| o.id }).to eq([frank, steve, jim])
       expect(TaggableModel.tagged_with(%w(bob tricia), wild: true, exclude: true).to_a).to eq([jim])
       expect(TaggableModel.tagged_with('ji', wild: true, any: true).to_a).to match_array([frank, jim])
     end
@@ -555,39 +559,39 @@ describe 'Taggable' do
       let(:bob) { TaggableModel.create(name: 'Bob') }
       context 'case sensitive' do
         it '#add' do
-          expect(lambda {
+          expect {
             bob.tag_list.add 'happier'
             bob.tag_list.add 'happier'
             bob.tag_list.add 'happier', 'rich', 'funny'
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(3)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(3)
         end
         it '#<<' do
-          expect(lambda {
+          expect {
             bob.tag_list << 'social'
             bob.tag_list << 'social'
             bob.tag_list << 'social' << 'wow'
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(2)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(2)
 
         end
 
         it 'unicode' do
 
-          expect(lambda {
+          expect {
             bob.tag_list.add 'ПРИВЕТ'
             bob.tag_list.add 'ПРИВЕТ'
             bob.tag_list.add 'ПРИВЕТ', 'ПРИВЕТ'
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(1)
 
         end
 
         it '#=' do
-          expect(lambda {
+          expect {
             bob.tag_list = ['Happy', 'Happy']
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(1)
         end
       end
       context 'case insensitive' do
@@ -595,39 +599,39 @@ describe 'Taggable' do
         after(:all) { ActsAsTaggableOn.force_lowercase = false }
 
         it '#<<' do
-          expect(lambda {
+          expect {
             bob.tag_list << 'Alone'
             bob.tag_list << 'AloNe'
             bob.tag_list << 'ALONE' << 'In The dark'
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(2)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(2)
 
         end
 
         it '#add' do
-          expect(lambda {
+          expect {
             bob.tag_list.add 'forever'
             bob.tag_list.add 'ForEver'
             bob.tag_list.add 'FOREVER', 'ALONE'
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(2)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(2)
         end
 
         it 'unicode' do
 
-          expect(lambda {
+          expect {
             bob.tag_list.add 'ПРИВЕТ'
             bob.tag_list.add 'привет', 'Привет'
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(1)
 
         end
 
         it '#=' do
-          expect(lambda {
+          expect {
             bob.tag_list = ['Happy', 'HAPPY']
             bob.save
-          }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+          }.to change(ActsAsTaggableOn::Tagging, :count).by(1)
         end
 
 
@@ -636,26 +640,29 @@ describe 'Taggable' do
 
     end
 
-    xit 'should not duplicate tags added on different threads', if: supports_concurrency?, skip: 'FIXME, Deadlocks in travis' do
-      #TODO, try with more threads and fix deadlock
-      thread_count = 4
-      barrier = Barrier.new thread_count
+    it 'should not duplicate tags' do
+      connor = TaggableModel.new(name: 'Connor', tag_list: 'There, can, be, only, one')
 
-      expect {
-        thread_count.times.map do |idx|
-          Thread.start do
-            connor = TaggableModel.first_or_create(name: 'Connor')
-            connor.tag_list = 'There, can, be, only, one'
-            barrier.wait
-            begin
-              connor.save
-            rescue ActsAsTaggableOn::DuplicateTagError
-              # second save should succeed
-              connor.save
-            end
-          end
-        end.map(&:join)
-      }.to change(ActsAsTaggableOn::Tag, :count).by(5)
+      allow(ActsAsTaggableOn::Tag).to receive(:create).and_call_original
+      expect(ActsAsTaggableOn::Tag).to receive(:create).with(name: 'can') do
+        # Simulate concurrent tag creation
+        ActsAsTaggableOn::Tag.new(name: 'can').save!
+
+        raise ActiveRecord::RecordNotUnique
+      end
+
+      expect(ActsAsTaggableOn::Tag).to receive(:create).with(name: 'be') do
+        # Simulate concurrent tag creation
+        ActsAsTaggableOn::Tag.new(name: 'be').save!
+
+        raise ActiveRecord::RecordNotUnique
+      end
+
+      expect { connor.save! }.to change(ActsAsTaggableOn::Tag, :count).by(5)
+
+      %w[There can only be one].each do |tag|
+        expect(TaggableModel.tagged_with(tag).count).to eq(1)
+      end
     end
   end
 
@@ -726,9 +733,9 @@ describe 'Taggable' do
       @taggable.skill_list = 'ruby, rails, css'
       expect(@taggable.instance_variable_get('@skill_list').instance_of?(ActsAsTaggableOn::TagList)).to be_truthy
 
-      expect(-> {
+      expect {
         @taggable.save
-      }).to change(ActsAsTaggableOn::Tag, :count).by(3)
+      }.to change(ActsAsTaggableOn::Tag, :count).by(3)
 
       @taggable.reload
       expect(@taggable.skill_list.sort).to eq(%w(ruby rails css).sort)

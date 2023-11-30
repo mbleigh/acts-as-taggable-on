@@ -40,9 +40,7 @@ module ActsAsTaggableOn
         false
       end
 
-      def is_tagger?
-        tagger?
-      end
+      alias is_tagger? tagger?
     end
 
     module InstanceMethods
@@ -75,9 +73,7 @@ module ActsAsTaggableOn
         self.class.is_tagger?
       end
 
-      def is_tagger?
-        tagger?
-      end
+      alias is_tagger? tagger?
     end
 
     module SingletonMethods
@@ -85,9 +81,7 @@ module ActsAsTaggableOn
         true
       end
 
-      def is_tagger?
-        tagger?
-      end
+      alias is_tagger? tagger?
     end
   end
 end

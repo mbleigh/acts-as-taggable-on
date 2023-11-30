@@ -61,10 +61,10 @@ describe 'Tagger' do
 
   it 'should not overlap tags from different taggers' do
     @user2 = User.new
-    expect(-> {
+    expect {
       @user.tag(@taggable, with: 'ruby, scheme', on: :tags)
       @user2.tag(@taggable, with: 'java, python, lisp, ruby', on: :tags)
-    }).to change(ActsAsTaggableOn::Tagging, :count).by(6)
+    }.to change(ActsAsTaggableOn::Tagging, :count).by(6)
 
     [@user, @user2, @taggable].each(&:reload)
 
@@ -83,9 +83,9 @@ describe 'Tagger' do
     @user2.tag(@taggable, with: 'java, python, lisp, ruby', on: :tags)
     @user.tag(@taggable, with: 'ruby, scheme', on: :tags)
 
-    expect(-> {
+    expect {
       @user2.tag(@taggable, with: 'java, python, lisp', on: :tags)
-    }).to change(ActsAsTaggableOn::Tagging, :count).by(-1)
+    }.to change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
     [@user, @user2, @taggable].each(&:reload)
 
@@ -102,9 +102,9 @@ describe 'Tagger' do
     @user.tag(@taggable, with: 'awesome', on: :tags)
     @user2.tag(@taggable, with: 'awesome, epic', on: :tags)
 
-    expect(-> {
+    expect {
       @user2.tag(@taggable, with: 'epic', on: :tags)
-    }).to change(ActsAsTaggableOn::Tagging, :count).by(-1)
+    }.to change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
     @taggable.reload
     expect(@taggable.all_tags_list).to include('awesome')
@@ -119,9 +119,9 @@ describe 'Tagger' do
     expect(@taggable.tag_list).to eq(%w(ruby))
     expect(@taggable.all_tags_list.sort).to eq(%w(ruby scheme).sort)
 
-    expect(-> {
+    expect {
       @taggable.update(tag_list: '')
-    }).to change(ActsAsTaggableOn::Tagging, :count).by(-1)
+    }.to change(ActsAsTaggableOn::Tagging, :count).by(-1)
 
     expect(@taggable.tag_list).to be_empty
     expect(@taggable.all_tags_list.sort).to eq(%w(ruby scheme).sort)

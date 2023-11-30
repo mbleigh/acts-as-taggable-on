@@ -255,7 +255,11 @@ User.tagged_with(["awesome", "cool"], :exclude => true)
 User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
-You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
+#### Wildcard tag search
+You now have the following options for prefix, suffix and containment search, along with `:any` or `:exclude` option.
+Use `wild: :suffix` to place a wildcard at the end of the tag. It will be looking for `awesome%` and `cool%` in SQL.
+Use `wild: :prefix` to place a wildcard at the beginning of the tag. It will be looking for `%awesome` and `%cool` in SQL.
+Use `wild: true` to place a wildcard both at the beginning and the end of the tag. It will be looking for `%awesome%` and `%cool%` in SQL.
 
 __Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
 
@@ -294,6 +298,15 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 @user.tags_on(:customs) # => [<Tag name='same'>,...]
 @user.tag_counts_on(:customs)
 User.tagged_with("same", :on => :customs) # => [@user]
+```
+
+### Finding tags based on context
+
+You can find tags for a specific context by using the ```for_context``` scope:
+
+```ruby
+ActsAsTaggableOn::Tag.for_context(:tags)
+ActsAsTaggableOn::Tag.for_context(:skills)
 ```
 
 ### Tag Parsers

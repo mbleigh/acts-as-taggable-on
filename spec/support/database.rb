@@ -18,18 +18,14 @@ if ActiveRecord.version >= Gem::Version.new('7.0.0.alpha2')
 else
   ActiveRecord::Base.default_timezone = :utc
 end
-config = if ActiveRecord.version >= Gem::Version.new('6.1.0')
-           ActiveRecord::Base.configurations.configs_for(env_name: db_name)
-         else
-           ActiveSupport::HashWithIndifferentAccess.new(ActiveRecord::Base.configurations[db_name])
-         end
+config = ActiveRecord::Base.configurations.configs_for(env_name: db_name)
 
 begin
   ActiveRecord::Base.establish_connection(db_name.to_sym)
   ActiveRecord::Base.connection
 rescue StandardError
   case db_name
-  when /mysql/
+  when /(mysql)/
     ActiveRecord::Base.establish_connection(config.merge('database' => nil))
     ActiveRecord::Base.connection.create_database(config['database'],
                                                   { charset: 'utf8', collation: 'utf8_unicode_ci' })
