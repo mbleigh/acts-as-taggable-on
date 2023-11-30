@@ -57,7 +57,7 @@ was used.
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 7.0'
+gem 'acts-as-taggable-on', '~> 9.0'
 ```
 
 and bundle:
@@ -555,12 +555,11 @@ Versions >= 4.x are compatible with Ruby 2.0.0+ and Rails 4 and 5.
 
 Versions >= 7.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
 
+Versions >= 8.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
+
+Versions >= 9.x are compatible with Ruby 2.5.0 and Rails 6 and 7.
+
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
-
-## TODO
-
-- Write benchmark script
-- Resolve concurrency issues
 
 ## Testing
 
@@ -572,7 +571,8 @@ bundle
 rake spec
 ```
 
-You can run all the tests across all the Rails versions by running `rake appraise`.  If you'd also like to [run the tests across all rubies and databases as configured for Travis CI, install and run `wwtd`](https://github.com/grosser/wwtd).
+You can run all the tests across all the Rails versions by running `rake appraise`.
+If you'd also like to [run the tests across all rubies and databases as configured for Github Actions, install and run `wwtd`](https://github.com/grosser/wwtd).
 
 
 ## License

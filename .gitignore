@@ -11,3 +11,5 @@ tmp
 *.lock
 *.iml
 /.idea
+
+.rubocop-https*
