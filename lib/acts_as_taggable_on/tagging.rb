@@ -28,12 +28,15 @@ module ActsAsTaggableOn
     private
 
     def remove_unused_tags
-      if ActsAsTaggableOn.remove_unused_tags
-        if ActsAsTaggableOn.tags_counter
-          tag.destroy if tag.reload.taggings_count.zero?
-        elsif tag.reload.taggings.none?
-          tag.destroy
-        end
+      return unless ActsAsTaggableOn.remove_unused_tags
+
+      tag.reload if association(:tag).loaded?
+      if ActsAsTaggableOn.tags_counter
+        tag.destroy if tag.taggings_count.zero?
+      elsif tag.taggings.none?
+        # We already know there is no taggings, but the depended: :destroy will
+        # fire a query nonetheless, can we avoid it ?
+        tag.destroy
       end
     end
   end
