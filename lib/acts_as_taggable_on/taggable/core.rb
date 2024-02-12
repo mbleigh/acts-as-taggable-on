@@ -217,7 +217,7 @@ module ActsAsTaggableOn
       end
 
       def tagging_contexts
-        self.class.tag_types.map(&:to_s) + custom_contexts
+        (self.class.tag_types.map(&:to_s) + custom_contexts).uniq
       end
 
       def taggable_tenant
