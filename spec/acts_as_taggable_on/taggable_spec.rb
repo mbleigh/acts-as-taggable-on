@@ -761,7 +761,7 @@ describe 'Taggable' do
   end
 
   # See https://github.com/mbleigh/acts-as-taggable-on/pull/457 for details
-  context 'tag_counts and aggreating scopes, compatability with MySQL ' do
+  context 'tag_counts and aggreating scopes, compatibility with MySQL ' do
     before(:each) do
       TaggableModel.new(:name => 'Barb Jones').tap { |t| t.tag_list = %w(awesome fun) }.save
       TaggableModel.new(:name => 'John Doe').tap { |t| t.tag_list = %w(cool fun hella) }.save

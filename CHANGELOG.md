@@ -121,7 +121,7 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
 
 * Fixes
   * [@rikettsie #623 collation parameter is ignored if it generates an exception](https://github.com/mbleigh/acts-as-taggable-on/pull/650)
-  * [@bwvoss References working parser in deprectation warning](https://github.com/mbleigh/acts-as-taggable-on/pull/659)
+  * [@bwvoss References working parser in deprecation warning](https://github.com/mbleigh/acts-as-taggable-on/pull/659)
   * [@jh125486 Updated tagging_contexts to include dynamic contexts](https://github.com/mbleigh/acts-as-taggable-on/pull/660)
   * [@jh125486 Fixed wildcard test (postgres returning rows with unexpected order)](https://github.com/mbleigh/acts-as-taggable-on/pull/660)
   * [@FlowerWrong Add rails 5.0.0 alpha support, not hack rails <5](https://github.com/mbleigh/acts-as-taggable-on/pull/673)
@@ -142,7 +142,7 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
   * [@seuros Remove more deprecations](https://github.com/mbleigh/acts-as-taggable-on/commit/05794170f64f8bf250b34d2d594e368721009278)
   * [@lukeasrodgers Bugfix `TagList#concat` with non-duplicates.](https://github.com/mbleigh/acts-as-taggable-on/commit/2c6214f0ddf8c6440ab81eec04d1fbf9d97c8826)
   * [@seuros clean! should return self.](https://github.com/mbleigh/acts-as-taggable-on/commit/c739422f56f8ff37e3f321235e74997422a1c980)
-  * [@rbritom renable appraisals](https://github.com/mbleigh/acts-as-taggable-on/commit/0ca1f1c5b059699c683a28b522e86a3d5cd7639e)
+  * [@rbritom re-enable appraisals](https://github.com/mbleigh/acts-as-taggable-on/commit/0ca1f1c5b059699c683a28b522e86a3d5cd7639e)
   * [@rbritom remove index conditionally on up method.](https://github.com/mbleigh/acts-as-taggable-on/commit/9cc580e7f88164634eb10c8826e5b30ea0e00544)
   * [@rbritom add index on down method . ](https://github.com/mbleigh/acts-as-taggable-on/pull/767)
   * [@rbritom remove index conditionally on up method](https://github.com/mbleigh/acts-as-taggable-on/commit/9cc580e7f88164634eb10c8826e5b30ea0e00544)
