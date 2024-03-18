@@ -161,7 +161,7 @@ describe ActsAsTaggableOn::TagList do
       expect(parser).to have_received(:parse)
     end
 
-    it 'should use the parser setted as attribute' do
+    it 'should use the parser set as attribute' do
       allow(parser_class).to receive(:new).with('new, tag').and_return(parser)
 
       tag_list = ActsAsTaggableOn::TagList.new('example')
