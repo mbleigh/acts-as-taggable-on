@@ -32,7 +32,7 @@
 
 [![Join the chat at https://gitter.im/mbleigh/acts-as-taggable-on](https://badges.gitter.im/mbleigh/acts-as-taggable-on.svg)](https://gitter.im/mbleigh/acts-as-taggable-on?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Gem Version](https://badge.fury.io/rb/acts-as-taggable-on.svg)](http://badge.fury.io/rb/acts-as-taggable-on)
-[![Build Status](https://secure.travis-ci.com/mbleigh/acts-as-taggable-on.svg)](http://travis-ci.com/mbleigh/acts-as-taggable-on)
+[![Build Status](https://github.com/mbleigh/acts-as-taggable-on/workflows/spec/badge.svg)](https://github.com/mbleigh/acts-as-taggable-on/actions)
 [![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.svg)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
 [![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.svg)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
 [![Security](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master.svg)](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master)
@@ -57,7 +57,7 @@ was used.
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 7.0'
+gem 'acts-as-taggable-on', '~> 9.0'
 ```
 
 and bundle:
@@ -79,6 +79,8 @@ Review the generated migrations then migrate :
 ```shell
 rake db:migrate
 ```
+
+If you do not wish or need to support multi-tenancy, the migration for `add_tenant_to_taggings` is optional and can be discarded safely.
 
 #### For MySql users
 You can circumvent at any time the problem of special characters [issue 623](https://github.com/mbleigh/acts-as-taggable-on/issues/623) by setting in an initializer file:
@@ -253,7 +255,11 @@ User.tagged_with(["awesome", "cool"], :exclude => true)
 User.tagged_with(['awesome', 'cool'], :on => :tags, :any => true).tagged_with(['smart', 'shy'], :on => :skills, :any => true)
 ```
 
-You can also use `:wild => true` option along with `:any` or `:exclude` option. It will be looking for `%awesome%` and `%cool%` in SQL.
+#### Wildcard tag search
+You now have the following options for prefix, suffix and containment search, along with `:any` or `:exclude` option.
+Use `wild: :suffix` to place a wildcard at the end of the tag. It will be looking for `awesome%` and `cool%` in SQL.
+Use `wild: :prefix` to place a wildcard at the beginning of the tag. It will be looking for `%awesome` and `%cool` in SQL.
+Use `wild: true` to place a wildcard both at the beginning and the end of the tag. It will be looking for `%awesome%` and `%cool%` in SQL.
 
 __Tip:__ `User.tagged_with([])` or `User.tagged_with('')` will return `[]`, an empty set of records.
 
@@ -292,6 +298,15 @@ to allow for dynamic tag contexts (this could be user generated tag contexts!)
 @user.tags_on(:customs) # => [<Tag name='same'>,...]
 @user.tag_counts_on(:customs)
 User.tagged_with("same", :on => :customs) # => [@user]
+```
+
+### Finding tags based on context
+
+You can find tags for a specific context by using the ```for_context``` scope:
+
+```ruby
+ActsAsTaggableOn::Tag.for_context(:tags)
+ActsAsTaggableOn::Tag.for_context(:skills)
 ```
 
 ### Tag Parsers
@@ -388,6 +403,27 @@ def remove_owned_tag
     @tag_owner.tag(@some_item, :with => stringify(owned_tag_list), :on => :tags)
     @some_item.save
 end
+```
+
+### Tag Tenancy
+
+Tags support multi-tenancy. This is useful for applications where a Tag belongs to a scoped set of models:
+
+```ruby
+class Account < ActiveRecord::Base
+  has_many :photos
+end
+
+class User < ActiveRecord::Base
+  belongs_to :account
+  acts_as_taggable_on :tags
+  acts_as_taggable_tenant :account_id
+end
+
+@user1.tag_list = ["foo", "bar"] # these taggings will automatically have the tenant saved
+@user2.tag_list = ["bar", "baz"]
+
+ActsAsTaggableOn::Tag.for_tenant(@user1.account.id) # returns Tag models for "foo" and "bar", but not "baz"
 ```
 
 ### Dirty objects
@@ -532,12 +568,11 @@ Versions >= 4.x are compatible with Ruby 2.0.0+ and Rails 4 and 5.
 
 Versions >= 7.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
 
+Versions >= 8.x are compatible with Ruby 2.3.7+ and Rails 5 and 6.
+
+Versions >= 9.x are compatible with Ruby 2.5.0 and Rails 6 and 7.
+
 For an up-to-date roadmap, see https://github.com/mbleigh/acts-as-taggable-on/milestones
-
-## TODO
-
-- Write benchmark script
-- Resolve concurrency issues
 
 ## Testing
 
@@ -549,7 +584,8 @@ bundle
 rake spec
 ```
 
-You can run all the tests across all the Rails versions by running `rake appraise`.  If you'd also like to [run the tests across all rubies and databases as configured for Travis CI, install and run `wwtd`](https://github.com/grosser/wwtd).
+You can run all the tests across all the Rails versions by running `rake appraise`.
+If you'd also like to [run the tests across all rubies and databases as configured for Github Actions, install and run `wwtd`](https://github.com/grosser/wwtd).
 
 
 ## License

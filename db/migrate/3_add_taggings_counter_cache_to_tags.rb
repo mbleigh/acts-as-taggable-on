@@ -1,9 +1,6 @@
-if ActiveRecord.gem_version >= Gem::Version.new('5.0')
-  class AddTaggingsCounterCacheToTags < ActiveRecord::Migration[4.2]; end
-else
-  class AddTaggingsCounterCacheToTags < ActiveRecord::Migration; end
-end
-AddTaggingsCounterCacheToTags.class_eval do
+# frozen_string_literal: true
+
+class AddTaggingsCounterCacheToTags < ActiveRecord::Migration[6.0]
   def self.up
     add_column ActsAsTaggableOn.tags_table, :taggings_count, :integer, default: 0
 

@@ -14,7 +14,7 @@ end
 describe ActsAsTaggableOn::Tag do
   before(:each) do
     @tag = ActsAsTaggableOn::Tag.new
-    @user = TaggableModel.create(name: 'Pablo')
+    @user = TaggableModel.create(name: 'Pablo', tenant_id: 100)
   end
 
 
@@ -70,6 +70,21 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
+  describe 'for tenant' do
+    before(:each) do
+      @user.skill_list.add('ruby')
+      @user.save
+    end
+
+    it 'should return tags for the tenant' do
+      expect(ActsAsTaggableOn::Tag.for_tenant('100').pluck(:name)).to include('ruby')
+    end
+
+    it 'should not return tags for other tenants' do
+      expect(ActsAsTaggableOn::Tag.for_tenant('200').pluck(:name)).to_not include('ruby')
+    end
+  end
+
   describe 'find or create by name' do
     before(:each) do
       @tag.name = 'awesome'
@@ -85,9 +100,9 @@ describe ActsAsTaggableOn::Tag do
     end
 
     it 'should create by name' do
-      expect(-> {
+      expect {
         ActsAsTaggableOn::Tag.find_or_create_with_like_by_name('epic')
-      }).to change(ActsAsTaggableOn::Tag, :count).by(1)
+      }.to change(ActsAsTaggableOn::Tag, :count).by(1)
     end
   end
 
@@ -166,6 +181,25 @@ describe ActsAsTaggableOn::Tag do
 
     it 'should return an empty array if no tags are specified' do
       expect(ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name([])).to be_empty
+    end
+
+    context 'another tag is created concurrently', :database_cleaner_delete, if: supports_concurrency?  do
+      it 'retries and finds tag if tag with same name created concurrently' do
+        tag_name = 'super'
+
+        expect(ActsAsTaggableOn::Tag).to receive(:create).with(name: tag_name) do
+          # Simulate concurrent tag creation
+          Thread.new do
+            ActsAsTaggableOn::Tag.new(name: tag_name).save!
+          end.join
+
+          raise ActiveRecord::RecordNotUnique
+        end
+
+        expect {
+          ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_name)
+        }.to change(ActsAsTaggableOn::Tag, :count).by(1)
+      end
     end
   end
 
@@ -337,4 +371,28 @@ describe ActsAsTaggableOn::Tag do
     end
   end
 
+  describe 'base_class' do
+    before do
+      class Foo < ActiveRecord::Base; end
+    end
+
+    context "default" do
+      it "inherits from ActiveRecord::Base" do
+
+        expect(ActsAsTaggableOn::Tag.ancestors).to include(ActiveRecord::Base)
+        expect(ActsAsTaggableOn::Tag.ancestors).to_not include(Foo)
+      end
+    end
+
+    context "custom" do
+      it "inherits from custom class" do
+
+        ActsAsTaggableOn.base_class = 'Foo'
+        hide_const("ActsAsTaggableOn::Tag")
+        load("lib/acts_as_taggable_on/tag.rb")
+
+        expect(ActsAsTaggableOn::Tag.ancestors).to include(Foo)
+      end
+    end
+  end
 end

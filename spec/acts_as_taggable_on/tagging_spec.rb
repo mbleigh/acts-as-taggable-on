@@ -20,9 +20,9 @@ describe ActsAsTaggableOn::Tagging do
     @taggable = TaggableModel.create(name: 'Bob Jones')
     @tag = ActsAsTaggableOn::Tag.create(name: 'awesome')
 
-    expect(-> {
+    expect {
       2.times { ActsAsTaggableOn::Tagging.create(taggable: @taggable, tag: @tag, context: 'tags') }
-    }).to change(ActsAsTaggableOn::Tagging, :count).by(1)
+    }.to change(ActsAsTaggableOn::Tagging, :count).by(1)
   end
 
   it 'should not delete tags of other records' do
@@ -49,6 +49,22 @@ describe ActsAsTaggableOn::Tagging do
     ActsAsTaggableOn.remove_unused_tags = previous_setting
   end
 
+  it 'should destroy unused tags after tagging destroyed when not using tags_counter' do
+    remove_unused_tags_previous_setting = ActsAsTaggableOn.remove_unused_tags
+    tags_counter_previous_setting = ActsAsTaggableOn.tags_counter
+    ActsAsTaggableOn.remove_unused_tags = true
+    ActsAsTaggableOn.tags_counter = false
+
+    ActsAsTaggableOn::Tag.destroy_all
+    @taggable = TaggableModel.create(name: 'Bob Jones')
+    @taggable.update_attribute :tag_list, 'aaa,bbb,ccc'
+    @taggable.update_attribute :tag_list, ''
+    expect(ActsAsTaggableOn::Tag.count).to eql(0)
+
+    ActsAsTaggableOn.remove_unused_tags = remove_unused_tags_previous_setting
+    ActsAsTaggableOn.tags_counter = tags_counter_previous_setting
+  end
+
   describe 'context scopes' do
     before do
       @tagging_2 = ActsAsTaggableOn::Tagging.new
@@ -61,12 +77,14 @@ describe ActsAsTaggableOn::Tagging do
       @tagging.tag = ActsAsTaggableOn::Tag.create(name: "Physics")
       @tagging.tagger = @tagger
       @tagging.context = 'Science'
+      @tagging.tenant = 'account1'
       @tagging.save
 
       @tagging_2.taggable = TaggableModel.create(name: "Satellites")
       @tagging_2.tag = ActsAsTaggableOn::Tag.create(name: "Technology")
       @tagging_2.tagger = @tagger_2
       @tagging_2.context = 'Science'
+      @tagging_2.tenant = 'account1'
       @tagging_2.save
 
       @tagging_3.taggable = TaggableModel.create(name: "Satellites")
@@ -98,6 +116,14 @@ describe ActsAsTaggableOn::Tagging do
       end
     end
 
+    describe '.by_tenant' do
+      it "should find taggings by tenant" do
+        expect(ActsAsTaggableOn::Tagging.by_tenant('account1').length).to eq(2);
+        expect(ActsAsTaggableOn::Tagging.by_tenant('account1').first).to eq(@tagging);
+        expect(ActsAsTaggableOn::Tagging.by_tenant('account1').second).to eq(@tagging_2);
+      end
+    end
+
     describe '.not_owned' do
       before do
         @tagging_4 = ActsAsTaggableOn::Tagging.new
@@ -114,4 +140,30 @@ describe ActsAsTaggableOn::Tagging do
       end
     end
   end
+
+  describe 'base_class' do
+    before do
+      class Foo < ActiveRecord::Base; end
+    end
+
+    context "default" do
+      it "inherits from ActiveRecord::Base" do
+
+        expect(ActsAsTaggableOn::Tagging.ancestors).to include(ActiveRecord::Base)
+        expect(ActsAsTaggableOn::Tagging.ancestors).to_not include(Foo)
+      end
+    end
+
+    context "custom" do
+      it "inherits from custom class" do
+
+        ActsAsTaggableOn.base_class = 'Foo'
+        hide_const("ActsAsTaggableOn::Tagging")
+        load("lib/acts_as_taggable_on/tagging.rb")
+
+        expect(ActsAsTaggableOn::Tagging.ancestors).to include(Foo)
+      end
+    end
+  end
+
 end
