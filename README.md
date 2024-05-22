@@ -22,7 +22,6 @@
       - [Upgrading](#upgrading)
   - [Contributors](#contributors)
   - [Compatibility](#compatibility)
-  - [TODO](#todo)
   - [Testing](#testing)
   - [License](#license)
 
@@ -377,7 +376,7 @@ Note that `tag_list` only returns tags whose taggings do not have an owner. Cont
 To retrieve all tags of an object (regardless of ownership) or if only one owner can tag the object, use `all_tags_list`.
 
 ##### Adding owned tags
-Note that **owned tags** are added all at once, in the form of ***comma seperated tags*** in string.
+Note that **owned tags** are added all at once, in the form of ***comma separated tags*** in string.
 Also, when you try to add **owned tags** again, it simply overwrites the previous set of **owned tags**.
 So to append tags in previously existing **owned tags** list, go as follows:
 ```ruby
