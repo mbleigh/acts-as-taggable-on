@@ -22,7 +22,6 @@
       - [Upgrading](#upgrading)
   - [Contributors](#contributors)
   - [Compatibility](#compatibility)
-  - [TODO](#todo)
   - [Testing](#testing)
   - [License](#license)
 
