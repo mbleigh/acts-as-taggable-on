@@ -56,7 +56,7 @@ was used.
 To use it, add it to your Gemfile:
 
 ```ruby
-gem 'acts-as-taggable-on', '~> 9.0'
+gem 'acts-as-taggable-on'
 ```
 
 and bundle:
