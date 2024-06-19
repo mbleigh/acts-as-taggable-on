@@ -9,4 +9,10 @@ class ChangeCollationForTagNames < ActiveRecord::Migration[6.0]
       execute("ALTER TABLE #{ActsAsTaggableOn.tags_table} MODIFY name varchar(255) CHARACTER SET utf8 COLLATE utf8_bin;")
     end
   end
+
+  def down
+    if ActsAsTaggableOn::Utils.using_mysql?
+      execute("ALTER TABLE #{ActsAsTaggableOn.tags_table} MODIFY name varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci;")
+    end
+  end
 end
