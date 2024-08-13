@@ -18,6 +18,7 @@ jobs:
           - "3.0"
           - 2.7
         gemfile:
+          - gemfiles/activerecord_7.2.gemfile
           - gemfiles/activerecord_7.1.gemfile
           - gemfiles/activerecord_7.0.gemfile
           - gemfiles/activerecord_6.1.gemfile
@@ -35,6 +36,10 @@ jobs:
         exclude:
           - ruby: 3.2
             gemfile: gemfiles/activerecord_6.0.gemfile
+          - ruby: 2.7
+            gemfile: gemfiles/activerecord_7.2.gemfile
+          - ruby: 3.0
+            gemfile: gemfiles/activerecord_7.2.gemfile
 
     services:
       postgres:
