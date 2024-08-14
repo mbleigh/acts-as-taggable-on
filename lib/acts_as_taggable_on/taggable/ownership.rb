@@ -90,6 +90,7 @@ module ActsAsTaggableOn
         super(*args)
       end
 
+      # This looks duplicated from taggable/core.rb
       def save_owned_tags
         tagging_contexts.each do |context|
           cached_owned_tag_list_on(context).each do |owner, tag_list|
