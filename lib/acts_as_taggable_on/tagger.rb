@@ -2,11 +2,9 @@
 
 module ActsAsTaggableOn
   module Tagger
-    def self.included(base)
-      base.extend ClassMethods
-    end
+    extend ActiveSupport::Concern
 
-    module ClassMethods
+    class_methods do
       ##
       # Make a model a tagger. This allows an instance of a model to claim ownership
       # of tags.

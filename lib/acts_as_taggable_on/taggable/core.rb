@@ -6,19 +6,17 @@ require_relative 'tag_list_type'
 module ActsAsTaggableOn
   module Taggable
     module Core
-      def self.included(base)
-        base.extend ActsAsTaggableOn::Taggable::Core::ClassMethods
+      extend ActiveSupport::Concern
 
-        base.class_eval do
+      included do
           attr_writer :custom_contexts
 
           after_save :save_tags
-        end
 
-        base.initialize_acts_as_taggable_on_core
+        initialize_acts_as_taggable_on_core
       end
 
-      module ClassMethods
+      class_methods do
         def initialize_acts_as_taggable_on_core
           include taggable_mixin
           tag_types.map(&:to_s).each do |tags_type|

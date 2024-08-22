@@ -13,11 +13,7 @@ ActiveRecord::Base.configurations = YAML.load_file(database_yml)
 ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), '../debug.log'))
 ActiveRecord::Base.logger.level = ENV['CI'] ? ::Logger::ERROR : ::Logger::DEBUG
 ActiveRecord::Migration.verbose = false
-if ActiveRecord.version >= Gem::Version.new('7.0.0.alpha2')
-  ActiveRecord.default_timezone = :utc
-else
-  ActiveRecord::Base.default_timezone = :utc
-end
+ActiveRecord.default_timezone = :utc
 config = ActiveRecord::Base.configurations.configs_for(env_name: db_name)
 
 begin
