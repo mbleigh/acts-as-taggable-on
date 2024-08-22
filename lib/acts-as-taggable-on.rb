@@ -111,6 +111,7 @@ end
 ActiveSupport.on_load(:active_record) do
   extend ActsAsTaggableOn::Taggable
   include ActsAsTaggableOn::Tagger
+
 end
 ActiveSupport.on_load(:action_view) do
   include ActsAsTaggableOn::TagsHelper
