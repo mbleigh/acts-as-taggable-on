@@ -159,7 +159,7 @@ describe ActsAsTaggableOn::Tagging do
 
         ActsAsTaggableOn.base_class = 'Foo'
         hide_const("ActsAsTaggableOn::Tagging")
-        load("lib/acts_as_taggable_on/tagging.rb")
+        load("lib/acts-as-taggable-on/tagging.rb")
 
         expect(ActsAsTaggableOn::Tagging.ancestors).to include(Foo)
       end

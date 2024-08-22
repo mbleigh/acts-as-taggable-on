@@ -9,10 +9,10 @@ namespace :acts_as_taggable_on do
         "lib",
         "tasks",
         "examples",
-        "acts_as_taggable_on.rb.example"
+        "acts-as-taggable-on.rb.example"
       )
 
-      destination = "config/initializers/acts_as_taggable_on.rb"
+      destination = "config/initializers/acts-as-taggable-on.rb"
 
       cp source, destination
     end

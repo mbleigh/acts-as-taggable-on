@@ -1,6 +1,6 @@
 # coding: utf-8
 
-require_relative 'lib/acts_as_taggable_on/version'
+require_relative 'lib/acts-as-taggable-on/version'
 
 Gem::Specification.new do |gem|
   gem.name          = 'acts-as-taggable-on'
@@ -22,6 +22,7 @@ Gem::Specification.new do |gem|
   end
 
   gem.add_runtime_dependency 'activerecord', '>= 7.0', '< 8.0'
+  gem.add_runtime_dependency 'zeitwerk', '>= 2.4', '< 3.0'
 
   gem.add_development_dependency 'rspec-rails'
   gem.add_development_dependency 'rspec-its'

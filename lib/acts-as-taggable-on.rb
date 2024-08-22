@@ -1,43 +1,21 @@
 require 'active_record'
 require 'active_record/version'
 require 'active_support/core_ext/module'
+require 'zeitwerk'
+
+loader = Zeitwerk::Loader.for_gem
+loader.inflector.inflect "acts-as-taggable-on" => "ActsAsTaggableOn"
+loader.setup
 
 begin
   require 'rails/engine'
-  require 'acts_as_taggable_on/engine'
+  require 'acts-as-taggable-on/engine'
   rescue LoadError
-
 end
 
 require 'digest/sha1'
 
 module ActsAsTaggableOn
-  extend ActiveSupport::Autoload
-
-  autoload :Tag
-  autoload :TagList
-  autoload :GenericParser
-  autoload :DefaultParser
-  autoload :Taggable
-  autoload :Tagger
-  autoload :Tagging
-  autoload :TagsHelper
-  autoload :VERSION
-
-  autoload_under 'taggable' do
-    autoload :Cache
-    autoload :Collection
-    autoload :Core
-    autoload :Dirty
-    autoload :Ownership
-    autoload :Related
-    autoload :TagListType
-  end
-
-  autoload :Utils
-  autoload :Compatibility
-
-
   class DuplicateTagError < StandardError
   end
 
