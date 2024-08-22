@@ -3,12 +3,13 @@
 module ActsAsTaggableOn
   module Taggable
     module Collection
-      def self.included(base)
-        base.extend ActsAsTaggableOn::Taggable::Collection::ClassMethods
-        base.initialize_acts_as_taggable_on_collection
+      extend ActiveSupport::Concern
+
+      included do
+        initialize_acts_as_taggable_on_collection
       end
 
-      module ClassMethods
+      class_methods do
         def initialize_acts_as_taggable_on_collection
           tag_types.map(&:to_s).each do |tag_type|
             class_eval <<-RUBY, __FILE__, __LINE__ + 1

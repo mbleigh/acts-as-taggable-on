@@ -3,17 +3,15 @@
 module ActsAsTaggableOn
   module Taggable
     module Ownership
-      def self.included(base)
-        base.extend ActsAsTaggableOn::Taggable::Ownership::ClassMethods
+      extend ActiveSupport::Concern
 
-        base.class_eval do
-          after_save :save_owned_tags
-        end
+      included do
+        after_save :save_owned_tags
 
-        base.initialize_acts_as_taggable_on_ownership
+        initialize_acts_as_taggable_on_ownership
       end
 
-      module ClassMethods
+      class_methods do
         def acts_as_taggable_on(*args)
           initialize_acts_as_taggable_on_ownership
           super(*args)

@@ -66,7 +66,7 @@ module ActsAsTaggableOn
       # called on each call of taggable_on
       include Core
       include Collection
-      include Cache
+      include Caching
       include Ownership
       include Related
     end
@@ -91,13 +91,13 @@ module ActsAsTaggableOn
         self.tag_types = (self.tag_types + tag_types).uniq
         self.preserve_tag_order = preserve_tag_order
       else
-        class_attribute :tag_types
-        self.tag_types = tag_types
-        class_attribute :preserve_tag_order
-        self.preserve_tag_order = preserve_tag_order
-        class_attribute :tenant_column
-
         class_eval do
+          class_attribute :tag_types
+          class_attribute :preserve_tag_order
+          class_attribute :tenant_column
+          self.tag_types = tag_types
+          self.preserve_tag_order = preserve_tag_order
+
           has_many :taggings, as: :taggable, dependent: :destroy, class_name: '::ActsAsTaggableOn::Tagging'
           has_many :base_tags, through: :taggings, source: :tag, class_name: '::ActsAsTaggableOn::Tag'
 
@@ -111,7 +111,7 @@ module ActsAsTaggableOn
       # called on each call of taggable_on
       include Core
       include Collection
-      include Cache
+      include Caching
       include Ownership
       include Related
     end

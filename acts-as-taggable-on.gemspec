@@ -1,6 +1,6 @@
 # coding: utf-8
 
-require_relative 'lib/acts_as_taggable_on/version'
+require_relative 'lib/acts-as-taggable-on/version'
 
 Gem::Specification.new do |gem|
   gem.name          = 'acts-as-taggable-on'
@@ -15,13 +15,14 @@ Gem::Specification.new do |gem|
   gem.files         = `git ls-files`.split($/)
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ['lib']
-  gem.required_ruby_version     = '>= 2.7.0'
+  gem.required_ruby_version     = '>= 3.0.0'
 
   if File.exist?('UPGRADING.md')
     gem.post_install_message = File.read('UPGRADING.md')
   end
 
-  gem.add_runtime_dependency 'activerecord', '>= 6.1', '< 7.2'
+  gem.add_runtime_dependency 'activerecord', '>= 7.0', '< 8.0'
+  gem.add_runtime_dependency 'zeitwerk', '>= 2.4', '< 3.0'
 
   gem.add_development_dependency 'rspec-rails'
   gem.add_development_dependency 'rspec-its'
