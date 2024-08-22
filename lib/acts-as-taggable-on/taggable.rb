@@ -66,7 +66,7 @@ module ActsAsTaggableOn
       # called on each call of taggable_on
       include Core
       include Collection
-      include Cache
+      include Caching
       include Ownership
       include Related
     end
@@ -111,7 +111,7 @@ module ActsAsTaggableOn
       # called on each call of taggable_on
       include Core
       include Collection
-      include Cache
+      include Caching
       include Ownership
       include Related
     end
