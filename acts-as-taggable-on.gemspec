@@ -15,13 +15,13 @@ Gem::Specification.new do |gem|
   gem.files         = `git ls-files`.split($/)
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ['lib']
-  gem.required_ruby_version     = '>= 3.0.0'
+  gem.required_ruby_version     = '>= 3.2.0'
 
   if File.exist?('UPGRADING.md')
     gem.post_install_message = File.read('UPGRADING.md')
   end
 
-  gem.add_runtime_dependency 'activerecord', '>= 7.0', '< 8.0'
+  gem.add_runtime_dependency 'activerecord', '>= 7.1', '< 8.1'
   gem.add_runtime_dependency 'zeitwerk', '>= 2.4', '< 3.0'
 
   gem.add_development_dependency 'rspec-rails'
