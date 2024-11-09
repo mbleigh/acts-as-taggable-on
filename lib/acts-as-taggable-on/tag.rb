@@ -33,7 +33,7 @@ module ActsAsTaggableOn
 
     def self.named_any(list)
       clause = list.map do |tag|
-        sanitize_sql_for_named_any(tag).force_encoding('BINARY')
+        sanitize_sql_for_named_any(tag)
       end.join(' OR ')
       where(clause)
     end
