@@ -18,6 +18,7 @@
         - [Removing owned tags](#removing-owned-tags)
     - [Dirty objects](#dirty-objects)
     - [Tag cloud calculations](#tag-cloud-calculations)
+    - [UUID Primary keys](#uuid-primary-keys)
   - [Configuration](#configuration)
       - [Upgrading](#upgrading)
   - [Contributors](#contributors)
@@ -73,6 +74,9 @@ Install migrations
 # For the latest versions :
 rake acts_as_taggable_on_engine:install:migrations
 ```
+
+> If you're using UUIDs as Primary Keys for your tables, you'll have to update
+> the generated migrations accordingly. See [UUID Primary keys](#uuid-primary-keys)
 
 Review the generated migrations then migrate :
 ```shell
@@ -490,6 +494,31 @@ CSS:
 .css3 { font-size: 1.4em; }
 .css4 { font-size: 1.6em; }
 ```
+
+### UUID Primary Keys
+
+If your app is using UUIDs as primary key for your tables, you'll need to update
+one of the generated migrations: the one creating the tables. (db/migrate/xxx_acts_as_taggable_on_migration.acts_as_taggable_on_engine.rb)
+
+If the tables that you want to tag are using UUIDs as PK, you'll need to replace
+
+``` ruby
+t.references :taggable, polymorphic: true
+```
+
+with:
+
+``` ruby
+t.references :taggable, polymorphic: true, uuid: true
+```
+
+The same goes for the `tagger` reference, if your users (or whatever is
+producing tags) table as a UUID PK.
+
+
+If you want to use UUIDs as PK for the acts-as-taggable-on tables themselves,
+you'll need to add `type: uuid` to each of the `create_table` calls in the same
+file
 
 ## Configuration
 
