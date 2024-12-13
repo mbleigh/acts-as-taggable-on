@@ -15,8 +15,7 @@ appraise 'activerecord-7.2' do
 end
 
 appraise 'activerecord-8.0' do
-  gem 'activerecord', '~> 8.0.0.beta1'
-  gem 'railties', '~> 8.0.0.beta1'
+  gem 'activerecord', '~> 8.0.0'
   gem 'pg'
   gem 'sqlite3', '~> 2.2'
   gem 'mysql2', '~> 0.5'

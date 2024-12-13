@@ -10,6 +10,11 @@ Each change should fall into categories that would affect whether the release is
 
 As such, _Breaking Changes_ are major. _Features_ would map to either major or minor. _Fixes_, _Performance_, and _Misc_ are either minor or patch, the difference being kind of fuzzy for the purposes of history. Adding _Documentation_ (including tests) would be patch level.
 
+### unreleased
+
+* Features
+  * [@tagliala Add back Ruby 3.1 compatibility](https://github.com/mbleigh/acts-as-taggable-on/pull/1082)
+
 ### [v11.0.0) / 2024-08-23](https://github.com/mbleigh/acts-as-taggable-on/compare/v10.0.0...v11.0.0)
 - Removed support for Ruby 2.7
 - Removed support for Rails 6.1
