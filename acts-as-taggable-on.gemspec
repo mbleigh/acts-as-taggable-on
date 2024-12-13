@@ -17,6 +17,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.required_ruby_version     = '>= 3.2.0'
 
+  gem.metadata = { 'rubygems_mfa_required' => 'true' }
+
   if File.exist?('UPGRADING.md')
     gem.post_install_message = File.read('UPGRADING.md')
   end
