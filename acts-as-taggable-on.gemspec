@@ -1,5 +1,3 @@
-# coding: utf-8
-
 require_relative 'lib/acts-as-taggable-on/version'
 
 Gem::Specification.new do |gem|
