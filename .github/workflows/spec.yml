@@ -15,6 +15,7 @@ jobs:
         ruby:
           - 3.3
           - 3.2
+          - 3.1
         gemfile:
           - gemfiles/activerecord_8.0.gemfile
           - gemfiles/activerecord_7.2.gemfile
@@ -33,6 +34,9 @@ jobs:
           - ruby: truffleruby-head
             db: postgresql
             gemfile: gemfiles/activerecord_7.2.gemfile
+        exclude:
+          - ruby: 3.1
+            gemfile: gemfiles/activerecord_8.0.gemfile
 
     services:
       postgres:
