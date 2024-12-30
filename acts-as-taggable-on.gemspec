@@ -10,8 +10,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = 'https://github.com/mbleigh/acts-as-taggable-on'
   gem.license       = 'MIT'
 
-  gem.files         = `git ls-files`.split($/)
-  gem.test_files    = gem.files.grep(%r{^spec/})
+  gem.files         = Dir['db/**/*', 'lib/**/*', 'LICENSE.md'].reject { |f| File.directory?(f) }
   gem.require_paths = ['lib']
   gem.required_ruby_version     = '>= 3.1.0'
 
