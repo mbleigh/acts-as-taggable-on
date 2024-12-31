@@ -14,7 +14,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.required_ruby_version     = '>= 3.1.0'
 
-  gem.metadata = { 'rubygems_mfa_required' => 'true' }
+  gem.metadata = { 'changelog_uri' => gem.homepage + '/blob/master/CHANGELOG.md',
+                   'rubygems_mfa_required' => 'true' }
 
   if File.exist?('UPGRADING.md')
     gem.post_install_message = File.read('UPGRADING.md')
