@@ -1,4 +1,4 @@
-__Copyright (c) 2007 Michael Bleigh and Intridea Inc.__
+__Copyright (c) 2025 Michael Bleigh and Intridea Inc.__
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
