@@ -10,7 +10,7 @@ loader.setup
 begin
   require 'rails/engine'
   require 'acts-as-taggable-on/engine'
-  rescue LoadError
+rescue LoadError
 end
 
 require 'digest/sha1'
