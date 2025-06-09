@@ -17,6 +17,7 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
   * Reduce packaged gem size
 * Fixes
   * [@iainbeeston Fix mismatched indentations warning message](https://github.com/mbleigh/acts-as-taggable-on/pull/1150)
+  * [@james-reading Fix issue when reordering tags and @@remove_unused_tags is true](https://github.com/mbleigh/acts-as-taggable-on/pull/1154)
 
 ### [v12.0.0) / 2024-11-09](https://github.com/mbleigh/acts-as-taggable-on/compare/v11.0.0...v12.0.0)
 
