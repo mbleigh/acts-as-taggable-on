@@ -23,7 +23,7 @@ module ActsAsTaggableOn
 
     validates_uniqueness_of :tag_id, scope: %i[taggable_type taggable_id context tagger_id tagger_type]
 
-    after_destroy :remove_unused_tags
+    after_destroy_commit :remove_unused_tags
 
     private
 
