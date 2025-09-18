@@ -32,7 +32,6 @@
 [![Join the chat at https://gitter.im/mbleigh/acts-as-taggable-on](https://badges.gitter.im/mbleigh/acts-as-taggable-on.svg)](https://gitter.im/mbleigh/acts-as-taggable-on?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Gem Version](https://badge.fury.io/rb/acts-as-taggable-on.svg)](http://badge.fury.io/rb/acts-as-taggable-on)
 [![Build Status](https://github.com/mbleigh/acts-as-taggable-on/workflows/spec/badge.svg)](https://github.com/mbleigh/acts-as-taggable-on/actions)
-[![Code Climate](https://codeclimate.com/github/mbleigh/acts-as-taggable-on.svg)](https://codeclimate.com/github/mbleigh/acts-as-taggable-on)
 [![Inline docs](http://inch-ci.org/github/mbleigh/acts-as-taggable-on.svg)](http://inch-ci.org/github/mbleigh/acts-as-taggable-on)
 [![Security](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master.svg)](https://hakiri.io/github/mbleigh/acts-as-taggable-on/master)
 
