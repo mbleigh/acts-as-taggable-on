@@ -82,7 +82,7 @@ module ActsAsTaggableOn
       reject!(&:blank?)
       map!(&:to_s)
       map!(&:strip)
-      map! { |tag| tag.mb_chars.downcase.to_s } if ActsAsTaggableOn.force_lowercase
+      map! { |tag| tag.downcase.to_s } if ActsAsTaggableOn.force_lowercase
       map!(&:parameterize) if ActsAsTaggableOn.force_parameterize
 
       ActsAsTaggableOn.strict_case_match ? uniq! : uniq!(&:downcase)

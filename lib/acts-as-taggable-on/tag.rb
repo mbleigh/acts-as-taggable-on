@@ -25,9 +25,9 @@ module ActsAsTaggableOn
 
     def self.named(name)
       if ActsAsTaggableOn.strict_case_match
-        where(["name = #{binary}?", as_8bit_ascii(name)])
+        where(["name = ?", name])
       else
-        where(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(name))])
+        where(['LOWER(name) = LOWER(?)', name.to_s.downcase])
       end
     end
 
@@ -118,27 +118,15 @@ module ActsAsTaggableOn
         if ActsAsTaggableOn.strict_case_match
           str
         else
-          unicode_downcase(str.to_s)
+          str.to_s.downcase
         end
-      end
-
-      def binary
-        ActsAsTaggableOn::Utils.using_mysql? ? 'BINARY ' : nil
-      end
-
-      def as_8bit_ascii(string)
-        string.to_s.mb_chars
-      end
-
-      def unicode_downcase(string)
-        as_8bit_ascii(string).downcase
       end
 
       def sanitize_sql_for_named_any(tag)
         if ActsAsTaggableOn.strict_case_match
-          sanitize_sql(["name = #{binary}?", as_8bit_ascii(tag)])
+          sanitize_sql(["name = ?", tag])
         else
-          sanitize_sql(['LOWER(name) = LOWER(?)', as_8bit_ascii(unicode_downcase(tag))])
+          sanitize_sql(['LOWER(name) = LOWER(?)', tag.to_s.downcase])
         end
       end
     end
