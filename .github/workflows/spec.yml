@@ -18,6 +18,7 @@ jobs:
           - 3.2
           - 3.1
         gemfile:
+          - gemfiles/activerecord_8.1.gemfile
           - gemfiles/activerecord_8.0.gemfile
           - gemfiles/activerecord_7.2.gemfile
           - gemfiles/activerecord_7.1.gemfile
@@ -36,6 +37,8 @@ jobs:
             db: postgresql
             gemfile: gemfiles/activerecord_7.2.gemfile
         exclude:
+          - ruby: 3.1
+            gemfile: gemfiles/activerecord_8.1.gemfile
           - ruby: 3.1
             gemfile: gemfiles/activerecord_8.0.gemfile
 

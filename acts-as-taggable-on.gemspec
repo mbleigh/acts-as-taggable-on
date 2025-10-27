@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
     gem.post_install_message = File.read('UPGRADING.md')
   end
 
-  gem.add_runtime_dependency 'activerecord', '>= 7.1', '< 8.1'
+  gem.add_runtime_dependency 'activerecord', '>= 7.1', '< 8.2'
   gem.add_runtime_dependency 'zeitwerk', '>= 2.4', '< 3.0'
 
   gem.add_development_dependency 'rspec-rails'
