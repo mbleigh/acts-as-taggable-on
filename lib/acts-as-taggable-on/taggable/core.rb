@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'tagged_with_query'
-require_relative 'tag_list_type'
-
 module ActsAsTaggableOn
   module Taggable
     module Core
