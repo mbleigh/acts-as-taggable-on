@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Taggable To Preserve Order' do
+RSpec.describe 'Taggable To Preserve Order' do
   before(:each) do
     @taggable = OrderedTaggableModel.new(name: 'Bob Jones')
   end
@@ -94,7 +94,7 @@ describe 'Taggable To Preserve Order' do
   end
 end
 
-describe 'Taggable' do
+RSpec.describe 'Taggable' do
   before(:each) do
     @taggable = TaggableModel.new(name: 'Bob Jones')
     @taggables = [@taggable, TaggableModel.new(name: 'John Doe')]
@@ -798,7 +798,7 @@ describe 'Taggable' do
   end
 end
 
-describe 'Taggable model with json columns', if: postgresql_support_json? do
+RSpec.describe 'Taggable model with json columns', if: postgresql_support_json? do
   before(:each) do
     @taggable = TaggableModelWithJson.new(:name => 'Bob Jones')
     @taggables = [@taggable, TaggableModelWithJson.new(:name => 'John Doe')]

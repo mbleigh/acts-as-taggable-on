@@ -1,8 +1,7 @@
 require 'spec_helper'
 require 'db/migrate/2_add_missing_unique_indices.rb'
 
-
-shared_examples_for 'without unique index' do
+RSpec.shared_examples_for 'without unique index' do
   prepend_before(:all) { AddMissingUniqueIndices.down }
   append_after(:all) do
     ActsAsTaggableOn::Tag.delete_all
@@ -10,7 +9,7 @@ shared_examples_for 'without unique index' do
   end
 end
 
-describe ActsAsTaggableOn::Tag do
+RSpec.describe ActsAsTaggableOn::Tag do
   before(:each) do
     @tag = ActsAsTaggableOn::Tag.new
     @user = TaggableModel.create(name: 'Pablo', tenant_id: 100)

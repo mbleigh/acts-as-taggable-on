@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ActsAsTaggableOn::Utils do
+RSpec.describe ActsAsTaggableOn::Utils do
   describe '#like_operator' do
     it 'should return \'ILIKE\' when the adapter is PostgreSQL' do
       allow(ActsAsTaggableOn::Utils.connection).to receive(:adapter_name) { 'PostgreSQL' }

@@ -17,4 +17,8 @@ Dir['./spec/support/**/*.rb'].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
+
+  # disable monkey patching
+  # see: https://rspec.info/features/3-13/rspec-core/configuration/zero-monkey-patching-mode/
+  config.disable_monkey_patching!
 end

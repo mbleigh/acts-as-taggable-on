@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ActsAsTaggableOn::TagsHelper do
+RSpec.describe ActsAsTaggableOn::TagsHelper do
   before(:each) do
     @bob = TaggableModel.create(name: 'Bob Jones', language_list: 'ruby, php')
     @tom = TaggableModel.create(name: 'Tom Marley', language_list: 'ruby, java')
@@ -11,7 +11,6 @@ describe ActsAsTaggableOn::TagsHelper do
           include ActsAsTaggableOn::TagsHelper
         end.new
   end
-
 
   it 'should yield the proper css classes' do
     tags = {}

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ActsAsTaggableOn::DefaultParser do
+RSpec.describe ActsAsTaggableOn::DefaultParser do
   it '#parse should return empty array if empty array is passed' do
     parser = ActsAsTaggableOn::DefaultParser.new([])
     expect(parser.parse).to be_empty

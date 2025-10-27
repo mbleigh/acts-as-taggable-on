@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ActsAsTaggableOn::Tagging do
+RSpec.describe ActsAsTaggableOn::Tagging do
   before(:each) do
     @tagging = ActsAsTaggableOn::Tagging.new
   end

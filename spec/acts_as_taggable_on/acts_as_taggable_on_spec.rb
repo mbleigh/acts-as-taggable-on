@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Acts As Taggable On' do
+RSpec.describe 'Acts As Taggable On' do
 
   it "should provide a class method 'taggable?' that is false for untaggable models" do
     expect(UntaggableModel).to_not be_taggable
