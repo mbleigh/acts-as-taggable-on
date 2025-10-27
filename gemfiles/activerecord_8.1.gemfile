@@ -2,17 +2,18 @@
 
 source "https://rubygems.org"
 
+gem "appraisal"
+gem "barrier"
+gem "byebug", platforms: [:mri]
+gem "database_cleaner"
+gem "rake"
+gem "rspec"
+gem "rspec-rails"
+gem "rspec-its"
+gem "sqlite3", "~> 2.2"
+gem "guard-rspec", require: false
 gem "activerecord", "~> 8.1.0"
 gem "pg"
-gem "sqlite3", "~> 2.2"
 gem "mysql2", "~> 0.5"
-
-group :local_development do
-  gem "guard"
-  gem "guard-rspec"
-  gem "appraisal"
-  gem "rake"
-  gem "byebug", platforms: [:mri]
-end
 
 gemspec path: "../"

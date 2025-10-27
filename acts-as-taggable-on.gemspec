@@ -23,10 +23,4 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord', '>= 7.1', '< 8.2'
   gem.add_runtime_dependency 'zeitwerk', '>= 2.4', '< 3.0'
-
-  gem.add_development_dependency 'rspec-rails'
-  gem.add_development_dependency 'rspec-its'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'barrier'
-  gem.add_development_dependency 'database_cleaner'
 end
