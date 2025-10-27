@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ActsAsTaggableOn::TagList do
+RSpec.describe ActsAsTaggableOn::TagList do
   let(:tag_list) { ActsAsTaggableOn::TagList.new('awesome', 'radical') }
   let(:another_tag_list) { ActsAsTaggableOn::TagList.new('awesome','crazy', 'alien') }
 

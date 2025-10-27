@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Dirty behavior of taggable objects' do
+RSpec.describe 'Dirty behavior of taggable objects' do
   context 'with un-contexted tags' do
     before(:each) do
       @taggable = TaggableModel.create(tag_list: 'awesome, epic')

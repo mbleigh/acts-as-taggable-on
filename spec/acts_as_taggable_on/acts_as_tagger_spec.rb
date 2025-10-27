@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'acts_as_tagger' do
+RSpec.describe 'acts_as_tagger' do
 
   describe 'Tagger Method Generation' do
     before(:each) do

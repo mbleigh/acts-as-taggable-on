@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Single Table Inheritance' do
+RSpec.describe 'Single Table Inheritance' do
   let(:taggable) { TaggableModel.new(name: 'taggable model') }
 
   let(:inheriting_model) { InheritingTaggableModel.new(name: 'Inheriting Taggable Model') }

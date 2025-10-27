@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Acts As Taggable On' do
+RSpec.describe 'Acts As Taggable On' do
 
   describe 'Caching' do
     before(:each) do
