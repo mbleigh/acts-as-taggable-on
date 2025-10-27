@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   postgres:
     image: postgres:10
@@ -7,6 +6,7 @@ services:
       POSTGRES_DB: acts_as_taggable_on
       POSTGRES_PASSWORD: postgres
     ports: ['5432:5432']
+
   mysql:
     image: mysql:8
     environment:
