@@ -12,5 +12,8 @@ gem 'rspec'
 gem 'rspec-rails'
 gem 'rspec-its'
 
+# Fallback to sqlite3 in dev/local environment
+gem 'sqlite3'
+
 # Dev tools / linter
 gem 'guard-rspec', require: false
