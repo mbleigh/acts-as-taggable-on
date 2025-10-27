@@ -11,3 +11,4 @@ tmp
 *.lock
 *.iml
 /.idea
+.DS_Store
