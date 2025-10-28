@@ -272,15 +272,17 @@ module ActsAsTaggableOn
             # Delete discarded tags and create new tags
           end
 
-          # Destroy old taggings:
-          taggings.not_owned.by_context(context).where(tag_id: old_tags).destroy_all if old_tags.present?
+          transaction do
+            # Destroy old taggings:
+            taggings.not_owned.by_context(context).where(tag_id: old_tags).destroy_all if old_tags.present?
 
-          # Create new taggings:
-          new_tags.each do |tag|
-            if taggable_tenant
-              taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self, tenant: taggable_tenant)
-            else
-              taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
+            # Create new taggings:
+            new_tags.each do |tag|
+              if taggable_tenant
+                taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self, tenant: taggable_tenant)
+              else
+                taggings.create!(tag_id: tag.id, context: context.to_s, taggable: self)
+              end
             end
           end
         end
