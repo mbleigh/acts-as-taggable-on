@@ -36,6 +36,14 @@ RSpec.describe 'Dirty behavior of taggable objects' do
         expect(@taggable.tag_list_change).to eq([['awesome', 'epic'], ['one']])
       end
 
+      it 'populates previous_changes correctly' do
+        @taggable.save!
+        @taggable.update!(tag_list: %w(two three four))
+
+        expect(@taggable.previous_changes['tag_list'])
+          .to eq([%w(one), %w(two three four)])
+      end
+
       context 'without order' do
         it 'should not mark attribute if order change ' do
           taggable = TaggableModel.create(name: 'Dirty Harry', tag_list: %w(d c b a))
