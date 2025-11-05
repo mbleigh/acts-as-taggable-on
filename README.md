@@ -87,7 +87,7 @@ You can circumvent at any time the problem of special characters [issue 623](htt
 ActsAsTaggableOn.force_binary_collation = true
 ```
 
-Or by running this rake task:
+If `utf8_bin` collation is not aleady set on `name` column in your schema then make sure to set by re-running migration generator or run this rake task:
 
 ```shell
 rake acts_as_taggable_on_engine:tag_names:collate_bin
