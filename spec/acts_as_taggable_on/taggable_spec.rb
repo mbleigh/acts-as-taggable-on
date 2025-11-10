@@ -92,6 +92,23 @@ RSpec.describe 'Taggable To Preserve Order' do
     ids = @taggable.tags.map { |t| t.taggings.first.id }
     expect(ids).to eq(ids.sort)
   end
+
+  it 'can reorder tags successfully when @@remove_unused_tags is true' do
+    previous_setting = ActsAsTaggableOn.remove_unused_tags
+    ActsAsTaggableOn.remove_unused_tags = true
+
+    @taggable.tag_list = 'pow, ruby, rails'
+    @taggable.save!
+    @taggable.reload
+    expect(@taggable.tag_list).to eq(%w(pow ruby rails))
+
+    @taggable.tag_list = 'rails, pow, ruby'
+    @taggable.save!
+    @taggable.reload
+    expect(@taggable.tag_list).to eq(%w(rails pow ruby))
+  ensure
+    ActsAsTaggableOn.remove_unused_tags = previous_setting
+  end
 end
 
 RSpec.describe 'Taggable' do
