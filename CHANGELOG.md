@@ -12,9 +12,12 @@ As such, _Breaking Changes_ are major. _Features_ would map to either major or m
 
 ### unreleased
 
+### [v13.0.0) / 2025-10-31](https://github.com/mbleigh/acts-as-taggable-on/compare/v12.0.0...v13.0.0)
+
 * Features
-  * [@tagliala Add back Ruby 3.1 compatibility](https://github.com/mbleigh/acts-as-taggable-on/pull/1082)
+  * [@tagliala Add back Ruby 3.1 compatibility](https://github.com/mbleigh/acts-as-taggable-on/pull/1146)
   * Reduce packaged gem size
+  * Add support for Rails 8.1
 * Fixes
   * [@iainbeeston Fix mismatched indentations warning message](https://github.com/mbleigh/acts-as-taggable-on/pull/1150)
 
