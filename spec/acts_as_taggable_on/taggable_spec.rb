@@ -788,6 +788,18 @@ describe 'Taggable' do
   end
 end
 
+describe 'Taggable with soft-delete (paranoid)' do
+  it 'does not set dependent: :destroy on the taggings association for paranoid models' do
+    reflection = ParanoidTaggableModel.reflect_on_association(:taggings)
+    expect(reflection.options[:dependent]).to be_nil
+  end
+
+  it 'still sets dependent: :destroy on the taggings association for regular models' do
+    reflection = TaggableModel.reflect_on_association(:taggings)
+    expect(reflection.options[:dependent]).to eq(:destroy)
+  end
+end
+
 describe 'Taggable model with json columns', if: postgresql_support_json? do
   before(:each) do
     @taggable = TaggableModelWithJson.new(:name => 'Bob Jones')

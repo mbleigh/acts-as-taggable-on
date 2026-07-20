@@ -80,7 +80,10 @@ module ActsAsTaggableOn
         self.preserve_tag_order = preserve_tag_order
 
         class_eval do
-          has_many :taggings, as: :taggable, dependent: :destroy, class_name: '::ActsAsTaggableOn::Tagging'
+          # Tags não devem ser destruídas por soft-delete
+          taggings_dependent = respond_to?(:paranoid?) && paranoid? ? nil : :destroy
+
+          has_many :taggings, as: :taggable, dependent: taggings_dependent, class_name: '::ActsAsTaggableOn::Tagging'
           has_many :base_tags, through: :taggings, source: :tag, class_name: '::ActsAsTaggableOn::Tag'
 
           def self.taggable?
