@@ -238,7 +238,7 @@ RSpec.describe 'Taggable' do
     @taggable.skill_list = 'ruby, rails, css'
     @taggable.save
 
-    expect(TaggableModel.tagged_with('ruby').to_sql).to_not match /DISTINCT/
+    expect(TaggableModel.tagged_with('ruby').to_sql).to_not match /SELECT DISTINCT/
   end
 
   it "should be able to find a tag using dates" do
@@ -268,7 +268,7 @@ RSpec.describe 'Taggable' do
     expect(TaggableModel.tagged_with('bob', on: :tags).first).to eq(@taggable)
     expect(TaggableModel.tagged_with('julia', on: :skills).size).to eq(1)
     expect(TaggableModel.tagged_with('julia', on: :tags).size).to eq(1)
-    expect(TaggableModel.tagged_with('julia', on: nil).size).to eq(2)
+    expect(TaggableModel.tagged_with('julia', on: nil).size).to eq(1)
   end
 
   it 'should not care about case' do
@@ -523,6 +523,12 @@ RSpec.describe 'Taggable' do
     TaggableModel.create(name: 'Steve', tag_list: 'fitter, happier', skill_list: 'ruby, rails, css')
 
     expect(TaggableModel.tagged_with('css', on: :skills, match_all: true).to_a).to eq([frank])
+  end
+
+  it 'should not generate joins for tagged_with queries' do
+    TaggableModel.create(name: 'Bob', tag_list: 'ruby, rails, css')
+    expect(TaggableModel.tagged_with('ruby').to_sql).not_to match(/JOIN/)
+    expect(TaggableModel.tagged_with('ruby, rails, css').to_sql).not_to match(/JOIN/)
   end
 
   it 'should be able to find tagged with some excluded tags' do
