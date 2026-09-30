@@ -9,6 +9,8 @@ module ActsAsTaggableOn
           attr_writer :custom_contexts
 
           after_save :save_tags
+          after_commit { @tag_list_baselines_before_save = nil }
+          after_rollback :restore_tag_list_baselines
 
         initialize_acts_as_taggable_on_core
       end
@@ -143,20 +145,28 @@ module ActsAsTaggableOn
         self["cached_#{context.to_s.singularize}_list"]
       end
 
+      # True only when the context's list was changed since it was loaded or last saved.
+      # A list that was merely read must not overwrite tags written elsewhere (#576).
       def tag_list_cache_set_on(context)
         variable_name = "@#{context.to_s.singularize}_list"
-        instance_variable_defined?(variable_name) && instance_variable_get(variable_name)
+        list = instance_variable_defined?(variable_name) && instance_variable_get(variable_name)
+        return false unless list
+
+        baseline = tag_list_baselines[context.to_s]
+        baseline.nil? || !tag_lists_equal?(list, baseline)
       end
 
       def tag_list_cache_on(context)
         variable_name = "@#{context.to_s.singularize}_list"
-        if instance_variable_get(variable_name)
-          instance_variable_get(variable_name)
-        elsif cached_tag_list_on(context) && ensure_included_cache_methods! && self.class.caching_tag_list_on?(context)
-          instance_variable_set(variable_name, ActsAsTaggableOn.default_parser.new(cached_tag_list_on(context)).parse)
-        else
-          instance_variable_set(variable_name, ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name)))
-        end
+        return instance_variable_get(variable_name) if instance_variable_get(variable_name)
+
+        list = if cached_tag_list_on(context) && ensure_included_cache_methods! && self.class.caching_tag_list_on?(context)
+                 ActsAsTaggableOn.default_parser.new(cached_tag_list_on(context)).parse
+               else
+                 ActsAsTaggableOn::TagList.new(tags_on(context).map(&:name))
+               end
+        tag_list_baselines[context.to_s] = list.dup
+        instance_variable_set(variable_name, list)
       end
 
       def tag_list_on(context)
@@ -220,6 +230,8 @@ module ActsAsTaggableOn
       end
 
       def reload(*args)
+        @tag_list_baselines = nil
+        @tag_list_baselines_before_save = nil
         self.class.tag_types.each do |context|
           instance_variable_set("@#{context.to_s.singularize}_list", nil)
           instance_variable_set("@all_#{context.to_s.singularize}_list", nil)
@@ -240,6 +252,10 @@ module ActsAsTaggableOn
 
           # List of currently assigned tag names
           tag_list = tag_list_cache_on(context).uniq
+
+          # Remember the pre-save baseline so a rolled-back save can be retried
+          @tag_list_baselines_before_save ||= tag_list_baselines.dup
+          tag_list_baselines[context.to_s] = tag_list_cache_on(context).dup
 
           # Find existing tags or create non-existing tags:
           tags = find_or_create_tags_from_list_with_context(tag_list, context)
@@ -289,6 +305,25 @@ module ActsAsTaggableOn
       end
 
       private
+
+      def tag_list_baselines
+        @tag_list_baselines ||= {}
+      end
+
+      def tag_lists_equal?(list, baseline)
+        if self.class.preserve_tag_order?
+          list.uniq == baseline.uniq
+        else
+          list.uniq.sort == baseline.uniq.sort
+        end
+      end
+
+      def restore_tag_list_baselines
+        @tag_list_baselines = @tag_list_baselines_before_save if @tag_list_baselines_before_save
+        @tag_list_baselines_before_save = nil
+        # Drop taggings built by the rolled-back save, or autosave would re-insert them on retry
+        association(:taggings).reset
+      end
 
       def ensure_included_cache_methods!
         self.class.columns
